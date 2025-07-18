@@ -3,45 +3,176 @@
 import { useSession } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { TutorialWithQuiz } from "@/lib/tutorialService";
+import {
+  Sprout,
+  Target,
+  BarChart3,
+  BookOpen,
+  Clock,
+  ChevronRight,
+  CheckCircle,
+  Circle,
+  Trophy,
+} from "lucide-react";
 
-// Mock tutorial data - will be replaced with database queries
-const TUTORIALS = [
-  {
-    id: 1,
-    title: "JavaScript Basics",
-    description: "Learn the fundamentals of JavaScript programming",
-    level: "beginner",
-    emoji: "🌱",
-    lessons: 8,
-    estimatedTime: "2 hours",
-    topics: ["Variables", "Functions", "Loops", "Conditionals"],
-  },
-  {
-    id: 2,
-    title: "DOM Manipulation",
-    description: "Master interacting with HTML elements using JavaScript",
-    level: "intermediate",
-    emoji: "🎯",
-    lessons: 6,
-    estimatedTime: "1.5 hours",
-    topics: ["Selecting Elements", "Event Listeners", "Dynamic Content"],
-  },
-  {
-    id: 3,
-    title: "Arrays and Objects",
-    description:
-      "Master data structures and learn to organize information effectively",
-    level: "beginner",
-    emoji: "📊",
-    lessons: 8,
-    estimatedTime: "50 minutes",
-    topics: ["Arrays", "Objects", "Methods", "Properties", "Data Structures"],
-  },
-];
+interface TutorialProgress {
+  id: string;
+  status: string;
+  quizPassed: boolean;
+  quizAttempts: number;
+  bestScore: number | null;
+  completedAt: Date | null;
+}
+
+interface TutorialWithProgress extends TutorialWithQuiz {
+  progress?: TutorialProgress | null;
+  level?: string;
+  lessons?: number;
+  estimatedTime?: string;
+  topics?: string[];
+}
+
+// Helper function to get tutorial icon
+const getTutorialIcon = (
+  tutorial: TutorialWithQuiz,
+  size: string = "w-6 h-6"
+) => {
+  if (tutorial.order === 1 || tutorial.slug?.includes("variable")) {
+    return <Sprout className={`${size} text-green-600`} />;
+  } else if (tutorial.order === 2 || tutorial.slug?.includes("function")) {
+    return <Target className={`${size} text-blue-600`} />;
+  } else if (
+    tutorial.order === 3 ||
+    tutorial.slug?.includes("array") ||
+    tutorial.slug?.includes("object")
+  ) {
+    return <BarChart3 className={`${size} text-purple-600`} />;
+  }
+  return <BookOpen className={`${size} text-gray-600`} />;
+};
 
 export default function TutorialsPage() {
   const { data: session } = useSession();
   const { currentMood } = useMood();
+  const [tutorials, setTutorials] = useState<TutorialWithProgress[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch tutorials from API
+  useEffect(() => {
+    async function fetchTutorials() {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/tutorials");
+        if (!response.ok) {
+          throw new Error("Failed to fetch tutorials");
+        }
+        const data = await response.json();
+
+        if (data.success) {
+          // Map database tutorials and load MDX metadata if available
+          const mappedTutorials: TutorialWithProgress[] = await Promise.all(
+            data.data.map(async (tutorial: TutorialWithQuiz) => {
+              let estimatedTime = "2 hours"; // default
+              let topics: string[] = ["JavaScript", "Programming"]; // default
+
+              // If tutorial has MDX file, load its frontmatter for rich metadata
+              if (tutorial.mdxFile) {
+                try {
+                  const mdxResponse = await fetch(
+                    `/api/tutorials/mdx?file=${tutorial.mdxFile}`
+                  );
+                  if (mdxResponse.ok) {
+                    const mdxData = await mdxResponse.json();
+                    if (mdxData.success && mdxData.data.frontmatter) {
+                      const frontmatter = mdxData.data.frontmatter as {
+                        estimatedTime?: string;
+                        topics?: string[];
+                      };
+                      // Use MDX frontmatter if available
+                      estimatedTime =
+                        frontmatter.estimatedTime || estimatedTime;
+                      topics = frontmatter.topics || topics;
+                    }
+                  }
+                } catch (error) {
+                  console.warn(
+                    `Failed to load MDX metadata for ${tutorial.mdxFile}:`,
+                    error
+                  );
+                }
+              }
+
+              return {
+                ...tutorial,
+                level:
+                  tutorial.difficulty === 1
+                    ? "beginner"
+                    : tutorial.difficulty === 2
+                    ? "intermediate"
+                    : "advanced",
+                lessons: 8, // Default for display - could be extracted from MDX content
+                estimatedTime,
+                topics,
+              };
+            })
+          );
+
+          setTutorials(mappedTutorials);
+
+          // Fetch progress for each tutorial if user is logged in
+          if (session?.user?.id) {
+            fetchProgress(mappedTutorials);
+          }
+        } else {
+          throw new Error(data.error?.message || "Failed to fetch tutorials");
+        }
+      } catch (err) {
+        console.error("Error fetching tutorials:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to load tutorials"
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function fetchProgress(tutorialList: TutorialWithProgress[]) {
+      if (!session?.user?.id) return;
+
+      try {
+        const progressPromises = tutorialList.map(async (tutorial) => {
+          const response = await fetch(
+            `/api/progress/tutorial?tutorialId=${tutorial.id}&userId=${session.user.id}`
+          );
+          if (response.ok) {
+            const progressData = await response.json();
+            return { tutorialId: tutorial.id, progress: progressData.data };
+          }
+          return { tutorialId: tutorial.id, progress: null };
+        });
+
+        const progressResults = await Promise.all(progressPromises);
+        const progressMap = new Map(
+          progressResults.map((r) => [r.tutorialId, r.progress])
+        );
+
+        setTutorials((prev) =>
+          prev.map((tutorial) => ({
+            ...tutorial,
+            progress: progressMap.get(tutorial.id) || null,
+          }))
+        );
+      } catch (err) {
+        console.error("Error fetching progress:", err);
+        // Don't show error for progress, just continue without it
+      }
+    }
+
+    fetchTutorials();
+  }, [session]);
 
   const getMoodColors = () => {
     switch (currentMood.id) {
@@ -86,37 +217,51 @@ export default function TutorialsPage() {
     );
   }
 
-  return (
-    <div className={`min-h-screen bg-gradient-to-br ${moodColors.gradient}`}>
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/dashboard" className="text-2xl font-bold">
-              <span className="text-blue-600">Vibed</span> to{" "}
-              <span className="text-purple-600">Cracked</span>
-            </Link>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">
-                Learning in{" "}
-                <span className="font-semibold">{currentMood.name}</span> mode
-                <span className="ml-2">{currentMood.emoji}</span>
-              </span>
-              <Link
-                href="/dashboard"
-                className="text-gray-600 hover:text-gray-800 transition-colors"
-              >
-                ← Back to Dashboard
-              </Link>
+  if (loading) {
+    return (
+      <div className={`min-h-screen bg-gradient-to-br ${moodColors.gradient}`}>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">
+                Loading tutorials...
+              </p>
             </div>
           </div>
         </div>
-      </header>
+      </div>
+    );
+  }
 
+  if (error) {
+    return (
+      <div className={`min-h-screen bg-gradient-to-br ${moodColors.gradient}`}>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <p className="text-red-600 dark:text-red-400 mb-4">
+                Error: {error}
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`min-h-screen bg-gradient-to-br ${moodColors.gradient}`}>
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             JavaScript Tutorials
           </h1>
           <p className="text-gray-600">
@@ -150,24 +295,43 @@ export default function TutorialsPage() {
 
         {/* Tutorials Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {TUTORIALS.map((tutorial) => (
+          {tutorials.map((tutorial) => (
             <div
               key={tutorial.id}
-              className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-blue-200"
+              className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-blue-200 dark:hover:border-blue-600 relative"
             >
+              {/* Progress Badge */}
+              {tutorial.progress?.quizPassed && (
+                <div className="absolute top-4 right-4">
+                  <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3" /> Completed
+                  </span>
+                </div>
+              )}
+              {tutorial.progress?.quizAttempts &&
+                !tutorial.progress.quizPassed && (
+                  <div className="absolute top-4 right-4">
+                    <span className="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                      <Circle className="w-3 h-3" /> In Progress
+                    </span>
+                  </div>
+                )}
+
               <div className="flex items-center gap-3 mb-4">
-                <span className="text-3xl">{tutorial.emoji}</span>
+                <div className="flex-shrink-0">
+                  {getTutorialIcon(tutorial, "w-8 h-8")}
+                </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                     {tutorial.title}
                   </h3>
                   <span
                     className={`text-xs px-2 py-1 rounded-full ${
                       tutorial.level === "beginner"
-                        ? "bg-green-100 text-green-800"
+                        ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
                         : tutorial.level === "intermediate"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-red-100 text-red-800"
+                        ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                        : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                     }`}
                   >
                     {tutorial.level}
@@ -175,28 +339,42 @@ export default function TutorialsPage() {
                 </div>
               </div>
 
-              <p className="text-gray-600 mb-4">{tutorial.description}</p>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                {tutorial.description}
+              </p>
 
               <div className="space-y-2 mb-4">
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <span>📖</span>
+                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                  <BookOpen className="w-4 h-4" />
                   <span>{tutorial.lessons} lessons</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <span>⏱️</span>
+                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                  <Clock className="w-4 h-4" />
                   <span>{tutorial.estimatedTime}</span>
                 </div>
+                {tutorial.progress && (
+                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                    <Trophy className="w-4 h-4" />
+                    <span>
+                      Best Score: {tutorial.progress.bestScore?.toFixed(0) || 0}
+                      %
+                      {tutorial.progress.quizAttempts > 0 && (
+                        <> • {tutorial.progress.quizAttempts} attempts</>
+                      )}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="mb-4">
-                <div className="text-sm text-gray-500 mb-2">
+                <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                   Topics covered:
                 </div>
                 <div className="flex flex-wrap gap-1">
-                  {tutorial.topics.map((topic, index) => (
+                  {tutorial.topics?.map((topic, index) => (
                     <span
                       key={index}
-                      className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
+                      className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded"
                     >
                       {topic}
                     </span>
@@ -206,9 +384,19 @@ export default function TutorialsPage() {
 
               <Link
                 href={`/tutorials/${tutorial.id}`}
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center block"
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center flex items-center justify-center gap-2"
               >
-                Start Tutorial
+                {tutorial.progress?.quizPassed ? (
+                  <>
+                    <CheckCircle className="w-5 h-5" />
+                    Review Tutorial
+                  </>
+                ) : (
+                  <>
+                    Start Tutorial
+                    <ChevronRight className="w-5 h-5" />
+                  </>
+                )}
               </Link>
             </div>
           ))}

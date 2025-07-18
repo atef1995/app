@@ -1,0 +1,172 @@
+import React from "react";
+import { CheckCircle, Clock, XCircle, Target } from "lucide-react";
+
+interface ProgressBadgeProps {
+  status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
+  score?: number;
+  attempts?: number;
+  type: "tutorial" | "challenge";
+}
+
+export function ProgressBadge({
+  status,
+  score,
+  attempts,
+  type,
+}: ProgressBadgeProps) {
+  const getStatusIcon = () => {
+    switch (status) {
+      case "COMPLETED":
+        return <CheckCircle className="w-4 h-4 text-green-600" />;
+      case "IN_PROGRESS":
+        return <Clock className="w-4 h-4 text-yellow-600" />;
+      case "FAILED":
+        return <XCircle className="w-4 h-4 text-red-600" />;
+      default:
+        return <Target className="w-4 h-4 text-gray-400" />;
+    }
+  };
+
+  const getStatusColor = () => {
+    switch (status) {
+      case "COMPLETED":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "IN_PROGRESS":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "FAILED":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-600 border-gray-200";
+    }
+  };
+
+  const getStatusText = () => {
+    switch (status) {
+      case "COMPLETED":
+        return type === "tutorial"
+          ? `Completed${score ? ` (${score}%)` : ""}`
+          : "Passed";
+      case "IN_PROGRESS":
+        return type === "tutorial"
+          ? `In Progress${attempts ? ` (${attempts} attempts)` : ""}`
+          : `Attempting${attempts ? ` (${attempts} tries)` : ""}`;
+      case "FAILED":
+        return `Failed${attempts ? ` (${attempts} attempts)` : ""}`;
+      default:
+        return "Not Started";
+    }
+  };
+
+  return (
+    <div
+      className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-sm font-medium ${getStatusColor()}`}
+    >
+      {getStatusIcon()}
+      <span>{getStatusText()}</span>
+    </div>
+  );
+}
+
+interface ProgressStatsProps {
+  tutorialStats: {
+    completed: number;
+    inProgress: number;
+    notStarted: number;
+  };
+  challengeStats: {
+    completed: number;
+    inProgress: number;
+    failed: number;
+  };
+}
+
+export function ProgressStats({
+  tutorialStats,
+  challengeStats,
+}: ProgressStatsProps) {
+  const totalTutorials =
+    tutorialStats.completed +
+    tutorialStats.inProgress +
+    tutorialStats.notStarted;
+  const totalChallenges =
+    challengeStats.completed +
+    challengeStats.inProgress +
+    challengeStats.failed;
+
+  const tutorialProgress =
+    totalTutorials > 0 ? (tutorialStats.completed / totalTutorials) * 100 : 0;
+  const challengeProgress =
+    totalChallenges > 0
+      ? (challengeStats.completed / totalChallenges) * 100
+      : 0;
+
+  return (
+    <div className="bg-white rounded-2xl p-6 shadow-lg">
+      <h3 className="text-xl font-bold text-gray-900 mb-6">Your Progress</h3>
+
+      <div className="space-y-6">
+        {/* Tutorial Progress */}
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium text-gray-700">Tutorials</span>
+            <span className="text-sm text-gray-500">
+              {tutorialStats.completed}/{totalTutorials} completed
+            </span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className={`bg-blue-600 h-2 rounded-full transition-all duration-300`}
+              style={{
+                width: `${Math.min(100, Math.max(0, tutorialProgress))}%`,
+              }}
+            ></div>
+          </div>
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>{tutorialStats.inProgress} in progress</span>
+            <span>{Math.round(tutorialProgress)}% complete</span>
+          </div>
+        </div>
+
+        {/* Challenge Progress */}
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium text-gray-700">
+              Challenges
+            </span>
+            <span className="text-sm text-gray-500">
+              {challengeStats.completed}/{totalChallenges} passed
+            </span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className={`bg-purple-600 h-2 rounded-full transition-all duration-300`}
+              style={{
+                width: `${Math.min(100, Math.max(0, challengeProgress))}%`,
+              }}
+            ></div>
+          </div>
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>{challengeStats.failed} failed</span>
+            <span>{Math.round(challengeProgress)}% passed</span>
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-600">
+              {tutorialStats.completed}
+            </div>
+            <div className="text-xs text-gray-500">Tutorials Completed</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-purple-600">
+              {challengeStats.completed}
+            </div>
+            <div className="text-xs text-gray-500">Challenges Passed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

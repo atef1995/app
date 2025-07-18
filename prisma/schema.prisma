@@ -53,6 +53,8 @@ model User {
 
   accounts          Account[]
   sessions          Session[]
+  tutorialProgress  TutorialProgress[]
+  challengeProgress ChallengeProgress[]
   progress          Progress[]
   quizAttempts      QuizAttempt[]
   challengeAttempts ChallengeAttempt[]
@@ -74,30 +76,28 @@ model Tutorial {
   slug        String   @unique
   title       String
   description String?
-  content     String
+  content     String? // Optional - content can come from MDX file
+  mdxFile     String? // Reference to MDX file name
   difficulty  Int      @default(1)
   order       Int
   published   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  quizzes  Quiz[]
-  progress Progress[]
+  quizzes          Quiz[]
+  tutorialProgress TutorialProgress[]
+  progress         Progress[]
 
   @@map("tutorials")
 }
 
 model Quiz {
-  id            String     @id @default(cuid())
-  tutorialId    String
-  question      String
-  options       Json // Array of options
-  correctAnswer Int
-  explanation   String?
-  videoUrl      String?
-  difficulty    Difficulty @default(EASY)
-  order         Int        @default(0)
-  createdAt     DateTime   @default(now())
+  id         String   @id @default(cuid())
+  tutorialId String
+  title      String
+  questions  Json // Array of question objects
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   tutorial Tutorial      @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
   attempts QuizAttempt[]
@@ -106,19 +106,62 @@ model Quiz {
 }
 
 model QuizAttempt {
-  id        String   @id @default(cuid())
-  userId    String
-  quizId    String
-  answer    Int
-  correct   Boolean
-  timeSpent Int? // in seconds
-  mood      Mood
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  userId     String
+  quizId     String
+  tutorialId String // link to tutorial for completion tracking
+  answers    Json // array of user answers
+  score      Float // percentage score (0-100)
+  passed     Boolean // whether they passed (score >= passing threshold)
+  timeSpent  Int? // time in seconds
+  mood       Mood
+  createdAt  DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
   @@map("quiz_attempts")
+}
+
+model TutorialProgress {
+  id           String           @id @default(cuid())
+  userId       String
+  tutorialId   String
+  status       CompletionStatus @default(NOT_STARTED)
+  quizPassed   Boolean          @default(false)
+  quizAttempts Int              @default(0)
+  bestScore    Float? // best quiz score percentage
+  timeSpent    Int? // total time in seconds
+  completedAt  DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tutorial Tutorial @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tutorialId])
+  @@map("tutorial_progress")
+}
+
+model ChallengeProgress {
+  id             String           @id @default(cuid())
+  userId         String
+  challengeId    String
+  status         CompletionStatus @default(NOT_STARTED)
+  passed         Boolean          @default(false)
+  attempts       Int              @default(0)
+  failedAttempts Int              @default(0)
+  bestTime       Int? // best completion time in seconds
+  firstPassedAt  DateTime?
+  lastAttemptAt  DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, challengeId])
+  @@map("challenge_progress")
 }
 
 model Progress {
@@ -169,9 +212,10 @@ model Challenge {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  moodAdaptations ChallengeMoodAdaptation[]
-  tests           ChallengeTest[]
-  attempts        ChallengeAttempt[]
+  moodAdaptations   ChallengeMoodAdaptation[]
+  tests             ChallengeTest[]
+  attempts          ChallengeAttempt[]
+  challengeProgress ChallengeProgress[]
 
   @@map("challenges")
 }
@@ -240,4 +284,11 @@ enum ChallengeType {
   ARRAY
   OBJECT
   LOGIC
+}
+
+enum CompletionStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
 }

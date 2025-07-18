@@ -1,12 +1,50 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 import { MoodSelector } from "@/components/MoodSelector";
-import { MoodIndicator } from "@/components/MoodIndicator";
+import { ProgressStats } from "@/components/ProgressComponents";
 import Link from "next/link";
+
+interface ProgressStats {
+  tutorials: {
+    completed: number;
+    inProgress: number;
+    notStarted: number;
+  };
+  challenges: {
+    completed: number;
+    inProgress: number;
+    failed: number;
+  };
+}
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
+  const [progressStats, setProgressStats] = useState<ProgressStats | null>(
+    null
+  );
+  const [loadingProgress, setLoadingProgress] = useState(true);
+
+  useEffect(() => {
+    if (session?.user) {
+      fetchProgressStats();
+    }
+  }, [session]);
+
+  const fetchProgressStats = async () => {
+    try {
+      const response = await fetch("/api/progress?type=stats");
+      if (response.ok) {
+        const data = await response.json();
+        setProgressStats(data.stats);
+      }
+    } catch (error) {
+      console.error("Error fetching progress:", error);
+    } finally {
+      setLoadingProgress(false);
+    }
+  };
 
   if (status === "loading") {
     return (
@@ -24,30 +62,11 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold">
-            <span className="text-blue-600">Vibed</span> to{" "}
-            <span className="text-purple-600">Cracked</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <MoodIndicator />
-            <button
-              onClick={() => signOut({ callbackUrl: "/" })}
-              className="text-gray-600 hover:text-gray-800 transition-colors"
-            >
-              Sign out
-            </button>
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             Welcome back, {session.user.name?.split(" ")[0]}! 👋
           </h1>
           <p className="text-gray-600">
@@ -110,24 +129,27 @@ export default function DashboardPage() {
         </div>
 
         {/* Progress Section */}
-        <div className="mt-12 bg-white rounded-2xl p-8 shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Your Progress
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">0</div>
-              <div className="text-gray-600">Tutorials Completed</div>
+        <div className="mt-12">
+          {loadingProgress ? (
+            <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading your progress...</p>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-2">0</div>
-              <div className="text-gray-600">Quizzes Taken</div>
+          ) : progressStats ? (
+            <ProgressStats
+              tutorialStats={progressStats.tutorials}
+              challengeStats={progressStats.challenges}
+            />
+          ) : (
+            <div className="bg-white rounded-2xl p-8 shadow-lg">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                Your Progress
+              </h2>
+              <p className="text-gray-600 text-center">
+                Start learning to see your progress here!
+              </p>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-600 mb-2">0</div>
-              <div className="text-gray-600">Code Challenges</div>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

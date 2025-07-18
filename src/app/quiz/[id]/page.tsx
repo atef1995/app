@@ -1,11 +1,30 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, use } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { quizzes, type Quiz } from "@/data/quizzes";
 import { MOODS } from "@/lib/moods";
+import { useMood } from "@/components/providers/MoodProvider";
+import { ProgressBadge } from "@/components/ProgressComponents";
+import { PartyPopper, ThumbsUp, Dumbbell, Star, Book } from "lucide-react";
+
+// Types for database quiz data
+interface Question {
+  id: number;
+  question: string;
+  options: string[];
+  correct: number;
+  explanation: string;
+  difficulty: "easy" | "medium" | "hard";
+}
+
+interface Quiz {
+  id: string;
+  tutorialId: string;
+  title: string;
+  questions: Question[];
+}
 
 interface QuizState {
   currentQuestion: number;
@@ -13,11 +32,24 @@ interface QuizState {
   showResults: boolean;
   timeLeft?: number;
   startTime: number;
+  submissionResult?: {
+    passed: boolean;
+    score: number;
+    status: "COMPLETED" | "IN_PROGRESS";
+  };
 }
 
-export default function QuizPage({ params }: { params: { id: string } }) {
+export default function QuizPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const resolvedParams = use(params);
   const { data: session } = useSession();
   const router = useRouter();
+  const { currentMood } = useMood();
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [loadingQuiz, setLoadingQuiz] = useState(true);
   const [quizState, setQuizState] = useState<QuizState>({
     currentQuestion: 0,
     answers: [],
@@ -25,8 +57,123 @@ export default function QuizPage({ params }: { params: { id: string } }) {
     startTime: Date.now(),
   });
 
-  const quizId = parseInt(params.id);
-  const quiz: Quiz | undefined = quizzes[quizId as keyof typeof quizzes];
+  // Fetch quiz data from API
+  useEffect(() => {
+    const fetchQuiz = async () => {
+      try {
+        const response = await fetch(`/api/quizzes?id=${resolvedParams.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setQuiz(data.quiz);
+        }
+      } catch (error) {
+        console.error("Error fetching quiz:", error);
+      } finally {
+        setLoadingQuiz(false);
+      }
+    };
+
+    fetchQuiz();
+  }, [resolvedParams.id]);
+
+  // Define functions early to avoid conditional hook calls
+  const calculateScore = useCallback(() => {
+    if (!quiz) return { correct: 0, total: 0 };
+
+    const currentMoodConfig = MOODS[currentMood.id.toLowerCase()];
+    const filteredQuestions = quiz.questions.filter((q) => {
+      if (currentMoodConfig.quizSettings.difficulty === "easy") {
+        return q.difficulty === "easy";
+      } else if (currentMoodConfig.quizSettings.difficulty === "medium") {
+        return q.difficulty === "easy" || q.difficulty === "medium";
+      }
+      return true;
+    });
+    const questionsToShow = filteredQuestions.slice(
+      0,
+      currentMoodConfig.quizSettings.questionsPerTutorial
+    );
+
+    let correct = 0;
+    quizState.answers.forEach((answer, index) => {
+      if (questionsToShow[index] && answer === questionsToShow[index].correct) {
+        correct++;
+      }
+    });
+    return { correct, total: questionsToShow.length };
+  }, [quiz, currentMood.id, quizState.answers]);
+
+  const handleQuizComplete = useCallback(async () => {
+    if (!quiz) return;
+
+    const currentMoodConfig = MOODS[currentMood.id.toLowerCase()];
+    const filteredQuestions = quiz.questions.filter((q) => {
+      if (currentMoodConfig.quizSettings.difficulty === "easy") {
+        return q.difficulty === "easy";
+      } else if (currentMoodConfig.quizSettings.difficulty === "medium") {
+        return q.difficulty === "easy" || q.difficulty === "medium";
+      }
+      return true;
+    });
+    const questionsToShow = filteredQuestions.slice(
+      0,
+      currentMoodConfig.quizSettings.questionsPerTutorial
+    );
+
+    const timeTaken = Math.round((Date.now() - quizState.startTime) / 1000);
+
+    // Submit quiz results to backend
+    try {
+      const response = await fetch("/api/quiz/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tutorialId: resolvedParams.id,
+          answers: quizState.answers,
+          timeSpent: timeTaken,
+          quizData: {
+            questions: questionsToShow,
+            passingScore: 70, // 70% passing score
+          },
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Quiz submitted successfully:", result);
+
+        // Store submission result for UI display
+        setQuizState((prev) => ({
+          ...prev,
+          showResults: true,
+          submissionResult: {
+            passed: result.passed,
+            score: result.score,
+            status: result.passed ? "COMPLETED" : "IN_PROGRESS",
+          },
+        }));
+        return;
+      } else {
+        console.error("Failed to submit quiz");
+      }
+    } catch (error) {
+      console.error("Error submitting quiz:", error);
+    }
+
+    // Fallback: show results even if submission failed
+    setQuizState((prev) => ({
+      ...prev,
+      showResults: true,
+    }));
+  }, [
+    quiz,
+    currentMood.id,
+    quizState.startTime,
+    quizState.answers,
+    resolvedParams.id,
+  ]);
 
   useEffect(() => {
     if (!session) {
@@ -37,29 +184,39 @@ export default function QuizPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     // Set up timer based on user's mood
-    if (session?.user.mood) {
-      const moodConfig = MOODS[session.user.mood.toLowerCase()];
-      if (moodConfig.quizSettings.timeLimit) {
-        setQuizState((prev) => ({
-          ...prev,
-          timeLeft: moodConfig.quizSettings.timeLimit! * 60,
-        }));
+    const moodConfig = MOODS[currentMood.id.toLowerCase()];
+    if (moodConfig.quizSettings.timeLimit && !quizState.showResults) {
+      setQuizState((prev) => ({
+        ...prev,
+        timeLeft: moodConfig.quizSettings.timeLimit! * 60,
+      }));
 
-        const timer = setInterval(() => {
-          setQuizState((prev) => {
-            if (prev.timeLeft && prev.timeLeft > 0) {
-              return { ...prev, timeLeft: prev.timeLeft - 1 };
-            } else {
-              handleQuizComplete();
-              return prev;
-            }
-          });
-        }, 1000);
+      const timer = setInterval(() => {
+        setQuizState((prev) => {
+          if (prev.timeLeft && prev.timeLeft > 0 && !prev.showResults) {
+            return { ...prev, timeLeft: prev.timeLeft - 1 };
+          } else if (prev.timeLeft === 0) {
+            handleQuizComplete();
+            return prev;
+          }
+          return prev;
+        });
+      }, 1000);
 
-        return () => clearInterval(timer);
-      }
+      return () => clearInterval(timer);
     }
-  }, [session]);
+  }, [currentMood, quizState.showResults, handleQuizComplete]);
+
+  if (loadingQuiz) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading quiz...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!quiz) {
     return (
@@ -86,18 +243,18 @@ export default function QuizPage({ params }: { params: { id: string } }) {
     );
   }
 
-  const userMood = session.user.mood || "CHILL";
-  const currentMoodConfig = MOODS[userMood.toLowerCase()];
+  const currentMoodConfig = MOODS[currentMood.id.toLowerCase()];
 
   // Filter questions based on mood difficulty
-  const filteredQuestions = quiz.questions.filter((q) => {
-    if (currentMoodConfig.quizSettings.difficulty === "easy") {
-      return q.difficulty === "easy";
-    } else if (currentMoodConfig.quizSettings.difficulty === "medium") {
-      return q.difficulty === "easy" || q.difficulty === "medium";
-    }
-    return true; // hard mode includes all questions
-  });
+  const filteredQuestions =
+    quiz?.questions.filter((q) => {
+      if (currentMoodConfig.quizSettings.difficulty === "easy") {
+        return q.difficulty === "easy";
+      } else if (currentMoodConfig.quizSettings.difficulty === "medium") {
+        return q.difficulty === "easy" || q.difficulty === "medium";
+      }
+      return true; // hard mode includes all questions
+    }) || [];
 
   const questionsToShow = filteredQuestions.slice(
     0,
@@ -121,20 +278,6 @@ export default function QuizPage({ params }: { params: { id: string } }) {
     }
   };
 
-  const handleQuizComplete = () => {
-    setQuizState((prev) => ({ ...prev, showResults: true }));
-  };
-
-  const calculateScore = () => {
-    let correct = 0;
-    quizState.answers.forEach((answer, index) => {
-      if (questionsToShow[index] && answer === questionsToShow[index].correct) {
-        correct++;
-      }
-    });
-    return { correct, total: questionsToShow.length };
-  };
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -147,26 +290,35 @@ export default function QuizPage({ params }: { params: { id: string } }) {
     const timeTaken = Math.round((Date.now() - quizState.startTime) / 1000);
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-        <header className="bg-white shadow-sm border-b">
-          <div className="container mx-auto px-4 py-4">
-            <Link href="/tutorials" className="text-2xl font-bold">
-              <span className="text-blue-600">Vibed</span> to{" "}
-              <span className="text-purple-600">Cracked</span>
-            </Link>
-          </div>
-        </header>
-
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
-              <div className="text-6xl mb-4">
-                {percentage >= 80 ? "🎉" : percentage >= 60 ? "👍" : "💪"}
+              <div className="text-6xl mb-4 flex justify-center">
+                {percentage >= 80 ? (
+                  <PartyPopper className="h-16 w-16 text-green-500" />
+                ) : percentage >= 60 ? (
+                  <ThumbsUp className="h-16 w-16 text-blue-500" />
+                ) : (
+                  <Dumbbell className="h-16 w-16 text-orange-500" />
+                )}
               </div>
 
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
                 Quiz Complete!
               </h1>
+
+              {/* Progress Badge */}
+              <div className="mb-6">
+                <ProgressBadge
+                  status={
+                    quizState.submissionResult?.status ||
+                    (percentage >= 70 ? "COMPLETED" : "IN_PROGRESS")
+                  }
+                  score={percentage}
+                  type="tutorial"
+                />
+              </div>
 
               <div className="text-6xl font-bold mb-4">
                 <span
@@ -191,14 +343,14 @@ export default function QuizPage({ params }: { params: { id: string } }) {
                   <div>
                     <span className="text-gray-500">Time Taken:</span>
                     <br />
-                    <span className="font-semibold">
+                    <span className="font-semibold text-black">
                       {formatTime(timeTaken)}
                     </span>
                   </div>
                   <div>
                     <span className="text-gray-500">Mood:</span>
                     <br />
-                    <span className="font-semibold">
+                    <span className="font-semibold text-black">
                       {currentMoodConfig.name} {currentMoodConfig.emoji}
                     </span>
                   </div>
@@ -206,48 +358,54 @@ export default function QuizPage({ params }: { params: { id: string } }) {
               </div>
 
               <div className="space-y-4">
-                {percentage >= 80 ? (
+                {percentage >= 70 ? (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <p className="text-green-800 font-semibold">
-                      Excellent work! 🌟
+                    <p className="text-green-800 font-semibold flex items-center gap-2">
+                      <Star className="h-5 w-5" />
+                      Tutorial Completed!
+                      <Star className="h-5 w-5" />
                     </p>
                     <p className="text-green-700">
-                      You&apos;ve mastered this topic. Ready for the next
-                      challenge?
+                      Excellent work! You&apos;ve successfully completed this
+                      tutorial with a passing score.
+                      {percentage >= 80 && " You truly mastered this topic!"}
                     </p>
                   </div>
                 ) : percentage >= 60 ? (
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <p className="text-yellow-800 font-semibold">
-                      Good job! 📚
+                    <p className="text-yellow-800 font-semibold flex items-center gap-2">
+                      <Book className="h-5 w-5" />
+                      Good attempt!
                     </p>
                     <p className="text-yellow-700">
-                      You understand the basics. Consider reviewing the tutorial
-                      again.
+                      You need 70% to complete the tutorial. Review the material
+                      and try again!
                     </p>
                   </div>
                 ) : (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                    <p className="text-red-800 font-semibold">
-                      Keep practicing! 💪
+                    <p className="text-red-800 font-semibold flex items-center gap-2">
+                      <Dumbbell className="h-5 w-5" />
+                      Keep practicing!
                     </p>
                     <p className="text-red-700">
-                      Review the tutorial and try again when you&apos;re ready.
+                      Review the tutorial carefully and try again when
+                      you&apos;re ready.
                     </p>
                   </div>
                 )}
 
                 <div className="flex gap-4 justify-center">
                   <Link
-                    href={`/tutorials/${params.id}`}
+                    href={`/tutorials/${resolvedParams.id}`}
                     className="bg-gray-200 text-gray-700 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors"
                   >
                     Review Tutorial
                   </Link>
 
-                  {percentage >= 60 && parseInt(params.id) < 2 && (
+                  {percentage >= 70 && parseInt(resolvedParams.id) < 2 && (
                     <Link
-                      href={`/tutorials/${parseInt(params.id) + 1}`}
+                      href={`/tutorials/${parseInt(resolvedParams.id) + 1}`}
                       className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors"
                     >
                       Next Tutorial
@@ -272,35 +430,22 @@ export default function QuizPage({ params }: { params: { id: string } }) {
   const currentQuestionData = questionsToShow[quizState.currentQuestion];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/tutorials" className="text-2xl font-bold">
-              <span className="text-blue-600">Vibed</span> to{" "}
-              <span className="text-purple-600">Cracked</span>
-            </Link>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">
-                {currentMoodConfig.name} Mode {currentMoodConfig.emoji}
-              </span>
-              {quizState.timeLeft && (
-                <div
-                  className={`text-sm font-mono px-3 py-1 rounded ${
-                    quizState.timeLeft < 60
-                      ? "bg-red-100 text-red-800"
-                      : "bg-blue-100 text-blue-800"
-                  }`}
-                >
-                  ⏱️ {formatTime(quizState.timeLeft)}
-                </div>
-              )}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="container mx-auto px-4 py-8">
+        {/* Quiz Timer - moved to top of content */}
+        {quizState.timeLeft && (
+          <div className="max-w-2xl mx-auto mb-4">
+            <div
+              className={`text-center text-sm font-mono px-3 py-2 rounded-lg ${
+                quizState.timeLeft < 60
+                  ? "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                  : "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+              }`}
+            >
+              ⏱️ Time Remaining: {formatTime(quizState.timeLeft)}
             </div>
           </div>
-        </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-8">
+        )}
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl p-8 shadow-lg">
             <div className="mb-6">
@@ -342,8 +487,8 @@ export default function QuizPage({ params }: { params: { id: string } }) {
                     onClick={() => handleAnswerSelect(index)}
                     className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
                       quizState.answers[quizState.currentQuestion] === index
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                        ? "border-blue-500 bg-blue-100 text-blue-900"
+                        : "border-gray-300 bg-white hover:border-blue-300 hover:bg-blue-50 text-gray-800"
                     }`}
                   >
                     <span className="font-semibold mr-3">

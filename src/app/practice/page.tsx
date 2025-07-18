@@ -111,30 +111,14 @@ export default function PracticePage() {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${moodColors.gradient}`}>
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/dashboard" className="text-2xl font-bold">
-            <span className="text-blue-600">Vibed</span> to{" "}
-            <span className="text-purple-600">Cracked</span>
-          </Link>
-          <Link
-            href="/dashboard"
-            className="text-gray-600 hover:text-gray-800 transition-colors"
-          >
-            ← Dashboard
-          </Link>
-        </div>
-      </header>
-
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             Practice Challenges 💻
           </h1>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-600 dark:text-gray-400 text-lg">
             Sharpen your JavaScript skills with hands-on coding challenges
           </p>
         </div>

@@ -1,10 +1,11 @@
 "use client";
 
-import { signIn, getProviders, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { signIn, getSession, useSession, getProviders } from "next-auth/react";
 import Link from "next/link";
 import type { ClientSafeProvider } from "next-auth/react";
+import { CheckCircle } from "lucide-react";
 
 export default function SignInPage() {
   const { data: session, status } = useSession();
@@ -49,7 +50,9 @@ export default function SignInPage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
         <div className="text-center max-w-md w-full">
           <div className="bg-white rounded-2xl shadow-xl p-8">
-            <div className="text-green-600 text-5xl mb-4">✓</div>
+            <div className="text-green-600 mb-4 flex justify-center">
+              <CheckCircle className="h-12 w-12" />
+            </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               You are signed in!
             </h2>
