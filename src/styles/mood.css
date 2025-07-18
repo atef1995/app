@@ -1,0 +1,56 @@
+/* Mood Selector Styles */
+.mood-card {
+  --mood-bg: #f0f9ff;
+  --mood-text: #1e293b;
+  --mood-primary: #3b82f6;
+  --mood-secondary: #93c5fd;
+  --mood-accent: #06b6d4;
+}
+
+.mood-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--mood-primary),
+    var(--mood-secondary)
+  );
+}
+
+.mood-difficulty-badge {
+  background-color: rgba(6, 182, 212, 0.2); /* fallback */
+  background-color: var(--mood-accent-20, rgba(6, 182, 212, 0.2));
+  color: var(--mood-accent);
+}
+
+/* Global mood theme CSS custom properties */
+:root {
+  --mood-primary: #3b82f6;
+  --mood-secondary: #93c5fd;
+  --mood-background: #f0f9ff;
+  --mood-text: #1e293b;
+  --mood-accent: #06b6d4;
+  --mood-accent-20: rgba(6, 182, 212, 0.2);
+}
+
+/* Mood-aware components can use these variables */
+.mood-themed {
+  background-color: var(--mood-background);
+  color: var(--mood-text);
+}
+
+.mood-themed .primary {
+  color: var(--mood-primary);
+}
+
+.mood-themed .accent {
+  color: var(--mood-accent);
+}
+
+.mood-themed .button-primary {
+  background-color: var(--mood-primary);
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+.mood-themed .button-primary:hover {
+  filter: brightness(0.9);
+}

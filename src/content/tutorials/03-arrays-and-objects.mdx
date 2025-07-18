@@ -1,0 +1,662 @@
+---
+title: "Arrays and Objects in JavaScript"
+description: "Master data structures and learn to organize information effectively"
+level: "beginner"
+estimatedTime: "50 minutes"
+topics: ["Arrays", "Objects", "Methods", "Properties", "Data Structures"]
+quizQuestions: 7
+order: 3
+---
+
+# Arrays and Objects in JavaScript
+
+Welcome to your third tutorial! 🎯 Now that you understand variables and functions, it's time to learn about **data structures** - the building blocks for organizing and managing information in your programs.
+
+## What are Arrays?
+
+Arrays are ordered lists that can store multiple values in a single variable. Think of them as containers with numbered slots!
+
+```javascript
+let fruits = ["apple", "banana", "orange"];
+let numbers = [1, 2, 3, 4, 5];
+let mixed = ["hello", 42, true, "world"];
+
+console.log(fruits[0]); // "apple" (first item)
+console.log(fruits[1]); // "banana" (second item)
+console.log(fruits[2]); // "orange" (third item)
+```
+
+**Key Points:**
+
+- Arrays use **square brackets** `[]`
+- Items are separated by **commas**
+- Indexing starts at **0** (zero-based)
+- Can store **any data type**
+
+## Creating and Accessing Arrays
+
+### Creating Arrays
+
+```javascript
+// Array literal (most common)
+let colors = ["red", "green", "blue"];
+
+// Array constructor
+let sizes = new Array("small", "medium", "large");
+
+// Empty array
+let emptyArray = [];
+```
+
+### Accessing Elements
+
+```javascript
+let animals = ["cat", "dog", "bird", "fish"];
+
+console.log(animals[0]); // "cat"
+console.log(animals[3]); // "fish"
+console.log(animals[10]); // undefined (doesn't exist)
+
+// Getting array length
+console.log(animals.length); // 4
+
+// Last element
+console.log(animals[animals.length - 1]); // "fish"
+```
+
+## Array Methods: Your Toolkit
+
+### Adding Elements
+
+```javascript
+let groceries = ["milk", "bread"];
+
+// Add to end
+groceries.push("eggs");
+console.log(groceries); // ["milk", "bread", "eggs"]
+
+// Add to beginning
+groceries.unshift("butter");
+console.log(groceries); // ["butter", "milk", "bread", "eggs"]
+```
+
+### Removing Elements
+
+```javascript
+let tasks = ["homework", "dishes", "laundry", "shopping"];
+
+// Remove from end
+let lastTask = tasks.pop();
+console.log(lastTask); // "shopping"
+console.log(tasks); // ["homework", "dishes", "laundry"]
+
+// Remove from beginning
+let firstTask = tasks.shift();
+console.log(firstTask); // "homework"
+console.log(tasks); // ["dishes", "laundry"]
+```
+
+### Finding Elements
+
+```javascript
+let numbers = [10, 20, 30, 40, 50];
+
+// Find index of element
+console.log(numbers.indexOf(30)); // 2
+console.log(numbers.indexOf(99)); // -1 (not found)
+
+// Check if element exists
+console.log(numbers.includes(40)); // true
+console.log(numbers.includes(99)); // false
+```
+
+### Transforming Arrays
+
+```javascript
+let scores = [85, 92, 78, 96, 88];
+
+// Transform each element
+let percentages = scores.map((score) => score + "%");
+console.log(percentages); // ["85%", "92%", "78%", "96%", "88%"]
+
+// Filter elements
+let highScores = scores.filter((score) => score >= 90);
+console.log(highScores); // [92, 96]
+
+// Find single element
+let perfectScore = scores.find((score) => score === 100);
+console.log(perfectScore); // undefined
+```
+
+## What are Objects?
+
+Objects are collections of **key-value pairs**. Think of them as dictionaries or filing cabinets where each piece of information has a label!
+
+```javascript
+let person = {
+  name: "Alice",
+  age: 28,
+  city: "New York",
+  isStudent: false,
+};
+
+console.log(person.name); // "Alice"
+console.log(person.age); // 28
+```
+
+## Creating and Accessing Objects
+
+### Creating Objects
+
+```javascript
+// Object literal (most common)
+let book = {
+  title: "JavaScript Basics",
+  author: "John Doe",
+  pages: 350,
+  isAvailable: true,
+};
+
+// Empty object
+let emptyObject = {};
+```
+
+### Accessing Properties
+
+```javascript
+let car = {
+  make: "Toyota",
+  model: "Camry",
+  year: 2022,
+  color: "blue",
+};
+
+// Dot notation (preferred)
+console.log(car.make); // "Toyota"
+console.log(car.year); // 2022
+
+// Bracket notation (useful for dynamic access)
+console.log(car["color"]); // "blue"
+
+let property = "model";
+console.log(car[property]); // "Camry"
+```
+
+### Modifying Objects
+
+```javascript
+let user = {
+  username: "coder123",
+  email: "user@example.com",
+  score: 0,
+};
+
+// Add new property
+user.level = "beginner";
+
+// Modify existing property
+user.score = 150;
+
+// Delete property
+delete user.email;
+
+console.log(user);
+// { username: "coder123", score: 150, level: "beginner" }
+```
+
+## Objects with Methods
+
+Objects can contain functions as properties - these are called **methods**:
+
+```javascript
+let calculator = {
+  result: 0,
+
+  add: function (number) {
+    this.result += number;
+    return this;
+  },
+
+  subtract: function (number) {
+    this.result -= number;
+    return this;
+  },
+
+  multiply: function (number) {
+    this.result *= number;
+    return this;
+  },
+
+  clear: function () {
+    this.result = 0;
+    return this;
+  },
+
+  getValue: function () {
+    return this.result;
+  },
+};
+
+// Method chaining
+calculator.add(10).multiply(2).subtract(5);
+console.log(calculator.getValue()); // 15
+```
+
+## Real-World Examples
+
+### 1. User Profile System
+
+```javascript
+function createUserProfile(name, email, age) {
+  return {
+    name: name,
+    email: email,
+    age: age,
+    posts: [],
+    friends: [],
+
+    addPost: function (content) {
+      this.posts.push({
+        content: content,
+        timestamp: new Date(),
+        likes: 0,
+      });
+    },
+
+    addFriend: function (friendName) {
+      this.friends.push(friendName);
+    },
+
+    getInfo: function () {
+      return `${this.name} (${this.age}) - ${this.posts.length} posts, ${this.friends.length} friends`;
+    },
+  };
+}
+
+let alice = createUserProfile("Alice", "alice@email.com", 25);
+alice.addPost("Hello World!");
+alice.addPost("Learning JavaScript is fun!");
+alice.addFriend("Bob");
+
+console.log(alice.getInfo());
+// "Alice (25) - 2 posts, 1 friends"
+```
+
+### 2. Shopping Cart
+
+```javascript
+let shoppingCart = {
+  items: [],
+  total: 0,
+
+  addItem: function (name, price, quantity = 1) {
+    let item = {
+      name: name,
+      price: price,
+      quantity: quantity,
+      subtotal: price * quantity,
+    };
+
+    this.items.push(item);
+    this.calculateTotal();
+  },
+
+  removeItem: function (name) {
+    this.items = this.items.filter((item) => item.name !== name);
+    this.calculateTotal();
+  },
+
+  calculateTotal: function () {
+    this.total = this.items.reduce((sum, item) => sum + item.subtotal, 0);
+  },
+
+  getItemCount: function () {
+    return this.items.reduce((count, item) => count + item.quantity, 0);
+  },
+
+  checkout: function () {
+    console.log("Items in cart:");
+    this.items.forEach((item) => {
+      console.log(
+        `- ${item.name}: $${item.price} x ${item.quantity} = $${item.subtotal}`
+      );
+    });
+    console.log(`Total: $${this.total}`);
+    console.log(`Items: ${this.getItemCount()}`);
+  },
+};
+
+// Usage
+shoppingCart.addItem("Laptop", 999, 1);
+shoppingCart.addItem("Mouse", 25, 2);
+shoppingCart.addItem("Keyboard", 75, 1);
+shoppingCart.checkout();
+```
+
+### 3. Task Management System
+
+```javascript
+let taskManager = {
+  tasks: [],
+  nextId: 1,
+
+  addTask: function (title, priority = "medium") {
+    let task = {
+      id: this.nextId++,
+      title: title,
+      priority: priority,
+      completed: false,
+      createdAt: new Date(),
+    };
+
+    this.tasks.push(task);
+    return task.id;
+  },
+
+  completeTask: function (id) {
+    let task = this.tasks.find((task) => task.id === id);
+    if (task) {
+      task.completed = true;
+      task.completedAt = new Date();
+    }
+  },
+
+  getTasks: function (filter = "all") {
+    if (filter === "completed") {
+      return this.tasks.filter((task) => task.completed);
+    } else if (filter === "pending") {
+      return this.tasks.filter((task) => !task.completed);
+    } else {
+      return this.tasks;
+    }
+  },
+
+  getTasksByPriority: function (priority) {
+    return this.tasks.filter((task) => task.priority === priority);
+  },
+
+  getStats: function () {
+    let completed = this.tasks.filter((task) => task.completed).length;
+    let total = this.tasks.length;
+    let pending = total - completed;
+
+    return {
+      total: total,
+      completed: completed,
+      pending: pending,
+      completionRate: total > 0 ? Math.round((completed / total) * 100) : 0,
+    };
+  },
+};
+
+// Usage
+taskManager.addTask("Learn JavaScript Arrays", "high");
+taskManager.addTask("Practice coding", "medium");
+taskManager.addTask("Read documentation", "low");
+
+taskManager.completeTask(1);
+
+console.log("All tasks:", taskManager.getTasks());
+console.log("High priority:", taskManager.getTasksByPriority("high"));
+console.log("Stats:", taskManager.getStats());
+```
+
+## Arrays of Objects: Powerful Combinations
+
+```javascript
+let students = [
+  { name: "Alice", grade: 85, subject: "Math" },
+  { name: "Bob", grade: 92, subject: "Science" },
+  { name: "Charlie", grade: 78, subject: "Math" },
+  { name: "Diana", grade: 96, subject: "Science" },
+];
+
+// Find all Math students
+let mathStudents = students.filter((student) => student.subject === "Math");
+
+// Calculate average grade
+let averageGrade =
+  students.reduce((sum, student) => sum + student.grade, 0) / students.length;
+
+// Find top performer
+let topStudent = students.reduce((top, student) =>
+  student.grade > top.grade ? student : top
+);
+
+console.log("Math students:", mathStudents);
+console.log("Average grade:", averageGrade);
+console.log("Top student:", topStudent.name, "-", topStudent.grade);
+```
+
+## Common Array and Object Patterns
+
+### 1. Data Transformation
+
+```javascript
+// Transform array of objects
+let products = [
+  { name: "Laptop", price: 999 },
+  { name: "Phone", price: 599 },
+  { name: "Tablet", price: 399 },
+];
+
+// Add discounted prices
+let discountedProducts = products.map((product) => ({
+  ...product,
+  discountedPrice: product.price * 0.8,
+  savings: product.price * 0.2,
+}));
+
+console.log(discountedProducts);
+```
+
+### 2. Grouping Data
+
+```javascript
+let orders = [
+  { customer: "Alice", amount: 100, status: "pending" },
+  { customer: "Bob", amount: 150, status: "completed" },
+  { customer: "Alice", amount: 75, status: "completed" },
+  { customer: "Charlie", amount: 200, status: "pending" },
+];
+
+// Group by customer
+let customerTotals = {};
+orders.forEach((order) => {
+  if (!customerTotals[order.customer]) {
+    customerTotals[order.customer] = 0;
+  }
+  customerTotals[order.customer] += order.amount;
+});
+
+console.log(customerTotals);
+// { Alice: 175, Bob: 150, Charlie: 200 }
+```
+
+## Best Practices
+
+### 1. Use Descriptive Property Names
+
+```javascript
+// ❌ Bad
+let u = { n: "John", a: 25 };
+
+// ✅ Good
+let user = { name: "John", age: 25 };
+```
+
+### 2. Be Consistent with Data Types
+
+```javascript
+// ❌ Bad - mixed data types
+let data = ["John", 25, "Engineer", true, "New York"];
+
+// ✅ Good - structured object
+let person = {
+  name: "John",
+  age: 25,
+  profession: "Engineer",
+  isEmployed: true,
+  city: "New York",
+};
+```
+
+### 3. Use Array Methods Instead of Loops
+
+```javascript
+let numbers = [1, 2, 3, 4, 5];
+
+// ❌ Avoid - manual loop
+let doubled = [];
+for (let i = 0; i < numbers.length; i++) {
+  doubled.push(numbers[i] * 2);
+}
+
+// ✅ Better - array method
+let doubled = numbers.map((num) => num * 2);
+```
+
+## Your Turn! 💪
+
+Practice with these exercises:
+
+### Exercise 1: Student Gradebook
+
+```javascript
+// Create a gradebook system
+let gradebook = {
+  students: [],
+
+  addStudent: function (name) {
+    // Add a student with empty grades array
+  },
+
+  addGrade: function (studentName, subject, grade) {
+    // Add a grade for a specific student and subject
+  },
+
+  getStudentAverage: function (studentName) {
+    // Calculate average grade for a student
+  },
+
+  getTopStudent: function () {
+    // Find student with highest average
+  },
+};
+
+// Test your gradebook
+gradebook.addStudent("Alice");
+gradebook.addGrade("Alice", "Math", 85);
+gradebook.addGrade("Alice", "Science", 92);
+```
+
+### Exercise 2: Inventory Management
+
+```javascript
+// Create an inventory system for a store
+let inventory = {
+  items: [],
+
+  addItem: function (name, price, quantity) {
+    // Add new item or update existing quantity
+  },
+
+  sellItem: function (name, quantity) {
+    // Reduce quantity, return total price
+  },
+
+  getInventoryValue: function () {
+    // Calculate total value of all items
+  },
+
+  getLowStockItems: function (threshold = 5) {
+    // Return items with quantity below threshold
+  },
+};
+```
+
+### Exercise 3: Playlist Manager
+
+```javascript
+// Create a music playlist system
+let playlist = {
+  name: "My Favorites",
+  songs: [],
+
+  addSong: function (title, artist, duration) {
+    // Add song object to playlist
+  },
+
+  removeSong: function (title) {
+    // Remove song by title
+  },
+
+  getTotalDuration: function () {
+    // Calculate total playlist duration
+  },
+
+  getSongsByArtist: function (artist) {
+    // Return all songs by specific artist
+  },
+
+  shuffle: function () {
+    // Randomly reorder songs array
+  },
+};
+```
+
+## Common Mistakes to Avoid
+
+### 1. Confusing Array Index and Length
+
+```javascript
+let fruits = ["apple", "banana", "orange"];
+
+// ❌ Wrong - arrays are zero-indexed
+console.log(fruits[3]); // undefined
+
+// ✅ Correct
+console.log(fruits[2]); // "orange"
+console.log(fruits[fruits.length - 1]); // "orange" (last item)
+```
+
+### 2. Mutating Arrays Unintentionally
+
+```javascript
+let originalArray = [1, 2, 3];
+
+// ❌ Bad - modifies original
+let modifiedArray = originalArray;
+modifiedArray.push(4);
+console.log(originalArray); // [1, 2, 3, 4] - Original changed!
+
+// ✅ Good - creates new array
+let modifiedArray = [...originalArray, 4];
+console.log(originalArray); // [1, 2, 3] - Original unchanged
+```
+
+### 3. Incorrect Property Access
+
+```javascript
+let user = { firstName: "John", lastName: "Doe" };
+
+// ❌ Wrong property name
+console.log(user.firstname); // undefined
+
+// ✅ Correct
+console.log(user.firstName); // "John"
+```
+
+## Quiz Time! 🧠
+
+Ready to test your knowledge of arrays and objects? The quiz will adapt to your current mood - whether you're feeling chill, rush, or grind mode!
+
+## What's Next?
+
+Fantastic work! 🎉 You now understand how to organize and manipulate data using arrays and objects. Coming up next:
+
+- **Loops and Conditionals** - Control the flow of your programs
+- **DOM Manipulation** - Make your web pages interactive
+- **Code Execution Environment** - Run JavaScript directly in your browser
+
+You're building a solid foundation in JavaScript! Keep up the excellent work! 🚀

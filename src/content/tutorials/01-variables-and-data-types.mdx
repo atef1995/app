@@ -1,0 +1,283 @@
+---
+title: "JavaScript Basics: Variables and Data Types"
+description: "Learn the fundamentals of JavaScript variables and data types"
+level: "beginner"
+estimatedTime: "30 minutes"
+topics: ["Variables", "Data Types", "let", "const", "var"]
+quizQuestions: 5
+order: 1
+---
+
+# JavaScript Basics: Variables and Data Types
+
+Welcome to your first JavaScript tutorial! 🎉 In this lesson, we'll explore the foundation of JavaScript programming: variables and data types.
+
+## What are Variables?
+
+Variables are containers that store data values. Think of them as labeled boxes where you can put different types of information.
+
+<InteractiveCodeBlock title="Try Your First Variables" description="Run this code to see how variables work:">
+let message = "Hello, World!";
+let age = 25;
+let isLearning = true;
+
+console.log(message);
+console.log("Age:", age);
+console.log("Learning JavaScript:", isLearning);
+
+</InteractiveCodeBlock>
+
+## Variable Declarations
+
+JavaScript has three ways to declare variables:
+
+### 1. `let` - Modern and Flexible
+
+<InteractiveCodeBlock title="Experimenting with let" description="Try changing the userName value:">
+let userName = "Alex";
+console.log("Original name:", userName);
+
+userName = "Sam"; // Can be reassigned
+console.log("New name:", userName);
+
+</InteractiveCodeBlock>
+
+**Use `let` when:**
+
+- The value might change later
+- You need block-level scope
+
+### 2. `const` - Constants
+
+<InteractiveCodeBlock title="Working with const" description="See what happens with constants:">
+const pi = 3.14159;
+const siteName = "Vibed to Cracked";
+
+console.log("Pi:", pi);
+console.log("Site:", siteName);
+
+// Try uncommenting the next line to see the error:
+// pi = 3.14; // ❌ Error! Cannot reassign
+
+</InteractiveCodeBlock>
+
+**Use `const` when:**
+
+- The value should never change
+- For objects and arrays (content can change, reference cannot)
+
+### 3. `var` - Legacy (Avoid in Modern JavaScript)
+
+```javascript
+var oldStyle = "Don't use this anymore";
+```
+
+**Why avoid `var`:**
+
+- Function-scoped (confusing behavior)
+- Hoisting issues
+- No block scope
+
+## Data Types in JavaScript
+
+JavaScript has several built-in data types:
+
+### Primitive Types
+
+#### 1. Number
+
+<InteractiveCodeBlock title="Working with Numbers" description="JavaScript handles all numbers as the same type:">
+let age = 25;
+let price = 19.99;
+let negative = -10;
+
+console.log("Age:", age);
+console.log("Price:", price);
+console.log("Negative:", negative);
+
+// Try some math operations
+console.log("Age + 5:", age + 5);
+console.log("Price _ 2:", price _ 2);
+
+</InteractiveCodeBlock>
+
+#### 2. String
+
+<InteractiveCodeBlock title="String Manipulation" description="Explore different ways to work with text:">
+let firstName = "John";
+let lastName = "Doe";
+let fullName = `${firstName} ${lastName}`; // Template literal
+
+console.log("First name:", firstName);
+console.log("Last name:", lastName);
+console.log("Full name:", fullName);
+
+// String methods
+console.log("Length:", fullName.length);
+console.log("Uppercase:", fullName.toUpperCase());
+
+</InteractiveCodeBlock>
+
+#### 3. Boolean
+
+<InteractiveCodeBlock title="Boolean Logic" description="True or false - the foundation of programming logic:">
+let isActive = true;
+let isComplete = false;
+
+console.log("Is active:", isActive);
+console.log("Is complete:", isComplete);
+
+// Boolean operations
+console.log("Both true:", isActive && isComplete);
+console.log("At least one true:", isActive || isComplete);
+console.log("Not active:", !isActive);
+
+</InteractiveCodeBlock>
+
+#### 4. Undefined
+
+<InteractiveCodeBlock
+  title="Understanding Undefined"
+  description="Variables without values:"
+>
+  let notAssigned; console.log("Not assigned:", notAssigned);
+  console.log("Type:", typeof notAssigned);
+</InteractiveCodeBlock>
+
+#### 5. Null
+
+<InteractiveCodeBlock
+  title="Null Values"
+  description="Intentionally empty values:"
+>
+  let emptyValue = null; // Intentionally empty console.log("Empty value:",
+  emptyValue); console.log("Type:", typeof emptyValue); // Quirk: shows 'object'
+</InteractiveCodeBlock>
+
+### Checking Data Types
+
+Use the `typeof` operator:
+
+```javascript
+console.log(typeof 42); // "number"
+console.log(typeof "Hello"); // "string"
+console.log(typeof true); // "boolean"
+console.log(typeof undefined); // "undefined"
+console.log(typeof null); // "object" (this is a known quirk!)
+```
+
+## Best Practices
+
+### 1. Use Descriptive Names
+
+```javascript
+// ❌ Bad
+let x = 25;
+let data = "John";
+
+// ✅ Good
+let userAge = 25;
+let firstName = "John";
+```
+
+### 2. Use `const` by Default
+
+```javascript
+// ✅ Start with const
+const userName = "Alex";
+const userPreferences = { theme: "dark" };
+
+// ✅ Use let only when you need to reassign
+let currentPage = 1;
+currentPage = 2; // This is why we need let
+```
+
+### 3. Initialize Variables
+
+```javascript
+// ❌ Avoid
+let score;
+// ... lots of code ...
+score = 100; // Easy to forget!
+
+// ✅ Better
+let score = 0;
+```
+
+## Interactive Example
+
+Try this in your browser's console:
+
+```javascript
+// Create variables for a simple user profile
+const username = "coder123";
+let points = 0;
+let level = "beginner";
+let isOnline = true;
+
+// Update the user's progress
+points = points + 50;
+level = "intermediate";
+
+console.log(`User: ${username}`);
+console.log(`Points: ${points}`);
+console.log(`Level: ${level}`);
+console.log(`Online: ${isOnline}`);
+```
+
+## Common Mistakes to Avoid
+
+### 1. Reassigning `const`
+
+```javascript
+const score = 100;
+score = 200; // ❌ TypeError: Assignment to constant variable
+```
+
+### 2. Using Variables Before Declaration
+
+```javascript
+console.log(myVar); // ❌ ReferenceError
+let myVar = "Hello";
+```
+
+### 3. Confusing `null` and `undefined`
+
+```javascript
+let uninitialized; // undefined (not set)
+let intentionallyEmpty = null; // null (intentionally empty)
+```
+
+## Your Turn! 💪
+
+Practice with these exercises:
+
+1. Create a `const` variable for your favorite programming language
+2. Create a `let` variable for your current mood
+3. Use template literals to create a sentence combining both
+4. Check the `typeof` each variable
+
+```javascript
+// Your code here:
+const favLanguage = "JavaScript";
+let currentMood = "excited";
+let sentence = `I'm ${currentMood} about learning ${favLanguage}!`;
+
+console.log(sentence);
+console.log(typeof favLanguage);
+console.log(typeof currentMood);
+```
+
+## Quiz Time! 🧠
+
+Ready to test your knowledge? The quiz will adapt to your current mood setting - whether you're in chill, rush, or grind mode!
+
+## What's Next?
+
+Great job! 🎉 You've mastered the basics of variables and data types. Next up:
+
+- **Functions and Scope** - Learn how to organize your code
+- **Arrays and Objects** - Store and manipulate collections of data
+- **Control Flow** - Make decisions in your code
+
+Keep coding, and remember: every expert was once a beginner! 🚀
