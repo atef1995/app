@@ -12,6 +12,7 @@ import {
   Code,
   Brain,
   Settings,
+  Crown,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -25,6 +26,7 @@ export function GlobalHeader() {
     { href: "/tutorials", label: "Tutorials", icon: BookOpen },
     { href: "/practice", label: "Practice", icon: Code },
     { href: "/quizzes", label: "Quizzes", icon: Brain },
+    { href: "/pricing", label: "Pricing", icon: Crown },
   ];
 
   return (

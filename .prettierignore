@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+.next/
+
+# Build outputs
+dist/
+build/
+out/
+
+# Package files
+package-lock.json
+yarn.lock
+
+# MDX files - preserve original formatting for tutorials
+*.mdx
+**/*.mdx
+src/content/**/*.mdx
+content/**/*.mdx
+src/content/tutorials/
+content/tutorials/
+
+# Content directories - preserve all content formatting
+src/content/
+content/
+
+# Database files
+*.db
+*.sqlite
+prisma/dev.db
+
+# Environment files
+.env*
+
+# Generated files
+.vscode/
+*.log
+
+# Prisma generated files
+prisma/migrations/
+
+# Tailwind generated CSS
+**/*.css
+
+# Lock files
+pnpm-lock.yaml

@@ -4,6 +4,15 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import {
+  FileText,
+  Clock,
+  Target,
+  BarChart3,
+  Lightbulb,
+  ArrowRight,
+  BookOpen,
+} from "lucide-react";
 import { MOODS } from "@/lib/moods";
 import { useMood } from "@/components/providers/MoodProvider";
 import { ProgressBadge } from "@/components/ProgressComponents";
@@ -44,13 +53,15 @@ const QuizCard: React.FC<QuizCardProps> = ({
 }) => {
   const moodConfig = MOODS[userMood.toLowerCase()];
   const difficultyColors = {
-    easy: "bg-green-100 text-green-800",
-    medium: "bg-yellow-100 text-yellow-800",
-    hard: "bg-red-100 text-red-800",
+    easy: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+    medium:
+      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+    hard: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
   };
 
-  // Filter questions based on mood difficulty
-  const filteredQuestions = quiz.questions.filter((q) => {
+  // Ensure questions is an array and filter based on mood difficulty
+  const questions = Array.isArray(quiz.questions) ? quiz.questions : [];
+  const filteredQuestions = questions.filter((q) => {
     if (moodConfig.quizSettings.difficulty === "easy") {
       return q.difficulty === "easy";
     } else if (moodConfig.quizSettings.difficulty === "medium") {
@@ -67,15 +78,19 @@ const QuizCard: React.FC<QuizCardProps> = ({
   const estimatedTime = moodConfig.quizSettings.timeLimit || 10;
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl hover:shadow-xl dark:hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-12 min-w-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
             {index + 1}
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-900">{quiz.title}</h3>
-            <p className="text-sm text-gray-500">Tutorial {quiz.tutorialId}</p>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+              {quiz.title}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Tutorial {quiz.tutorialId}
+            </p>
           </div>
         </div>
         <div
@@ -107,22 +122,28 @@ const QuizCard: React.FC<QuizCardProps> = ({
       <div className="mb-6">
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="flex items-center space-x-2">
-            <span className="text-gray-400">📝</span>
-            <span className="text-gray-600">
+            <FileText className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <span className="text-gray-600 dark:text-gray-300">
               {questionsToShow.length} questions
             </span>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="text-gray-400">⏱️</span>
-            <span className="text-gray-600">{estimatedTime} min</span>
+            <Clock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <span className="text-gray-600 dark:text-gray-300">
+              {estimatedTime} min
+            </span>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="text-gray-400">{moodConfig.emoji}</span>
-            <span className="text-gray-600">{moodConfig.name} Mode</span>
+            <span className="text-gray-400 dark:text-gray-500">
+              {moodConfig.emoji}
+            </span>
+            <span className="text-gray-600 dark:text-gray-300">
+              {moodConfig.name} Mode
+            </span>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="text-gray-400">🎯</span>
-            <span className="text-gray-600">
+            <Target className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <span className="text-gray-600 dark:text-gray-300">
               {moodConfig.quizSettings.difficulty === "easy"
                 ? "Beginner"
                 : moodConfig.quizSettings.difficulty === "medium"
@@ -134,9 +155,11 @@ const QuizCard: React.FC<QuizCardProps> = ({
       </div>
 
       <div className="mb-6">
-        <div className="text-xs text-gray-500 mb-2">Question Preview:</div>
-        <div className="bg-gray-50 rounded-lg p-3">
-          <p className="text-sm text-gray-700 line-clamp-2">
+        <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+          Question Preview:
+        </div>
+        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+          <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
             {questionsToShow[0]?.question ||
               "No questions available for this difficulty level"}
           </p>
@@ -144,7 +167,7 @@ const QuizCard: React.FC<QuizCardProps> = ({
       </div>
 
       <div className="flex items-center justify-between">
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-gray-500 dark:text-gray-400">
           Based on your <span className="font-medium">{moodConfig.name}</span>{" "}
           mood
         </div>
@@ -228,9 +251,11 @@ export default function QuizzesPage() {
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600">Please sign in to access quizzes.</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Please sign in to access quizzes.
+          </p>
         </div>
       </div>
     );
@@ -247,15 +272,16 @@ export default function QuizzesPage() {
             <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
               JavaScript Quizzes
             </h1>
-            <p className="text-xl text-gray-600 mb-6">
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
               Test your knowledge and track your progress
             </p>
 
             {/* Progress Summary */}
             {!loadingProgress && (
               <div className="mb-6">
-                <div className="inline-flex items-center space-x-4 text-sm text-gray-600 bg-blue-50 px-4 py-2 rounded-lg">
-                  <span>📊 Progress:</span>
+                <div className="inline-flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-300 bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-lg">
+                  <BarChart3 className="w-4 h-4" />
+                  <span>Progress:</span>
                   <span>
                     {
                       Object.values(tutorialProgress).filter(
@@ -283,14 +309,14 @@ export default function QuizzesPage() {
             )}
 
             {/* Mood-based info card */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg max-w-2xl mx-auto">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl max-w-2xl mx-auto">
               <div className="flex items-center justify-center space-x-4 mb-4">
                 <div className="text-3xl">{currentMoodConfig.emoji}</div>
                 <div className="text-left">
-                  <h3 className="text-lg font-bold text-gray-900">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
                     {currentMoodConfig.name} Mode Active
                   </h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
                     {currentMoodConfig.quizSettings.timeLimit
                       ? `${currentMoodConfig.quizSettings.timeLimit} minute timer`
                       : "No time limit"}{" "}
@@ -299,7 +325,7 @@ export default function QuizzesPage() {
                   </p>
                 </div>
               </div>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-gray-500 dark:text-gray-400">
                 Difficulty:{" "}
                 <span className="font-medium capitalize">
                   {currentMoodConfig.quizSettings.difficulty}
@@ -313,7 +339,9 @@ export default function QuizzesPage() {
           {loadingProgress || loadingQuizzes ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading quiz progress...</p>
+              <p className="text-gray-600 dark:text-gray-300">
+                Loading quiz progress...
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -335,14 +363,20 @@ export default function QuizzesPage() {
 
           {/* Footer Section */}
           <div className="text-center mt-12">
-            <div className="bg-white rounded-2xl p-8 shadow-lg max-w-2xl mx-auto">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                💡 Quiz Tips
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl max-w-2xl mx-auto">
+              <div className="flex items-center justify-center mb-4">
+                <Lightbulb className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-2" />
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                  Quiz Tips
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-300">
                 <div className="text-left">
-                  <div className="font-medium text-gray-800 mb-1">
-                    🎯 Current Mode:
+                  <div className="flex items-center mb-1">
+                    <Target className="w-4 h-4 text-blue-600 dark:text-blue-400 mr-1" />
+                    <span className="font-medium text-gray-800 dark:text-gray-200">
+                      Current Mode:
+                    </span>
                   </div>
                   <div>
                     {currentMoodConfig.quizSettings.difficulty === "easy"
@@ -353,8 +387,11 @@ export default function QuizzesPage() {
                   </div>
                 </div>
                 <div className="text-left">
-                  <div className="font-medium text-gray-800 mb-1">
-                    ⏱️ Time Management:
+                  <div className="flex items-center mb-1">
+                    <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400 mr-1" />
+                    <span className="font-medium text-gray-800 dark:text-gray-200">
+                      Time Management:
+                    </span>
                   </div>
                   <div>
                     {currentMoodConfig.quizSettings.timeLimit
@@ -363,12 +400,14 @@ export default function QuizzesPage() {
                   </div>
                 </div>
               </div>
-              <div className="mt-6 pt-4 border-t border-gray-200">
+              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
                 <Link
                   href="/tutorials"
-                  className="text-blue-600 hover:text-blue-800 font-medium"
+                  className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
                 >
-                  Review tutorials before taking quizzes →
+                  <BookOpen className="w-4 h-4 mr-1" />
+                  Review tutorials before taking quizzes
+                  <ArrowRight className="w-4 h-4 ml-1" />
                 </Link>
               </div>
             </div>

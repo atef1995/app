@@ -24,6 +24,21 @@ export interface ChallengeSubmission {
   mood: Mood;
 }
 
+interface QuizQuestion {
+  id: number;
+  question: string;
+  options: string[];
+  correct: number;
+  explanation: string;
+  difficulty: "easy" | "medium" | "hard";
+}
+
+interface QuizData {
+  questions: QuizQuestion[];
+  passingScore?: number;
+  uiQuestions?: QuizQuestion[];
+}
+
 /**
  * Progress Service for tracking user completion of tutorials, quizzes, and challenges
  */
@@ -34,23 +49,31 @@ export class ProgressService {
   static async submitQuizAttempt(
     userId: string,
     submission: QuizSubmission,
-    quizData: { questions: any[]; passingScore?: number }
+    quizData: QuizData
   ) {
     const passingScore = quizData.passingScore || 70; // Default 70% passing score
-    const totalQuestions = quizData.questions.length;
+    const totalQuestions = quizData.questions.length; // Always use full question set for scoring
+    const uiQuestions = quizData.uiQuestions || quizData.questions; // Fallback to full set if no UI questions provided
+
     let correctAnswers = 0;
 
-    // Calculate score
+    // Calculate score based on the questions the user actually answered (UI questions)
+    // but normalize against the full question set for fair scoring
     submission.answers.forEach((answer, index) => {
-      if (
-        quizData.questions[index] &&
-        answer === quizData.questions[index].correct
-      ) {
+      if (uiQuestions[index] && answer === uiQuestions[index].correct) {
         correctAnswers++;
       }
     });
 
-    const score = (correctAnswers / totalQuestions) * 100;
+    // Normalize score: (correct answers / questions answered) * (questions answered / total questions) * 100
+    // This gives partial credit based on the subset they answered while maintaining fairness
+    const questionsAnswered = uiQuestions.length;
+    const rawScore =
+      questionsAnswered > 0 ? (correctAnswers / questionsAnswered) * 100 : 0;
+
+    // For scoring purposes, we'll use the raw score as it represents their performance
+    // on the questions they were given, regardless of mood
+    const score = rawScore;
     const passed = score >= passingScore;
 
     // Create quiz attempt record

@@ -47,11 +47,18 @@ export async function GET(request: NextRequest) {
     // Parse frontmatter
     const { data: frontmatter, content } = matter(fileContent);
 
+    // Clean up the content - ensure proper line endings and spacing
+    const cleanContent = content
+      .trim()
+      .replace(/\r\n/g, "\n") // Normalize line endings
+      .replace(/\n{3,}/g, "\n\n"); // Remove excessive line breaks
+
     return NextResponse.json({
       success: true,
       data: {
         frontmatter,
-        content,
+        content: cleanContent,
+        rawContent: fileContent, // Also provide raw content for debugging
       },
     });
   } catch (error) {

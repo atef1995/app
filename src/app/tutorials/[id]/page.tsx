@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useSession } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
 import Link from "next/link";
@@ -19,6 +20,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import SyntaxHighlighter from "@/components/SyntaxHighlighter";
 
 // No more hardcoded mapping - we'll get this from the database
 
@@ -112,9 +114,14 @@ export default function TutorialPage({ params }: TutorialPageProps) {
         // Use stored content if no MDX file
         const finalContent = mdxContent || tutorialInfo.content || "";
 
-        // Serialize the MDX content
+        // Serialize the MDX content (don't parse frontmatter again since we already did it)
         const mdxSource = await serialize(finalContent, {
-          parseFrontmatter: true,
+          parseFrontmatter: false, // We already parsed it in the API route
+          mdxOptions: {
+            remarkPlugins: [],
+            rehypePlugins: [],
+            development: process.env.NODE_ENV === "development",
+          },
         });
 
         setTutorial({
@@ -149,27 +156,30 @@ export default function TutorialPage({ params }: TutorialPageProps) {
     switch (currentMood.id) {
       case "rush":
         return {
-          gradient: "from-red-50 via-orange-50 to-yellow-50",
+          gradient:
+            "from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20",
           border: "border-red-500",
-          text: "text-red-700",
-          bg: "bg-red-50",
-          accent: "bg-red-600",
+          text: "text-red-700 dark:text-red-300",
+          bg: "bg-red-50 dark:bg-red-900/20",
+          accent: "bg-red-600 dark:bg-red-700",
         };
       case "grind":
         return {
-          gradient: "from-gray-50 via-slate-50 to-blue-50",
+          gradient:
+            "from-gray-50 via-slate-50 to-blue-50 dark:from-gray-900/20 dark:via-slate-900/20 dark:to-blue-900/20",
           border: "border-blue-500",
-          text: "text-blue-700",
-          bg: "bg-blue-50",
-          accent: "bg-blue-600",
+          text: "text-blue-700 dark:text-blue-300",
+          bg: "bg-blue-50 dark:bg-blue-900/20",
+          accent: "bg-blue-600 dark:bg-blue-700",
         };
       default: // chill
         return {
-          gradient: "from-purple-50 via-pink-50 to-indigo-50",
+          gradient:
+            "from-purple-50 via-pink-50 to-indigo-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-indigo-900/20",
           border: "border-purple-500",
-          text: "text-purple-700",
-          bg: "bg-purple-50",
-          accent: "bg-purple-600",
+          text: "text-purple-700 dark:text-purple-300",
+          bg: "bg-purple-50 dark:bg-purple-900/20",
+          accent: "bg-purple-600 dark:bg-purple-700",
         };
     }
   };
@@ -178,17 +188,21 @@ export default function TutorialPage({ params }: TutorialPageProps) {
   const getTutorialIcon = (tutorial: TutorialData) => {
     // Use order or slug to determine icon consistently
     if (tutorial.order === 1 || tutorial.slug?.includes("variable")) {
-      return <Sprout className="w-12 h-12 text-green-600" />;
+      return (
+        <Sprout className="w-12 h-12 text-green-600 dark:text-green-400" />
+      );
     } else if (tutorial.order === 2 || tutorial.slug?.includes("function")) {
-      return <Target className="w-12 h-12 text-blue-600" />;
+      return <Target className="w-12 h-12 text-blue-600 dark:text-blue-400" />;
     } else if (
       tutorial.order === 3 ||
       tutorial.slug?.includes("array") ||
       tutorial.slug?.includes("object")
     ) {
-      return <BarChart3 className="w-12 h-12 text-purple-600" />;
+      return (
+        <BarChart3 className="w-12 h-12 text-purple-600 dark:text-purple-400" />
+      );
     }
-    return <BookOpen className="w-12 h-12 text-gray-600" />; // default
+    return <BookOpen className="w-12 h-12 text-gray-600 dark:text-gray-400" />; // default
   };
 
   const moodColors = getMoodColors();
@@ -199,10 +213,12 @@ export default function TutorialPage({ params }: TutorialPageProps) {
         className={`min-h-screen bg-gradient-to-br ${moodColors.gradient} flex items-center justify-center`}
       >
         <div className="text-center">
-          <p className="text-gray-600">Please sign in to access tutorials.</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Please sign in to access tutorials.
+          </p>
           <Link
             href="/auth/signin"
-            className="text-blue-600 hover:underline flex items-center justify-center gap-1 mt-2"
+            className="text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-center gap-1 mt-2"
           >
             Sign in here <ChevronRight className="w-4 h-4" />
           </Link>
@@ -239,7 +255,7 @@ export default function TutorialPage({ params }: TutorialPageProps) {
               </p>
               <Link
                 href="/tutorials"
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                className="bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800"
               >
                 Back to Tutorials
               </Link>
@@ -256,14 +272,14 @@ export default function TutorialPage({ params }: TutorialPageProps) {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Tutorial Header */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl mb-8">
             <div className="flex items-center gap-4 mb-4">
               <div className="flex-shrink-0">{getTutorialIcon(tutorial)}</div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                   {tutorial.meta.title || tutorial.title}
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-gray-600 dark:text-gray-300">
                   {tutorial.meta.description || tutorial.description}
                 </p>
                 <div className="flex items-center gap-4 mt-2">
@@ -305,17 +321,134 @@ export default function TutorialPage({ params }: TutorialPageProps) {
           </div>
 
           {/* Tutorial Content */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl mb-8">
             {tutorial.mdxSource ? (
-              <div className="prose prose-lg dark:prose-invert max-w-none">
+              <article className="prose prose-lg dark:prose-invert max-w-none">
                 <MDXRemote
                   {...tutorial.mdxSource}
                   components={{
                     InteractiveCodeBlock,
-                    // Add other custom components as needed
+                    // Add custom heading components to ensure they work
+                    h1: (props) => (
+                      <h1
+                        className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4"
+                        {...props}
+                      />
+                    ),
+                    h2: (props) => (
+                      <h2
+                        className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mt-8 mb-4"
+                        {...props}
+                      />
+                    ),
+                    h3: (props) => (
+                      <h3
+                        className="text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3"
+                        {...props}
+                      />
+                    ),
+                    h4: (props) => (
+                      <h4
+                        className="text-lg font-medium text-gray-700 dark:text-gray-300 mt-4 mb-2"
+                        {...props}
+                      />
+                    ),
+                    p: (props) => (
+                      <p
+                        className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4"
+                        {...props}
+                      />
+                    ),
+                    code: (props) => {
+                      // Check if this is an inline code or a code block
+                      const isInline = !props.className;
+
+                      if (isInline) {
+                        // Inline code styling
+                        return (
+                          <code
+                            className="bg-gray-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 px-2 py-1 rounded text-sm font-mono border border-gray-200 dark:border-gray-700"
+                            {...props}
+                          />
+                        );
+                      } else {
+                        // Block code - use SyntaxHighlighter
+                        return <SyntaxHighlighter {...props} />;
+                      }
+                    },
+                    pre: (props) => {
+                      // Handle code blocks wrapped in <pre>
+                      const hasCodeChild = React.Children.toArray(
+                        props.children
+                      ).some(
+                        (child) =>
+                          React.isValidElement(child) && child.type === "code"
+                      );
+
+                      if (hasCodeChild) {
+                        // Let the code component handle it
+                        return <>{props.children}</>;
+                      } else {
+                        // Regular pre block
+                        return (
+                          <pre
+                            className="m-2 shadow-inner bg-gray-900/20 dark:bg-gray-950/20 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono whitespace-pre-wrap"
+                            {...props}
+                          />
+                        );
+                      }
+                    },
+                    ul: (props) => (
+                      <ul
+                        className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400 mb-4 ml-4"
+                        {...props}
+                      />
+                    ),
+                    ol: (props) => (
+                      <ol
+                        className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-400 mb-4 ml-4"
+                        {...props}
+                      />
+                    ),
+                    li: (props) => (
+                      <li
+                        className="text-gray-600 dark:text-gray-400 leading-relaxed"
+                        {...props}
+                      />
+                    ),
+                    strong: (props) => (
+                      <strong
+                        className="font-bold text-gray-900 dark:text-gray-100"
+                        {...props}
+                      />
+                    ),
+                    em: (props) => (
+                      <em
+                        className="italic text-gray-700 dark:text-gray-300"
+                        {...props}
+                      />
+                    ),
+                    blockquote: (props) => (
+                      <blockquote
+                        className="border-l-4 border-blue-400 dark:border-blue-500 pl-4 py-2 bg-blue-50 dark:bg-blue-900/20 text-gray-700 dark:text-gray-300 italic my-4 rounded-r-lg"
+                        {...props}
+                      />
+                    ),
+                    a: (props) => (
+                      <a
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline font-medium transition-colors"
+                        {...props}
+                      />
+                    ),
+                    hr: (props) => (
+                      <hr
+                        className="border-gray-300 dark:border-gray-600 my-8"
+                        {...props}
+                      />
+                    ),
                   }}
                 />
-              </div>
+              </article>
             ) : (
               <div className="flex items-center justify-center h-32">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -325,13 +458,13 @@ export default function TutorialPage({ params }: TutorialPageProps) {
 
           {/* Quiz Section */}
           {(tutorial.meta.quizQuestions > 0 || tutorial.quiz) && (
-            <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                     Ready for the Quiz?
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600 dark:text-gray-300">
                     Test your knowledge with{" "}
                     {tutorial.meta.quizQuestions ||
                       tutorial.quiz?.questions.length ||
@@ -339,7 +472,7 @@ export default function TutorialPage({ params }: TutorialPageProps) {
                     questions. You need 70% or higher to complete this tutorial.
                   </p>
                 </div>
-                <Brain className="w-12 h-12 text-blue-600" />
+                <Brain className="w-12 h-12 text-blue-600 dark:text-blue-400" />
               </div>
 
               <div
@@ -372,7 +505,7 @@ export default function TutorialPage({ params }: TutorialPageProps) {
           )}
 
           {/* Tutorial Navigation */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-lg mt-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl mt-8">
             <div className="flex justify-between items-center">
               <Link
                 href="/tutorials"

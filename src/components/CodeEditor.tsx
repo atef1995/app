@@ -2,12 +2,14 @@
 
 import React, { useState } from "react";
 import { executeJavaScriptSimple } from "@/lib/codeRunner";
+import Editor from "@monaco-editor/react";
+import { useTheme } from "@/components/providers/ThemeProvider";
 
 interface CodeEditorProps {
   initialCode?: string;
-  placeholder?: string;
   readOnly?: boolean;
   height?: string;
+  placeholder?: string;
   onCodeChange?: (code: string) => void;
 }
 
@@ -19,15 +21,16 @@ interface ExecutionResult {
 
 const CodeEditor: React.FC<CodeEditorProps> = ({
   initialCode = "",
-  placeholder = "// Write your JavaScript code here...",
   readOnly = false,
   height = "300px",
+  placeholder,
   onCodeChange,
 }) => {
   const [code, setCode] = useState(initialCode);
   const [result, setResult] = useState<ExecutionResult | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   // Update code when initialCode changes
   React.useEffect(() => {
@@ -66,29 +69,6 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       });
     } finally {
       setIsRunning(false);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-      e.preventDefault();
-      handleRunCode();
-    }
-
-    // Handle tab for indentation
-    if (e.key === "Tab") {
-      e.preventDefault();
-      const textarea = e.currentTarget;
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-
-      const newValue = code.substring(0, start) + "  " + code.substring(end);
-      handleCodeChange(newValue);
-
-      // Set cursor position after the inserted tab
-      setTimeout(() => {
-        textarea.selectionStart = textarea.selectionEnd = start + 2;
-      }, 0);
     }
   };
 
@@ -147,28 +127,91 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
           </div>
         )}
 
-        <textarea
+        <Editor
+          height={isExpanded ? "calc(100vh - 140px)" : height}
+          defaultLanguage="javascript"
           value={code}
-          onChange={(e) => handleCodeChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          readOnly={readOnly}
-          className={`w-full p-4 font-mono text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 resize-none focus:outline-none ${
-            isExpanded
-              ? "h-screen"
-              : height === "300px"
-              ? "h-72"
-              : height === "200px"
-              ? "h-48"
-              : height === "400px"
-              ? "h-96"
-              : "h-72"
-          }`}
-          spellCheck={false}
+          onChange={(value) => handleCodeChange(value || "")}
+          theme={resolvedTheme === "dark" ? "vs-dark" : "light"}
+          options={{
+            minimap: { enabled: false },
+            fontSize: 14,
+            lineNumbers: "on",
+            roundedSelection: false,
+            scrollBeyondLastLine: false,
+            readOnly: readOnly,
+            automaticLayout: true,
+            tabSize: 2,
+            insertSpaces: true,
+            wordWrap: "on",
+            formatOnType: true,
+            formatOnPaste: true,
+            suggest: {
+              showKeywords: true,
+              showSnippets: true,
+            },
+            quickSuggestions: {
+              other: true,
+              comments: true,
+              strings: true,
+            },
+            ...(placeholder && !code
+              ? {
+                  renderLineHighlight: "none",
+                  hideCursorInOverviewRuler: true,
+                  overviewRulerBorder: false,
+                }
+              : {}),
+          }}
+          onMount={(editor, monaco) => {
+            // Add keyboard shortcut for running code
+            editor.addCommand(
+              monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+              () => {
+                handleRunCode();
+              }
+            );
+
+            // Add placeholder support
+            if (placeholder && !code) {
+              const placeholderDecoration = editor.deltaDecorations(
+                [],
+                [
+                  {
+                    range: new monaco.Range(1, 1, 1, 1),
+                    options: {
+                      afterContentClassName: "placeholder-text",
+                      isWholeLine: false,
+                    },
+                  },
+                ]
+              );
+
+              // Add CSS for placeholder
+              const style = document.createElement("style");
+              style.textContent = `
+                .placeholder-text::after {
+                  content: "${placeholder}";
+                  color: #999;
+                  font-style: italic;
+                  pointer-events: none;
+                }
+              `;
+              document.head.appendChild(style);
+
+              // Remove placeholder when user starts typing
+              editor.onDidChangeModelContent(() => {
+                const content = editor.getValue();
+                if (content) {
+                  editor.deltaDecorations(placeholderDecoration, []);
+                }
+              });
+            }
+          }}
         />
 
         {!readOnly && (
-          <div className="absolute bottom-2 right-2 text-xs text-gray-400">
+          <div className="absolute bottom-2 right-2 text-xs text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-800 px-2 py-1 rounded">
             Ctrl+Enter to run
           </div>
         )}

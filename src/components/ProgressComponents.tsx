@@ -17,26 +17,30 @@ export function ProgressBadge({
   const getStatusIcon = () => {
     switch (status) {
       case "COMPLETED":
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
+        return (
+          <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+        );
       case "IN_PROGRESS":
-        return <Clock className="w-4 h-4 text-yellow-600" />;
+        return (
+          <Clock className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
+        );
       case "FAILED":
-        return <XCircle className="w-4 h-4 text-red-600" />;
+        return <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />;
       default:
-        return <Target className="w-4 h-4 text-gray-400" />;
+        return <Target className="w-4 h-4 text-gray-400 dark:text-gray-500" />;
     }
   };
 
   const getStatusColor = () => {
     switch (status) {
       case "COMPLETED":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 border-green-200 dark:border-green-700";
       case "IN_PROGRESS":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border-yellow-200 dark:border-yellow-700";
       case "FAILED":
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 border-red-200 dark:border-red-700";
       default:
-        return "bg-gray-100 text-gray-600 border-gray-200";
+        return "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600";
     }
   };
 
@@ -101,27 +105,31 @@ export function ProgressStats({
       : 0;
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-lg">
-      <h3 className="text-xl font-bold text-gray-900 mb-6">Your Progress</h3>
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl">
+      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+        Your Progress
+      </h3>
 
       <div className="space-y-6">
         {/* Tutorial Progress */}
         <div>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-700">Tutorials</span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Tutorials
+            </span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               {tutorialStats.completed}/{totalTutorials} completed
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
             <div
-              className={`bg-blue-600 h-2 rounded-full transition-all duration-300`}
+              className={`bg-blue-600 dark:bg-blue-500 h-2 rounded-full transition-all duration-300`}
               style={{
                 width: `${Math.min(100, Math.max(0, tutorialProgress))}%`,
               }}
             ></div>
           </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
             <span>{tutorialStats.inProgress} in progress</span>
             <span>{Math.round(tutorialProgress)}% complete</span>
           </div>
@@ -130,40 +138,44 @@ export function ProgressStats({
         {/* Challenge Progress */}
         <div>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Challenges
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               {challengeStats.completed}/{totalChallenges} passed
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
             <div
-              className={`bg-purple-600 h-2 rounded-full transition-all duration-300`}
+              className={`bg-purple-600 dark:bg-purple-500 h-2 rounded-full transition-all duration-300`}
               style={{
                 width: `${Math.min(100, Math.max(0, challengeProgress))}%`,
               }}
             ></div>
           </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
             <span>{challengeStats.failed} failed</span>
             <span>{Math.round(challengeProgress)}% passed</span>
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
               {tutorialStats.completed}
             </div>
-            <div className="text-xs text-gray-500">Tutorials Completed</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Tutorials Completed
+            </div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">
+            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
               {challengeStats.completed}
             </div>
-            <div className="text-xs text-gray-500">Challenges Passed</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Challenges Passed
+            </div>
           </div>
         </div>
       </div>

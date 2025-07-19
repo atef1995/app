@@ -17,6 +17,8 @@ export interface TutorialWithQuiz {
   difficulty: number;
   order: number;
   published: boolean;
+  isPremium: boolean;
+  requiredPlan: "FREE" | "PREMIUM" | "PRO";
   createdAt: Date;
   updatedAt: Date;
   quiz?: {
@@ -56,6 +58,8 @@ export class TutorialService {
       difficulty: tutorial.difficulty,
       order: tutorial.order,
       published: tutorial.published,
+      isPremium: tutorial.isPremium,
+      requiredPlan: tutorial.requiredPlan as "FREE" | "PREMIUM" | "PRO",
       createdAt: tutorial.createdAt,
       updatedAt: tutorial.updatedAt,
       quiz: tutorial.quizzes[0]
@@ -95,6 +99,8 @@ export class TutorialService {
       difficulty: tutorial.difficulty,
       order: tutorial.order,
       published: tutorial.published,
+      isPremium: tutorial.isPremium,
+      requiredPlan: tutorial.requiredPlan as "FREE" | "PREMIUM" | "PRO",
       createdAt: tutorial.createdAt,
       updatedAt: tutorial.updatedAt,
       quiz: tutorial.quizzes[0]
@@ -136,6 +142,8 @@ export class TutorialService {
       difficulty: tutorial.difficulty,
       order: tutorial.order,
       published: tutorial.published,
+      isPremium: tutorial.isPremium,
+      requiredPlan: tutorial.requiredPlan,
       createdAt: tutorial.createdAt,
       updatedAt: tutorial.updatedAt,
       quiz: tutorial.quizzes[0]
@@ -210,6 +218,8 @@ export class TutorialService {
       difficulty: tutorial.difficulty,
       order: tutorial.order,
       published: tutorial.published,
+      isPremium: tutorial.isPremium,
+      requiredPlan: tutorial.requiredPlan as "FREE" | "PREMIUM" | "PRO",
       createdAt: tutorial.createdAt,
       updatedAt: tutorial.updatedAt,
       quiz: tutorial.quizzes[0]

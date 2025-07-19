@@ -18,6 +18,25 @@ export interface Quiz {
   updatedAt: Date;
 }
 
+/**
+ * Helper function to safely parse questions from database JSON
+ */
+function parseQuestions(questionsData: unknown): Question[] {
+  try {
+    if (Array.isArray(questionsData)) {
+      return questionsData as Question[];
+    }
+    if (typeof questionsData === "string") {
+      const parsed = JSON.parse(questionsData);
+      return Array.isArray(parsed) ? parsed : [];
+    }
+    return [];
+  } catch (error) {
+    console.error("Error parsing questions:", error);
+    return [];
+  }
+}
+
 export class QuizService {
   /**
    * Get all quizzes from the database
@@ -31,7 +50,7 @@ export class QuizService {
 
     return quizzes.map((quiz) => ({
       ...quiz,
-      questions: quiz.questions as unknown as Question[],
+      questions: parseQuestions(quiz.questions),
     }));
   }
 
@@ -47,7 +66,7 @@ export class QuizService {
 
     return {
       ...quiz,
-      questions: quiz.questions as unknown as Question[],
+      questions: parseQuestions(quiz.questions),
     };
   }
 
@@ -64,7 +83,7 @@ export class QuizService {
 
     return quizzes.map((quiz) => ({
       ...quiz,
-      questions: quiz.questions as unknown as Question[],
+      questions: parseQuestions(quiz.questions),
     }));
   }
 
