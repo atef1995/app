@@ -27,6 +27,7 @@ function convertDbChallengeToFrontend(dbChallenge: DbChallenge): Challenge {
 
   return {
     id: dbChallenge.id,
+    slug: dbChallenge.slug,
     title: dbChallenge.title,
     description: dbChallenge.description,
     difficulty: dbChallenge.difficulty.toLowerCase() as
@@ -40,12 +41,14 @@ function convertDbChallengeToFrontend(dbChallenge: DbChallenge): Challenge {
       | "object"
       | "logic",
     estimatedTime: dbChallenge.estimatedTime,
+    isPremium: dbChallenge.isPremium,
+    requiredPlan: dbChallenge.requiredPlan,
     moodAdapted: moodAdaptations,
     starter: dbChallenge.starter,
     solution: dbChallenge.solution,
     tests: dbChallenge.tests.map((test) => ({
-      input: JSON.parse(test.input as string),
-      expected: JSON.parse(test.expected as string),
+      input: test.input as unknown,
+      expected: test.expected as unknown,
       description: test.description,
     })),
   };
@@ -85,6 +88,27 @@ export async function getChallengeById(id: string): Promise<Challenge | null> {
     return convertDbChallengeToFrontend(dbChallenge);
   } catch (error) {
     console.error("Error fetching challenge by ID:", error);
+    return null;
+  }
+}
+
+export async function getChallengeBySlug(slug: string): Promise<Challenge | null> {
+  try {
+    const dbChallenge = await prisma.challenge.findUnique({
+      where: { slug },
+      include: {
+        tests: true,
+        moodAdaptations: true,
+      },
+    });
+
+    if (!dbChallenge) {
+      return null;
+    }
+
+    return convertDbChallengeToFrontend(dbChallenge);
+  } catch (error) {
+    console.error("Error fetching challenge by slug:", error);
     return null;
   }
 }

@@ -279,7 +279,13 @@ export class ProgressService {
    * Get user's overall progress stats
    */
   static async getUserStats(userId: string) {
-    const [tutorialStats, challengeStats, recentActivity] = await Promise.all([
+    const [
+      tutorialStats,
+      challengeStats,
+      recentActivity,
+      totalTutorials,
+      totalChallenges,
+    ] = await Promise.all([
       // Tutorial stats
       prisma.tutorialProgress.groupBy({
         by: ["status"],
@@ -314,30 +320,55 @@ export class ProgressService {
         },
         take: 10,
       }),
+
+      // Total available tutorials
+      prisma.tutorial.count(),
+
+      // Total available challenges
+      prisma.challenge.count(),
     ]);
+
+    const completedTutorials =
+      tutorialStats.find((s) => s.status === CompletionStatus.COMPLETED)?._count
+        .status || 0;
+    const inProgressTutorials =
+      tutorialStats.find((s) => s.status === CompletionStatus.IN_PROGRESS)
+        ?._count.status || 0;
+    const notStartedTutorials = Math.max(
+      0,
+      totalTutorials - completedTutorials - inProgressTutorials
+    );
+
+    const completedChallenges =
+      challengeStats.find((s) => s.status === CompletionStatus.COMPLETED)
+        ?._count.status || 0;
+    const inProgressChallenges =
+      challengeStats.find((s) => s.status === CompletionStatus.IN_PROGRESS)
+        ?._count.status || 0;
+    const failedChallenges =
+      challengeStats.find((s) => s.status === CompletionStatus.FAILED)?._count
+        .status || 0;
+    const notStartedChallenges = Math.max(
+      0,
+      totalChallenges -
+        completedChallenges -
+        inProgressChallenges -
+        failedChallenges
+    );
 
     return {
       tutorials: {
-        completed:
-          tutorialStats.find((s) => s.status === CompletionStatus.COMPLETED)
-            ?._count.status || 0,
-        inProgress:
-          tutorialStats.find((s) => s.status === CompletionStatus.IN_PROGRESS)
-            ?._count.status || 0,
-        notStarted:
-          tutorialStats.find((s) => s.status === CompletionStatus.NOT_STARTED)
-            ?._count.status || 0,
+        completed: completedTutorials,
+        inProgress: inProgressTutorials,
+        notStarted: notStartedTutorials,
+        total: totalTutorials,
       },
       challenges: {
-        completed:
-          challengeStats.find((s) => s.status === CompletionStatus.COMPLETED)
-            ?._count.status || 0,
-        inProgress:
-          challengeStats.find((s) => s.status === CompletionStatus.IN_PROGRESS)
-            ?._count.status || 0,
-        failed:
-          challengeStats.find((s) => s.status === CompletionStatus.FAILED)
-            ?._count.status || 0,
+        completed: completedChallenges,
+        inProgress: inProgressChallenges,
+        failed: failedChallenges,
+        notStarted: notStartedChallenges,
+        total: totalChallenges,
       },
       recentActivity,
     };

@@ -24,7 +24,10 @@ export interface TutorialWithQuiz {
   quiz?: {
     id: string;
     title: string;
+    slug: string;
     questions: QuizQuestion[];
+    isPremium: boolean;
+    requiredPlan: string;
   };
 }
 
@@ -66,8 +69,11 @@ export class TutorialService {
         ? {
             id: tutorial.quizzes[0].id,
             title: tutorial.quizzes[0].title,
+            slug: tutorial.quizzes[0].slug,
             questions: tutorial.quizzes[0]
               .questions as unknown as QuizQuestion[],
+            isPremium: tutorial.quizzes[0].isPremium,
+            requiredPlan: tutorial.quizzes[0].requiredPlan,
           }
         : undefined,
     }));
@@ -107,8 +113,11 @@ export class TutorialService {
         ? {
             id: tutorial.quizzes[0].id,
             title: tutorial.quizzes[0].title,
+            slug: tutorial.quizzes[0].slug,
             questions: tutorial.quizzes[0]
               .questions as unknown as QuizQuestion[],
+            isPremium: tutorial.quizzes[0].isPremium,
+            requiredPlan: tutorial.quizzes[0].requiredPlan,
           }
         : undefined,
     };
@@ -143,15 +152,18 @@ export class TutorialService {
       order: tutorial.order,
       published: tutorial.published,
       isPremium: tutorial.isPremium,
-      requiredPlan: tutorial.requiredPlan,
+      requiredPlan: tutorial.requiredPlan as "FREE" | "PREMIUM" | "PRO",
       createdAt: tutorial.createdAt,
       updatedAt: tutorial.updatedAt,
       quiz: tutorial.quizzes[0]
         ? {
             id: tutorial.quizzes[0].id,
             title: tutorial.quizzes[0].title,
+            slug: tutorial.quizzes[0].slug,
             questions: tutorial.quizzes[0]
               .questions as unknown as QuizQuestion[],
+            isPremium: tutorial.quizzes[0].isPremium,
+            requiredPlan: tutorial.quizzes[0].requiredPlan,
           }
         : undefined,
     };
@@ -226,8 +238,11 @@ export class TutorialService {
         ? {
             id: tutorial.quizzes[0].id,
             title: tutorial.quizzes[0].title,
+            slug: tutorial.quizzes[0].slug,
             questions: tutorial.quizzes[0]
               .questions as unknown as QuizQuestion[],
+            isPremium: tutorial.quizzes[0].isPremium,
+            requiredPlan: tutorial.quizzes[0].requiredPlan,
           }
         : undefined,
     }));

@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { basicChallenges } from "../src/data/challenges/basic";
 import { algorithmChallenges } from "../src/data/challenges/algorithms";
+import { slugify, generateUniqueSlug } from "../src/lib/slugify";
 
 const prisma = new PrismaClient();
 
@@ -364,14 +365,21 @@ async function main() {
 
   // Combine all challenges
   const allChallenges = [...basicChallenges, ...algorithmChallenges];
+  const existingSlugs: string[] = [];
 
   for (const challenge of allChallenges) {
     console.log(`🔧 Creating challenge: ${challenge.title}`);
+
+    // Generate unique slug
+    const baseSlug = slugify(challenge.title);
+    const uniqueSlug = generateUniqueSlug(baseSlug, existingSlugs);
+    existingSlugs.push(uniqueSlug);
 
     // Create the challenge
     const createdChallenge = await prisma.challenge.create({
       data: {
         id: challenge.id,
+        slug: uniqueSlug,
         title: challenge.title,
         description: challenge.description,
         difficulty: challenge.difficulty.toUpperCase() as

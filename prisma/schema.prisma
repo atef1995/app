@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -23,8 +20,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
@@ -41,28 +37,27 @@ model Session {
 }
 
 model User {
-  id                 String             @id @default(cuid())
+  id                 String              @id @default(cuid())
   name               String?
-  email              String             @unique
+  email              String              @unique
   emailVerified      DateTime?
   image              String?
-  mood               Mood               @default(CHILL)
-  subscription       Plan               @default(FREE)
-  subscriptionStatus SubscriptionStatus @default(INACTIVE)
+  mood               String              @default("CHILL")
+  subscription       String              @default("FREE")
+  subscriptionStatus String              @default("INACTIVE")
   subscriptionEndsAt DateTime?
   stripeCustomerId   String?
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-
-  accounts          Account[]
-  sessions          Session[]
-  tutorialProgress  TutorialProgress[]
-  challengeProgress ChallengeProgress[]
-  progress          Progress[]
-  quizAttempts      QuizAttempt[]
-  challengeAttempts ChallengeAttempt[]
-  payments          Payment[]
-  subscriptions     Subscription[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  accounts           Account[]
+  challengeAttempts  ChallengeAttempt[]
+  challengeProgress  ChallengeProgress[]
+  payments           Payment[]
+  progress           Progress[]
+  quizAttempts       QuizAttempt[]
+  sessions           Session[]
+  subscriptions      Subscription[]
+  tutorialProgress   TutorialProgress[]
 
   @@map("users")
 }
@@ -77,37 +72,38 @@ model VerificationToken {
 }
 
 model Tutorial {
-  id           String   @id @default(cuid())
-  slug         String   @unique
-  title        String
-  description  String?
-  content      String? // Optional - content can come from MDX file
-  mdxFile      String? // Reference to MDX file name
-  difficulty   Int      @default(1)
-  order        Int
-  published    Boolean  @default(false)
-  isPremium    Boolean  @default(false) // Premium content lock
-  requiredPlan Plan     @default(FREE) // Minimum plan required
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
+  id               String             @id @default(cuid())
+  slug             String             @unique
+  title            String
+  description      String?
+  content          String?
+  mdxFile          String?
+  difficulty       Int                @default(1)
+  order            Int
+  published        Boolean            @default(false)
+  isPremium        Boolean            @default(false)
+  requiredPlan     String             @default("FREE")
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  progress         Progress[]
   quizzes          Quiz[]
   tutorialProgress TutorialProgress[]
-  progress         Progress[]
 
   @@map("tutorials")
 }
 
 model Quiz {
-  id         String   @id @default(cuid())
-  tutorialId String
-  title      String
-  questions  Json // Array of question objects
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  tutorial Tutorial      @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
-  attempts QuizAttempt[]
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  tutorialId   String
+  title        String
+  questions    Json
+  isPremium    Boolean       @default(false)
+  requiredPlan String        @default("FREE")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  attempts     QuizAttempt[]
+  tutorial     Tutorial      @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
 
   @@map("quizzes")
 }
@@ -116,56 +112,53 @@ model QuizAttempt {
   id         String   @id @default(cuid())
   userId     String
   quizId     String
-  tutorialId String // link to tutorial for completion tracking
-  answers    Json // array of user answers
-  score      Float // percentage score (0-100)
-  passed     Boolean // whether they passed (score >= passing threshold)
-  timeSpent  Int? // time in seconds
-  mood       Mood
+  tutorialId String
+  answers    Json
+  score      Float
+  passed     Boolean
+  timeSpent  Int?
+  mood       String
   createdAt  DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quiz       Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("quiz_attempts")
 }
 
 model TutorialProgress {
-  id           String           @id @default(cuid())
+  id           String    @id @default(cuid())
   userId       String
   tutorialId   String
-  status       CompletionStatus @default(NOT_STARTED)
-  quizPassed   Boolean          @default(false)
-  quizAttempts Int              @default(0)
-  bestScore    Float? // best quiz score percentage
-  timeSpent    Int? // total time in seconds
+  status       String    @default("NOT_STARTED")
+  quizPassed   Boolean   @default(false)
+  quizAttempts Int       @default(0)
+  bestScore    Float?
+  timeSpent    Int?
   completedAt  DateTime?
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
-
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tutorial Tutorial @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  tutorial     Tutorial  @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, tutorialId])
   @@map("tutorial_progress")
 }
 
 model ChallengeProgress {
-  id             String           @id @default(cuid())
+  id             String    @id @default(cuid())
   userId         String
   challengeId    String
-  status         CompletionStatus @default(NOT_STARTED)
-  passed         Boolean          @default(false)
-  attempts       Int              @default(0)
-  failedAttempts Int              @default(0)
-  bestTime       Int? // best completion time in seconds
+  status         String    @default("NOT_STARTED")
+  passed         Boolean   @default(false)
+  attempts       Int       @default(0)
+  failedAttempts Int       @default(0)
+  bestTime       Int?
   firstPassedAt  DateTime?
   lastAttemptAt  DateTime?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  challenge      Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, challengeId])
   @@map("challenge_progress")
@@ -176,15 +169,14 @@ model Progress {
   userId       String
   tutorialId   String
   completed    Boolean   @default(false)
-  score        Float? // percentage score
-  timeSpent    Int? // total time in seconds
+  score        Float?
+  timeSpent    Int?
   quizzesTaken Int       @default(0)
   completedAt  DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tutorial Tutorial @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  tutorial     Tutorial  @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, tutorialId])
   @@map("progress")
@@ -197,8 +189,8 @@ model CodeExecution {
   result     String?
   error      String?
   success    Boolean
-  timeSpent  Int? // execution time in ms
-  mood       Mood?
+  timeSpent  Int?
+  mood       String?
   tutorialId String?
   createdAt  DateTime @default(now())
 
@@ -206,151 +198,97 @@ model CodeExecution {
 }
 
 model Challenge {
-  id            String        @id @default(cuid())
-  title         String
-  description   String
-  difficulty    Difficulty    @default(EASY)
-  type          ChallengeType @default(FUNCTION)
-  estimatedTime String
-  starter       String // starter code
-  solution      String // solution code
-  order         Int           @default(0)
-  published     Boolean       @default(true)
-  isPremium     Boolean       @default(false) // Premium content lock
-  requiredPlan  Plan          @default(FREE) // Minimum plan required
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-
-  moodAdaptations   ChallengeMoodAdaptation[]
-  tests             ChallengeTest[]
+  id                String                    @id @default(cuid())
+  slug              String                    @unique
+  title             String
+  description       String
+  difficulty        String                    @default("EASY")
+  type              String                    @default("FUNCTION")
+  estimatedTime     String
+  starter           String
+  solution          String
+  order             Int                       @default(0)
+  published         Boolean                   @default(true)
+  isPremium         Boolean                   @default(false)
+  requiredPlan      String                    @default("FREE")
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
   attempts          ChallengeAttempt[]
+  moodAdaptations   ChallengeMoodAdaptation[]
   challengeProgress ChallengeProgress[]
+  tests             ChallengeTest[]
 
   @@map("challenges")
 }
 
 model ChallengeMoodAdaptation {
-  id          String @id @default(cuid())
+  id          String    @id @default(cuid())
   challengeId String
-  mood        Mood
-  content     String // mood-specific motivation text
-
-  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  mood        String
+  content     String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
 
   @@unique([challengeId, mood])
   @@map("challenge_mood_adaptations")
 }
 
 model ChallengeTest {
-  id          String @id @default(cuid())
+  id          String    @id @default(cuid())
   challengeId String
-  input       Json // test input data
-  expected    Json // expected output
+  input       Json
+  expected    Json
   description String
-  order       Int    @default(0)
-
-  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  order       Int       @default(0)
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
 
   @@map("challenge_tests")
 }
 
 model ChallengeAttempt {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
   challengeId String
   code        String
   passed      Boolean
-  timeSpent   Int? // time in seconds
-  mood        Mood
-  createdAt   DateTime @default(now())
-
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  timeSpent   Int?
+  mood        String
+  createdAt   DateTime  @default(now())
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("challenge_attempts")
 }
 
 model Payment {
-  id                    String        @id @default(cuid())
+  id                    String   @id @default(cuid())
   userId                String
-  amount                Float // amount in cents
-  currency              String        @default("usd")
-  status                PaymentStatus @default(PENDING)
+  amount                Float
+  currency              String   @default("usd")
+  status                String   @default("PENDING")
   stripePaymentIntentId String?
   stripeSessionId       String?
-  plan                  Plan
-  metadata              Json? // additional payment info
-  createdAt             DateTime      @default(now())
-  updatedAt             DateTime      @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                  String
+  metadata              Json?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("payments")
 }
 
 model Subscription {
-  id                   String             @id @default(cuid())
+  id                   String   @id @default(cuid())
   userId               String
-  plan                 Plan
-  status               SubscriptionStatus @default(TRIAL)
+  plan                 String
+  status               String   @default("TRIAL")
   stripeSubscriptionId String?
   stripePriceId        String?
   currentPeriodStart   DateTime
   currentPeriodEnd     DateTime
-  cancelAtPeriodEnd    Boolean            @default(false)
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cancelAtPeriodEnd    Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("subscriptions")
-}
-
-enum Mood {
-  CHILL
-  RUSH
-  GRIND
-}
-
-enum Plan {
-  FREE
-  PREMIUM
-  PRO
-}
-
-enum PaymentStatus {
-  PENDING
-  COMPLETED
-  FAILED
-  CANCELLED
-  REFUNDED
-}
-
-enum SubscriptionStatus {
-  ACTIVE
-  INACTIVE
-  CANCELLED
-  EXPIRED
-  TRIAL
-}
-
-enum Difficulty {
-  EASY
-  MEDIUM
-  HARD
-}
-
-enum ChallengeType {
-  ALGORITHM
-  FUNCTION
-  ARRAY
-  OBJECT
-  LOGIC
-}
-
-enum CompletionStatus {
-  NOT_STARTED
-  IN_PROGRESS
-  COMPLETED
-  FAILED
 }

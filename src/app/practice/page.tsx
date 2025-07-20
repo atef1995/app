@@ -236,7 +236,7 @@ export default function PracticePage() {
             {challenges.map((challenge) => (
               <Link
                 key={challenge.id}
-                href={`/practice/${challenge.id}`}
+                href={`/practice/${challenge.slug}`}
                 className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl dark:shadow-xl transition-all border-2 border-transparent hover:border-purple-200 dark:hover:border-purple-600"
               >
                 <div className="flex items-center justify-between mb-4">

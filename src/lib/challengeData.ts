@@ -1,6 +1,7 @@
 import {
   getAllChallenges as dbGetAllChallenges,
   getChallengeById as dbGetChallengeById,
+  getChallengeBySlug as dbGetChallengeBySlug,
   getFilteredChallenges as dbGetFilteredChallenges,
   getChallengeTypes as dbGetChallengeTypes,
   getChallengeDifficulties as dbGetChallengeDifficulties,
@@ -42,6 +43,26 @@ export async function getChallengeById(id: string): Promise<Challenge | null> {
       return data.challenge || null;
     } catch (error) {
       console.error("Error fetching challenge from API:", error);
+      return null;
+    }
+  }
+}
+
+export async function getChallengeBySlug(slug: string): Promise<Challenge | null> {
+  if (typeof window === "undefined") {
+    // Server-side: use database service directly
+    return await dbGetChallengeBySlug(slug);
+  } else {
+    // Client-side: fetch from API
+    try {
+      const response = await fetch(`/api/challenges/slug/${slug}`);
+      if (!response.ok) {
+        return null;
+      }
+      const data = await response.json();
+      return data.challenge || null;
+    } catch (error) {
+      console.error("Error fetching challenge by slug from API:", error);
       return null;
     }
   }

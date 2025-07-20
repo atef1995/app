@@ -340,7 +340,7 @@ export default function TutorialsPage() {
                 });
                 setShowPremiumModal(true);
               } else {
-                window.location.href = `/tutorials/${tutorial.id}`;
+                window.location.href = `/tutorials/${tutorial.slug}`;
               }
             };
 
@@ -451,7 +451,7 @@ export default function TutorialsPage() {
 
                 {/* Tutorial Access Button */}
                 <Link
-                  href={`/tutorials/${tutorial.id}`}
+                  href={`/tutorials/${tutorial.slug}`}
                   className="w-full bg-blue-600 dark:bg-blue-700 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors text-center flex items-center justify-center gap-2"
                   onClick={(e) => {
                     if (

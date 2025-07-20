@@ -1,0 +1,454 @@
+---
+title: "Functions Fundamentals in JavaScript"
+description: "Learn the basics of JavaScript functions and how to use them effectively"
+level: "beginner"
+estimatedTime: "30 minutes"
+topics: ["Functions", "Parameters", "Return Values", "Function Types"]
+quizQuestions: 8
+order: 2
+---
+
+# Functions Fundamentals in JavaScript
+
+Welcome back! 🚀 Now that you understand variables and data types, let's dive into one of the most important concepts in JavaScript: **functions**.
+
+## What are Functions?
+
+Functions are reusable blocks of code that perform specific tasks. Think of them as mini-programs within your program!
+
+```javascript
+function greetUser(name) {
+  return `Hello, ${name}! Welcome to Vibed to Cracked!`;
+}
+
+// Using the function
+let message = greetUser("Alex");
+console.log(message); // "Hello, Alex! Welcome to Vibed to Cracked!"
+```
+
+Think of functions like recipes in a cookbook:
+- **Input (Ingredients)**: Parameters you pass to the function
+- **Process (Steps)**: The code inside the function
+- **Output (Final Dish)**: The value the function returns
+
+## Function Declaration vs Function Expression
+
+### 1. Function Declaration
+
+```javascript
+function calculateArea(width, height) {
+  return width * height;
+}
+```
+
+**Features:**
+- Hoisted (can be called before declaration)
+- Named function
+- Traditional syntax
+- Best for main program logic
+
+**Example of Hoisting:**
+```javascript
+// This works! Function is hoisted
+console.log(sayHello("World")); // "Hello, World!"
+
+function sayHello(name) {
+  return `Hello, ${name}!`;
+}
+```
+
+### 2. Function Expression
+
+```javascript
+const calculateArea = function (width, height) {
+  return width * height;
+};
+```
+
+**Features:**
+- Not hoisted (must be declared before use)
+- Can be anonymous or named
+- Stored in a variable
+- Good for conditional function creation
+
+**Example:**
+```javascript
+// This won't work - function not hoisted
+// console.log(multiply(2, 3)); // Error!
+
+const multiply = function(a, b) {
+  return a * b;
+};
+
+console.log(multiply(2, 3)); // 6 - Works!
+```
+
+## Parameters and Arguments
+
+### Basic Parameters
+
+Parameters are like placeholders that accept values when the function is called:
+
+```javascript
+function createProfile(name, age, city) {
+  return {
+    name: name,
+    age: age,
+    city: city,
+    isActive: true,
+  };
+}
+
+let profile = createProfile("Sarah", 28, "New York");
+console.log(profile);
+// { name: "Sarah", age: 28, city: "New York", isActive: true }
+```
+
+### Default Parameters
+
+Set default values for parameters when no argument is provided:
+
+```javascript
+function greetUser(name = "Friend", timeOfDay = "day") {
+  return `Good ${timeOfDay}, ${name}!`;
+}
+
+console.log(greetUser()); // "Good day, Friend!"
+console.log(greetUser("Alice")); // "Good day, Alice!"
+console.log(greetUser("Bob", "morning")); // "Good morning, Bob!"
+```
+
+### Rest Parameters (...)
+
+Collect multiple arguments into an array:
+
+```javascript
+function calculateTotal(...numbers) {
+  let total = 0;
+  for (let number of numbers) {
+    total += number;
+  }
+  return total;
+}
+
+console.log(calculateTotal(1, 2, 3, 4, 5)); // 15
+console.log(calculateTotal(10, 20)); // 30
+console.log(calculateTotal()); // 0
+```
+
+## Return Values
+
+Functions can return values using the `return` statement:
+
+```javascript
+function multiply(a, b) {
+  return a * b; // Returns the result
+}
+
+function isEven(number) {
+  return number % 2 === 0; // Returns true or false
+}
+
+function processData(data) {
+  // Multiple return paths
+  if (!data) {
+    return "No data provided";
+  }
+
+  if (data.length === 0) {
+    return "Empty data set";
+  }
+
+  return `Processed ${data.length} items`;
+}
+```
+
+**Important:** Functions without a `return` statement return `undefined`.
+
+```javascript
+function noReturn() {
+  console.log("I don't return anything");
+}
+
+let result = noReturn(); // Logs: "I don't return anything"
+console.log(result); // undefined
+```
+
+## Real-World Examples
+
+### 1. Input Validation
+
+```javascript
+function validateEmail(email) {
+  if (!email) {
+    return false;
+  }
+  return email.includes("@") && email.includes(".");
+}
+
+function validatePassword(password) {
+  return password && password.length >= 8;
+}
+
+// Using validation functions
+const userEmail = "user@example.com";
+const userPassword = "mypassword123";
+
+if (validateEmail(userEmail) && validatePassword(userPassword)) {
+  console.log("User credentials are valid!");
+} else {
+  console.log("Invalid credentials");
+}
+```
+
+### 2. Data Processing
+
+```javascript
+function formatCurrency(amount, currency = "USD") {
+  return `${currency} $${amount.toFixed(2)}`;
+}
+
+function calculateDiscount(price, discountPercent) {
+  const discount = price * (discountPercent / 100);
+  return price - discount;
+}
+
+// Usage
+const originalPrice = 100;
+const discountedPrice = calculateDiscount(originalPrice, 20);
+console.log(formatCurrency(discountedPrice)); // "USD $80.00"
+```
+
+### 3. Reusable Utilities
+
+```javascript
+function getRandomNumber(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function capitalizeFirstLetter(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function isValidAge(age) {
+  return age >= 0 && age <= 150;
+}
+
+// Usage
+console.log(getRandomNumber(1, 10)); // Random number between 1-10
+console.log(capitalizeFirstLetter("hello")); // "Hello"
+console.log(isValidAge(25)); // true
+console.log(isValidAge(-5)); // false
+```
+
+## Best Practices
+
+### 1. Use Descriptive Names
+
+```javascript
+// ❌ Bad
+function calc(x, y) {
+  return x * y;
+}
+
+// ✅ Good
+function calculateRectangleArea(width, height) {
+  return width * height;
+}
+```
+
+### 2. Keep Functions Small and Focused
+
+```javascript
+// ❌ Bad - does too many things
+function processUserData(userData) {
+  // validate data
+  // format data
+  // save to database
+  // send email
+  // update UI
+  // ... 50 lines of code
+}
+
+// ✅ Good - single responsibility
+function validateUserData(userData) {
+  // validation logic only
+  return userData.name && userData.email;
+}
+
+function formatUserData(userData) {
+  // formatting logic only
+  return {
+    name: userData.name.trim(),
+    email: userData.email.toLowerCase()
+  };
+}
+
+function saveUser(userData) {
+  // database logic only
+  console.log("Saving user:", userData);
+}
+```
+
+### 3. Handle Edge Cases
+
+```javascript
+// ❌ Bad
+function divide(a, b) {
+  return a / b;
+}
+
+// ✅ Good
+function divide(a, b) {
+  if (b === 0) {
+    return "Cannot divide by zero";
+  }
+  if (typeof a !== 'number' || typeof b !== 'number') {
+    return "Both arguments must be numbers";
+  }
+  return a / b;
+}
+```
+
+## Your Turn! 💪
+
+Practice with these exercises:
+
+{/* prettier-ignore-start */}
+### Exercise 1: Temperature Converter
+
+<InteractiveCodeBlock 
+  title="Temperature Converter" 
+  description="Complete the temperature conversion functions"
+  initialCode={`function celsiusToFahrenheit(celsius) {
+  // Your code here
+  // Formula: (celsius * 9/5) + 32
+}
+
+function fahrenheitToCelsius(fahrenheit) {
+  // Your code here
+  // Formula: (fahrenheit - 32) * 5/9
+}
+
+// Test your functions
+console.log(celsiusToFahrenheit(0)); // Should be 32
+console.log(fahrenheitToCelsius(32)); // Should be 0`}
+/>
+
+### Exercise 2: Age Calculator
+
+<InteractiveCodeBlock 
+  title="Age Calculator" 
+  description="Calculate age from birth year"
+  initialCode={`function calculateAge(birthYear, currentYear = 2025) {
+  // Calculate and return the age
+  // Handle edge cases (future birth year, negative values)
+}
+
+// Test your function
+console.log(calculateAge(1995)); // Should be 30
+console.log(calculateAge(2030)); // Should handle future year
+console.log(calculateAge(-100)); // Should handle invalid input`}
+/>
+
+### Exercise 3: Number Utilities
+
+<InteractiveCodeBlock 
+  title="Number Utilities" 
+  description="Create utility functions for numbers"
+  initialCode={`function isEven(number) {
+  // Return true if number is even, false otherwise
+}
+
+function findLargest(a, b, c) {
+  // Return the largest of three numbers
+}
+
+function roundToDecimals(number, decimals = 2) {
+  // Round number to specified decimal places
+}
+
+// Test your functions
+console.log(isEven(4)); // true
+console.log(findLargest(10, 5, 8)); // 10
+console.log(roundToDecimals(3.14159, 2)); // 3.14`}
+/>
+{/* prettier-ignore-end */}
+
+## Common Pitfalls to Avoid
+
+### 1. Forgetting to Return
+
+```javascript
+// ❌ Bad
+function addNumbers(a, b) {
+  a + b; // Missing return!
+}
+
+console.log(addNumbers(2, 3)); // undefined
+
+// ✅ Good
+function addNumbers(a, b) {
+  return a + b;
+}
+
+console.log(addNumbers(2, 3)); // 5
+```
+
+### 2. Not Handling Missing Parameters
+
+```javascript
+// ❌ Bad
+function greet(firstName, lastName) {
+  return `Hello, ${firstName} ${lastName}!`;
+}
+
+console.log(greet("John")); // "Hello, John undefined!"
+
+// ✅ Good
+function greet(firstName, lastName = "") {
+  return `Hello, ${firstName} ${lastName}!`.trim();
+}
+
+console.log(greet("John")); // "Hello, John!"
+```
+
+### 3. Function Naming Issues
+
+```javascript
+// ❌ Bad
+function func1() { /* ... */ }
+function doStuff() { /* ... */ }
+function x() { /* ... */ }
+
+// ✅ Good
+function calculateTotalPrice() { /* ... */ }
+function validateUserInput() { /* ... */ }
+function formatPhoneNumber() { /* ... */ }
+```
+
+## Key Takeaways
+
+🎯 **Functions are reusable blocks of code** that make programs modular and maintainable
+
+🎯 **Function declarations are hoisted**, function expressions are not
+
+🎯 **Parameters** are inputs, **return values** are outputs
+
+🎯 **Default parameters** help handle missing arguments gracefully
+
+🎯 **Descriptive names** and **single responsibility** make functions easier to understand
+
+## Quiz Time! 🧠
+
+You've learned the fundamentals of functions! Time to test your understanding with a quiz.
+
+## What's Next?
+
+Great progress! 🎉 You now understand the basics of functions. Coming up next:
+
+- **Advanced Functions & Scope** - Arrow functions, anonymous functions, closures, and scope
+- **Arrays and Objects** - Organize and manipulate data collections
+- **Loops and Conditionals** - Control the flow of your programs
+
+Keep building those coding fundamentals! 💪

@@ -1,5 +1,6 @@
-import { PrismaClient, Difficulty } from "@prisma/client";
-import { quizzes } from "../src/data/quizzes";
+import { PrismaClient } from "@prisma/client";
+import { quizzes, Quiz } from "../src/data/quizzes";
+import { slugify, generateUniqueSlug } from "../src/lib/slugify";
 
 const prisma = new PrismaClient();
 
@@ -73,39 +74,41 @@ async function main() {
 
   console.log("Created tutorials...");
 
-  // Now process quizzes - flatten questions into individual Quiz records
+  // Get existing quiz slugs to avoid conflicts
+  const existingQuizzes = await prisma.quiz.findMany({
+    select: { slug: true }
+  });
+  const existingSlugs = existingQuizzes.map(q => q.slug).filter(Boolean);
+
+  // Now process quizzes - create single Quiz records with questions as JSON
   const quizArray = Object.values(quizzes);
 
   for (const quiz of quizArray) {
     const tutorialId = quiz.tutorialId.toString();
+    
+    // Generate unique slug for the quiz
+    const baseSlug = slugify(quiz.title);
+    const uniqueSlug = generateUniqueSlug(baseSlug, existingSlugs);
+    existingSlugs.push(uniqueSlug);
 
-    // Create quiz questions as individual Quiz records
-    for (let i = 0; i < quiz.questions.length; i++) {
-      const question = quiz.questions[i];
+    const quizRecord = {
+      id: quiz.id.toString(),
+      tutorialId: tutorialId,
+      title: quiz.title,
+      slug: uniqueSlug,
+      questions: quiz.questions, // Store as JSON
+    };
 
-      const quizRecord = {
-        id: `${quiz.id}-${question.id}`, // Create unique ID
-        tutorialId: tutorialId,
-        question: question.question,
-        options: question.options, // JSON array
-        correctAnswer: question.correct,
-        explanation: question.explanation,
-        difficulty: question.difficulty.toUpperCase() as
-          | "EASY"
-          | "MEDIUM"
-          | "HARD",
-        order: i + 1,
-      };
+    await prisma.quiz.upsert({
+      where: { id: quizRecord.id },
+      update: quizRecord,
+      create: quizRecord,
+    });
 
-      await prisma.quiz.upsert({
-        where: { id: quizRecord.id },
-        update: quizRecord,
-        create: quizRecord,
-      });
-    }
+    console.log(`✅ Created quiz "${quiz.title}" with slug: ${uniqueSlug}`);
   }
 
-  console.log("Seeded quiz questions...");
+  console.log("Seeded quizzes...");
   console.log("Seeding completed!");
 }
 

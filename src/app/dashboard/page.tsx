@@ -12,11 +12,14 @@ interface ProgressStats {
     completed: number;
     inProgress: number;
     notStarted: number;
+    total: number;
   };
   challenges: {
     completed: number;
     inProgress: number;
     failed: number;
+    notStarted: number;
+    total: number;
   };
 }
 

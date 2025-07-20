@@ -76,11 +76,14 @@ interface ProgressStatsProps {
     completed: number;
     inProgress: number;
     notStarted: number;
+    total: number; // Total available tutorials in the system
   };
   challengeStats: {
     completed: number;
     inProgress: number;
     failed: number;
+    notStarted: number;
+    total: number; // Total available challenges in the system
   };
 }
 
@@ -88,14 +91,8 @@ export function ProgressStats({
   tutorialStats,
   challengeStats,
 }: ProgressStatsProps) {
-  const totalTutorials =
-    tutorialStats.completed +
-    tutorialStats.inProgress +
-    tutorialStats.notStarted;
-  const totalChallenges =
-    challengeStats.completed +
-    challengeStats.inProgress +
-    challengeStats.failed;
+  const totalTutorials = tutorialStats.total;
+  const totalChallenges = challengeStats.total;
 
   const tutorialProgress =
     totalTutorials > 0 ? (tutorialStats.completed / totalTutorials) * 100 : 0;
@@ -103,6 +100,13 @@ export function ProgressStats({
     totalChallenges > 0
       ? (challengeStats.completed / totalChallenges) * 100
       : 0;
+
+  // Clamp progress values between 0 and 100
+  const clampedTutorialProgress = Math.min(100, Math.max(0, tutorialProgress));
+  const clampedChallengeProgress = Math.min(
+    100,
+    Math.max(0, challengeProgress)
+  );
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl">
@@ -122,15 +126,17 @@ export function ProgressStats({
             </span>
           </div>
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            {/* Dynamic width required for progress indicator */}
             <div
-              className={`bg-blue-600 dark:bg-blue-500 h-2 rounded-full transition-all duration-300`}
-              style={{
-                width: `${Math.min(100, Math.max(0, tutorialProgress))}%`,
-              }}
+              className="bg-blue-600 dark:bg-blue-500 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${clampedTutorialProgress}%` }}
             ></div>
           </div>
           <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-            <span>{tutorialStats.inProgress} in progress</span>
+            <span>
+              {tutorialStats.inProgress} in progress •{" "}
+              {tutorialStats.notStarted} not started
+            </span>
             <span>{Math.round(tutorialProgress)}% complete</span>
           </div>
         </div>
@@ -146,15 +152,17 @@ export function ProgressStats({
             </span>
           </div>
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            {/* Dynamic width required for progress indicator */}
             <div
-              className={`bg-purple-600 dark:bg-purple-500 h-2 rounded-full transition-all duration-300`}
-              style={{
-                width: `${Math.min(100, Math.max(0, challengeProgress))}%`,
-              }}
+              className="bg-purple-600 dark:bg-purple-500 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${clampedChallengeProgress}%` }}
             ></div>
           </div>
           <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-            <span>{challengeStats.failed} failed</span>
+            <span>
+              {challengeStats.inProgress} in progress •{" "}
+              {challengeStats.notStarted} not started
+            </span>
             <span>{Math.round(challengeProgress)}% passed</span>
           </div>
         </div>

@@ -16,6 +16,9 @@ import {
 import { MOODS } from "@/lib/moods";
 import { useMood } from "@/components/providers/MoodProvider";
 import { ProgressBadge } from "@/components/ProgressComponents";
+import Card from "@/components/ui/Card";
+import PremiumModal from "@/components/ui/PremiumModal";
+import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 
 // Types for database quiz data
 interface Question {
@@ -31,7 +34,10 @@ interface Quiz {
   id: string;
   tutorialId: string;
   title: string;
+  slug: string;
   questions: Question[];
+  isPremium: boolean;
+  requiredPlan: string;
 }
 
 interface QuizCardProps {
@@ -52,6 +58,9 @@ const QuizCard: React.FC<QuizCardProps> = ({
   progress,
 }) => {
   const moodConfig = MOODS[userMood.toLowerCase()];
+  const { checkPremiumAccess, showPremiumModal, setShowPremiumModal } = usePremiumAccess();
+  const router = useRouter();
+  
   const difficultyColors = {
     easy: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
     medium:
@@ -77,108 +86,144 @@ const QuizCard: React.FC<QuizCardProps> = ({
 
   const estimatedTime = moodConfig.quizSettings.timeLimit || 10;
 
+  const handleQuizClick = () => {
+    if (quiz.isPremium) {
+      const hasAccess = checkPremiumAccess(
+        quiz.requiredPlan as "PREMIUM" | "PRO",
+        quiz.isPremium
+      );
+      if (!hasAccess) {
+        return; // Premium modal is shown by the hook
+      }
+    }
+    router.push(`/quiz/${quiz.slug}`);
+  };
+
+  const handlePremiumClick = () => {
+    setShowPremiumModal(true);
+  };
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl hover:shadow-xl dark:hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-12 min-w-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
-            {index + 1}
+    <>
+      <Card
+        isPremium={quiz.isPremium}
+        requiredPlan={quiz.requiredPlan as "PREMIUM" | "PRO"}
+        onPremiumClick={handlePremiumClick}
+        onClick={!quiz.isPremium ? handleQuizClick : undefined}
+        title={quiz.title}
+        description={`Tutorial ${quiz.tutorialId} • ${questionsToShow.length} questions`}
+      >
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-12 min-w-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
+              {index + 1}
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                {quiz.title}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Tutorial {quiz.tutorialId}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-              {quiz.title}
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Tutorial {quiz.tutorialId}
+          <div
+            className={`text-pretty w-10 px-2 py-1 rounded-md text-xs font-medium ${
+              difficultyColors[moodConfig.quizSettings.difficulty]
+            }`}
+          >
+            <span>
+              {moodConfig.quizSettings.difficulty.charAt(0).toUpperCase() +
+                moodConfig.quizSettings.difficulty.slice(1)}{" "}
+              Mode
+            </span>
+          </div>
+        </div>
+
+        {/* Progress Badge */}
+        {progress && (
+          <div className="mb-4">
+            <ProgressBadge
+              status={progress.status}
+              score={progress.bestScore}
+              attempts={progress.quizAttempts}
+              type="tutorial"
+            />
+          </div>
+        )}
+
+        <div className="mb-6">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="flex items-center space-x-2">
+              <FileText className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+              <span className="text-gray-600 dark:text-gray-300">
+                {questionsToShow.length} questions
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Clock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+              <span className="text-gray-600 dark:text-gray-300">
+                {estimatedTime} min
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-400 dark:text-gray-500">
+                {moodConfig.emoji}
+              </span>
+              <span className="text-gray-600 dark:text-gray-300">
+                {moodConfig.name} Mode
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Target className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+              <span className="text-gray-600 dark:text-gray-300">
+                {moodConfig.quizSettings.difficulty === "easy"
+                  ? "Beginner"
+                  : moodConfig.quizSettings.difficulty === "medium"
+                  ? "Intermediate"
+                  : "Advanced"}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+            Question Preview:
+          </div>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
+              {questionsToShow[0]?.question ||
+                "No questions available for this difficulty level"}
             </p>
           </div>
         </div>
-        <div
-          className={`text-pretty w-10 px-2 py-1 rounded-md text-xs font-medium ${
-            difficultyColors[moodConfig.quizSettings.difficulty]
-          }
-            `}
-        >
-          <span>
-            {moodConfig.quizSettings.difficulty.charAt(0).toUpperCase() +
-              moodConfig.quizSettings.difficulty.slice(1)}{" "}
-            Mode
-          </span>
-        </div>
-      </div>
 
-      {/* Progress Badge */}
-      {progress && (
-        <div className="mb-4">
-          <ProgressBadge
-            status={progress.status}
-            score={progress.bestScore}
-            attempts={progress.quizAttempts}
-            type="tutorial"
-          />
+        <div className="flex items-center justify-between">
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            Based on your <span className="font-medium">{moodConfig.name}</span>{" "}
+            mood
+          </div>
+          {!quiz.isPremium && (
+            <Link
+              href={`/quiz/${quiz.slug}`}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium"
+            >
+              Start Quiz
+            </Link>
+          )}
         </div>
-      )}
+      </Card>
 
-      <div className="mb-6">
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="flex items-center space-x-2">
-            <FileText className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-            <span className="text-gray-600 dark:text-gray-300">
-              {questionsToShow.length} questions
-            </span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Clock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-            <span className="text-gray-600 dark:text-gray-300">
-              {estimatedTime} min
-            </span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-gray-400 dark:text-gray-500">
-              {moodConfig.emoji}
-            </span>
-            <span className="text-gray-600 dark:text-gray-300">
-              {moodConfig.name} Mode
-            </span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Target className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-            <span className="text-gray-600 dark:text-gray-300">
-              {moodConfig.quizSettings.difficulty === "easy"
-                ? "Beginner"
-                : moodConfig.quizSettings.difficulty === "medium"
-                ? "Intermediate"
-                : "Advanced"}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="mb-6">
-        <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-          Question Preview:
-        </div>
-        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-          <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
-            {questionsToShow[0]?.question ||
-              "No questions available for this difficulty level"}
-          </p>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <div className="text-xs text-gray-500 dark:text-gray-400">
-          Based on your <span className="font-medium">{moodConfig.name}</span>{" "}
-          mood
-        </div>
-        <Link
-          href={`/quiz/${quiz.id}`}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium"
-        >
-          Start Quiz
-        </Link>
-      </div>
-    </div>
+      {/* Premium Modal */}
+      <PremiumModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        requiredPlan={quiz.requiredPlan as "PREMIUM" | "PRO"}
+        contentType="quiz"
+        contentTitle={quiz.title}
+      />
+    </>
   );
 };
 

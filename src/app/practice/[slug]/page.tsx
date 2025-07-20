@@ -2,23 +2,24 @@
 
 import { useSession } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
+import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { notFound } from "next/navigation";
 import CodeEditor from "@/components/CodeEditor";
 import { Challenge } from "@/types/practice";
-import { getChallengeById } from "@/lib/challengeData";
-
-// Mock challenges data - replaced with modular system
+import { getChallengeBySlug } from "@/lib/challengeData";
+import PremiumModal from "@/components/ui/PremiumModal";
 
 interface ChallengePageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export default function ChallengePage({ params }: ChallengePageProps) {
   const { data: session } = useSession();
   const { currentMood } = useMood();
-  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
+  const { canAccess, showPremiumModal, setShowPremiumModal } = usePremiumAccess();
+  const [resolvedParams, setResolvedParams] = useState<{ slug: string } | null>(
     null
   );
   const [challenge, setChallenge] = useState<Challenge | null>(null);
@@ -33,7 +34,6 @@ export default function ChallengePage({ params }: ChallengePageProps) {
   const [isRunning, setIsRunning] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
-  const [totalTime, setTotalTime] = useState(0);
   const [challengeStartTime, setChallengeStartTime] = useState<number | null>(
     null
   );
@@ -57,7 +57,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
       const p = await params;
       setResolvedParams(p);
 
-      const foundChallenge = await getChallengeById(p.id);
+      const foundChallenge = await getChallengeBySlug(p.slug);
       if (!foundChallenge) {
         notFound();
         return;
@@ -65,6 +65,12 @@ export default function ChallengePage({ params }: ChallengePageProps) {
 
       setChallenge(foundChallenge);
       setUserCode(foundChallenge.starter);
+
+      // Check premium access
+      if (foundChallenge.isPremium && !canAccess(foundChallenge.requiredPlan as "PREMIUM" | "PRO", foundChallenge.isPremium)) {
+        setShowPremiumModal(true);
+        return;
+      }
 
       // Start timer based on mood
       const moodTimeLimit = getMoodTimeLimit();
@@ -75,13 +81,15 @@ export default function ChallengePage({ params }: ChallengePageProps) {
     };
 
     resolveParams();
-  }, [params, getMoodTimeLimit]);
+  }, [params, getMoodTimeLimit, canAccess, setShowPremiumModal]);
 
   // Update total time spent
   useEffect(() => {
     if (challengeStartTime) {
       const updateTotalTime = () => {
-        setTotalTime(Math.floor((Date.now() - challengeStartTime) / 1000));
+        // Track time for analytics if needed
+        const timeSpent = Math.floor((Date.now() - challengeStartTime) / 1000);
+        console.log('Time spent:', timeSpent);
       };
 
       const interval = setInterval(updateTotalTime, 1000);
@@ -165,9 +173,10 @@ export default function ChallengePage({ params }: ChallengePageProps) {
   // Loading state
   if (!session || !resolvedParams || !challenge) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-lg font-medium text-gray-600 dark:text-gray-300">
-          Loading challenge...
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Loading challenge...</p>
         </div>
       </div>
     );
@@ -178,13 +187,13 @@ export default function ChallengePage({ params }: ChallengePageProps) {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "easy":
-        return "text-green-600 bg-green-100";
+        return "text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30";
       case "medium":
-        return "text-yellow-600 bg-yellow-100";
+        return "text-yellow-600 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/30";
       case "hard":
-        return "text-red-600 bg-red-100";
+        return "text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30";
       default:
-        return "text-gray-600 bg-gray-100";
+        return "text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-800";
     }
   };
 
@@ -205,17 +214,6 @@ export default function ChallengePage({ params }: ChallengePageProps) {
     }
   };
 
-  if (!session || !resolvedParams || !challenge) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading challenge...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Main Content */}
@@ -224,7 +222,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
           {/* Challenge Description */}
           <div className="space-y-6">
             {/* Challenge Header */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-4">
                 <div className="text-3xl">{getTypeIcon(challenge.type)}</div>
                 <span
@@ -236,21 +234,21 @@ export default function ChallengePage({ params }: ChallengePageProps) {
                 </span>
               </div>
 
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                 {challenge.title}
               </h1>
 
-              <p className="text-gray-600 mb-4">{challenge.description}</p>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">{challenge.description}</p>
 
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-gray-500 dark:text-gray-400">
                 ⏱️ Estimated time: {challenge.estimatedTime}
               </div>
 
               {/* Timer Display */}
               {timeLeft !== null && (
-                <div className="mt-4 p-3 rounded-lg bg-gray-50 border-l-4 border-blue-500">
+                <div className="mt-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border-l-4 border-blue-500 dark:border-blue-400">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       {currentMood.id === "rush"
                         ? "Rush Mode Timer"
                         : "Grind Mode Timer"}
@@ -258,10 +256,10 @@ export default function ChallengePage({ params }: ChallengePageProps) {
                     <span
                       className={`text-lg font-bold ${
                         timeLeft <= 60
-                          ? "text-red-600"
+                          ? "text-red-600 dark:text-red-400"
                           : currentMood.id === "rush"
-                          ? "text-orange-600"
-                          : "text-blue-600"
+                          ? "text-orange-600 dark:text-orange-400"
+                          : "text-blue-600 dark:text-blue-400"
                       }`}
                     >
                       {Math.floor(timeLeft / 60)}:
@@ -269,7 +267,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
                     </span>
                   </div>
                   {currentMood.id === "rush" && timeLeft <= 60 && (
-                    <div className="text-xs text-red-500 mt-1">
+                    <div className="text-xs text-red-500 dark:text-red-400 mt-1">
                       ⚡ Auto-submit when timer reaches zero!
                     </div>
                   )}
@@ -278,30 +276,30 @@ export default function ChallengePage({ params }: ChallengePageProps) {
             </div>
 
             {/* Mood-Adapted Motivation */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-l-4 border-purple-500">
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 border-l-4 border-l-purple-500 dark:border-l-purple-400">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 {currentMood.name} Energy 🎯
               </h2>
-              <p className="text-purple-700">
+              <p className="text-purple-700 dark:text-purple-300">
                 {challenge.moodAdapted[currentMood.id]}
               </p>
             </div>
 
             {/* Test Cases */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                 Test Cases
               </h2>
               <div className="space-y-3">
                 {challenge.tests.map((test, index) => (
                   <div
                     key={index}
-                    className="border border-gray-200 rounded-lg p-3"
+                    className="border border-gray-200 dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-gray-700"
                   >
-                    <div className="text-sm text-gray-600 mb-1">
+                    <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">
                       {test.description}
                     </div>
-                    <div className="font-mono text-xs text-black dark:bg-black dark:text-white p-2 rounded">
+                    <div className="font-mono text-xs bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-2 rounded border">
                       Expected: {JSON.stringify(test.expected)}
                     </div>
                   </div>
@@ -311,8 +309,8 @@ export default function ChallengePage({ params }: ChallengePageProps) {
 
             {/* Test Results */}
             {testResults && (
-              <div className="bg-white rounded-2xl p-6 shadow-lg">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                   Test Results
                 </h2>
                 <div className="space-y-3">
@@ -321,27 +319,29 @@ export default function ChallengePage({ params }: ChallengePageProps) {
                       key={index}
                       className={`border rounded-lg p-3 ${
                         result.passed
-                          ? "border-green-200 bg-green-50"
-                          : "border-red-200 bg-red-50"
+                          ? "border-green-200 bg-green-50 dark:border-green-700 dark:bg-green-900/20"
+                          : "border-red-200 bg-red-50 dark:border-red-700 dark:bg-red-900/20"
                       }`}
                     >
                       <div className="flex items-center mb-2">
                         <span
                           className={`text-sm font-semibold ${
-                            result.passed ? "text-green-600" : "text-red-600"
+                            result.passed 
+                              ? "text-green-600 dark:text-green-400" 
+                              : "text-red-600 dark:text-red-400"
                           }`}
                         >
                           {result.passed ? "✅ PASS" : "❌ FAIL"}
                         </span>
-                        <span className="text-sm text-gray-600 ml-2">
+                        <span className="text-sm text-gray-600 dark:text-gray-300 ml-2">
                           {result.description}
                         </span>
                       </div>
-                      <div className="font-mono text-black rounded-sm dark:bg-black p-2 dark:text-white text-xs space-y-1">
+                      <div className="font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-sm p-2 text-xs space-y-1 border">
                         <div>Expected: {JSON.stringify(result.expected)}</div>
                         <div>Actual: {JSON.stringify(result.actual)}</div>
                         {result.error && (
-                          <div className="text-red-600">
+                          <div className="text-red-600 dark:text-red-400">
                             Error: {result.error}
                           </div>
                         )}
@@ -351,11 +351,11 @@ export default function ChallengePage({ params }: ChallengePageProps) {
                 </div>
 
                 {allTestsPassed && (
-                  <div className="mt-4 p-4 bg-green-100 border border-green-200 rounded-lg">
-                    <div className="text-green-800 font-semibold">
+                  <div className="mt-4 p-4 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg">
+                    <div className="text-green-800 dark:text-green-300 font-semibold">
                       🎉 Congratulations! All tests passed!
                     </div>
-                    <p className="text-green-700 text-sm mt-1">
+                    <p className="text-green-700 dark:text-green-400 text-sm mt-1">
                       You&apos;ve successfully solved this challenge. Ready for
                       the next one?
                     </p>
@@ -367,9 +367,9 @@ export default function ChallengePage({ params }: ChallengePageProps) {
 
           {/* Code Editor */}
           <div className="space-y-6">
-            <div className="bg-white rounded-2xl p-6 shadow-lg">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   Your Solution
                 </h2>
                 <div className="flex gap-2">
@@ -378,10 +378,10 @@ export default function ChallengePage({ params }: ChallengePageProps) {
                     disabled={isRunning}
                     className={`px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 ${
                       currentMood.id === "rush"
-                        ? "bg-orange-600 text-white hover:bg-orange-700"
+                        ? "bg-orange-600 text-white hover:bg-orange-700 dark:bg-orange-600 dark:hover:bg-orange-700"
                         : currentMood.id === "grind"
-                        ? "bg-blue-600 text-white hover:bg-blue-700"
-                        : "bg-green-600 text-white hover:bg-green-700"
+                        ? "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+                        : "bg-green-600 text-white hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700"
                     }`}
                   >
                     {isRunning
@@ -394,7 +394,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
                   </button>
                   <button
                     onClick={() => setShowSolution(!showSolution)}
-                    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                    className="bg-gray-600 dark:bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
                   >
                     {showSolution ? "Hide Solution" : "Show Solution"}
                   </button>
@@ -405,13 +405,13 @@ export default function ChallengePage({ params }: ChallengePageProps) {
               <div
                 className={`mb-4 p-3 rounded-lg border-l-4 ${
                   currentMood.id === "rush"
-                    ? "bg-orange-50 border-orange-400"
+                    ? "bg-orange-50 dark:bg-orange-900/20 border-orange-400 dark:border-orange-500"
                     : currentMood.id === "grind"
-                    ? "bg-blue-50 border-blue-400"
-                    : "bg-green-50 border-green-400"
+                    ? "bg-blue-50 dark:bg-blue-900/20 border-blue-400 dark:border-blue-500"
+                    : "bg-green-50 dark:bg-green-900/20 border-green-400 dark:border-green-500"
                 }`}
               >
-                <div className="text-sm font-medium">
+                <div className="text-sm font-medium text-gray-800 dark:text-gray-200">
                   {currentMood.id === "rush" &&
                     "⚡ Rush Mode: Quick and efficient solutions!"}
                   {currentMood.id === "grind" &&
@@ -419,7 +419,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
                   {currentMood.id === "chill" &&
                     "😌 Chill Mode: Take your time and explore"}
                 </div>
-                <div className="text-xs text-gray-600 mt-1">
+                <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                   {currentMood.id === "rush" &&
                     "Focus on getting it working fast - optimal solution preferred"}
                   {currentMood.id === "grind" &&
@@ -443,11 +443,11 @@ export default function ChallengePage({ params }: ChallengePageProps) {
               />
 
               {showSolution && (
-                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <h3 className="font-semibold text-yellow-800 mb-2">
+                <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+                  <h3 className="font-semibold text-yellow-800 dark:text-yellow-300 mb-2">
                     Solution:
                   </h3>
-                  <pre className="font-mono text-sm text-yellow-700 whitespace-pre-wrap">
+                  <pre className="font-mono text-sm text-yellow-700 dark:text-yellow-400 whitespace-pre-wrap">
                     {challenge.solution}
                   </pre>
                 </div>
@@ -456,20 +456,20 @@ export default function ChallengePage({ params }: ChallengePageProps) {
 
             {/* Navigation */}
             {allTestsPassed && (
-              <div className="bg-white rounded-2xl p-6 shadow-lg">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                   What&apos;s Next?
                 </h2>
                 <div className="space-y-3">
                   <Link
                     href="/practice"
-                    className="block w-full bg-purple-600 text-white text-center py-3 rounded-lg hover:bg-purple-700 transition-colors"
+                    className="block w-full bg-purple-600 dark:bg-purple-700 text-white text-center py-3 rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors"
                   >
                     Try Another Challenge
                   </Link>
                   <Link
                     href="/dashboard"
-                    className="block w-full bg-gray-600 text-white text-center py-3 rounded-lg hover:bg-gray-700 transition-colors"
+                    className="block w-full bg-gray-600 dark:bg-gray-700 text-white text-center py-3 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
                   >
                     Back to Dashboard
                   </Link>
@@ -479,6 +479,15 @@ export default function ChallengePage({ params }: ChallengePageProps) {
           </div>
         </div>
       </div>
+
+      {/* Premium Modal */}
+      <PremiumModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        requiredPlan={challenge?.requiredPlan as "PREMIUM" | "PRO"}
+        contentType="challenge"
+        contentTitle={challenge?.title}
+      />
     </div>
   );
 }

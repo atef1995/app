@@ -13,9 +13,18 @@ export interface Quiz {
   id: string;
   tutorialId: string;
   title: string;
+  slug: string;
   questions: Question[];
+  isPremium: boolean;
+  requiredPlan: string;
   createdAt: Date;
   updatedAt: Date;
+  tutorial?: {
+    id: string;
+    slug: string;
+    title: string;
+    order: number;
+  };
 }
 
 /**
@@ -60,6 +69,28 @@ export class QuizService {
   static async getQuizById(id: string): Promise<Quiz | null> {
     const quiz = await prisma.quiz.findUnique({
       where: { id },
+      include: {
+        tutorial: true, // Include tutorial information
+      },
+    });
+
+    if (!quiz) return null;
+
+    return {
+      ...quiz,
+      questions: parseQuestions(quiz.questions),
+    };
+  }
+
+  /**
+   * Get a specific quiz by slug
+   */
+  static async getQuizBySlug(slug: string): Promise<Quiz | null> {
+    const quiz = await prisma.quiz.findUnique({
+      where: { slug },
+      include: {
+        tutorial: true, // Include tutorial information
+      },
     });
 
     if (!quiz) return null;

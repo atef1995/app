@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MOODS } from "@/lib/moods";
 import { useMood } from "@/components/providers/MoodProvider";
-import { useTheme } from "@/components/providers/ThemeProvider";
 import { ProgressBadge } from "@/components/ProgressComponents";
 import { PartyPopper, ThumbsUp, Dumbbell, Star, Book } from "lucide-react";
 
@@ -24,6 +23,7 @@ interface Quiz {
   id: string;
   tutorialId: string;
   title: string;
+  slug: string;
   questions: Question[];
 }
 
@@ -43,18 +43,20 @@ interface QuizState {
 export default function QuizPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }) {
   const resolvedParams = use(params);
   const { data: session } = useSession();
   const router = useRouter();
   const { currentMood } = useMood();
-  const { resolvedTheme } = useTheme();
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [loadingQuiz, setLoadingQuiz] = useState(true);
-  const [devToolsDetected, setDevToolsDetected] = useState(false);
+  const [tutorialNavigation, setTutorialNavigation] = useState<{
+    current: { id: string; slug: string; title: string; order: number };
+    prev: { id: string; slug: string; title: string; order: number } | null;
+    next: { id: string; slug: string; title: string; order: number } | null;
+  } | null>(null);
   const [cheatAttempts, setCheatAttempts] = useState(0);
-  const [showCheatWarning, setShowCheatWarning] = useState(false);
   const [quizState, setQuizState] = useState<QuizState>({
     currentQuestion: 0,
     answers: [],
@@ -62,14 +64,25 @@ export default function QuizPage({
     startTime: Date.now(),
   });
 
-  // Fetch quiz data from API
+  // Fetch quiz data from API using slug
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const response = await fetch(`/api/quizzes?id=${resolvedParams.id}`);
+        const response = await fetch(`/api/quizzes/slug/${resolvedParams.slug}`);
         if (response.ok) {
           const data = await response.json();
           setQuiz(data.quiz);
+          
+          // Fetch tutorial navigation if quiz has tutorial info
+          if (data.quiz?.tutorialId) {
+            const navResponse = await fetch(`/api/tutorials/navigation?tutorialId=${data.quiz.tutorialId}`);
+            if (navResponse.ok) {
+              const navData = await navResponse.json();
+              if (navData.success) {
+                setTutorialNavigation(navData.data);
+              }
+            }
+          }
         }
       } catch (error) {
         console.error("Error fetching quiz:", error);
@@ -79,7 +92,7 @@ export default function QuizPage({
     };
 
     fetchQuiz();
-  }, [resolvedParams.id]);
+  }, [resolvedParams.slug]);
 
   // Fun cheat attempt messages
   const cheatMessages = useCallback(
@@ -101,7 +114,6 @@ export default function QuizPage({
   const showCheatMessage = useCallback(() => {
     const messages = cheatMessages();
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-    setShowCheatWarning(true);
 
     // Create a fun popup that can't be easily dismissed
     const messageEl = document.createElement("div");
@@ -152,17 +164,17 @@ export default function QuizPage({
       if (document.head.contains(style)) {
         document.head.removeChild(style);
       }
-      setShowCheatWarning(false);
     }, 3000);
 
     // If too many attempts, redirect them
     if (cheatAttempts >= 4) {
       setTimeout(() => {
         alert("Too many cheat attempts! Time to actually study 📚");
-        router.push(`/tutorials/${resolvedParams.id}`);
+        const redirectSlug = tutorialNavigation?.current?.slug || resolvedParams.slug;
+        router.push(`/tutorials/${redirectSlug}`);
       }, 3500);
     }
-  }, [cheatAttempts, router, resolvedParams.id, cheatMessages]);
+  }, [cheatAttempts, router, resolvedParams.slug, cheatMessages, tutorialNavigation]);
 
   // Define functions early to avoid conditional hook calls
   const calculateScore = useCallback(() => {
@@ -218,7 +230,7 @@ export default function QuizPage({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          tutorialId: resolvedParams.id,
+          tutorialId: quiz.id, // Use quiz ID for backend submission
           answers: quizState.answers,
           timeSpent: timeTaken,
           quizData: {
@@ -261,7 +273,6 @@ export default function QuizPage({
     currentMood.id,
     quizState.startTime,
     quizState.answers,
-    resolvedParams.id,
   ]);
 
   useEffect(() => {
@@ -324,7 +335,6 @@ export default function QuizPage({
 
       if ((widthThreshold || heightThreshold || consoleOpen) && !devToolsOpen) {
         devToolsOpen = true;
-        setDevToolsDetected(true);
         showCheatMessage();
 
         // Extra spicy message for dev tools
@@ -345,7 +355,6 @@ export default function QuizPage({
         devToolsOpen
       ) {
         devToolsOpen = false;
-        setDevToolsDetected(false);
       }
     };
 
@@ -635,15 +644,15 @@ export default function QuizPage({
 
                 <div className="flex gap-4 justify-center">
                   <Link
-                    href={`/tutorials/${resolvedParams.id}`}
+                    href={tutorialNavigation?.current?.slug ? `/tutorials/${tutorialNavigation.current.slug}` : `/tutorials`}
                     className="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
                   >
                     Review Tutorial
                   </Link>
 
-                  {percentage >= 70 && parseInt(resolvedParams.id) < 2 && (
+                  {percentage >= 70 && tutorialNavigation?.next && (
                     <Link
-                      href={`/tutorials/${parseInt(resolvedParams.id) + 1}`}
+                      href={`/tutorials/${tutorialNavigation.next.slug}`}
                       className="bg-blue-600 dark:bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
                     >
                       Next Tutorial

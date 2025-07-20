@@ -22,8 +22,6 @@ import {
 } from "lucide-react";
 import SyntaxHighlighter from "@/components/SyntaxHighlighter";
 
-// No more hardcoded mapping - we'll get this from the database
-
 interface TutorialMeta {
   title: string;
   description: string;
@@ -55,16 +53,17 @@ interface TutorialData {
   quiz?: {
     id: string;
     title: string;
+    slug: string;
     questions: QuizQuestion[];
   };
 }
 
 interface TutorialPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export default function TutorialPage({ params }: TutorialPageProps) {
-  const { id } = use(params);
+  const { slug } = use(params);
   const { data: session } = useSession();
   const { currentMood } = useMood();
   const [tutorial, setTutorial] = useState<TutorialData | null>(null);
@@ -77,8 +76,8 @@ export default function TutorialPage({ params }: TutorialPageProps) {
       try {
         setLoading(true);
 
-        // First, fetch tutorial metadata from database
-        const tutorialResponse = await fetch(`/api/tutorials?id=${id}`);
+        // First, fetch tutorial metadata from database using slug
+        const tutorialResponse = await fetch(`/api/tutorials?slug=${slug}`);
         if (!tutorialResponse.ok) {
           throw new Error("Failed to fetch tutorial from database");
         }
@@ -147,10 +146,10 @@ export default function TutorialPage({ params }: TutorialPageProps) {
       }
     }
 
-    if (id) {
+    if (slug) {
       loadTutorial();
     }
-  }, [id]);
+  }, [slug]);
 
   const getMoodColors = () => {
     switch (currentMood.id) {
@@ -496,7 +495,7 @@ export default function TutorialPage({ params }: TutorialPageProps) {
               </div>
 
               <Link
-                href={`/quiz/${tutorial.id}`}
+                href={tutorial.quiz?.slug ? `/quiz/${tutorial.quiz.slug}` : '#'}
                 className={`inline-flex items-center gap-2 ${moodColors.accent} text-white py-3 px-8 rounded-lg font-semibold hover:opacity-90 transition-opacity`}
               >
                 Start Quiz <ChevronRight className="w-5 h-5" />
@@ -516,7 +515,7 @@ export default function TutorialPage({ params }: TutorialPageProps) {
               </Link>
 
               <div className="text-sm text-gray-500 dark:text-gray-400">
-                Tutorial {id}
+                {tutorial.slug}
               </div>
 
               <Link
