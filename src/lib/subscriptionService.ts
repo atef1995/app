@@ -3,13 +3,13 @@ import { prisma } from "./prisma";
 // Define the constants since they're not enums in the schema
 export const Plan = {
   FREE: "FREE",
-  PREMIUM: "PREMIUM", 
-  PRO: "PRO",
+  VIBED: "VIBED",
+  CRACKED: "CRACKED",
 } as const;
 
 export const SubscriptionStatus = {
   ACTIVE: "ACTIVE",
-  INACTIVE: "INACTIVE", 
+  INACTIVE: "INACTIVE",
   CANCELLED: "CANCELLED",
   EXPIRED: "EXPIRED",
 } as const;
@@ -17,14 +17,15 @@ export const SubscriptionStatus = {
 export const PaymentStatus = {
   PENDING: "PENDING",
   COMPLETED: "COMPLETED",
-  FAILED: "FAILED", 
+  FAILED: "FAILED",
   CANCELLED: "CANCELLED",
 } as const;
 
 // Define the types from the constants
-export type Plan = typeof Plan[keyof typeof Plan];
-export type SubscriptionStatus = typeof SubscriptionStatus[keyof typeof SubscriptionStatus];
-export type PaymentStatus = typeof PaymentStatus[keyof typeof PaymentStatus];
+export type Plan = (typeof Plan)[keyof typeof Plan];
+export type SubscriptionStatus =
+  (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus];
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
 
 export interface SubscriptionInfo {
   plan: Plan;
@@ -53,7 +54,7 @@ export const PLAN_CONFIGS: Record<Plan, PlanLimits> = {
     hasProgressTracking: true,
     hasAdvancedFeatures: false,
   },
-  PREMIUM: {
+  VIBED: {
     maxTutorials: Infinity,
     maxChallenges: Infinity,
     hasQuizzes: true,
@@ -61,7 +62,7 @@ export const PLAN_CONFIGS: Record<Plan, PlanLimits> = {
     hasProgressTracking: true,
     hasAdvancedFeatures: true,
   },
-  PRO: {
+  CRACKED: {
     maxTutorials: Infinity,
     maxChallenges: Infinity,
     hasQuizzes: true,
@@ -72,8 +73,8 @@ export const PLAN_CONFIGS: Record<Plan, PlanLimits> = {
 };
 
 export const PLAN_PRICES = {
-  PREMIUM: 999, // $9.99 in cents
-  PRO: 1999, // $19.99 in cents
+  VIBED: 998, // $9.98 in cents
+  CRACKED: 1990, // $19.90 in cents
 };
 
 export class SubscriptionService {
@@ -270,7 +271,7 @@ export class SubscriptionService {
     userPlan: Plan,
     requiredPlan: Plan
   ): boolean {
-    const planHierarchy = [Plan.FREE, Plan.PREMIUM, Plan.PRO];
+    const planHierarchy = [Plan.FREE, Plan.VIBED, Plan.CRACKED];
     const userPlanIndex = planHierarchy.indexOf(userPlan);
     const requiredPlanIndex = planHierarchy.indexOf(requiredPlan);
     return userPlanIndex >= requiredPlanIndex;
@@ -304,31 +305,31 @@ export class SubscriptionService {
     currentPlan: Plan,
     limits: PlanLimits
   ) {
-    console.log('Plan limits:', limits); // Use the parameter to avoid warning
-    
+    console.log("Plan limits:", limits); // Use the parameter to avoid warning
+
     if (currentPlan === Plan.FREE) {
       return {
-        suggestedPlan: Plan.PREMIUM,
+        suggestedPlan: Plan.VIBED,
         benefits: [
           "Unlimited tutorials and challenges",
           "Quiz system for knowledge testing",
           "Advanced progress tracking",
           "Priority support",
         ],
-        price: PLAN_PRICES.PREMIUM,
+        price: PLAN_PRICES.VIBED,
       };
     }
 
-    if (currentPlan === Plan.PREMIUM) {
+    if (currentPlan === Plan.VIBED) {
       return {
-        suggestedPlan: Plan.PRO,
+        suggestedPlan: Plan.CRACKED,
         benefits: [
           "Everything in Vibed",
           "AI-Powered Code Reviews",
           "1-on-1 Mentorship Sessions",
           "Early Access to New Features",
         ],
-        price: PLAN_PRICES.PRO,
+        price: PLAN_PRICES.CRACKED,
       };
     }
 

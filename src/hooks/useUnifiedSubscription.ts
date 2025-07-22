@@ -4,7 +4,7 @@ import { useSubscription } from "./useSubscription";
 
 // Core subscription interface
 export interface SubscriptionInfo {
-  plan: "FREE" | "PREMIUM" | "PRO";
+  plan: "FREE" | "VIBED" | "CRACKED";
   status: string;
   subscriptionEndsAt: Date | null;
   isActive: boolean;
@@ -15,7 +15,7 @@ export interface SubscriptionInfo {
 interface PremiumContent {
   title: string;
   type: "tutorial" | "challenge" | "quiz";
-  requiredPlan: "PREMIUM" | "PRO";
+  requiredPlan: "VIBED" | "CRACKED";
 }
 
 // Unified return interface that combines all hook functionalities
@@ -27,13 +27,16 @@ export interface UnifiedSubscriptionReturn {
   isPremium: boolean;
 
   // Access checking functions
-  canAccess: (requiredPlan: "PREMIUM" | "PRO", isPremium?: boolean) => boolean;
+  canAccess: (
+    requiredPlan: "VIBED" | "CRACKED",
+    isPremium?: boolean
+  ) => boolean;
   canAccessContent: (
-    requiredPlan: "FREE" | "PREMIUM" | "PRO",
+    requiredPlan: "FREE" | "VIBED" | "CRACKED",
     isPremium?: boolean
   ) => Promise<{ canAccess: boolean; reason?: string }>;
   checkPremiumAccess: (
-    requiredPlan: "PREMIUM" | "PRO",
+    requiredPlan: "VIBED" | "CRACKED",
     isPremium?: boolean
   ) => boolean;
 
@@ -63,29 +66,30 @@ export interface UnifiedSubscriptionReturn {
 
 export function useUnifiedSubscription(): UnifiedSubscriptionReturn {
   const { data: session } = useSession();
-  
+
   // Use centralized subscription hook with TanStack Query caching
   const { data: subscription, isLoading: loading } = useSubscription();
-  
+
   // Premium modal state
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const [selectedPremiumContent, setSelectedPremiumContent] = useState<PremiumContent | null>(null);
+  const [selectedPremiumContent, setSelectedPremiumContent] =
+    useState<PremiumContent | null>(null);
 
   // Synchronous access check (from usePremiumAccess)
   const canAccess = useCallback(
-    (requiredPlan: "PREMIUM" | "PRO", isPremium = false): boolean => {
+    (requiredPlan: "VIBED" | "CRACKED", isPremium = false): boolean => {
       if (!isPremium) return true;
       if (!session?.user?.id) return false;
       if (!subscription) return false;
 
       const userPlan = subscription.plan;
 
-      if (requiredPlan === "PREMIUM") {
-        return userPlan === "PREMIUM" || userPlan === "PRO";
+      if (requiredPlan === "VIBED") {
+        return userPlan === "VIBED" || userPlan === "CRACKED";
       }
 
-      if (requiredPlan === "PRO") {
-        return userPlan === "PRO";
+      if (requiredPlan === "CRACKED") {
+        return userPlan === "CRACKED";
       }
 
       return false;
@@ -96,7 +100,7 @@ export function useUnifiedSubscription(): UnifiedSubscriptionReturn {
   // Asynchronous access check with API call (from useSubscription)
   const canAccessContent = useCallback(
     async (
-      requiredPlan: "FREE" | "PREMIUM" | "PRO",
+      requiredPlan: "FREE" | "VIBED" | "CRACKED",
       isPremium = false
     ): Promise<{ canAccess: boolean; reason?: string }> => {
       if (!session?.user?.id) {
@@ -129,7 +133,7 @@ export function useUnifiedSubscription(): UnifiedSubscriptionReturn {
 
   // Premium access check with modal trigger (from usePremiumAccess)
   const checkPremiumAccess = useCallback(
-    (requiredPlan: "PREMIUM" | "PRO", isPremium = false): boolean => {
+    (requiredPlan: "VIBED" | "CRACKED", isPremium = false): boolean => {
       const hasAccess = canAccess(requiredPlan, isPremium);
 
       if (!hasAccess && isPremium) {
@@ -156,8 +160,8 @@ export function useUnifiedSubscription(): UnifiedSubscriptionReturn {
         content.isPremium &&
         !canAccess(
           content.requiredPlan === "FREE"
-            ? "PREMIUM"
-            : (content.requiredPlan as "PREMIUM" | "PRO"),
+            ? "VIBED"
+            : (content.requiredPlan as "VIBED" | "CRACKED"),
           content.isPremium
         )
       ) {
@@ -166,8 +170,8 @@ export function useUnifiedSubscription(): UnifiedSubscriptionReturn {
           type: content.type,
           requiredPlan:
             content.requiredPlan === "FREE"
-              ? "PREMIUM"
-              : (content.requiredPlan as "PREMIUM" | "PRO"),
+              ? "VIBED"
+              : (content.requiredPlan as "VIBED" | "CRACKED"),
         });
         setShowPremiumModal(true);
       } else {
@@ -181,11 +185,11 @@ export function useUnifiedSubscription(): UnifiedSubscriptionReturn {
   const isPremiumLocked = useCallback(
     (content: { isPremium?: boolean; requiredPlan?: string }): boolean => {
       if (!content.isPremium) return false;
-      
+
       return !canAccess(
         content.requiredPlan === "FREE"
-          ? "PREMIUM"
-          : (content.requiredPlan as "PREMIUM" | "PRO"),
+          ? "VIBED"
+          : (content.requiredPlan as "VIBED" | "CRACKED"),
         content.isPremium
       );
     },

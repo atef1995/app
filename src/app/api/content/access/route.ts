@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     // Check if user can access the content
     const accessCheck = await SubscriptionService.canUserAccessContent(
       session.user.id,
-      requiredPlan as "FREE" | "PREMIUM" | "PRO",
+      requiredPlan as "FREE" | "VIBED" | "CRACKED",
       isPremium
     );
 

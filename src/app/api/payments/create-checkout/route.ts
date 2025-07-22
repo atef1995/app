@@ -24,24 +24,29 @@ export async function POST(request: NextRequest) {
     const { plan, annual = false } = body;
 
     // Validate plan
-    if (!plan || !["PREMIUM", "PRO"].includes(plan)) {
+    if (!plan || !["VIBED", "CRACKED"].includes(plan)) {
       return NextResponse.json(
-        { success: false, error: { message: "Invalid plan specified" } },
+        {
+          success: false,
+          error: {
+            message: "Invalid plan specified. Must be VIBED or CRACKED.",
+          },
+        },
         { status: 400 }
       );
     }
 
     // Get price ID based on plan and billing cycle
     const getPriceId = (planType: string, isAnnual: boolean) => {
-      if (planType === "PREMIUM") {
-        return isAnnual 
-          ? process.env.STRIPE_PREMIUM_ANNUAL_PRICE_ID 
-          : process.env.STRIPE_PREMIUM_PRICE_ID;
+      if (planType === "CRACKED") {
+        return isAnnual
+          ? process.env.STRIPE_CRACKED_ANNUAL_PRICE_ID
+          : process.env.STRIPE_CRACKED_PRICE_ID;
       }
-      if (planType === "PRO") {
-        return isAnnual 
-          ? process.env.STRIPE_PRO_ANNUAL_PRICE_ID 
-          : process.env.STRIPE_PRO_PRICE_ID;
+      if (planType === "VIBED") {
+        return isAnnual
+          ? process.env.STRIPE_VIBED_ANNUAL_PRICE_ID
+          : process.env.STRIPE_VIBED_PRICE_ID;
       }
       return null;
     };
@@ -55,8 +60,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Check current subscription status
-    const userSubscription = await SubscriptionService.getUserSubscription(session.user.id);
-    
+    const userSubscription = await SubscriptionService.getUserSubscription(
+      session.user.id
+    );
+
     // Get user's Stripe customer ID from database
     const dbUser = await prisma.user.findUnique({
       where: { id: session.user.id },
@@ -74,7 +81,7 @@ export async function POST(request: NextRequest) {
         },
       });
       customerId = customer.id;
-      
+
       // Update user with Stripe customer ID
       await prisma.user.update({
         where: { id: session.user.id },
@@ -126,7 +133,13 @@ export async function POST(request: NextRequest) {
     await SubscriptionService.createPayment(
       session.user.id,
       plan,
-      annual ? (plan === "PREMIUM" ? 9600 : 19200) : (plan === "PREMIUM" ? 999 : 1999), // Price in cents
+      annual
+        ? plan === "CRACKED"
+          ? 9900 // $99/year for Cracked
+          : 8900 // $89/year for Vibed
+        : plan === "CRACKED"
+        ? 1990 // $19.90/month for Cracked
+        : 998, // $9.98/month for Vibed
       "usd",
       checkoutSession.id
     );
@@ -136,15 +149,15 @@ export async function POST(request: NextRequest) {
       url: checkoutSession.url,
       sessionId: checkoutSession.id,
     });
-
   } catch (error) {
     console.error("Error creating checkout session:", error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: { 
-          message: error instanceof Error ? error.message : "Internal server error" 
-        } 
+      {
+        success: false,
+        error: {
+          message:
+            error instanceof Error ? error.message : "Internal server error",
+        },
       },
       { status: 500 }
     );

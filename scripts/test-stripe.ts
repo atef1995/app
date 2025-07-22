@@ -8,15 +8,15 @@ console.log("🧪 Testing Stripe Integration Setup...\n");
 // Test 1: Environment Variables
 console.log("1. Checking environment variables...");
 const requiredEnvVars = [
-  'STRIPE_SECRET_KEY',
-  'STRIPE_PUBLISHABLE_KEY',
-  'NEXTAUTH_URL'
+  "STRIPE_SECRET_KEY",
+  "STRIPE_PUBLISHABLE_KEY",
+  "NEXTAUTH_URL",
 ];
 
-const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+const missingVars = requiredEnvVars.filter((varName) => !process.env[varName]);
 if (missingVars.length > 0) {
   console.log("❌ Missing required environment variables:");
-  missingVars.forEach(varName => console.log(`   - ${varName}`));
+  missingVars.forEach((varName) => console.log(`   - ${varName}`));
 } else {
   console.log("✅ All required environment variables are set");
 }
@@ -24,17 +24,20 @@ if (missingVars.length > 0) {
 // Test 2: Stripe Connection
 console.log("\n2. Testing Stripe connection...");
 try {
-  import('stripe').then(({ default: Stripe }) => {
+  import("stripe").then(({ default: Stripe }) => {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: '2025-06-30.basil',
+      apiVersion: "2025-06-30.basil",
     });
-    
+
     // Test API call
-    stripe.prices.list({ limit: 1 }).then(() => {
-      console.log("✅ Stripe API connection successful");
-    }).catch((error: Error) => {
-      console.log("❌ Stripe API connection failed:", error.message);
-    });
+    stripe.prices
+      .list({ limit: 1 })
+      .then(() => {
+        console.log("✅ Stripe API connection successful");
+      })
+      .catch((error: Error) => {
+        console.log("❌ Stripe API connection failed:", error.message);
+      });
   });
 } catch (error) {
   console.log("❌ Stripe module error:", (error as Error).message);
@@ -42,15 +45,12 @@ try {
 
 // Test 3: Price IDs
 console.log("\n3. Checking price ID configuration...");
-const priceIds = [
-  'STRIPE_PREMIUM_PRICE_ID',
-  'STRIPE_PRO_PRICE_ID'
-];
+const priceIds = ["STRIPE_CRACKED_PRICE_ID", "STRIPE_VIBED_PRICE_ID"];
 
-const missingPriceIds = priceIds.filter(varName => !process.env[varName]);
+const missingPriceIds = priceIds.filter((varName) => !process.env[varName]);
 if (missingPriceIds.length > 0) {
   console.log("⚠️  Missing price IDs (you'll need to create these in Stripe):");
-  missingPriceIds.forEach(varName => console.log(`   - ${varName}`));
+  missingPriceIds.forEach((varName) => console.log(`   - ${varName}`));
 } else {
   console.log("✅ Price IDs are configured");
 }
@@ -59,7 +59,9 @@ if (missingPriceIds.length > 0) {
 console.log("\n4. Checking webhook configuration...");
 if (!process.env.STRIPE_WEBHOOK_SECRET) {
   console.log("⚠️  STRIPE_WEBHOOK_SECRET not set");
-  console.log("   For local development, run: stripe listen --forward-to localhost:3000/api/payments/webhook");
+  console.log(
+    "   For local development, run: stripe listen --forward-to localhost:3000/api/payments/webhook"
+  );
 } else {
   console.log("✅ Webhook secret is configured");
 }

@@ -18,7 +18,7 @@ export interface TutorialWithQuiz {
   order: number;
   published: boolean;
   isPremium: boolean;
-  requiredPlan: "FREE" | "PREMIUM" | "PRO";
+  requiredPlan: "FREE" | "VIBED" | "CRACKED";
   createdAt: Date;
   updatedAt: Date;
   quiz?: {
@@ -62,7 +62,7 @@ export class TutorialService {
       order: tutorial.order,
       published: tutorial.published,
       isPremium: tutorial.isPremium,
-      requiredPlan: tutorial.requiredPlan as "FREE" | "PREMIUM" | "PRO",
+      requiredPlan: tutorial.requiredPlan as "FREE" | "VIBED" | "CRACKED",
       createdAt: tutorial.createdAt,
       updatedAt: tutorial.updatedAt,
       quiz: tutorial.quizzes[0]
@@ -106,7 +106,7 @@ export class TutorialService {
       order: tutorial.order,
       published: tutorial.published,
       isPremium: tutorial.isPremium,
-      requiredPlan: tutorial.requiredPlan as "FREE" | "PREMIUM" | "PRO",
+      requiredPlan: tutorial.requiredPlan as "FREE" | "VIBED" | "CRACKED",
       createdAt: tutorial.createdAt,
       updatedAt: tutorial.updatedAt,
       quiz: tutorial.quizzes[0]
@@ -152,7 +152,7 @@ export class TutorialService {
       order: tutorial.order,
       published: tutorial.published,
       isPremium: tutorial.isPremium,
-      requiredPlan: tutorial.requiredPlan as "FREE" | "PREMIUM" | "PRO",
+      requiredPlan: tutorial.requiredPlan as "FREE" | "VIBED" | "CRACKED",
       createdAt: tutorial.createdAt,
       updatedAt: tutorial.updatedAt,
       quiz: tutorial.quizzes[0]
@@ -231,7 +231,7 @@ export class TutorialService {
       order: tutorial.order,
       published: tutorial.published,
       isPremium: tutorial.isPremium,
-      requiredPlan: tutorial.requiredPlan as "FREE" | "PREMIUM" | "PRO",
+      requiredPlan: tutorial.requiredPlan as "FREE" | "VIBED" | "CRACKED",
       createdAt: tutorial.createdAt,
       updatedAt: tutorial.updatedAt,
       quiz: tutorial.quizzes[0]

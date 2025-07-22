@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 
 // Core subscription interface
 export interface SubscriptionInfo {
-  plan: "FREE" | "PREMIUM" | "PRO";
+  plan: "FREE" | "VIBED" | "CRACKED";
   status: string;
   subscriptionEndsAt: Date | null;
   isActive: boolean;
@@ -20,17 +20,17 @@ interface SubscriptionResponse {
 // Fetch function for subscription data
 const fetchSubscription = async (): Promise<SubscriptionInfo> => {
   const response = await fetch("/api/user/subscription");
-  
+
   if (!response.ok) {
     throw new Error(`Failed to fetch subscription: ${response.status}`);
   }
-  
+
   const data: SubscriptionResponse = await response.json();
-  
+
   if (!data.success) {
     throw new Error("Failed to fetch subscription from API");
   }
-  
+
   return data.data;
 };
 
@@ -38,7 +38,7 @@ const fetchSubscription = async (): Promise<SubscriptionInfo> => {
 export const useSubscription = () => {
   const { data: session } = useSession();
   const userId = (session?.user as { id?: string })?.id; // Cast to access custom id field
-  
+
   return useQuery({
     queryKey: ["subscription", userId],
     queryFn: fetchSubscription,

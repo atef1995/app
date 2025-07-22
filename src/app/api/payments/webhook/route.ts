@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import Stripe from "stripe";
-import { SubscriptionService, Plan, SubscriptionStatus } from "@/lib/subscriptionService";
+import {
+  SubscriptionService,
+  Plan,
+  SubscriptionStatus,
+} from "@/lib/subscriptionService";
 import { prisma } from "@/lib/prisma";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -33,23 +37,33 @@ export async function POST(request: NextRequest) {
     // Handle the event
     switch (event.type) {
       case "checkout.session.completed":
-        await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
+        await handleCheckoutSessionCompleted(
+          event.data.object as Stripe.Checkout.Session
+        );
         break;
 
       case "customer.subscription.created":
-        await handleSubscriptionCreated(event.data.object as Stripe.Subscription);
+        await handleSubscriptionCreated(
+          event.data.object as Stripe.Subscription
+        );
         break;
 
       case "customer.subscription.updated":
-        await handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
+        await handleSubscriptionUpdated(
+          event.data.object as Stripe.Subscription
+        );
         break;
 
       case "customer.subscription.deleted":
-        await handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
+        await handleSubscriptionDeleted(
+          event.data.object as Stripe.Subscription
+        );
         break;
 
       case "invoice.payment_succeeded":
-        await handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice);
+        await handleInvoicePaymentSucceeded(
+          event.data.object as Stripe.Invoice
+        );
         break;
 
       case "invoice.payment_failed":
@@ -70,7 +84,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
+async function handleCheckoutSessionCompleted(
+  session: Stripe.Checkout.Session
+) {
   try {
     console.log("Processing checkout session completed:", session.id);
 
@@ -95,7 +111,6 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     }
 
     console.log(`Checkout completed for user ${userId}, plan ${plan}`);
-
   } catch (error) {
     console.error("Error handling checkout session completed:", error);
   }
@@ -120,20 +135,28 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
     }
 
     // Get plan from subscription metadata or price
-    let plan: Plan = Plan.PREMIUM;
+    let plan: Plan = Plan.VIBED;
     if (subscription.metadata?.plan) {
       plan = subscription.metadata.plan as Plan;
     } else {
       // Determine plan from price ID
       const priceId = subscription.items.data[0]?.price.id;
-      if (priceId?.includes('pro')) {
-        plan = Plan.PRO;
+      if (
+        priceId === process.env.STRIPE_CRACKED_PRICE_ID ||
+        priceId === process.env.STRIPE_CRACKED_ANNUAL_PRICE_ID
+      ) {
+        plan = Plan.CRACKED;
+      } else if (
+        priceId === process.env.STRIPE_VIBED_PRICE_ID ||
+        priceId === process.env.STRIPE_VIBED_ANNUAL_PRICE_ID
+      ) {
+        plan = Plan.VIBED;
       }
     }
 
     // Calculate subscription end date - using type assertion to access Stripe properties
-    const stripeData = subscription as unknown as { 
-      current_period_end: number; 
+    const stripeData = subscription as unknown as {
+      current_period_end: number;
       current_period_start: number;
     };
     const subscriptionEndsAt = new Date(stripeData.current_period_end * 1000);
@@ -160,7 +183,6 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
     });
 
     console.log(`Subscription created for user ${userId}, plan ${plan}`);
-
   } catch (error) {
     console.error("Error handling subscription created:", error);
   }
@@ -190,25 +212,36 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
       status = SubscriptionStatus.ACTIVE;
     } else if (subscription.status === "canceled") {
       status = SubscriptionStatus.CANCELLED;
-    } else if (subscription.status === "past_due" || subscription.status === "unpaid") {
+    } else if (
+      subscription.status === "past_due" ||
+      subscription.status === "unpaid"
+    ) {
       status = SubscriptionStatus.EXPIRED;
     } else {
       status = SubscriptionStatus.INACTIVE;
     }
 
     // Get plan from subscription metadata or price
-    let plan: Plan = Plan.PREMIUM;
+    let plan: Plan = Plan.VIBED;
     if (subscription.metadata?.plan) {
       plan = subscription.metadata.plan as Plan;
     } else {
       const priceId = subscription.items.data[0]?.price.id;
-      if (priceId?.includes('pro')) {
-        plan = Plan.PRO;
+      if (
+        priceId === process.env.STRIPE_CRACKED_PRICE_ID ||
+        priceId === process.env.STRIPE_CRACKED_ANNUAL_PRICE_ID
+      ) {
+        plan = Plan.CRACKED;
+      } else if (
+        priceId === process.env.STRIPE_VIBED_PRICE_ID ||
+        priceId === process.env.STRIPE_VIBED_ANNUAL_PRICE_ID
+      ) {
+        plan = Plan.VIBED;
       }
     }
 
-    const stripeData = subscription as unknown as { 
-      current_period_end: number; 
+    const stripeData = subscription as unknown as {
+      current_period_end: number;
       current_period_start: number;
     };
     const subscriptionEndsAt = new Date(stripeData.current_period_end * 1000);
@@ -233,7 +266,6 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     });
 
     console.log(`Subscription updated for user ${userId}, status ${status}`);
-
   } catch (error) {
     console.error("Error handling subscription updated:", error);
   }
@@ -264,7 +296,9 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
       userId,
       Plan.FREE,
       SubscriptionStatus.CANCELLED,
-      stripeData.canceled_at ? new Date(stripeData.canceled_at * 1000) : new Date()
+      stripeData.canceled_at
+        ? new Date(stripeData.canceled_at * 1000)
+        : new Date()
     );
 
     // Update subscription record
@@ -276,7 +310,6 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     });
 
     console.log(`Subscription deleted for user ${userId}`);
-
   } catch (error) {
     console.error("Error handling subscription deleted:", error);
   }
@@ -291,7 +324,9 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
       return; // Skip non-subscription invoices
     }
 
-    const subscription = await stripe.subscriptions.retrieve(invoiceData.subscription);
+    const subscription = await stripe.subscriptions.retrieve(
+      invoiceData.subscription
+    );
     const customerId = subscription.customer as string;
     const customer = await stripe.customers.retrieve(customerId);
 
@@ -317,8 +352,9 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
       },
     });
 
-    console.log(`Invoice payment succeeded for user ${userId}, amount ${invoice.amount_paid}`);
-
+    console.log(
+      `Invoice payment succeeded for user ${userId}, amount ${invoice.amount_paid}`
+    );
   } catch (error) {
     console.error("Error handling invoice payment succeeded:", error);
   }
@@ -333,7 +369,9 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
       return; // Skip non-subscription invoices
     }
 
-    const subscription = await stripe.subscriptions.retrieve(invoiceData.subscription);
+    const subscription = await stripe.subscriptions.retrieve(
+      invoiceData.subscription
+    );
     const customerId = subscription.customer as string;
     const customer = await stripe.customers.retrieve(customerId);
 
@@ -362,8 +400,9 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     // #TODO: Send email notification about failed payment
     // #TODO: Implement dunning management
 
-    console.log(`Invoice payment failed for user ${userId}, amount ${invoice.amount_due}`);
-
+    console.log(
+      `Invoice payment failed for user ${userId}, amount ${invoice.amount_due}`
+    );
   } catch (error) {
     console.error("Error handling invoice payment failed:", error);
   }

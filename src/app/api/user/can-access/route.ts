@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { SubscriptionService } from "@/lib/subscriptionService";
 
-type PlanType = "FREE" | "PREMIUM" | "PRO";
+type PlanType = "FREE" | "VIBED" | "CRACKED";
 
 export async function GET(request: NextRequest) {
   try {

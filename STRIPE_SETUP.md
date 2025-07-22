@@ -23,10 +23,10 @@ STRIPE_WEBHOOK_SECRET=whsec_86d4222bfe2e8065b5c57b9180b27e38b760fe170e5432326d14
 NEXTAUTH_URL=http://localhost:3000
 
 # Price IDs (you'll create these in step 3)
-STRIPE_PREMIUM_PRICE_ID=price_premium_monthly_id
-STRIPE_PREMIUM_ANNUAL_PRICE_ID=price_premium_annual_id
-STRIPE_PRO_PRICE_ID=price_pro_monthly_id
-STRIPE_PRO_ANNUAL_PRICE_ID=price_pro_annual_id
+STRIPE_CRACKED_PRICE_ID=price_premium_monthly_id
+STRIPE_CRACKSTRIPE_CRACKED_ANNUAL_PRICE_IDED_PRICE_ID=price_premium_annual_id
+STRIPE_VIBED_PRICE_ID=price_pro_monthly_id
+STRIPE_VIBED_ANNUAL_PRICE_ID=price_pro_annual_id
 ```
 
 ## 3. Create Products and Prices in Stripe
