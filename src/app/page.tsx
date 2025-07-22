@@ -24,11 +24,14 @@ import {
 } from "lucide-react";
 import { MOODS } from "@/lib/moods";
 import { MoodCard } from "@/components/MoodCard";
+import CrackedGlitch from "@/components/ui/CrackedGlitch";
 
 export default function HomePage() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [showAnimation, setShowAnimation] = useState(false);
-  const [backgroundElements, setBackgroundElements] = useState<Array<{left: string, top: string}>>([]);
+  const [backgroundElements, setBackgroundElements] = useState<
+    Array<{ left: string; top: string }>
+  >([]);
 
   // Generate random positions only on client side to avoid hydration mismatch
   useEffect(() => {
@@ -134,7 +137,11 @@ export default function HomePage() {
             transition={{ duration: 1, delay: 0.2 }}
           >
             From <span className="text-blue-600">Vibed</span> to{" "}
-            <span className="text-purple-600">Cracked</span>
+            <CrackedGlitch
+              className="text-purple-600"
+              size="large"
+              intensity="medium"
+            />
           </motion.h1>
           <motion.p
             className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8"
@@ -397,7 +404,12 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
           >
             Why <span className="text-blue-600">Vibed</span> to{" "}
-            <span className="text-purple-600">Cracked</span>?
+            <CrackedGlitch
+              className="text-purple-600"
+              size="small"
+              intensity="low"
+            />
+            ?
           </motion.h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
