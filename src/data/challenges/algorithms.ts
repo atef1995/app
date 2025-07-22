@@ -3,11 +3,14 @@ import { Challenge } from "@/types/practice";
 export const algorithmChallenges: Challenge[] = [
   {
     id: "4",
+    slug: "fibonacci-number",
     title: "Fibonacci Number",
     description: "Calculate the nth Fibonacci number",
     difficulty: "medium",
     type: "algorithm",
     estimatedTime: "20 minutes",
+    isPremium: false,
+    requiredPlan: "FREE",
     moodAdapted: {
       rush: "Time to unleash the math magic! 🔥 Let's calculate those Fibonacci numbers fast!",
       chill:
@@ -53,11 +56,14 @@ export const algorithmChallenges: Challenge[] = [
   },
   {
     id: "5",
+    slug: "two-sum",
     title: "Two Sum",
     description: "Find two numbers in an array that add up to a target sum",
     difficulty: "medium",
     type: "algorithm",
     estimatedTime: "25 minutes",
+    isPremium: true,
+    requiredPlan: "PREMIUM",
     moodAdapted: {
       rush: "Hunt down those pairs! 🎯 Use that algorithmic speed to find the solution!",
       chill:

@@ -195,6 +195,37 @@ export default function PremiumModal({
 
         {/* Content */}
         <div className="p-6">
+          {/* Required Plan Banner */}
+          {contentTitle && (
+            <div className="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0">
+                  {requiredPlan === "PRO" ? (
+                    <Sparkles className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+                  ) : (
+                    <Crown className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+                    {requiredPlan} Subscription Required
+                  </h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
+                    &ldquo;{contentTitle}&rdquo; requires a{" "}
+                    <span className="font-semibold text-yellow-700 dark:text-yellow-300">
+                      {requiredPlan}
+                    </span>{" "}
+                    subscription to access. Choose the{" "}
+                    <span className="font-semibold">
+                      {plans.find(p => p.id === requiredPlan)?.name}
+                    </span>{" "}
+                    plan below to unlock this {contentType} and many more!
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Mood-specific messaging */}
           <div className={`p-4 rounded-lg ${moodColors.bg} mb-6`}>
             <p className={`text-center ${moodColors.text} font-medium`}>
@@ -213,13 +244,22 @@ export default function PremiumModal({
               <div
                 key={plan.id}
                 className={`relative border-2 rounded-xl p-6 transition-all ${
-                  plan.id === requiredPlan || plan.popular
+                  plan.id === requiredPlan
+                    ? `border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 shadow-lg ring-2 ring-yellow-200 dark:ring-yellow-700`
+                    : plan.popular && requiredPlan === "PREMIUM"
                     ? `border-blue-500 bg-blue-50 dark:bg-blue-900/20`
                     : "border-gray-200 dark:border-gray-700"
                 }`}
               >
-                {/* Popular badge */}
-                {plan.popular && (
+                {/* Popular badge or Required badge */}
+                {plan.id === requiredPlan && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                      <Crown className="w-4 h-4" /> Required Plan
+                    </span>
+                  </div>
+                )}
+                {plan.popular && plan.id !== requiredPlan && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                     <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
                       <Star className="w-4 h-4" /> Most Popular
@@ -265,7 +305,9 @@ export default function PremiumModal({
                   onClick={() => handleUpgrade(plan.id)}
                   disabled={loading === plan.id}
                   className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
-                    plan.id === requiredPlan || plan.popular
+                    plan.id === requiredPlan
+                      ? `${moodColors.button} text-white shadow-lg`
+                      : plan.popular && requiredPlan === "PREMIUM"
                       ? `${moodColors.button} text-white`
                       : "border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
@@ -274,7 +316,12 @@ export default function PremiumModal({
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                   ) : (
                     <>
-                      {plan.id === requiredPlan ? "Upgrade Now" : "Choose Plan"}
+                      {plan.id === requiredPlan 
+                        ? `Get ${plan.name} (Required)` 
+                        : plan.popular && requiredPlan === "PREMIUM"
+                        ? `Get ${plan.name}`
+                        : `Choose ${plan.name}`
+                      }
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}

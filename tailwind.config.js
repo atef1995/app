@@ -219,6 +219,66 @@ const config = {
           },
         },
       }),
+
+      // Custom animations for toast notifications
+      keyframes: {
+        'slide-in': {
+          '0%': {
+            transform: 'translateX(100%) scale(0.95)',
+            opacity: '0'
+          },
+          '100%': {
+            transform: 'translateX(0) scale(1)',
+            opacity: '1'
+          },
+        },
+        'slide-out': {
+          '0%': {
+            transform: 'translateX(0) scale(1)',
+            opacity: '1'
+          },
+          '100%': {
+            transform: 'translateX(100%) scale(0.95)',
+            opacity: '0'
+          },
+        },
+        'bounce-in': {
+          '0%': {
+            transform: 'scale(0.3) translateX(100%)',
+            opacity: '0'
+          },
+          '50%': {
+            transform: 'scale(1.05) translateX(-10%)',
+            opacity: '0.8'
+          },
+          '100%': {
+            transform: 'scale(1) translateX(0)',
+            opacity: '1'
+          },
+        },
+        'shake': {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-2px)' },
+          '20%, 40%, 60%, 80%': { transform: 'translateX(2px)' },
+        },
+        'fade-in': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(-10px)'
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0)'
+          },
+        },
+      },
+      animation: {
+        'slide-in': 'slide-in 0.3s ease-out',
+        'slide-out': 'slide-out 0.3s ease-in',
+        'bounce-in': 'bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        'shake': 'shake 0.5s ease-in-out',
+        'fade-in': 'fade-in 0.3s ease-out',
+      },
     },
   },
   plugins: [

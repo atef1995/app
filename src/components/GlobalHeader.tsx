@@ -13,6 +13,8 @@ import {
   Brain,
   Settings,
   Crown,
+  Trophy,
+  Users,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -26,6 +28,8 @@ export function GlobalHeader() {
     { href: "/tutorials", label: "Tutorials", icon: BookOpen },
     { href: "/practice", label: "Practice", icon: Code },
     { href: "/quizzes", label: "Quizzes", icon: Brain },
+    { href: "/achievements", label: "Achievements", icon: Trophy },
+    { href: "/social", label: "Social", icon: Users },
     { href: "/pricing", label: "Pricing", icon: Crown },
   ];
 
@@ -89,7 +93,23 @@ export function GlobalHeader() {
                 {showUserMenu && (
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 py-2 z-50">
                     <Link
-                      href="/dashboard"
+                      href="/achievements"
+                      className="flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <Trophy className="w-4 h-4" />
+                      Achievements
+                    </Link>
+                    <Link
+                      href="/social"
+                      className="flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <Users className="w-4 h-4" />
+                      Social
+                    </Link>
+                    <Link
+                      href="/settings"
                       className="flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                       onClick={() => setShowUserMenu(false)}
                     >
@@ -124,8 +144,8 @@ export function GlobalHeader() {
         {/* Mobile Navigation - Improved spacing */}
         {session && (
           <nav className="lg:hidden mt-3 pt-3 border-t dark:border-gray-700">
-            <div className="grid grid-cols-4 gap-2">
-              {navigationItems.map((item) => (
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+              {navigationItems.slice(0, 6).map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -135,6 +155,16 @@ export function GlobalHeader() {
                   <span className="text-xs text-center">{item.label}</span>
                 </Link>
               ))}
+              {/* Pricing on separate row on mobile */}
+              <div className="col-span-3 sm:col-span-4 pt-2">
+                <Link
+                  href="/pricing"
+                  className="flex flex-col items-center gap-1 p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors w-full"
+                >
+                  <Crown className="w-5 h-5" />
+                  <span className="text-xs text-center">Pricing</span>
+                </Link>
+              </div>
             </div>
 
             {/* Mobile Mood Indicator */}

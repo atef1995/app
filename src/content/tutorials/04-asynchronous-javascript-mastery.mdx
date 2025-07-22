@@ -1,0 +1,1388 @@
+---
+title: "Asynchronous JavaScript Mastery"
+description: "Master async programming with callbacks, promises, async/await, and modern JavaScript patterns"
+level: "advanced"
+estimatedTime: "60 minutes"
+topics: ["Promises", "Async/Await", "Fetch API", "Error Handling", "Concurrency", "Event Loop"]
+quizQuestions: 15
+order: 4
+---
+
+# Asynchronous JavaScript Mastery
+
+Welcome to the world of asynchronous JavaScript! 🚀 In this comprehensive guide, you'll master the art of handling asynchronous operations, from basic callbacks to modern async/await patterns.
+
+## Understanding Asynchronous Programming 🌊
+
+JavaScript is **single-threaded**, but it can handle multiple operations simultaneously through asynchronous programming. This is crucial for web development where you need to fetch data, handle user interactions, and update the UI without blocking the main thread.
+
+### The Event Loop
+
+```javascript
+console.log('1 - Start');
+
+setTimeout(() => {
+  console.log('2 - Timeout callback');
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log('3 - Promise resolved');
+});
+
+console.log('4 - End');
+
+// Output order:
+// 1 - Start
+// 4 - End  
+// 3 - Promise resolved
+// 2 - Timeout callback
+```
+
+### Why Asynchronous Code Matters
+
+```javascript
+// ❌ Synchronous approach (blocking)
+function fetchDataSync() {
+  // This would freeze the browser for 3 seconds
+  const start = Date.now();
+  while (Date.now() - start < 3000) {
+    // Blocking operation
+  }
+  return "Data fetched";
+}
+
+// ✅ Asynchronous approach (non-blocking)
+function fetchDataAsync() {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve("Data fetched");
+    }, 3000);
+  });
+}
+
+// UI remains responsive while data loads
+fetchDataAsync().then(data => {
+  console.log(data);
+});
+```
+
+## Callbacks: The Foundation 📞
+
+Callbacks are functions passed as arguments to other functions, executed when an operation completes.
+
+### Basic Callback Pattern
+
+```javascript
+function fetchUserData(userId, callback) {
+  // Simulate API call
+  setTimeout(() => {
+    const userData = {
+      id: userId,
+      name: 'John Doe',
+      email: 'john@example.com'
+    };
+    callback(null, userData); // null = no error
+  }, 1000);
+}
+
+// Usage
+fetchUserData(123, (error, user) => {
+  if (error) {
+    console.error('Error:', error);
+  } else {
+    console.log('User:', user);
+  }
+});
+```
+
+### Callback Hell 😱
+
+```javascript
+// ❌ Nested callbacks become hard to read and maintain
+getUserData(userId, (userError, user) => {
+  if (userError) {
+    handleError(userError);
+  } else {
+    getPostsForUser(user.id, (postsError, posts) => {
+      if (postsError) {
+        handleError(postsError);
+      } else {
+        getCommentsForPost(posts[0].id, (commentsError, comments) => {
+          if (commentsError) {
+            handleError(commentsError);
+          } else {
+            // Finally got all the data... 😵‍💫
+            displayContent(user, posts, comments);
+          }
+        });
+      }
+    });
+  }
+});
+```
+
+## Promises: A Better Way 🤝
+
+Promises represent the eventual completion (or failure) of an asynchronous operation and its resulting value.
+
+### Creating Promises
+
+```javascript
+// Basic Promise creation
+const myPromise = new Promise((resolve, reject) => {
+  const success = Math.random() > 0.5;
+  
+  setTimeout(() => {
+    if (success) {
+      resolve("Operation successful!");
+    } else {
+      reject(new Error("Operation failed!"));
+    }
+  }, 1000);
+});
+
+// Using the Promise
+myPromise
+  .then(result => {
+    console.log("Success:", result);
+  })
+  .catch(error => {
+    console.error("Error:", error.message);
+  });
+```
+
+### Promise States
+
+```javascript
+// A Promise has three states:
+
+// 1. Pending (initial state)
+const pendingPromise = new Promise(() => {
+  // Never resolves or rejects
+});
+
+// 2. Fulfilled (operation completed successfully)
+const fulfilledPromise = Promise.resolve("Success!");
+
+// 3. Rejected (operation failed)
+const rejectedPromise = Promise.reject(new Error("Failed!"));
+
+// Once settled (fulfilled or rejected), a Promise cannot change state
+console.log(fulfilledPromise); // Promise { "Success!" }
+console.log(rejectedPromise);  // Promise { <rejected> Error: Failed! }
+```
+
+### Promise Chaining
+
+```javascript
+function fetchUser(id) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve({ id, name: 'Alice', role: 'user' });
+    }, 500);
+  });
+}
+
+function fetchUserPosts(userId) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve([
+        { id: 1, title: 'Post 1', userId },
+        { id: 2, title: 'Post 2', userId }
+      ]);
+    }, 300);
+  });
+}
+
+function enrichPostsWithComments(posts) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const enrichedPosts = posts.map(post => ({
+        ...post,
+        comments: [`Comment 1 on ${post.title}`, `Comment 2 on ${post.title}`]
+      }));
+      resolve(enrichedPosts);
+    }, 200);
+  });
+}
+
+// ✅ Clean Promise chaining
+fetchUser(123)
+  .then(user => {
+    console.log('User:', user);
+    return fetchUserPosts(user.id);
+  })
+  .then(posts => {
+    console.log('Posts:', posts);
+    return enrichPostsWithComments(posts);
+  })
+  .then(enrichedPosts => {
+    console.log('Enriched Posts:', enrichedPosts);
+  })
+  .catch(error => {
+    console.error('Error in chain:', error);
+  });
+```
+
+### Promise Utilities
+
+```javascript
+// Promise.all - Wait for all promises to complete
+const promises = [
+  fetch('/api/users'),
+  fetch('/api/posts'),
+  fetch('/api/comments')
+];
+
+Promise.all(promises)
+  .then(responses => {
+    console.log('All requests completed:', responses);
+    // All must succeed for this to run
+  })
+  .catch(error => {
+    console.error('At least one request failed:', error);
+  });
+
+// Promise.allSettled - Wait for all promises to settle (succeed or fail)
+Promise.allSettled(promises)
+  .then(results => {
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        console.log(`Promise ${index} succeeded:`, result.value);
+      } else {
+        console.log(`Promise ${index} failed:`, result.reason);
+      }
+    });
+  });
+
+// Promise.race - First promise to settle wins
+const timeoutPromise = new Promise((_, reject) => {
+  setTimeout(() => reject(new Error('Timeout')), 5000);
+});
+
+const dataPromise = fetch('/api/data');
+
+Promise.race([dataPromise, timeoutPromise])
+  .then(result => console.log('First to complete:', result))
+  .catch(error => console.error('First to fail:', error));
+```
+
+## Async/Await: Modern Asynchronous Code ✨
+
+Async/await makes asynchronous code look and behave more like synchronous code, improving readability and maintainability.
+
+### Basic Async/Await
+
+```javascript
+// Promise-based function
+function fetchData() {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve("Data fetched successfully!");
+    }, 1000);
+  });
+}
+
+// ✅ Using async/await
+async function getData() {
+  try {
+    console.log("Fetching data...");
+    const result = await fetchData();
+    console.log("Result:", result);
+    return result;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Re-throw if needed
+  }
+}
+
+// Call async function
+getData()
+  .then(data => console.log("Final data:", data))
+  .catch(error => console.error("Caught error:", error));
+```
+
+### Async/Await vs Promises
+
+```javascript
+// Promise chain approach
+function getUserDataPromises(userId) {
+  return fetchUser(userId)
+    .then(user => {
+      return fetchUserPosts(user.id)
+        .then(posts => {
+          return enrichPostsWithComments(posts)
+            .then(enrichedPosts => {
+              return { user, posts: enrichedPosts };
+            });
+        });
+    });
+}
+
+// ✅ Async/await approach - much cleaner!
+async function getUserDataAsync(userId) {
+  try {
+    const user = await fetchUser(userId);
+    const posts = await fetchUserPosts(user.id);
+    const enrichedPosts = await enrichPostsWithComments(posts);
+    
+    return { user, posts: enrichedPosts };
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error;
+  }
+}
+```
+
+### Parallel vs Sequential Execution
+
+```javascript
+// ❌ Sequential execution (slower)
+async function fetchDataSequential() {
+  const user = await fetchUser(1);        // Wait 500ms
+  const posts = await fetchUserPosts(1);  // Wait 300ms
+  const comments = await fetchComments(); // Wait 200ms
+  
+  return { user, posts, comments };
+  // Total time: 500 + 300 + 200 = 1000ms
+}
+
+// ✅ Parallel execution (faster)
+async function fetchDataParallel() {
+  const [user, posts, comments] = await Promise.all([
+    fetchUser(1),        // All three start simultaneously
+    fetchUserPosts(1),
+    fetchComments()
+  ]);
+  
+  return { user, posts, comments };
+  // Total time: max(500, 300, 200) = 500ms
+}
+
+// ✅ Mixed approach - when operations depend on each other
+async function fetchDataMixed() {
+  const user = await fetchUser(1);  // Must get user first
+  
+  // These can run in parallel since they both depend only on user
+  const [posts, profile] = await Promise.all([
+    fetchUserPosts(user.id),
+    fetchUserProfile(user.id)
+  ]);
+  
+  return { user, posts, profile };
+}
+```
+
+## The Fetch API: Modern HTTP Requests 🌐
+
+The Fetch API provides a modern interface for making HTTP requests, replacing older XMLHttpRequest.
+
+### Basic Fetch Usage
+
+```javascript
+// Simple GET request
+async function fetchUsers() {
+  try {
+    const response = await fetch('https://jsonplaceholder.typicode.com/users');
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const users = await response.json();
+    return users;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    throw error;
+  }
+}
+```
+
+### Advanced Fetch Patterns
+
+```javascript
+// POST request with JSON data
+async function createUser(userData) {
+  try {
+    const response = await fetch('/api/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + getAuthToken()
+      },
+      body: JSON.stringify(userData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Failed to create user: ${errorData.message}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Create user error:', error);
+    throw error;
+  }
+}
+
+// File upload
+async function uploadFile(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('category', 'documents');
+
+  try {
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData // Don't set Content-Type for FormData
+    });
+
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Upload error:', error);
+    throw error;
+  }
+}
+```
+
+### Fetch with Timeout and Retry
+
+```javascript
+async function fetchWithTimeout(url, options = {}, timeout = 5000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error(`Request timeout after ${timeout}ms`);
+    }
+    throw error;
+  }
+}
+
+async function fetchWithRetry(url, options = {}, maxRetries = 3) {
+  let lastError;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetchWithTimeout(url, options);
+      if (response.ok) {
+        return response;
+      }
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    } catch (error) {
+      lastError = error;
+      
+      if (attempt === maxRetries) {
+        break;
+      }
+      
+      // Exponential backoff
+      const delay = Math.pow(2, attempt) * 1000;
+      console.log(`Attempt ${attempt} failed, retrying in ${delay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  throw new Error(`Failed after ${maxRetries} attempts: ${lastError.message}`);
+}
+```
+
+## Error Handling Patterns 🛡️
+
+Proper error handling is crucial for robust asynchronous applications.
+
+### Try-Catch with Async/Await
+
+```javascript
+async function robustDataFetcher(userId) {
+  try {
+    // Validate input
+    if (!userId || typeof userId !== 'number') {
+      throw new Error('Invalid user ID provided');
+    }
+
+    // Fetch user data
+    const user = await fetchUser(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Fetch additional data
+    const [posts, profile] = await Promise.all([
+      fetchUserPosts(userId).catch(error => {
+        console.warn('Failed to fetch posts:', error);
+        return []; // Return empty array as fallback
+      }),
+      fetchUserProfile(userId).catch(error => {
+        console.warn('Failed to fetch profile:', error);
+        return null; // Return null as fallback
+      })
+    ]);
+
+    return {
+      user,
+      posts,
+      profile,
+      hasCompleteData: posts.length > 0 && profile !== null
+    };
+
+  } catch (error) {
+    // Log error for debugging
+    console.error('Error in robustDataFetcher:', {
+      userId,
+      error: error.message,
+      stack: error.stack
+    });
+
+    // Return structured error response
+    return {
+      error: true,
+      message: error.message,
+      code: error.code || 'UNKNOWN_ERROR'
+    };
+  }
+}
+```
+
+### Custom Error Classes
+
+```javascript
+class APIError extends Error {
+  constructor(message, status, code) {
+    super(message);
+    this.name = 'APIError';
+    this.status = status;
+    this.code = code;
+  }
+}
+
+class NetworkError extends Error {
+  constructor(message, originalError) {
+    super(message);
+    this.name = 'NetworkError';
+    this.originalError = originalError;
+  }
+}
+
+async function apiRequest(url, options = {}) {
+  try {
+    const response = await fetch(url, options);
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new APIError(
+        errorData.message || `HTTP ${response.status}`,
+        response.status,
+        errorData.code
+      );
+    }
+    
+    return await response.json();
+  } catch (error) {
+    if (error instanceof APIError) {
+      throw error; // Re-throw API errors as-is
+    }
+    
+    // Network or other errors
+    throw new NetworkError('Network request failed', error);
+  }
+}
+
+// Usage with specific error handling
+async function handleSpecificErrors() {
+  try {
+    const data = await apiRequest('/api/sensitive-data');
+    return data;
+  } catch (error) {
+    if (error instanceof APIError) {
+      if (error.status === 401) {
+        // Handle authentication error
+        redirectToLogin();
+      } else if (error.status === 403) {
+        // Handle authorization error
+        showAccessDeniedMessage();
+      } else if (error.status >= 500) {
+        // Handle server error
+        showServerErrorMessage();
+      }
+    } else if (error instanceof NetworkError) {
+      // Handle network issues
+      showNetworkErrorMessage();
+    }
+    
+    throw error; // Re-throw for higher-level handling
+  }
+}
+```
+
+## Advanced Patterns 🚀
+
+### Debouncing and Throttling
+
+```javascript
+// Debounce - delay execution until after calls have stopped
+function debounce(func, delay) {
+  let timeoutId;
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+// Throttle - limit execution to once per interval
+function throttle(func, interval) {
+  let lastCallTime = 0;
+  return function(...args) {
+    const now = Date.now();
+    if (now - lastCallTime >= interval) {
+      lastCallTime = now;
+      return func.apply(this, args);
+    }
+  };
+}
+
+// Usage for search input
+const searchAPI = async (query) => {
+  const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+  return response.json();
+};
+
+const debouncedSearch = debounce(async (query) => {
+  if (query.length > 2) {
+    try {
+      const results = await searchAPI(query);
+      displaySearchResults(results);
+    } catch (error) {
+      console.error('Search failed:', error);
+    }
+  }
+}, 300);
+
+// Attach to input event
+document.getElementById('search').addEventListener('input', (e) => {
+  debouncedSearch(e.target.value);
+});
+```
+
+### Queue Management
+
+```javascript
+class AsyncQueue {
+  constructor(concurrency = 1) {
+    this.concurrency = concurrency;
+    this.running = 0;
+    this.queue = [];
+  }
+  
+  async add(asyncFunction) {
+    return new Promise((resolve, reject) => {
+      this.queue.push({
+        asyncFunction,
+        resolve,
+        reject
+      });
+      this.process();
+    });
+  }
+  
+  async process() {
+    if (this.running >= this.concurrency || this.queue.length === 0) {
+      return;
+    }
+    
+    this.running++;
+    const { asyncFunction, resolve, reject } = this.queue.shift();
+    
+    try {
+      const result = await asyncFunction();
+      resolve(result);
+    } catch (error) {
+      reject(error);
+    } finally {
+      this.running--;
+      this.process(); // Process next item
+    }
+  }
+}
+
+// Usage
+const queue = new AsyncQueue(3); // Max 3 concurrent operations
+
+// Add multiple operations to queue
+const operations = [
+  () => fetchUser(1),
+  () => fetchUser(2),
+  () => fetchUser(3),
+  () => fetchUser(4),
+  () => fetchUser(5)
+];
+
+Promise.all(operations.map(op => queue.add(op)))
+  .then(results => {
+    console.log('All operations completed:', results);
+  })
+  .catch(error => {
+    console.error('Queue operation failed:', error);
+  });
+```
+
+### Caching with Expiration
+
+```javascript
+class AsyncCache {
+  constructor(defaultTTL = 300000) { // 5 minutes default
+    this.cache = new Map();
+    this.defaultTTL = defaultTTL;
+  }
+  
+  async get(key, fetcher, ttl = this.defaultTTL) {
+    const cached = this.cache.get(key);
+    
+    if (cached && Date.now() < cached.expiry) {
+      return cached.data;
+    }
+    
+    try {
+      const data = await fetcher();
+      this.cache.set(key, {
+        data,
+        expiry: Date.now() + ttl
+      });
+      return data;
+    } catch (error) {
+      // If we have stale data, return it on error
+      if (cached) {
+        console.warn('Using stale cache due to error:', error);
+        return cached.data;
+      }
+      throw error;
+    }
+  }
+  
+  invalidate(key) {
+    this.cache.delete(key);
+  }
+  
+  clear() {
+    this.cache.clear();
+  }
+}
+
+// Usage
+const cache = new AsyncCache();
+
+async function getCachedUser(userId) {
+  return cache.get(
+    `user:${userId}`,
+    () => fetchUser(userId),
+    60000 // 1 minute TTL
+  );
+}
+```
+
+## Real-World Examples 🌟
+
+### Building a Data Pipeline
+
+```javascript
+class DataPipeline {
+  constructor() {
+    this.steps = [];
+    this.errorHandlers = [];
+  }
+  
+  addStep(name, asyncFunction) {
+    this.steps.push({ name, function: asyncFunction });
+    return this;
+  }
+  
+  addErrorHandler(handler) {
+    this.errorHandlers.push(handler);
+    return this;
+  }
+  
+  async execute(initialData) {
+    let data = initialData;
+    const results = [];
+    
+    for (const step of this.steps) {
+      try {
+        console.log(`Executing step: ${step.name}`);
+        const stepResult = await step.function(data);
+        data = stepResult;
+        results.push({
+          step: step.name,
+          success: true,
+          data: stepResult
+        });
+      } catch (error) {
+        console.error(`Step failed: ${step.name}`, error);
+        
+        // Run error handlers
+        for (const handler of this.errorHandlers) {
+          try {
+            await handler(error, step.name, data);
+          } catch (handlerError) {
+            console.error('Error handler failed:', handlerError);
+          }
+        }
+        
+        results.push({
+          step: step.name,
+          success: false,
+          error: error.message
+        });
+        
+        throw new Error(`Pipeline failed at step: ${step.name}`);
+      }
+    }
+    
+    return { finalData: data, stepResults: results };
+  }
+}
+
+// Usage
+const pipeline = new DataPipeline()
+  .addStep('fetchUser', async (userId) => {
+    const user = await fetchUser(userId);
+    return { userId, user };
+  })
+  .addStep('enrichUser', async (data) => {
+    const profile = await fetchUserProfile(data.userId);
+    return { ...data, profile };
+  })
+  .addStep('generateReport', async (data) => {
+    const report = {
+      user: data.user,
+      profile: data.profile,
+      generatedAt: new Date().toISOString(),
+      summary: `Report for ${data.user.name}`
+    };
+    return report;
+  })
+  .addErrorHandler(async (error, stepName, data) => {
+    // Log to monitoring service
+    await logError({
+      pipeline: 'user-report',
+      step: stepName,
+      error: error.message,
+      data
+    });
+  });
+
+// Execute pipeline
+pipeline.execute(123)
+  .then(result => {
+    console.log('Pipeline completed:', result);
+  })
+  .catch(error => {
+    console.error('Pipeline failed:', error);
+  });
+```
+
+### WebSocket with Async/Await
+
+```javascript
+class WebSocketClient {
+  constructor(url) {
+    this.url = url;
+    this.ws = null;
+    this.messageHandlers = new Map();
+    this.pendingRequests = new Map();
+    this.requestId = 0;
+  }
+  
+  async connect() {
+    return new Promise((resolve, reject) => {
+      this.ws = new WebSocket(this.url);
+      
+      this.ws.onopen = () => {
+        console.log('WebSocket connected');
+        resolve();
+      };
+      
+      this.ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        reject(error);
+      };
+      
+      this.ws.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          this.handleMessage(message);
+        } catch (error) {
+          console.error('Failed to parse message:', error);
+        }
+      };
+      
+      this.ws.onclose = () => {
+        console.log('WebSocket disconnected');
+        this.handleDisconnect();
+      };
+    });
+  }
+  
+  async sendRequest(type, data, timeout = 10000) {
+    return new Promise((resolve, reject) => {
+      const requestId = ++this.requestId;
+      
+      // Set up timeout
+      const timeoutId = setTimeout(() => {
+        this.pendingRequests.delete(requestId);
+        reject(new Error(`Request timeout: ${type}`));
+      }, timeout);
+      
+      // Store pending request
+      this.pendingRequests.set(requestId, {
+        resolve,
+        reject,
+        timeoutId
+      });
+      
+      // Send message
+      const message = {
+        id: requestId,
+        type,
+        data
+      };
+      
+      this.ws.send(JSON.stringify(message));
+    });
+  }
+  
+  handleMessage(message) {
+    if (message.id && this.pendingRequests.has(message.id)) {
+      // Handle response to request
+      const { resolve, reject, timeoutId } = this.pendingRequests.get(message.id);
+      clearTimeout(timeoutId);
+      this.pendingRequests.delete(message.id);
+      
+      if (message.error) {
+        reject(new Error(message.error));
+      } else {
+        resolve(message.data);
+      }
+    } else {
+      // Handle push message
+      const handler = this.messageHandlers.get(message.type);
+      if (handler) {
+        handler(message.data);
+      }
+    }
+  }
+  
+  onMessage(type, handler) {
+    this.messageHandlers.set(type, handler);
+  }
+  
+  handleDisconnect() {
+    // Reject all pending requests
+    for (const [id, { reject, timeoutId }] of this.pendingRequests) {
+      clearTimeout(timeoutId);
+      reject(new Error('WebSocket disconnected'));
+    }
+    this.pendingRequests.clear();
+  }
+  
+  disconnect() {
+    if (this.ws) {
+      this.ws.close();
+    }
+  }
+}
+
+// Usage
+async function useWebSocket() {
+  const client = new WebSocketClient('ws://localhost:8080');
+  
+  try {
+    await client.connect();
+    
+    // Set up message handlers
+    client.onMessage('notification', (data) => {
+      console.log('Received notification:', data);
+    });
+    
+    // Send requests
+    const userData = await client.sendRequest('getUser', { id: 123 });
+    console.log('User data:', userData);
+    
+    const updateResult = await client.sendRequest('updateUser', {
+      id: 123,
+      name: 'New Name'
+    });
+    console.log('Update result:', updateResult);
+    
+  } catch (error) {
+    console.error('WebSocket error:', error);
+  } finally {
+    client.disconnect();
+  }
+}
+```
+
+## Practice Exercises 💪
+
+### Exercise 1: API Client with Caching
+
+<InteractiveCodeBlock 
+  title="Build an API Client with Caching" 
+  description="Create a reusable API client that caches responses"
+  initialCode={`class APIClient {
+  constructor(baseURL) {
+    this.baseURL = baseURL;
+    this.cache = new Map();
+  }
+  
+  async get(endpoint, options = {}) {
+    // Implement GET with caching
+    // Cache key should include endpoint and any query parameters
+    // Return cached data if fresh (within 5 minutes)
+  }
+  
+  async post(endpoint, data, options = {}) {
+    // Implement POST request
+    // Invalidate related cache entries
+  }
+  
+  invalidateCache(pattern) {
+    // Remove cache entries matching pattern
+  }
+}
+
+// Test your implementation
+const api = new APIClient('https://jsonplaceholder.typicode.com');
+
+async function testAPI() {
+  try {
+    const users = await api.get('/users');
+    console.log('Users:', users.length);
+    
+    const cachedUsers = await api.get('/users'); // Should use cache
+    console.log('Cached users:', cachedUsers.length);
+    
+  } catch (error) {
+    console.error('API test failed:', error);
+  }
+}
+
+testAPI();`}
+/>
+
+### Exercise 2: Async Data Processor
+
+<InteractiveCodeBlock 
+  title="Process Data Asynchronously" 
+  description="Build a system to process large datasets efficiently"
+  initialCode={`async function processLargeDataset(data, batchSize = 10) {
+  // Process data in batches to avoid overwhelming the system
+  // Each item should be processed asynchronously
+  // Return array of results maintaining original order
+  
+  const results = [];
+  
+  // Your implementation here
+  
+  return results;
+}
+
+// Simulate async processing function
+async function processItem(item) {
+  // Simulate variable processing time
+  await new Promise(resolve => setTimeout(resolve, Math.random() * 100));
+  return item * 2;
+}
+
+// Test with large dataset
+const largeDataset = Array.from({ length: 100 }, (_, i) => i + 1);
+
+processLargeDataset(largeDataset, 5)
+  .then(results => {
+    console.log('Processed', results.length, 'items');
+    console.log('First 10 results:', results.slice(0, 10));
+  })
+  .catch(error => {
+    console.error('Processing failed:', error);
+  });`}
+/>
+
+### Exercise 3: Retry Mechanism
+
+<InteractiveCodeBlock 
+  title="Implement Smart Retry Logic" 
+  description="Build a retry mechanism with exponential backoff"
+  initialCode={`async function retryOperation(operation, options = {}) {
+  const {
+    maxRetries = 3,
+    baseDelay = 1000,
+    maxDelay = 10000,
+    backoffFactor = 2,
+    retryCondition = () => true
+  } = options;
+  
+  // Implement retry logic with:
+  // 1. Exponential backoff
+  // 2. Maximum delay cap
+  // 3. Configurable retry condition
+  // 4. Detailed error reporting
+  
+  let lastError;
+  
+  for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
+    try {
+      // Your implementation here
+      
+    } catch (error) {
+      // Your error handling here
+    }
+  }
+  
+  throw lastError;
+}
+
+// Test with unreliable function
+let attemptCount = 0;
+async function unreliableOperation() {
+  attemptCount++;
+  if (attemptCount < 3) {
+    throw new Error(\`Attempt \${attemptCount} failed\`);
+  }
+  return \`Success on attempt \${attemptCount}\`;
+}
+
+// Test your retry mechanism
+retryOperation(
+  () => unreliableOperation(),
+  {
+    maxRetries: 5,
+    retryCondition: (error) => error.message.includes('failed')
+  }
+)
+.then(result => console.log('Result:', result))
+.catch(error => console.error('Final error:', error));`}
+/>
+
+## Common Pitfalls and Best Practices 🚨
+
+### 1. Forgetting to Handle Errors
+
+```javascript
+// ❌ Unhandled promise rejection
+async function badExample() {
+  const data = await fetch('/api/data'); // Could throw!
+  return data.json(); // Could also throw!
+}
+
+// ✅ Proper error handling
+async function goodExample() {
+  try {
+    const response = await fetch('/api/data');
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to fetch data:', error);
+    throw error; // Re-throw or handle appropriately
+  }
+}
+```
+
+### 2. Blocking the Event Loop
+
+```javascript
+// ❌ Blocking operation
+async function processHugeArray(array) {
+  const results = [];
+  for (const item of array) {
+    results.push(await processItem(item)); // Blocks event loop
+  }
+  return results;
+}
+
+// ✅ Non-blocking with batching
+async function processHugeArrayEfficiently(array, batchSize = 100) {
+  const results = [];
+  
+  for (let i = 0; i < array.length; i += batchSize) {
+    const batch = array.slice(i, i + batchSize);
+    const batchResults = await Promise.all(
+      batch.map(item => processItem(item))
+    );
+    results.push(...batchResults);
+    
+    // Yield control back to event loop
+    await new Promise(resolve => setTimeout(resolve, 0));
+  }
+  
+  return results;
+}
+```
+
+### 3. Memory Leaks with Promises
+
+```javascript
+// ❌ Potential memory leak
+const pendingPromises = [];
+
+function createLeakyPromise() {
+  const promise = new Promise((resolve) => {
+    // Long-running operation
+    setTimeout(resolve, 60000);
+  });
+  
+  pendingPromises.push(promise); // Never cleaned up!
+  return promise;
+}
+
+// ✅ Proper cleanup
+class PromiseManager {
+  constructor() {
+    this.pendingPromises = new Set();
+  }
+  
+  createManagedPromise(executor) {
+    let promiseResolve, promiseReject;
+    
+    const promise = new Promise((resolve, reject) => {
+      promiseResolve = resolve;
+      promiseReject = reject;
+      executor(resolve, reject);
+    });
+    
+    this.pendingPromises.add(promise);
+    
+    // Clean up when settled
+    promise.finally(() => {
+      this.pendingPromises.delete(promise);
+    });
+    
+    return promise;
+  }
+  
+  cancelAll() {
+    // Cancel all pending promises if possible
+    this.pendingPromises.clear();
+  }
+}
+```
+
+## Performance Optimization Tips 🚀
+
+### 1. Preloading and Prefetching
+
+```javascript
+// Preload critical resources
+async function preloadCriticalData() {
+  const criticalPromises = [
+    fetch('/api/user-session'),
+    fetch('/api/navigation-menu'),
+    fetch('/api/notifications')
+  ];
+  
+  // Start all requests immediately
+  const [session, menu, notifications] = await Promise.all(criticalPromises);
+  
+  return {
+    session: await session.json(),
+    menu: await menu.json(),
+    notifications: await notifications.json()
+  };
+}
+
+// Prefetch likely-needed data
+function prefetchUserData(userId) {
+  // Fire and forget - cache the result for later
+  fetch(`/api/users/${userId}/profile`).then(response => {
+    if (response.ok) {
+      return response.json();
+    }
+  }).then(data => {
+    if (data) {
+      cache.set(`user:${userId}:profile`, data);
+    }
+  }).catch(() => {
+    // Fail silently for prefetch
+  });
+}
+```
+
+### 2. Request Deduplication
+
+```javascript
+class RequestDeduplicator {
+  constructor() {
+    this.pendingRequests = new Map();
+  }
+  
+  async fetch(url, options = {}) {
+    const key = this.createKey(url, options);
+    
+    if (this.pendingRequests.has(key)) {
+      // Return existing promise
+      return this.pendingRequests.get(key);
+    }
+    
+    // Create new request
+    const promise = fetch(url, options)
+      .finally(() => {
+        // Clean up when done
+        this.pendingRequests.delete(key);
+      });
+    
+    this.pendingRequests.set(key, promise);
+    return promise;
+  }
+  
+  createKey(url, options) {
+    return JSON.stringify({ url, method: options.method || 'GET' });
+  }
+}
+
+const deduplicator = new RequestDeduplicator();
+
+// Multiple calls to same endpoint return same promise
+const promise1 = deduplicator.fetch('/api/data');
+const promise2 = deduplicator.fetch('/api/data'); // Same promise!
+```
+
+## Key Takeaways 🎯
+
+🎯 **Async/await** makes asynchronous code more readable and maintainable
+
+🎯 **Promise.all()** for parallel execution, await for sequential
+
+🎯 **Error handling** is crucial - always use try-catch with async/await
+
+🎯 **Fetch API** provides modern HTTP request capabilities
+
+🎯 **Proper cancellation** prevents memory leaks and unnecessary work
+
+🎯 **Caching and deduplication** improve performance and user experience
+
+## Quiz Time! 🧠
+
+You've mastered asynchronous JavaScript! Time to test your knowledge with advanced async patterns.
+
+## What's Next?
+
+Congratulations! 🎉 You now have deep expertise in asynchronous JavaScript. Coming up next:
+
+- **DOM Manipulation & Events** - Making web pages interactive
+- **JavaScript Modules & Build Tools** - Modern JavaScript development
+- **Testing JavaScript Applications** - Writing reliable, maintainable code
+
+You're well on your way to becoming a JavaScript expert! 🚀

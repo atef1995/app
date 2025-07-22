@@ -160,7 +160,7 @@ export async function getFilteredChallenges(filters: {
   difficulty?: "easy" | "medium" | "hard";
   type?: "algorithm" | "function" | "array" | "object" | "logic";
 }): Promise<DatabaseChallenge[]> {
-  const whereClause: any = { published: true };
+  const whereClause: Record<string, unknown> = { published: true };
 
   if (filters.difficulty) {
     whereClause.difficulty = difficultyToEnum[filters.difficulty];

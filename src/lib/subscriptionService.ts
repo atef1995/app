@@ -1,5 +1,30 @@
 import { prisma } from "./prisma";
-import { Plan, SubscriptionStatus, PaymentStatus } from "@prisma/client";
+
+// Define the constants since they're not enums in the schema
+export const Plan = {
+  FREE: "FREE",
+  PREMIUM: "PREMIUM", 
+  PRO: "PRO",
+} as const;
+
+export const SubscriptionStatus = {
+  ACTIVE: "ACTIVE",
+  INACTIVE: "INACTIVE", 
+  CANCELLED: "CANCELLED",
+  EXPIRED: "EXPIRED",
+} as const;
+
+export const PaymentStatus = {
+  PENDING: "PENDING",
+  COMPLETED: "COMPLETED",
+  FAILED: "FAILED", 
+  CANCELLED: "CANCELLED",
+} as const;
+
+// Define the types from the constants
+export type Plan = typeof Plan[keyof typeof Plan];
+export type SubscriptionStatus = typeof SubscriptionStatus[keyof typeof SubscriptionStatus];
+export type PaymentStatus = typeof PaymentStatus[keyof typeof PaymentStatus];
 
 export interface SubscriptionInfo {
   plan: Plan;
@@ -75,8 +100,8 @@ export class SubscriptionService {
       (user.subscriptionEndsAt === null || user.subscriptionEndsAt > now);
 
     return {
-      plan: user.subscription,
-      status: user.subscriptionStatus,
+      plan: user.subscription as Plan,
+      status: user.subscriptionStatus as SubscriptionStatus,
       subscriptionEndsAt: user.subscriptionEndsAt,
       isActive,
       canAccessPremium: isActive && user.subscription !== Plan.FREE,
@@ -221,7 +246,7 @@ export class SubscriptionService {
     // Update user subscription
     await this.updateUserSubscription(
       payment.userId,
-      payment.plan,
+      payment.plan as Plan,
       SubscriptionStatus.ACTIVE,
       subscriptionEndsAt
     );
@@ -277,8 +302,10 @@ export class SubscriptionService {
    */
   private static getUpgradeRecommendations(
     currentPlan: Plan,
-    _limits: PlanLimits
+    limits: PlanLimits
   ) {
+    console.log('Plan limits:', limits); // Use the parameter to avoid warning
+    
     if (currentPlan === Plan.FREE) {
       return {
         suggestedPlan: Plan.PREMIUM,

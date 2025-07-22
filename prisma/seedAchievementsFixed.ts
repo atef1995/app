@@ -1,0 +1,263 @@
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+const achievements = [
+  // First Steps
+  {
+    key: "FIRST_QUIZ",
+    title: "First Steps 🎯",
+    description: "Complete your first quiz",
+    icon: "🎯",
+    category: "learning",
+    rarity: "COMMON",
+    points: 10,
+    requirementType: "quiz_count",
+    requirementValue: 1,
+    isHidden: false,
+  },
+  {
+    key: "FIRST_CHALLENGE",
+    title: "Code Newbie 💻",
+    description: "Solve your first coding challenge",
+    icon: "💻",
+    category: "challenge",
+    rarity: "COMMON",
+    points: 15,
+    requirementType: "challenge_count",
+    requirementValue: 1,
+    isHidden: false,
+  },
+
+  // Learning Achievements
+  {
+    key: "QUIZ_MASTER_10",
+    title: "Quiz Explorer 🧠",
+    description: "Complete 10 quizzes",
+    icon: "🧠",
+    category: "learning",
+    rarity: "RARE",
+    points: 50,
+    requirementType: "quiz_count",
+    requirementValue: 10,
+    isHidden: false,
+  },
+  {
+    key: "QUIZ_MASTER_25",
+    title: "Quiz Master 👑",
+    description: "Complete 25 quizzes",
+    icon: "👑",
+    category: "learning",
+    rarity: "EPIC",
+    points: 100,
+    requirementType: "quiz_count",
+    requirementValue: 25,
+    isHidden: false,
+  },
+  {
+    key: "PERFECT_SCORE",
+    title: "Perfectionist ⭐",
+    description: "Score 100% on a quiz",
+    icon: "⭐",
+    category: "learning",
+    rarity: "RARE",
+    points: 25,
+    requirementType: "perfect_score",
+    requirementValue: 1,
+    isHidden: false,
+  },
+  {
+    key: "SPEED_DEMON",
+    title: "Speed Demon ⚡",
+    description: "Complete a quiz in under 30 seconds",
+    icon: "⚡",
+    category: "speed",
+    rarity: "EPIC",
+    points: 30,
+    requirementType: "quiz_time",
+    requirementValue: 30,
+    isHidden: false,
+  },
+
+  // Challenge Achievements
+  {
+    key: "CHALLENGE_MASTER_5",
+    title: "Code Solver 🔧",
+    description: "Solve 5 coding challenges",
+    icon: "🔧",
+    category: "challenge",
+    rarity: "RARE",
+    points: 40,
+    requirementType: "challenge_count",
+    requirementValue: 5,
+    isHidden: false,
+  },
+  {
+    key: "CHALLENGE_MASTER_15",
+    title: "Algorithm Expert 🚀",
+    description: "Solve 15 coding challenges",
+    icon: "🚀",
+    category: "challenge",
+    rarity: "EPIC",
+    points: 75,
+    requirementType: "challenge_count",
+    requirementValue: 15,
+    isHidden: false,
+  },
+
+  // Points Achievements
+  {
+    key: "POINTS_100",
+    title: "Point Collector 💰",
+    description: "Earn 100 total points",
+    icon: "💰",
+    category: "points",
+    rarity: "COMMON",
+    points: 25,
+    requirementType: "total_points",
+    requirementValue: 100,
+    isHidden: false,
+  },
+  {
+    key: "POINTS_500",
+    title: "Point Master 💎",
+    description: "Earn 500 total points",
+    icon: "💎",
+    category: "points",
+    rarity: "RARE",
+    points: 50,
+    requirementType: "total_points",
+    requirementValue: 500,
+    isHidden: false,
+  },
+  {
+    key: "POINTS_1000",
+    title: "Point Legend 🏆",
+    description: "Earn 1000 total points",
+    icon: "🏆",
+    category: "points",
+    rarity: "LEGENDARY",
+    points: 100,
+    requirementType: "total_points",
+    requirementValue: 1000,
+    isHidden: false,
+  },
+
+  // Mood-based Achievements
+  {
+    key: "CHILL_LEARNER",
+    title: "Chill Vibes 😎",
+    description: "Complete 10 quizzes in Chill mode",
+    icon: "😎",
+    category: "mood",
+    rarity: "RARE",
+    points: 30,
+    requirementType: "chill_quizzes",
+    requirementValue: 10,
+    isHidden: false,
+  },
+  {
+    key: "FOCUSED_LEARNER",
+    title: "Laser Focus 🎯",
+    description: "Complete 10 quizzes in Focused mode",
+    icon: "🎯",
+    category: "mood",
+    rarity: "RARE",
+    points: 30,
+    requirementType: "focused_quizzes",
+    requirementValue: 10,
+    isHidden: false,
+  },
+  {
+    key: "CRACKED_LEARNER",
+    title: "Absolutely Cracked 🔥",
+    description: "Complete 10 quizzes in Cracked mode",
+    icon: "🔥",
+    category: "mood",
+    rarity: "EPIC",
+    points: 50,
+    requirementType: "cracked_quizzes",
+    requirementValue: 10,
+    isHidden: false,
+  },
+
+  // Streak Achievements
+  {
+    key: "STREAK_3",
+    title: "Consistent Learner 📅",
+    description: "Learn for 3 days in a row",
+    icon: "📅",
+    category: "streak",
+    rarity: "COMMON",
+    points: 20,
+    requirementType: "daily_streak",
+    requirementValue: 3,
+    isHidden: false,
+  },
+  {
+    key: "STREAK_7",
+    title: "Dedicated Student 📚",
+    description: "Learn for 7 days in a row",
+    icon: "📚",
+    category: "streak",
+    rarity: "RARE",
+    points: 40,
+    requirementType: "daily_streak",
+    requirementValue: 7,
+    isHidden: false,
+  },
+  {
+    key: "STREAK_30",
+    title: "Learning Machine 🤖",
+    description: "Learn for 30 days in a row",
+    icon: "🤖",
+    category: "streak",
+    rarity: "LEGENDARY",
+    points: 100,
+    requirementType: "daily_streak",
+    requirementValue: 30,
+    isHidden: false,
+  },
+
+  // Social Achievements
+  {
+    key: "SOCIAL_BUTTERFLY",
+    title: "Social Butterfly 🦋",
+    description: "Make 5 friends",
+    icon: "🦋",
+    category: "social",
+    rarity: "RARE",
+    points: 30,
+    requirementType: "friends_count",
+    requirementValue: 5,
+    isHidden: false,
+  },
+  {
+    key: "INFLUENCER",
+    title: "Learning Influencer 📢",
+    description: "Share 10 achievements",
+    icon: "📢",
+    category: "social",
+    rarity: "EPIC",
+    points: 50,
+    requirementType: "shares_count",
+    requirementValue: 10,
+    isHidden: false,
+  },
+];
+
+export async function seedAchievements() {
+  console.log("🏆 Seeding achievements...");
+
+  for (const achievement of achievements) {
+    await prisma.achievement.upsert({
+      where: { key: achievement.key },
+      update: achievement,
+      create: achievement,
+    });
+  }
+
+  console.log(`✅ Seeded ${achievements.length} achievements`);
+}
+
+export default seedAchievements;

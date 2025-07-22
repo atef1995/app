@@ -1,8 +1,8 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
 import { MoodSelector } from "@/components/MoodSelector";
+import { useProgressStats } from "@/hooks/useProgress";
 import { ProgressStats } from "@/components/ProgressComponents";
 import { BookOpen, Code, Brain, Hand } from "lucide-react";
 import Link from "next/link";
@@ -25,30 +25,14 @@ interface ProgressStats {
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
-  const [progressStats, setProgressStats] = useState<ProgressStats | null>(
-    null
-  );
-  const [loadingProgress, setLoadingProgress] = useState(true);
-
-  useEffect(() => {
-    if (session?.user) {
-      fetchProgressStats();
-    }
-  }, [session]);
-
-  const fetchProgressStats = async () => {
-    try {
-      const response = await fetch("/api/progress?type=stats");
-      if (response.ok) {
-        const data = await response.json();
-        setProgressStats(data.stats);
-      }
-    } catch (error) {
-      console.error("Error fetching progress:", error);
-    } finally {
-      setLoadingProgress(false);
-    }
-  };
+  
+  // Use TanStack Query hook for progress stats
+  const { 
+    data: progressStats, 
+    isLoading: loadingProgress,
+    error: progressError,
+    isError: hasProgressError
+  } = useProgressStats(session?.user?.id);
 
   if (status === "loading") {
     return (
@@ -155,6 +139,18 @@ export default function DashboardPage() {
               <p className="text-gray-600 dark:text-gray-400">
                 Loading your progress...
               </p>
+            </div>
+          ) : hasProgressError ? (
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl text-center">
+              <p className="text-red-600 dark:text-red-400 mb-4">
+                Error loading progress: {progressError?.message || "Unknown error"}
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+              >
+                Retry
+              </button>
             </div>
           ) : progressStats ? (
             <ProgressStats

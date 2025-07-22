@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
 import { Check, ArrowRight, Star } from "lucide-react";
@@ -10,6 +10,26 @@ interface PlanFeature {
   text: string;
   included: boolean;
   highlight?: boolean;
+}
+
+interface StripePriceData {
+  id: string;
+  planType: 'PREMIUM' | 'PRO';
+  interval: string;
+  amount: number;
+  currency: string;
+  productName: string;
+}
+
+interface StripePrices {
+  PREMIUM: {
+    monthly?: StripePriceData;
+    annual?: StripePriceData;
+  };
+  PRO: {
+    monthly?: StripePriceData;
+    annual?: StripePriceData;
+  };
 }
 
 interface PricingPlan {
@@ -24,76 +44,111 @@ interface PricingPlan {
   emoji?: string;
 }
 
-const plans: PricingPlan[] = [
-  {
-    id: "FREE",
-    name: "Starter",
-    price: 0,
-    period: "forever",
-    description:
-      "Perfect for testing the waters and getting your first taste 🌊",
-    emoji: "🎯",
-    features: [
-      { text: "3 Basic Tutorials", included: true },
-      { text: "5 Practice Challenges", included: true },
-      { text: "Mood-Adaptive Learning", included: true },
-      { text: "Progress Tracking", included: true },
-      { text: "Interactive Code Editor", included: true },
-      { text: "Quizzes & Assessments", included: false },
-      { text: "Advanced Tutorials", included: false },
-      { text: "Unlimited Challenges", included: false },
-      { text: "Priority Support", included: false },
-    ],
-    cta: "Start Free",
-  },
-  {
-    id: "PREMIUM",
-    name: "Vibed",
-    price: 9.99,
-    period: "month",
-    description: "For the motivated learner ready to level up their game 🚀",
-    popular: true,
-    emoji: "🔥",
-    features: [
-      { text: "Unlimited Tutorials", included: true, highlight: true },
-      { text: "Unlimited Challenges", included: true, highlight: true },
-      { text: "Quizzes & Assessments", included: true, highlight: true },
-      { text: "Advanced Progress Analytics", included: true },
-      { text: "Mood-Adaptive Learning", included: true },
-      { text: "Interactive Code Editor", included: true },
-      { text: "Priority Support", included: true },
-      { text: "Certificate of Completion", included: true },
-      { text: "AI Code Reviews", included: false },
-    ],
-    cta: "Get Vibed",
-  },
-  {
-    id: "PRO",
-    name: "Cracked",
-    price: 19.99,
-    period: "month",
-    description: "When you're ready to become absolutely cracked at coding 💪",
-    emoji: "⚡",
-    features: [
-      { text: "Everything in Vibed", included: true },
-      { text: "AI-Powered Code Reviews", included: true, highlight: true },
-      { text: "Advanced Analytics Dashboard", included: true, highlight: true },
-      { text: "Custom Learning Paths", included: true },
-      { text: "Offline Content Access", included: true },
-      { text: "1-on-1 Mentorship Sessions", included: true },
-      { text: "Early Access to New Features", included: true },
-      { text: "Priority Discord Access", included: true },
-      { text: "Custom Integrations", included: true },
-    ],
-    cta: "Get Cracked",
-  },
-];
-
 export default function PricingPage() {
   const { data: session } = useSession();
   const { currentMood } = useMood();
   const [isAnnual, setIsAnnual] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
+  const [stripePrices, setStripePrices] = useState<StripePrices | null>(null);
+
+  // Fetch Stripe prices on component mount
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        const response = await fetch('/api/payments/prices');
+        const data = await response.json();
+        if (data.success) {
+          setStripePrices(data.prices);
+        } else {
+          console.error('Failed to fetch prices:', data.error);
+        }
+      } catch (error) {
+        console.error('Error fetching prices:', error);
+      }
+    };
+
+    fetchPrices();
+  }, []);
+
+  // Get real price from Stripe or fallback to hardcoded
+  const getRealPrice = (planId: "PREMIUM" | "PRO", annual: boolean) => {
+    if (!stripePrices) {
+      // Fallback prices
+      return planId === "PREMIUM" ? (annual ? 89 : 9.98) : (annual ? 99 : 19.9);
+    }
+
+    const planPrices = stripePrices[planId];
+    const priceData = annual ? planPrices.annual : planPrices.monthly;
+    return priceData?.amount || 0;
+  };
+
+  // Create plans with dynamic pricing - now inside the component
+  const getPlansWithDynamicPricing = (): PricingPlan[] => [
+    {
+      id: "FREE",
+      name: "Starter",
+      price: 0,
+      period: "forever",
+      description:
+        "Perfect for testing the waters and getting your first taste 🌊",
+      emoji: "🎯",
+      features: [
+        { text: "3 Basic Tutorials", included: true },
+        { text: "5 Practice Challenges", included: true },
+        { text: "Mood-Adaptive Learning", included: true },
+        { text: "Progress Tracking", included: true },
+        { text: "Interactive Code Editor", included: true },
+        { text: "Quizzes & Assessments", included: false },
+        { text: "Advanced Tutorials", included: false },
+        { text: "Unlimited Challenges", included: false },
+        { text: "Priority Support", included: false },
+      ],
+      cta: "Start Free",
+    },
+    {
+      id: "PREMIUM",
+      name: "Vibed",
+      price: getRealPrice("PREMIUM", false),
+      period: "month",
+      description: "For the motivated learner ready to level up their game 🚀",
+      popular: true,
+      emoji: "🔥",
+      features: [
+        { text: "Unlimited Tutorials", included: true, highlight: true },
+        { text: "Unlimited Challenges", included: true, highlight: true },
+        { text: "Quizzes & Assessments", included: true, highlight: true },
+        { text: "Advanced Progress Analytics", included: true },
+        { text: "Mood-Adaptive Learning", included: true },
+        { text: "Interactive Code Editor", included: true },
+        { text: "Priority Support", included: true },
+        { text: "Certificate of Completion", included: true },
+        { text: "AI Code Reviews", included: false },
+      ],
+      cta: "Get Vibed",
+    },
+    {
+      id: "PRO",
+      name: "Cracked",
+      price: getRealPrice("PRO", false),
+      period: "month",
+      description: "When you're ready to become absolutely cracked at coding 💪",
+      emoji: "⚡",
+      features: [
+        { text: "Everything in Vibed", included: true },
+        { text: "AI-Powered Code Reviews", included: true, highlight: true },
+        { text: "Advanced Analytics Dashboard", included: true, highlight: true },
+        { text: "Custom Learning Paths", included: true },
+        { text: "Offline Content Access", included: true },
+        { text: "1-on-1 Mentorship Sessions", included: true },
+        { text: "Early Access to New Features", included: true },
+        { text: "Priority Discord Access", included: true },
+        { text: "Custom Integrations", included: true },
+      ],
+      cta: "Get Cracked",
+    },
+  ];
+
+  const plans = getPlansWithDynamicPricing();
 
   const getMoodColors = () => {
     switch (currentMood.id) {
@@ -164,8 +219,13 @@ export default function PricingPage() {
     }
   };
 
-  const getDiscountedPrice = (price: number) => {
-    return isAnnual ? price * 12 * 0.8 : price; // 20% discount for annual
+  const getDiscountedPrice = (plan: PricingPlan) => {
+    if (plan.id === "FREE") return 0;
+    
+    const monthlyPrice = getRealPrice(plan.id as "PREMIUM" | "PRO", false);
+    const annualPrice = getRealPrice(plan.id as "PREMIUM" | "PRO", true);
+    
+    return isAnnual ? annualPrice : monthlyPrice;
   };
 
   return (
@@ -187,6 +247,13 @@ export default function PricingPage() {
             {currentMood.id === "chill" &&
               "Take your time and pick the perfect plan for your learning journey. No pressure! 😊"}
           </p>
+          
+          {/* Loading indicator for prices */}
+          {!stripePrices && (
+            <div className="mt-4 text-sm text-gray-500">
+              <div className="animate-pulse">Loading current pricing...</div>
+            </div>
+          )}
         </div>
 
         {/* Billing Toggle */}
@@ -252,7 +319,7 @@ export default function PricingPage() {
                       $
                       {plan.id === "FREE"
                         ? 0
-                        : getDiscountedPrice(plan.price).toFixed(2)}
+                        : getDiscountedPrice(plan).toFixed(2)}
                     </span>
                     {plan.id !== "FREE" && (
                       <span className="text-gray-600 dark:text-gray-400">
@@ -262,7 +329,7 @@ export default function PricingPage() {
                   </div>
                   {isAnnual && plan.id !== "FREE" && (
                     <div className="text-sm text-green-600 dark:text-green-400">
-                      Save ${(plan.price * 12 * 0.2).toFixed(2)} per year!
+                      Save ${(getRealPrice(plan.id as "PREMIUM" | "PRO", false) * 12 - getRealPrice(plan.id as "PREMIUM" | "PRO", true)).toFixed(2)} per year!
                     </div>
                   )}
                   <p className="text-gray-600 dark:text-gray-400 text-sm">

@@ -2,9 +2,15 @@
 
 import { useSession } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
-import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Challenge } from "@/types/practice";
+import Card, { CardAction } from "@/components/ui/Card";
+import { PageLayout } from "@/components/ui/PageLayout";
+import { MoodInfoCard } from "@/components/ui/MoodInfoCard";
+import { ContentGrid } from "@/components/ui/ContentGrid";
+import { usePremiumContentHandler } from "@/hooks/usePremiumContentHandler";
+import { useMoodColors } from "@/hooks/useMoodColors";
+import { useChallengesWithFilters } from "@/hooks/useChallenges";
 import {
   Search,
   Monitor,
@@ -13,13 +19,8 @@ import {
   Folder,
   Puzzle,
   Calculator,
-  Target,
-  Clock,
-  ArrowRight,
 } from "lucide-react";
 import {
-  getAllChallenges,
-  getFilteredChallenges,
   challengeTypes,
   difficultyLevels,
 } from "@/lib/challengeData";
@@ -27,37 +28,21 @@ import {
 export default function PracticePage() {
   const { data: session } = useSession();
   const { currentMood } = useMood();
+  const { handlePremiumContent } = usePremiumContentHandler();
+  const moodColors = useMoodColors();
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  // Load challenges on mount and when filters change
-  useEffect(() => {
-    async function loadChallenges() {
-      setLoading(true);
-      try {
-        let challengeData;
-        if (selectedType === "all" && selectedDifficulty === "all") {
-          challengeData = await getAllChallenges();
-        } else {
-          challengeData = await getFilteredChallenges({
-            type: selectedType === "all" ? undefined : selectedType,
-            difficulty:
-              selectedDifficulty === "all" ? undefined : selectedDifficulty,
-          });
-        }
-        setChallenges(challengeData);
-      } catch (error) {
-        console.error("Error loading challenges:", error);
-        setChallenges([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadChallenges();
-  }, [selectedType, selectedDifficulty]);
+  // Use TanStack Query hook for challenges with filters
+  const { 
+    data: challenges = [], 
+    isLoading: loading, 
+    error: challengesError,
+    isError: hasChallengesError
+  } = useChallengesWithFilters({
+    type: selectedType,
+    difficulty: selectedDifficulty,
+  });
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -72,36 +57,20 @@ export default function PracticePage() {
     }
   };
 
-  const getMoodColors = () => {
-    switch (currentMood.id) {
-      case "rush":
-        return {
-          gradient:
-            "from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-red-900/20 dark:to-orange-900/20",
-          border: "border-red-500 dark:border-red-400",
-          text: "text-red-700 dark:text-red-300",
-          bg: "bg-red-50 dark:bg-red-900/20",
-        };
-      case "grind":
-        return {
-          gradient:
-            "from-gray-50 via-slate-50 to-blue-50 dark:from-gray-900 dark:via-slate-900/20 dark:to-blue-900/20",
-          border: "border-blue-500 dark:border-blue-400",
-          text: "text-blue-700 dark:text-blue-300",
-          bg: "bg-blue-50 dark:bg-blue-900/20",
-        };
-      default: // chill
-        return {
-          gradient:
-            "from-purple-50 via-pink-50 to-indigo-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-indigo-900/20",
-          border: "border-purple-500 dark:border-purple-400",
-          text: "text-purple-700 dark:text-purple-300",
-          bg: "bg-purple-50 dark:bg-purple-900/20",
-        };
-    }
+  // Handle premium challenge click
+  const handleChallengeClick = (challenge: Challenge) => {
+    handlePremiumContent(
+      {
+        title: challenge.title,
+        isPremium: challenge.isPremium,
+        requiredPlan: challenge.requiredPlan === "FREE" ? "PREMIUM" : challenge.requiredPlan,
+        type: "challenge" as const,
+      },
+      () => {
+        window.location.href = `/practice/${challenge.slug}`;
+      }
+    );
   };
-
-  const moodColors = getMoodColors();
 
   const getTypeIcon = (type: string) => {
     const iconClass = "h-6 w-6";
@@ -147,97 +116,116 @@ export default function PracticePage() {
     return null; // Middleware will handle redirect
   }
 
-  return (
-    <div className={`min-h-screen bg-gradient-to-br ${moodColors.gradient}`}>
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-3">
-            Practice Challenges{" "}
-            <Monitor className="h-10 w-10 text-purple-600 dark:text-purple-400" />
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 text-lg">
-            Sharpen your JavaScript skills with hands-on coding challenges
-          </p>
-        </div>
-
-        {/* Mood-Adapted Motivation */}
-        <div
-          className={`bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl mb-8 border-l-4 ${moodColors.border}`}
-        >
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
-            {currentMood.name} Energy{" "}
-            <Target className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-          </h2>
-          <p className={moodColors.text}>
-            {currentMood.id === "rush" &&
-              "Ready to code with high energy! Let's tackle these challenges with speed and enthusiasm!"}
-            {currentMood.id === "chill" &&
-              "Perfect time for relaxed coding. Take your time and enjoy the learning process."}
-            {currentMood.id === "grind" &&
-              "Great mindset for deep problem-solving. Let's build strong foundations through deliberate practice."}
-          </p>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl mb-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            Filter Challenges
-          </h2>
-          <div className="flex flex-wrap gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Difficulty
-              </label>
-              <select
-                value={selectedDifficulty}
-                onChange={(e) => setSelectedDifficulty(e.target.value)}
-                className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
-                aria-label="Filter by difficulty"
-              >
-                {difficultyLevels.map((level) => (
-                  <option key={level.value} value={level.value}>
-                    {level.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Type
-              </label>
-              <select
-                value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value)}
-                className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
-                aria-label="Filter by challenge type"
-              >
-                {challengeTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Challenge Grid */}
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">
-              Loading challenges...
+  // Handle challenges loading error
+  if (hasChallengesError) {
+    return (
+      <PageLayout
+        title="Practice Challenges"
+        subtitle="Sharpen your JavaScript skills with hands-on coding challenges"
+      >
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-red-600 dark:text-red-400 mb-4">
+              Error loading challenges: {challengesError?.message || "Unknown error"}
             </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+            >
+              Retry
+            </button>
           </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {challenges.map((challenge) => (
-              <Link
+        </div>
+      </PageLayout>
+    );
+  }
+
+  return (
+    <PageLayout
+      title="Practice Challenges"
+      subtitle="Sharpen your JavaScript skills with hands-on coding challenges"
+      className="relative"
+    >
+      {/* Header Icon */}
+      <div className="absolute top-6 right-6">
+        <Monitor className="h-10 w-10 text-purple-600 dark:text-purple-400" />
+      </div>
+
+      {/* Mood Info Card */}
+      <MoodInfoCard className="mb-8" />
+
+      {/* Filters */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl mb-8">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+          Filter Challenges
+        </h2>
+        <div className="flex flex-wrap gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Difficulty
+            </label>
+            <select
+              value={selectedDifficulty}
+              onChange={(e) => setSelectedDifficulty(e.target.value)}
+              className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
+              aria-label="Filter by difficulty"
+            >
+              {difficultyLevels.map((level) => (
+                <option key={level.value} value={level.value}>
+                  {level.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Type
+            </label>
+            <select
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+              className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
+              aria-label="Filter by challenge type"
+            >
+              {challengeTypes.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Challenge Grid */}
+      {loading ? (
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">
+            Loading challenges...
+          </p>
+        </div>
+      ) : (
+        <ContentGrid columns="3" className="mb-8">
+          {challenges.map((challenge) => {
+            return (
+              <Card
                 key={challenge.id}
-                href={`/practice/${challenge.slug}`}
-                className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl dark:shadow-xl transition-all border-2 border-transparent hover:border-purple-200 dark:hover:border-purple-600"
+                isPremium={challenge.isPremium}
+                requiredPlan={challenge.requiredPlan === "FREE" ? "PREMIUM" : (challenge.requiredPlan as "PREMIUM" | "PRO")}
+                onPremiumClick={() => handleChallengeClick(challenge)}
+                onClick={() => handleChallengeClick(challenge)}
+                title={challenge.title}
+                description={challenge.description}
+                className="h-full"
+                actions={
+                  <div className="flex items-center justify-between w-full">
+                    <CardAction.TimeInfo time={challenge.estimatedTime} />
+                    <CardAction.Primary onClick={() => handleChallengeClick(challenge)}>
+                      Start Challenge
+                    </CardAction.Primary>
+                  </div>
+                }
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex justify-center">
@@ -261,41 +249,31 @@ export default function PracticePage() {
                 </p>
 
                 {/* Mood-adapted description */}
-                <div className={`${moodColors.bg} rounded-lg p-3 mb-4`}>
+                <div className={`${moodColors.bg} rounded-lg p-3`}>
                   <p className={`${moodColors.text} text-xs leading-relaxed`}>
                     {challenge.moodAdapted[currentMood.id]}
                   </p>
                 </div>
+              </Card>
+            );
+          })}
+        </ContentGrid>
+      )}
 
-                <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    {challenge.estimatedTime}
-                  </span>
-                  <span className="text-purple-600 dark:text-purple-400 font-semibold flex items-center gap-1">
-                    Start Challenge <ArrowRight className="h-4 w-4" />
-                  </span>
-                </div>
-              </Link>
-            ))}
+      {/* No Results */}
+      {challenges.length === 0 && !loading && (
+        <div className="text-center py-12">
+          <div className="mb-4 flex justify-center">
+            <Search className="h-16 w-16 text-gray-400 dark:text-gray-500" />
           </div>
-        )}
-
-        {/* No Results */}
-        {challenges.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <div className="mb-4 flex justify-center">
-              <Search className="h-16 w-16 text-gray-400 dark:text-gray-500" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-              No challenges found
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Try adjusting your filters to see more challenges
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+            No challenges found
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            Try adjusting your filters to see more challenges
+          </p>
+        </div>
+      )}
+    </PageLayout>
   );
 }

@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  FileText,
   Clock,
   Target,
   BarChart3,
@@ -16,9 +15,16 @@ import {
 import { MOODS } from "@/lib/moods";
 import { useMood } from "@/components/providers/MoodProvider";
 import { ProgressBadge } from "@/components/ProgressComponents";
-import Card from "@/components/ui/Card";
+import Card, { CardAction } from "@/components/ui/Card";
 import PremiumModal from "@/components/ui/PremiumModal";
-import { usePremiumAccess } from "@/hooks/usePremiumAccess";
+import { PageLayout } from "@/components/ui/PageLayout";
+import { MoodInfoCard } from "@/components/ui/MoodInfoCard";
+import { ContentGrid } from "@/components/ui/ContentGrid";
+import { usePremiumContentHandler } from "@/hooks/usePremiumContentHandler";
+import { useQuizzes } from "@/hooks/useQuizzes";
+import { useTutorialProgress } from "@/hooks/useProgress";
+import { usePagination } from "@/hooks/usePagination";
+import Pagination from "@/components/ui/Pagination";
 
 // Types for database quiz data
 interface Question {
@@ -49,6 +55,18 @@ interface QuizCardProps {
     bestScore?: number;
     quizAttempts?: number;
   };
+  // Premium content handler passed from parent
+  premiumHandler: {
+    handlePremiumContent: (
+      content: {
+        title: string;
+        isPremium?: boolean;
+        requiredPlan?: string;
+        type: "tutorial" | "challenge" | "quiz";
+      },
+      onAccess: () => void
+    ) => void;
+  };
 }
 
 const QuizCard: React.FC<QuizCardProps> = ({
@@ -56,10 +74,10 @@ const QuizCard: React.FC<QuizCardProps> = ({
   index,
   userMood,
   progress,
+  premiumHandler,
 }) => {
-  const moodConfig = MOODS[userMood.toLowerCase()];
-  const { checkPremiumAccess, showPremiumModal, setShowPremiumModal } = usePremiumAccess();
   const router = useRouter();
+  const moodConfig = MOODS[userMood.toLowerCase()];
   
   const difficultyColors = {
     easy: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
@@ -87,20 +105,17 @@ const QuizCard: React.FC<QuizCardProps> = ({
   const estimatedTime = moodConfig.quizSettings.timeLimit || 10;
 
   const handleQuizClick = () => {
-    if (quiz.isPremium) {
-      const hasAccess = checkPremiumAccess(
-        quiz.requiredPlan as "PREMIUM" | "PRO",
-        quiz.isPremium
-      );
-      if (!hasAccess) {
-        return; // Premium modal is shown by the hook
+    premiumHandler.handlePremiumContent(
+      {
+        title: quiz.title,
+        isPremium: quiz.isPremium,
+        requiredPlan: quiz.requiredPlan,
+        type: "quiz" as const,
+      },
+      () => {
+        router.push(`/quiz/${quiz.slug}`);
       }
-    }
-    router.push(`/quiz/${quiz.slug}`);
-  };
-
-  const handlePremiumClick = () => {
-    setShowPremiumModal(true);
+    );
   };
 
   return (
@@ -108,10 +123,28 @@ const QuizCard: React.FC<QuizCardProps> = ({
       <Card
         isPremium={quiz.isPremium}
         requiredPlan={quiz.requiredPlan as "PREMIUM" | "PRO"}
-        onPremiumClick={handlePremiumClick}
-        onClick={!quiz.isPremium ? handleQuizClick : undefined}
+        onPremiumClick={() =>
+          premiumHandler.handlePremiumContent(
+            {
+              title: quiz.title,
+              isPremium: quiz.isPremium,
+              requiredPlan: quiz.requiredPlan,
+              type: "quiz" as const,
+            },
+            () => {}
+          )
+        }
+        onClick={handleQuizClick}
         title={quiz.title}
-        description={`Tutorial ${quiz.tutorialId} • ${questionsToShow.length} questions`}
+        description={`${questionsToShow.length} questions`}
+        actions={
+          <div className="flex items-center justify-between w-full">
+            <CardAction.TimeInfo time={`${estimatedTime} min`} />
+            <CardAction.Primary onClick={handleQuizClick}>
+              Start Quiz
+            </CardAction.Primary>
+          </div>
+        }
       >
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
@@ -123,7 +156,7 @@ const QuizCard: React.FC<QuizCardProps> = ({
                 {quiz.title}
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Tutorial {quiz.tutorialId}
+                {questionsToShow.length} questions
               </p>
             </div>
           </div>
@@ -154,18 +187,6 @@ const QuizCard: React.FC<QuizCardProps> = ({
 
         <div className="mb-6">
           <div className="grid grid-cols-2 gap-4 text-sm">
-            <div className="flex items-center space-x-2">
-              <FileText className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-              <span className="text-gray-600 dark:text-gray-300">
-                {questionsToShow.length} questions
-              </span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Clock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-              <span className="text-gray-600 dark:text-gray-300">
-                {estimatedTime} min
-              </span>
-            </div>
             <div className="flex items-center space-x-2">
               <span className="text-gray-400 dark:text-gray-500">
                 {moodConfig.emoji}
@@ -198,52 +219,52 @@ const QuizCard: React.FC<QuizCardProps> = ({
             </p>
           </div>
         </div>
-
-        <div className="flex items-center justify-between">
-          <div className="text-xs text-gray-500 dark:text-gray-400">
-            Based on your <span className="font-medium">{moodConfig.name}</span>{" "}
-            mood
-          </div>
-          {!quiz.isPremium && (
-            <Link
-              href={`/quiz/${quiz.slug}`}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium"
-            >
-              Start Quiz
-            </Link>
-          )}
-        </div>
       </Card>
-
-      {/* Premium Modal */}
-      <PremiumModal
-        isOpen={showPremiumModal}
-        onClose={() => setShowPremiumModal(false)}
-        requiredPlan={quiz.requiredPlan as "PREMIUM" | "PRO"}
-        contentType="quiz"
-        contentTitle={quiz.title}
-      />
     </>
   );
 };
-
-interface TutorialProgress {
-  tutorialId: string;
-  status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
-  bestScore?: number;
-  quizAttempts: number;
-}
 
 export default function QuizzesPage() {
   const { data: session } = useSession();
   const { currentMood } = useMood();
   const router = useRouter();
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-  const [loadingQuizzes, setLoadingQuizzes] = useState(true);
-  const [tutorialProgress, setTutorialProgress] = useState<
-    Record<string, TutorialProgress>
-  >({});
-  const [loadingProgress, setLoadingProgress] = useState(true);
+
+  // Use TanStack Query hooks
+  const { 
+    data: quizzes = [], 
+    isLoading: loadingQuizzes, 
+    error: quizzesError,
+    isError: hasQuizzesError,
+    refetch: refetchQuizzes
+  } = useQuizzes();
+  
+  const { 
+    data: tutorialProgress = {}, 
+    isLoading: loadingProgress 
+  } = useTutorialProgress(session?.user?.id);
+
+  // Pagination hook
+  const {
+    currentPage,
+    pageSize,
+    totalPages,
+    totalItems,
+    paginatedData: paginatedQuizzes,
+    goToPage,
+    setPageSize,
+  } = usePagination(quizzes, {
+    initialPage: 1,
+    initialPageSize: 9, // 3x3 grid
+    totalItems: quizzes.length,
+  });
+
+  // Premium content handler at parent level
+  const {
+    handlePremiumContent,
+    selectedPremiumContent,
+    showPremiumModal,
+    setShowPremiumModal,
+  } = usePremiumContentHandler();
 
   useEffect(() => {
     if (!session) {
@@ -251,48 +272,6 @@ export default function QuizzesPage() {
       return;
     }
   }, [session, router]);
-
-  useEffect(() => {
-    if (session?.user) {
-      fetchQuizzes();
-      fetchTutorialProgress();
-    }
-  }, [session]);
-
-  const fetchQuizzes = async () => {
-    try {
-      const response = await fetch("/api/quizzes");
-      if (response.ok) {
-        const data = await response.json();
-        setQuizzes(data.quizzes || []);
-      }
-    } catch (error) {
-      console.error("Error fetching quizzes:", error);
-    } finally {
-      setLoadingQuizzes(false);
-    }
-  };
-
-  const fetchTutorialProgress = async () => {
-    try {
-      const response = await fetch("/api/progress?type=tutorial");
-      if (response.ok) {
-        const data = await response.json();
-        // Convert array to object with tutorialId as key
-        const progressMap: Record<string, TutorialProgress> = {};
-        if (data.progress && Array.isArray(data.progress)) {
-          data.progress.forEach((p: TutorialProgress) => {
-            progressMap[p.tutorialId] = p;
-          });
-        }
-        setTutorialProgress(progressMap);
-      }
-    } catch (error) {
-      console.error("Error fetching tutorial progress:", error);
-    } finally {
-      setLoadingProgress(false);
-    }
-  };
 
   if (!session) {
     return (
@@ -306,159 +285,187 @@ export default function QuizzesPage() {
     );
   }
 
+  // Handle quiz loading error
+  if (hasQuizzesError) {
+    return (
+      <PageLayout
+        title="JavaScript Quizzes"
+        subtitle="Test your knowledge and track your progress"
+      >
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-red-600 dark:text-red-400 mb-4">
+              Error loading quizzes: {quizzesError?.message || "Unknown error"}
+            </p>
+            <button
+              onClick={() => refetchQuizzes()}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
+
   const currentMoodConfig = MOODS[currentMood.id.toLowerCase()];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Header Section */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-              JavaScript Quizzes
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
-              Test your knowledge and track your progress
-            </p>
+    <PageLayout
+      title="JavaScript Quizzes"
+      subtitle="Test your knowledge and track your progress"
+    >
+      {/* Progress Summary */}
+      {!loadingProgress && (
+        <div className="mb-6">
+          <div className="inline-flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-300 bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-lg">
+            <BarChart3 className="w-4 h-4" />
+            <span>Progress:</span>
+            <span>
+              {
+                Object.values(tutorialProgress).filter(
+                  (p) => p.status === "COMPLETED"
+                ).length
+              }{" "}
+              completed
+            </span>
+            <span>•</span>
+            <span>
+              {
+                Object.values(tutorialProgress).filter(
+                  (p) => p.status === "IN_PROGRESS"
+                ).length
+              }{" "}
+              in progress
+            </span>
+            <span>•</span>
+            <span>
+              {totalItems - Object.keys(tutorialProgress).length} not
+              started
+            </span>
+            <span>•</span>
+            <span className="font-medium">
+              {totalItems} total quizzes
+            </span>
+          </div>
+        </div>
+      )}
 
-            {/* Progress Summary */}
-            {!loadingProgress && (
-              <div className="mb-6">
-                <div className="inline-flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-300 bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-lg">
-                  <BarChart3 className="w-4 h-4" />
-                  <span>Progress:</span>
-                  <span>
-                    {
-                      Object.values(tutorialProgress).filter(
-                        (p) => p.status === "COMPLETED"
-                      ).length
-                    }{" "}
-                    completed
-                  </span>
-                  <span>•</span>
-                  <span>
-                    {
-                      Object.values(tutorialProgress).filter(
-                        (p) => p.status === "IN_PROGRESS"
-                      ).length
-                    }{" "}
-                    in progress
-                  </span>
-                  <span>•</span>
-                  <span>
-                    {quizzes.length - Object.keys(tutorialProgress).length} not
-                    started
-                  </span>
-                </div>
-              </div>
-            )}
+      {/* Mood Info Card */}
+      <MoodInfoCard showQuizSettings={true} className="mb-12" />
 
-            {/* Mood-based info card */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl max-w-2xl mx-auto">
-              <div className="flex items-center justify-center space-x-4 mb-4">
-                <div className="text-3xl">{currentMoodConfig.emoji}</div>
-                <div className="text-left">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                    {currentMoodConfig.name} Mode Active
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
-                    {currentMoodConfig.quizSettings.timeLimit
-                      ? `${currentMoodConfig.quizSettings.timeLimit} minute timer`
-                      : "No time limit"}{" "}
-                    • {currentMoodConfig.quizSettings.questionsPerTutorial}{" "}
-                    questions per quiz
-                  </p>
-                </div>
+      {/* Quizzes Grid */}
+      {loadingProgress || loadingQuizzes ? (
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">
+            Loading quiz progress...
+          </p>
+        </div>
+      ) : (
+        <>
+          <ContentGrid columns="3" className="mb-8">
+            {paginatedQuizzes.map((quiz: Quiz, index: number) => {
+              // Calculate the actual index based on current page
+              const actualIndex = (currentPage - 1) * pageSize + index;
+              // The tutorialId in progress matches the quiz ID from the route parameter
+              const quizProgress = tutorialProgress[quiz.id.toString()];
+              return (
+                <QuizCard
+                  key={quiz.id}
+                  quiz={quiz}
+                  index={actualIndex}
+                  userMood={currentMood.id}
+                  progress={quizProgress}
+                  premiumHandler={{ handlePremiumContent }}
+                />
+              );
+            })}
+          </ContentGrid>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mb-12">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={pageSize}
+                onPageChange={goToPage}
+                showInfo={true}
+                showSizeSelector={true}
+                sizeOptions={[6, 9, 12, 18]}
+                onSizeChange={setPageSize}
+                className="justify-center"
+              />
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Footer Section */}
+      <div className="text-center">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl max-w-2xl mx-auto">
+          <div className="flex items-center justify-center mb-4">
+            <Lightbulb className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-2" />
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+              Quiz Tips
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-300">
+            <div className="text-left">
+              <div className="flex items-center mb-1">
+                <Target className="w-4 h-4 text-blue-600 dark:text-blue-400 mr-1" />
+                <span className="font-medium text-gray-800 dark:text-gray-200">
+                  Current Mode:
+                </span>
               </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                Difficulty:{" "}
-                <span className="font-medium capitalize">
-                  {currentMoodConfig.quizSettings.difficulty}
-                </span>{" "}
-                level questions
+              <div>
+                {currentMoodConfig.quizSettings.difficulty === "easy"
+                  ? "Focus on fundamental concepts and basic syntax"
+                  : currentMoodConfig.quizSettings.difficulty === "medium"
+                  ? "Mix of basic and intermediate concepts"
+                  : "Challenging questions covering advanced topics"}
+              </div>
+            </div>
+            <div className="text-left">
+              <div className="flex items-center mb-1">
+                <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400 mr-1" />
+                <span className="font-medium text-gray-800 dark:text-gray-200">
+                  Time Management:
+                </span>
+              </div>
+              <div>
+                {currentMoodConfig.quizSettings.timeLimit
+                  ? `You have ${currentMoodConfig.quizSettings.timeLimit} minutes per quiz`
+                  : "Take your time - no pressure!"}
               </div>
             </div>
           </div>
-
-          {/* Quizzes Grid */}
-          {loadingProgress || loadingQuizzes ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-300">
-                Loading quiz progress...
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {quizzes.map((quiz: Quiz, index: number) => {
-                // The tutorialId in progress matches the quiz ID from the route parameter
-                const quizProgress = tutorialProgress[quiz.id.toString()];
-                return (
-                  <QuizCard
-                    key={quiz.id}
-                    quiz={quiz}
-                    index={index}
-                    userMood={currentMood.id}
-                    progress={quizProgress}
-                  />
-                );
-              })}
-            </div>
-          )}
-
-          {/* Footer Section */}
-          <div className="text-center mt-12">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl max-w-2xl mx-auto">
-              <div className="flex items-center justify-center mb-4">
-                <Lightbulb className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-2" />
-                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                  Quiz Tips
-                </h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-300">
-                <div className="text-left">
-                  <div className="flex items-center mb-1">
-                    <Target className="w-4 h-4 text-blue-600 dark:text-blue-400 mr-1" />
-                    <span className="font-medium text-gray-800 dark:text-gray-200">
-                      Current Mode:
-                    </span>
-                  </div>
-                  <div>
-                    {currentMoodConfig.quizSettings.difficulty === "easy"
-                      ? "Focus on fundamental concepts and basic syntax"
-                      : currentMoodConfig.quizSettings.difficulty === "medium"
-                      ? "Mix of basic and intermediate concepts"
-                      : "Challenging questions covering advanced topics"}
-                  </div>
-                </div>
-                <div className="text-left">
-                  <div className="flex items-center mb-1">
-                    <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400 mr-1" />
-                    <span className="font-medium text-gray-800 dark:text-gray-200">
-                      Time Management:
-                    </span>
-                  </div>
-                  <div>
-                    {currentMoodConfig.quizSettings.timeLimit
-                      ? `You have ${currentMoodConfig.quizSettings.timeLimit} minutes per quiz`
-                      : "Take your time - no pressure!"}
-                  </div>
-                </div>
-              </div>
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
-                <Link
-                  href="/tutorials"
-                  className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
-                >
-                  <BookOpen className="w-4 h-4 mr-1" />
-                  Review tutorials before taking quizzes
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </Link>
-              </div>
-            </div>
+          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
+            <Link
+              href="/tutorials"
+              className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+            >
+              <BookOpen className="w-4 h-4 mr-1" />
+              Review tutorials before taking quizzes
+              <ArrowRight className="w-4 h-4 ml-1" />
+            </Link>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Premium Modal */}
+      {selectedPremiumContent && (
+        <PremiumModal
+          isOpen={showPremiumModal}
+          onClose={() => setShowPremiumModal(false)}
+          requiredPlan={selectedPremiumContent.requiredPlan as "PREMIUM" | "PRO"}
+          contentType={selectedPremiumContent.type}
+          contentTitle={selectedPremiumContent.title}
+        />
+      )}
+    </PageLayout>
   );
 }

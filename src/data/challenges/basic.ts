@@ -3,11 +3,14 @@ import { Challenge } from "@/types/practice";
 export const basicChallenges: Challenge[] = [
   {
     id: "1",
+    slug: "sum-of-two-numbers",
     title: "Sum of Two Numbers",
     description: "Write a function that returns the sum of two numbers",
     difficulty: "easy",
     type: "function",
     estimatedTime: "5 minutes",
+    isPremium: false,
+    requiredPlan: "FREE",
     moodAdapted: {
       rush: "Let's crush this basic challenge! 💪 Show that computer who's boss!",
       chill:
@@ -42,11 +45,14 @@ export const basicChallenges: Challenge[] = [
   },
   {
     id: "2",
+    slug: "find-maximum-in-array",
     title: "Find Maximum in Array",
     description: "Find the largest number in an array of numbers",
     difficulty: "easy",
     type: "array",
     estimatedTime: "10 minutes",
+    isPremium: true,
+    requiredPlan: "PREMIUM",
     moodAdapted: {
       rush: "Array hunting time! 🎯 Find that maximum like you're on a treasure hunt!",
       chill:
@@ -81,11 +87,14 @@ export const basicChallenges: Challenge[] = [
   },
   {
     id: "3",
+    slug: "palindrome-checker",
     title: "Palindrome Checker",
     description: "Check if a string reads the same forwards and backwards",
     difficulty: "medium",
     type: "logic",
     estimatedTime: "15 minutes",
+    isPremium: true,
+    requiredPlan: "PRO",
     moodAdapted: {
       rush: "Palindrome power! 🔄 Let's flip and reverse like a coding ninja!",
       chill:

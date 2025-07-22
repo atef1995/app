@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { MoodProvider } from "@/components/providers/MoodProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { QueryProvider } from "@/components/providers/QueryProvider";
+import { ToastProvider } from "@/components/providers/ToastProvider";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import "./globals.css";
 
@@ -33,12 +35,16 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-black min-h-screen`}
       >
         <ThemeProvider>
-          <AuthProvider>
-            <MoodProvider>
-              <GlobalHeader />
-              <main>{children}</main>
-            </MoodProvider>
-          </AuthProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <MoodProvider>
+                <ToastProvider>
+                  <GlobalHeader />
+                  <main>{children}</main>
+                </ToastProvider>
+              </MoodProvider>
+            </AuthProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

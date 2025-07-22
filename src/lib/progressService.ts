@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Mood } from "@prisma/client";
+import { AchievementService } from "./achievementService";
 
 // Define the completion status enum locally until Prisma client is regenerated
 export enum CompletionStatus {
@@ -141,6 +142,20 @@ export class ProgressService {
       },
     });
 
+    // Check for achievements if quiz was passed
+    let achievements: Array<{ achievement: { id: string; title: string; description: string; icon: string } }> = [];
+    if (passed) {
+      achievements = await AchievementService.checkAndUnlockAchievements({
+        userId,
+        action: "QUIZ_COMPLETED",
+        metadata: {
+          score,
+          timeSpent: submission.timeSpent,
+          mood: submission.mood,
+        }
+      });
+    }
+
     return {
       attempt: quizAttempt,
       progress,
@@ -148,6 +163,7 @@ export class ProgressService {
       passed,
       correctAnswers,
       totalQuestions,
+      achievements, // Include achievements in response
     };
   }
 
@@ -210,10 +226,24 @@ export class ProgressService {
       },
     });
 
+    // Check for achievements if challenge was passed
+    let achievements: Array<{ achievement: { id: string; title: string; description: string; icon: string } }> = [];
+    if (submission.passed) {
+      achievements = await AchievementService.checkAndUnlockAchievements({
+        userId,
+        action: "CHALLENGE_COMPLETED",
+        metadata: {
+          timeSpent: submission.timeSpent,
+          mood: submission.mood,
+        }
+      });
+    }
+
     return {
       attempt: challengeAttempt,
       progress,
       passed: submission.passed,
+      achievements, // Include achievements in response
     };
   }
 

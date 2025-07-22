@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
+import { useSubscription } from "@/hooks/useSubscription";
 import { Lock, Crown, Sparkles, Zap, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -14,13 +15,6 @@ interface PremiumLockProps {
   className?: string;
 }
 
-interface SubscriptionInfo {
-  plan: string;
-  status: string;
-  canAccessPremium: boolean;
-  subscriptionEndsAt: string | null;
-}
-
 export default function PremiumLock({
   requiredPlan = "PREMIUM",
   isPremium = false,
@@ -30,42 +24,33 @@ export default function PremiumLock({
 }: PremiumLockProps) {
   const { data: session } = useSession();
   const { currentMood } = useMood();
-  const [subscriptionInfo, setSubscriptionInfo] =
-    useState<SubscriptionInfo | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: subscription, isLoading: loading } = useSubscription();
   const [canAccess, setCanAccess] = useState(false);
 
   useEffect(() => {
     async function checkAccess() {
       if (!session?.user?.id) {
-        setLoading(false);
         return;
       }
 
       try {
-        const response = await fetch(`/api/user/subscription`);
-        if (response.ok) {
-          const data = await response.json();
-          setSubscriptionInfo(data.subscription);
-
-          // Check if user can access this content
-          const accessResponse = await fetch(
-            `/api/user/can-access?requiredPlan=${requiredPlan}&isPremium=${isPremium}`
-          );
-          if (accessResponse.ok) {
-            const accessData = await accessResponse.json();
-            setCanAccess(accessData.canAccess);
-          }
+        // Check if user can access this content using existing API
+        const accessResponse = await fetch(
+          `/api/user/can-access?requiredPlan=${requiredPlan}&isPremium=${isPremium}`
+        );
+        if (accessResponse.ok) {
+          const accessData = await accessResponse.json();
+          setCanAccess(accessData.canAccess);
         }
       } catch (error) {
-        console.error("Error checking subscription:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error checking access:", error);
       }
     }
 
-    checkAccess();
-  }, [session, requiredPlan, isPremium]);
+    if (!loading && subscription) {
+      checkAccess();
+    }
+  }, [session, requiredPlan, isPremium, loading, subscription]);
 
   // Get mood-specific styling
   const getMoodColors = () => {
@@ -180,11 +165,11 @@ export default function PremiumLock({
         </Link>
 
         {/* Current plan info - very compact */}
-        {subscriptionInfo && (
+        {subscription && (
           <div className="mt-3 text-center">
             <p className="text-xs text-gray-400 dark:text-gray-500">
               Current:{" "}
-              <span className="font-medium">{subscriptionInfo.plan}</span>
+              <span className="font-medium">{subscription.plan}</span>
             </p>
           </div>
         )}

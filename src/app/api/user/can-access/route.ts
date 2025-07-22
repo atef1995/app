@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { SubscriptionService } from "@/lib/subscriptionService";
-import { Plan } from "@prisma/client";
+
+type PlanType = "FREE" | "PREMIUM" | "PRO";
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const requiredPlan = searchParams.get("requiredPlan") as Plan;
+    const requiredPlan = searchParams.get("requiredPlan") as PlanType;
     const isPremium = searchParams.get("isPremium") === "true";
 
     if (!requiredPlan) {

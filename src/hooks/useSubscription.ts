@@ -1,6 +1,9 @@
-import { useState, useEffect } from "react";
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 
+// Core subscription interface
 export interface SubscriptionInfo {
   plan: "FREE" | "PREMIUM" | "PRO";
   status: string;
@@ -9,72 +12,42 @@ export interface SubscriptionInfo {
   canAccessPremium: boolean;
 }
 
-export function useSubscription() {
-  const { data: session } = useSession();
-  const [subscription, setSubscription] = useState<SubscriptionInfo | null>(
-    null
-  );
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchSubscription() {
-      if (!session?.user?.id) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await fetch("/api/user/subscription");
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success) {
-            setSubscription(data.data);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching subscription:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchSubscription();
-  }, [session]);
-
-  const canAccessContent = async (
-    requiredPlan: "FREE" | "PREMIUM" | "PRO",
-    isPremium = false
-  ) => {
-    if (!session?.user?.id)
-      return { canAccess: false, reason: "Not authenticated" };
-
-    try {
-      const response = await fetch("/api/content/access", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ requiredPlan, isPremium }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return data.success
-          ? data.data
-          : { canAccess: false, reason: "Unknown error" };
-      }
-    } catch (error) {
-      console.error("Error checking content access:", error);
-    }
-
-    return { canAccess: false, reason: "Error checking access" };
-  };
-
-  return {
-    subscription,
-    loading,
-    canAccessContent,
-    isAuthenticated: !!session?.user?.id,
-    isPremium: subscription?.canAccessPremium || false,
-  };
+interface SubscriptionResponse {
+  success: boolean;
+  data: SubscriptionInfo;
 }
+
+// Fetch function for subscription data
+const fetchSubscription = async (): Promise<SubscriptionInfo> => {
+  const response = await fetch("/api/user/subscription");
+  
+  if (!response.ok) {
+    throw new Error(`Failed to fetch subscription: ${response.status}`);
+  }
+  
+  const data: SubscriptionResponse = await response.json();
+  
+  if (!data.success) {
+    throw new Error("Failed to fetch subscription from API");
+  }
+  
+  return data.data;
+};
+
+// Hook for fetching subscription data with TanStack Query
+export const useSubscription = () => {
+  const { data: session } = useSession();
+  const userId = (session?.user as { id?: string })?.id; // Cast to access custom id field
+  
+  return useQuery({
+    queryKey: ["subscription", userId],
+    queryFn: fetchSubscription,
+    enabled: !!userId, // Only run if user is authenticated
+    staleTime: 5 * 60 * 1000, // 5 minutes - subscription doesn't change often
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    retry: 2,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false, // Don't refetch when component mounts if data exists
+    refetchOnReconnect: false, // Don't refetch on network reconnection
+  });
+};

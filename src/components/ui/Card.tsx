@@ -1,6 +1,6 @@
 "use client";
 
-import { Crown, Sparkles, Lock } from "lucide-react";
+import { Crown, Sparkles, Lock, ArrowRight, Clock } from "lucide-react";
 import { useMood } from "@/components/providers/MoodProvider";
 
 interface CardProps {
@@ -13,6 +13,57 @@ interface CardProps {
   disabled?: boolean;
   title?: string;
   description?: string;
+  footer?: React.ReactNode;
+  actions?: React.ReactNode;
+}
+
+// Helper component for consistent action buttons
+export const CardAction = {
+  Primary: ({ children, onClick, disabled = false }: { 
+    children: React.ReactNode; 
+    onClick?: () => void; 
+    disabled?: boolean;
+  }) => (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer active:scale-95"
+    >
+      {children}
+      <ArrowRight className="h-4 w-4" />
+    </button>
+  ),
+  
+  Secondary: ({ children, onClick, disabled = false }: { 
+    children: React.ReactNode; 
+    onClick?: () => void; 
+    disabled?: boolean;
+  }) => (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {children}
+    </button>
+  ),
+  
+  Info: ({ children, icon }: { 
+    children: React.ReactNode; 
+    icon?: React.ReactNode;
+  }) => (
+    <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+      {icon}
+      {children}
+    </span>
+  ),
+  
+  TimeInfo: ({ time }: { time: string }) => (
+    <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+      <Clock className="h-4 w-4" />
+      {time}
+    </span>
+  ),
 }
 
 export default function Card({
@@ -25,6 +76,8 @@ export default function Card({
   disabled = false,
   title,
   description,
+  footer,
+  actions,
 }: CardProps) {
   const { currentMood } = useMood();
 
@@ -68,7 +121,7 @@ export default function Card({
 
   const baseCardClasses = `
     relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-xl 
-    transition-all duration-300 border-2 border-transparent
+    transition-all duration-300 border-2 border-transparent flex flex-col
     ${
       !disabled && !isPremium
         ? "hover:shadow-xl dark:hover:shadow-2xl hover:border-blue-200 dark:hover:border-blue-600"
@@ -146,8 +199,27 @@ export default function Card({
       )}
 
       {/* Card Content */}
-      <div className={isPremium ? "opacity-30 pointer-events-none" : ""}>
-        {children}
+      <div className={`flex flex-col h-full ${isPremium ? "opacity-30 pointer-events-none" : ""}`}>
+        {/* Main content area */}
+        <div className="p-6 flex-1">
+          {children}
+        </div>
+        
+        {/* Footer/Actions section */}
+        {(footer || actions) && (
+          <div className="px-6 pb-6 pt-0 mt-auto border-t border-gray-100 dark:border-gray-700">
+            {footer && (
+              <div className="pt-4 mb-4">
+                {footer}
+              </div>
+            )}
+            {actions && (
+              <div className="pt-4">
+                {actions}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

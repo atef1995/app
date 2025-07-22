@@ -2,12 +2,24 @@
 
 import { useState, useEffect, useCallback, use } from "react";
 import { useSession } from "next-auth/react";
+import { useToastContext } from "@/components/providers/ToastProvider";
+import { submitQuizAction } from "@/lib/actions";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MOODS } from "@/lib/moods";
 import { useMood } from "@/components/providers/MoodProvider";
 import { ProgressBadge } from "@/components/ProgressComponents";
 import { PartyPopper, ThumbsUp, Dumbbell, Star, Book } from "lucide-react";
+
+// Define achievement type
+interface UnlockedAchievement {
+  achievement: {
+    id: string;
+    title: string;
+    description: string;
+    icon: string;
+  };
+}
 
 // Types for database quiz data
 interface Question {
@@ -47,6 +59,7 @@ export default function QuizPage({
 }) {
   const resolvedParams = use(params);
   const { data: session } = useSession();
+  const toast = useToastContext();
   const router = useRouter();
   const { currentMood } = useMood();
   const [quiz, setQuiz] = useState<Quiz | null>(null);
@@ -224,26 +237,29 @@ export default function QuizPage({
 
     // Submit quiz results to backend with full question set for normalized scoring
     try {
-      const response = await fetch("/api/quiz/submit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          tutorialId: quiz.id, // Use quiz ID for backend submission
-          answers: quizState.answers,
-          timeSpent: timeTaken,
-          quizData: {
-            questions: quiz.questions, // Send full question set for normalized scoring
-            passingScore: 70, // 70% passing score
-          },
+      const result = await submitQuizAction(
+        quiz.id, // Use quiz ID for backend submission
+        quizState.answers,
+        timeTaken,
+        {
+          questions: quiz.questions, // Send full question set for normalized scoring
+          passingScore: 70, // 70% passing score
           uiQuestions: questionsToShow, // Send filtered questions for UI reference
-        }),
-      });
+        }
+      );
 
-      if (response.ok) {
-        const result = await response.json();
+      if (result.success) {
         console.log("Quiz submitted successfully:", result);
+
+        // Show achievement notifications if any were unlocked
+        if (result.achievements && result.achievements.length > 0) {
+          result.achievements.forEach((achievement: UnlockedAchievement) => {
+            toast.achievement(
+              `🏆 Achievement Unlocked!`,
+              `${achievement.achievement.icon} ${achievement.achievement.title} - ${achievement.achievement.description}`
+            );
+          });
+        }
 
         // Store submission result for UI display
         setQuizState((prev) => ({
@@ -273,6 +289,7 @@ export default function QuizPage({
     currentMood.id,
     quizState.startTime,
     quizState.answers,
+    toast,
   ]);
 
   useEffect(() => {

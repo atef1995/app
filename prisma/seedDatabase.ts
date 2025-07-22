@@ -65,6 +65,7 @@ async function main() {
       id: quiz.id.toString(),
       tutorialId: quiz.tutorialId.toString(),
       title: quiz.title,
+      slug: `quiz-${quiz.id}`, // Add required slug field
       questions: quiz.questions, // Store the entire questions array as JSON
     };
 

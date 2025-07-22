@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Waves,
@@ -28,6 +28,16 @@ import { MoodCard } from "@/components/MoodCard";
 export default function HomePage() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [showAnimation, setShowAnimation] = useState(false);
+  const [backgroundElements, setBackgroundElements] = useState<Array<{left: string, top: string}>>([]);
+
+  // Generate random positions only on client side to avoid hydration mismatch
+  useEffect(() => {
+    const elements = [...Array(6)].map(() => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+    }));
+    setBackgroundElements(elements);
+  }, []);
 
   const handleMoodClick = (moodId: string) => {
     setSelectedMood(moodId);
@@ -85,15 +95,15 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(6)].map((_, i) => (
+        {backgroundElements.map((element, i) => (
           <motion.div
             key={i}
             className="absolute rounded-full bg-gradient-to-r from-blue-200/20 to-purple-200/20 dark:from-blue-800/20 dark:to-purple-800/20 blur-xl"
             style={{
               width: `${100 + i * 50}px`,
               height: `${100 + i * 50}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: element.left,
+              top: element.top,
             }}
             animate={{
               x: [0, 30, 0],

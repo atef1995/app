@@ -2,7 +2,9 @@
 
 import { useSession } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
-import { usePremiumAccess } from "@/hooks/usePremiumAccess";
+import { useToastContext } from "@/components/providers/ToastProvider";
+import { useUnifiedSubscription } from "@/hooks/useUnifiedSubscription";
+import { submitChallengeAction } from "@/lib/actions";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { notFound } from "next/navigation";
@@ -11,6 +13,16 @@ import { Challenge } from "@/types/practice";
 import { getChallengeBySlug } from "@/lib/challengeData";
 import PremiumModal from "@/components/ui/PremiumModal";
 
+// Define achievement type
+interface UnlockedAchievement {
+  achievement: {
+    id: string;
+    title: string;
+    description: string;
+    icon: string;
+  };
+}
+
 interface ChallengePageProps {
   params: Promise<{ slug: string }>;
 }
@@ -18,7 +30,8 @@ interface ChallengePageProps {
 export default function ChallengePage({ params }: ChallengePageProps) {
   const { data: session } = useSession();
   const { currentMood } = useMood();
-  const { canAccess, showPremiumModal, setShowPremiumModal } = usePremiumAccess();
+  const toast = useToastContext();
+  const { canAccess, showPremiumModal, setShowPremiumModal } = useUnifiedSubscription();
   const [resolvedParams, setResolvedParams] = useState<{ slug: string } | null>(
     null
   );
@@ -66,7 +79,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
       setChallenge(foundChallenge);
       setUserCode(foundChallenge.starter);
 
-      // Check premium access
+      // Check premium access inline (avoiding dependency loop)
       if (foundChallenge.isPremium && !canAccess(foundChallenge.requiredPlan as "PREMIUM" | "PRO", foundChallenge.isPremium)) {
         setShowPremiumModal(true);
         return;
@@ -78,10 +91,26 @@ export default function ChallengePage({ params }: ChallengePageProps) {
         setTimeLeft(moodTimeLimit);
         setChallengeStartTime(Date.now());
       }
+
+      // Track challenge start for progress and achievements
+      if (session?.user?.id && foundChallenge.id) {
+        fetch("/api/challenge/start", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            challengeId: foundChallenge.id,
+          }),
+        }).catch((error) => {
+          console.error("Failed to mark challenge as started:", error);
+        });
+      }
     };
 
     resolveParams();
-  }, [params, getMoodTimeLimit, canAccess, setShowPremiumModal]);
+  }, [params, getMoodTimeLimit]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Note: canAccess and setShowPremiumModal are excluded to prevent infinite loops
 
   // Update total time spent
   useEffect(() => {
@@ -102,10 +131,31 @@ export default function ChallengePage({ params }: ChallengePageProps) {
 
     setIsRunning(true);
     setTestResults(null);
+    const startTime = Date.now();
 
     try {
       // Create a function from user code that we can test
-      const testFunction = new Function("return " + userCode)();
+      // Handle both function expressions and function declarations
+      let testFunction;
+      
+      try {
+        // First try as function expression (arrow function or function assigned to variable)
+        testFunction = new Function("return " + userCode)();
+      } catch {
+        // If that fails, try evaluating the code directly (for function declarations)
+        // Create a sandbox environment to execute the function declaration
+        const functionScope: Record<string, unknown> = {};
+        new Function("scope", userCode + "; for(let key in this) { if(typeof this[key] === 'function') scope[key] = this[key]; }")
+          .call(functionScope, functionScope);
+        
+        // Find the function in the scope (usually the challenge function name like 'findMax')
+        const functionNames = Object.keys(functionScope).filter(key => typeof functionScope[key] === 'function');
+        if (functionNames.length > 0) {
+          testFunction = functionScope[functionNames[0]] as (...args: unknown[]) => unknown;
+        } else {
+          throw new Error("No function found in code");
+        }
+      }
 
       const results = challenge.tests.map((test) => {
         try {
@@ -134,6 +184,35 @@ export default function ChallengePage({ params }: ChallengePageProps) {
       });
 
       setTestResults(results);
+
+      // Check if all tests passed and submit attempt
+      const allPassed = results.every((result) => result.passed);
+      const timeSpent = Math.round((Date.now() - startTime) / 1000);
+
+      // Submit challenge attempt to track progress and trigger achievements
+      if (session?.user?.id) {
+        try {
+          const result = await submitChallengeAction(
+            challenge.id,
+            userCode,
+            allPassed,
+            timeSpent
+          );
+          
+          // Show achievement notifications if any were unlocked
+          if (result.success && result.achievements && result.achievements.length > 0) {
+            result.achievements.forEach((achievement: UnlockedAchievement) => {
+              toast.achievement(
+                `🏆 Achievement Unlocked!`,
+                `${achievement.achievement.icon} ${achievement.achievement.title} - ${achievement.achievement.description}`
+              );
+            });
+          }
+        } catch (error) {
+          console.error("Failed to submit challenge attempt:", error);
+          // Don't let submission errors break the test run
+        }
+      }
     } catch (error) {
       setTestResults([
         {
@@ -144,10 +223,31 @@ export default function ChallengePage({ params }: ChallengePageProps) {
           error: error instanceof Error ? error.message : "Unknown error",
         },
       ]);
+
+      // Still submit failed attempt for tracking
+      if (session?.user?.id) {
+        try {
+          const timeSpent = Math.round((Date.now() - startTime) / 1000);
+          await fetch("/api/challenge/submit", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              challengeId: challenge.id,
+              code: userCode,
+              passed: false,
+              timeSpent,
+            }),
+          });
+        } catch (error) {
+          console.error("Failed to submit challenge attempt:", error);
+        }
+      }
     }
 
     setIsRunning(false);
-  }, [challenge, userCode]);
+  }, [challenge, userCode, session?.user?.id, toast]);
 
   // Timer countdown effect
   useEffect(() => {

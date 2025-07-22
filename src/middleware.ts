@@ -34,7 +34,7 @@ export async function middleware(req: NextRequest) {
 }
 
 function isProtectedRoute(pathname: string): boolean {
-  const protectedRoutes = ["/dashboard", "/tutorials", "/practice", "/quizzes"];
+  const protectedRoutes = ["/dashboard", "/tutorials", "/practice", "/quizzes", "/quiz", "/settings"];
   return protectedRoutes.some((route) => pathname.startsWith(route));
 }
 
@@ -44,6 +44,8 @@ export const config = {
     "/tutorials/:path*",
     "/practice/:path*",
     "/quizzes/:path*",
+    "/quiz/:path*",
+    "/settings/:path*",
     "/auth/signin",
     "/auth/signin/:path*",
     // Catch all auth routes
