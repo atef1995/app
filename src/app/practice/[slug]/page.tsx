@@ -31,7 +31,8 @@ export default function ChallengePage({ params }: ChallengePageProps) {
   const { data: session } = useSession();
   const { currentMood } = useMood();
   const toast = useToastContext();
-  const { canAccess, showPremiumModal, setShowPremiumModal } = useUnifiedSubscription();
+  const { canAccess, showPremiumModal, setShowPremiumModal } =
+    useUnifiedSubscription();
   const [resolvedParams, setResolvedParams] = useState<{ slug: string } | null>(
     null
   );
@@ -80,7 +81,10 @@ export default function ChallengePage({ params }: ChallengePageProps) {
       setUserCode(foundChallenge.starter);
 
       // Check premium access inline (avoiding dependency loop)
-      if (foundChallenge.isPremium && !canAccess(foundChallenge.requiredPlan as "PREMIUM" | "PRO", foundChallenge.isPremium)) {
+      if (
+        foundChallenge.isPremium &&
+        !canAccess(foundChallenge.requiredPlan, foundChallenge.isPremium)
+      ) {
         setShowPremiumModal(true);
         return;
       }
@@ -118,7 +122,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
       const updateTotalTime = () => {
         // Track time for analytics if needed
         const timeSpent = Math.floor((Date.now() - challengeStartTime) / 1000);
-        console.log('Time spent:', timeSpent);
+        console.log("Time spent:", timeSpent);
       };
 
       const interval = setInterval(updateTotalTime, 1000);
@@ -137,7 +141,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
       // Create a function from user code that we can test
       // Handle both function expressions and function declarations
       let testFunction;
-      
+
       try {
         // First try as function expression (arrow function or function assigned to variable)
         testFunction = new Function("return " + userCode)();
@@ -145,13 +149,20 @@ export default function ChallengePage({ params }: ChallengePageProps) {
         // If that fails, try evaluating the code directly (for function declarations)
         // Create a sandbox environment to execute the function declaration
         const functionScope: Record<string, unknown> = {};
-        new Function("scope", userCode + "; for(let key in this) { if(typeof this[key] === 'function') scope[key] = this[key]; }")
-          .call(functionScope, functionScope);
-        
+        new Function(
+          "scope",
+          userCode +
+            "; for(let key in this) { if(typeof this[key] === 'function') scope[key] = this[key]; }"
+        ).call(functionScope, functionScope);
+
         // Find the function in the scope (usually the challenge function name like 'findMax')
-        const functionNames = Object.keys(functionScope).filter(key => typeof functionScope[key] === 'function');
+        const functionNames = Object.keys(functionScope).filter(
+          (key) => typeof functionScope[key] === "function"
+        );
         if (functionNames.length > 0) {
-          testFunction = functionScope[functionNames[0]] as (...args: unknown[]) => unknown;
+          testFunction = functionScope[functionNames[0]] as (
+            ...args: unknown[]
+          ) => unknown;
         } else {
           throw new Error("No function found in code");
         }
@@ -198,9 +209,13 @@ export default function ChallengePage({ params }: ChallengePageProps) {
             allPassed,
             timeSpent
           );
-          
+
           // Show achievement notifications if any were unlocked
-          if (result.success && result.achievements && result.achievements.length > 0) {
+          if (
+            result.success &&
+            result.achievements &&
+            result.achievements.length > 0
+          ) {
             result.achievements.forEach((achievement: UnlockedAchievement) => {
               toast.achievement(
                 `🏆 Achievement Unlocked!`,
@@ -276,7 +291,9 @@ export default function ChallengePage({ params }: ChallengePageProps) {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading challenge...</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Loading challenge...
+          </p>
         </div>
       </div>
     );
@@ -338,7 +355,9 @@ export default function ChallengePage({ params }: ChallengePageProps) {
                 {challenge.title}
               </h1>
 
-              <p className="text-gray-600 dark:text-gray-300 mb-4">{challenge.description}</p>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                {challenge.description}
+              </p>
 
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 ⏱️ Estimated time: {challenge.estimatedTime}
@@ -426,8 +445,8 @@ export default function ChallengePage({ params }: ChallengePageProps) {
                       <div className="flex items-center mb-2">
                         <span
                           className={`text-sm font-semibold ${
-                            result.passed 
-                              ? "text-green-600 dark:text-green-400" 
+                            result.passed
+                              ? "text-green-600 dark:text-green-400"
                               : "text-red-600 dark:text-red-400"
                           }`}
                         >

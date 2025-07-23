@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { prisma } from "@/lib/prisma";
-import { Challenge } from "@/types/practice";
-import { Mood, Difficulty, ChallengeType } from "@prisma/client";
 
 export interface DatabaseChallenge {
   id: string;
@@ -41,12 +41,6 @@ const typeMap: Record<
   LOGIC: "logic",
 };
 
-const moodMap: Record<Mood, "chill" | "rush" | "grind"> = {
-  CHILL: "chill",
-  RUSH: "rush",
-  GRIND: "grind",
-};
-
 // Convert our types to database enums
 const difficultyToEnum: Record<"easy" | "medium" | "hard", Difficulty> = {
   easy: "EASY",
@@ -63,12 +57,6 @@ const typeToEnum: Record<
   array: "ARRAY",
   object: "OBJECT",
   logic: "LOGIC",
-};
-
-const moodToEnum: Record<"chill" | "rush" | "grind", Mood> = {
-  chill: "CHILL",
-  rush: "RUSH",
-  grind: "GRIND",
 };
 
 export async function getAllChallenges(): Promise<DatabaseChallenge[]> {

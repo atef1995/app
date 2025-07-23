@@ -1,7 +1,6 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Challenge } from "@/types/practice";
 import {
   getAllChallenges as getAllChallengesFromLib,
   getFilteredChallenges as getFilteredChallengesFromLib,
@@ -40,7 +39,7 @@ export const useFilteredChallenges = (filters: ChallengeFilters) => {
 // Hook that automatically chooses between all challenges or filtered based on filters
 export const useChallengesWithFilters = (filters: ChallengeFilters) => {
   const hasFilters = !!(
-    (filters.type && filters.type !== "all") || 
+    (filters.type && filters.type !== "all") ||
     (filters.difficulty && filters.difficulty !== "all")
   );
 

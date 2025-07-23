@@ -6,6 +6,20 @@ const nextConfig: NextConfig = {
   experimental: {
     mdxRs: true,
   },
+  // Exclude scripts and seed files from build
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+    };
+
+    // Exclude scripts and prisma seed files
+    config.module.rules.push({
+      test: /\.(ts|tsx)$/,
+      exclude: [/scripts\//, /prisma\/seed/, /prisma\/migrations/],
+    });
+
+    return config;
+  },
   images: {
     remotePatterns: [
       {

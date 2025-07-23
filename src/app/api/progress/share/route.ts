@@ -63,28 +63,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-// Helper function to create different types of progress shares
-export async function createProgressShare(
-  userId: string,
-  type: string,
-  title: string,
-  description: string,
-  data?: Record<string, unknown>
-) {
-  try {
-    const progressShare = await prisma.progressShare.create({
-      data: {
-        userId,
-        type,
-        title,
-        description,
-        data: data || {},
-      },
-    });
-    return progressShare;
-  } catch (error) {
-    console.error("Error creating progress share:", error);
-    return null;
-  }
-}

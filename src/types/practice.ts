@@ -8,7 +8,7 @@ export interface Challenge {
   type: "algorithm" | "function" | "array" | "object" | "logic";
   estimatedTime: string;
   isPremium: boolean;
-  requiredPlan: string;
+  requiredPlan: "VIBED" | "CRACKED";
   moodAdapted: {
     chill: string;
     rush: string;

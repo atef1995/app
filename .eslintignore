@@ -1,0 +1,23 @@
+# Ignore scripts and seed files
+scripts/
+prisma/seed*.ts
+prisma/migrations/
+prisma/checkTutorial.ts
+
+# Ignore problematic legacy files
+src/lib/challengeDatabase.ts
+
+# Ignore build outputs
+.next/
+out/
+dist/
+
+# Ignore dependencies
+node_modules/
+
+# Ignore environment files
+.env*
+
+# Ignore logs
+*.log
+npm-debug.log*
