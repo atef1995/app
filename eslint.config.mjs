@@ -15,7 +15,7 @@ const eslintConfig = [
     ignores: [
       "scripts/**/*",
       "prisma/seed*.ts",
-      "prisma/migrations/**/*", 
+      "prisma/migrations/**/*",
       "prisma/checkTutorial.ts",
       "src/lib/challengeDatabase.ts",
       ".next/**/*",

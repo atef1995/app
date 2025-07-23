@@ -9,13 +9,13 @@ import Link from "next/link";
 interface PremiumModalProps {
   isOpen: boolean;
   onClose: () => void;
-  requiredPlan?: "PREMIUM" | "PRO";
+  requiredPlan?: "VIBED" | "CRACKED";
   contentType?: "tutorial" | "challenge" | "quiz";
   contentTitle?: string;
 }
 
 interface Plan {
-  id: "PREMIUM" | "PRO";
+  id: "VIBED" | "CRACKED";
   name: string;
   price: number;
   description: string;
@@ -26,7 +26,7 @@ interface Plan {
 
 const plans: Plan[] = [
   {
-    id: "PREMIUM",
+    id: "VIBED",
     name: "Vibed",
     price: 9.99,
     description: "For the motivated learner ready to level up 🚀",
@@ -41,7 +41,7 @@ const plans: Plan[] = [
     ],
   },
   {
-    id: "PRO",
+    id: "CRACKED",
     name: "Cracked",
     price: 19.99,
     description: "When you're ready to become absolutely cracked at coding 💪",
@@ -61,7 +61,7 @@ const plans: Plan[] = [
 export default function PremiumModal({
   isOpen,
   onClose,
-  requiredPlan = "PREMIUM",
+  requiredPlan = "VIBED",
   contentType = "tutorial",
   contentTitle,
 }: PremiumModalProps) {
@@ -167,7 +167,7 @@ export default function PremiumModal({
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold flex items-center gap-2">
-                {requiredPlan === "PRO" ? (
+                {requiredPlan === "CRACKED" ? (
                   <Sparkles className="w-6 h-6" />
                 ) : (
                   <Crown className="w-6 h-6" />
@@ -200,7 +200,7 @@ export default function PremiumModal({
             <div className="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg">
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0">
-                  {requiredPlan === "PRO" ? (
+                  {requiredPlan === "CRACKED" ? (
                     <Sparkles className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
                   ) : (
                     <Crown className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
@@ -217,7 +217,7 @@ export default function PremiumModal({
                     </span>{" "}
                     subscription to access. Choose the{" "}
                     <span className="font-semibold">
-                      {plans.find(p => p.id === requiredPlan)?.name}
+                      {plans.find((p) => p.id === requiredPlan)?.name}
                     </span>{" "}
                     plan below to unlock this {contentType} and many more!
                   </p>
@@ -246,7 +246,7 @@ export default function PremiumModal({
                 className={`relative border-2 rounded-xl p-6 transition-all ${
                   plan.id === requiredPlan
                     ? `border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 shadow-lg ring-2 ring-yellow-200 dark:ring-yellow-700`
-                    : plan.popular && requiredPlan === "PREMIUM"
+                    : plan.popular && requiredPlan === "VIBED"
                     ? `border-blue-500 bg-blue-50 dark:bg-blue-900/20`
                     : "border-gray-200 dark:border-gray-700"
                 }`}
@@ -307,7 +307,7 @@ export default function PremiumModal({
                   className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
                     plan.id === requiredPlan
                       ? `${moodColors.button} text-white shadow-lg`
-                      : plan.popular && requiredPlan === "PREMIUM"
+                      : plan.popular && requiredPlan === "VIBED"
                       ? `${moodColors.button} text-white`
                       : "border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
@@ -316,12 +316,11 @@ export default function PremiumModal({
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                   ) : (
                     <>
-                      {plan.id === requiredPlan 
-                        ? `Get ${plan.name} (Required)` 
-                        : plan.popular && requiredPlan === "PREMIUM"
+                      {plan.id === requiredPlan
+                        ? `Get ${plan.name} (Required)`
+                        : plan.popular && requiredPlan === "VIBED"
                         ? `Get ${plan.name}`
-                        : `Choose ${plan.name}`
-                      }
+                        : `Choose ${plan.name}`}
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}

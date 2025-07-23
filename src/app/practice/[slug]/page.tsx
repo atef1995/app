@@ -83,7 +83,8 @@ export default function ChallengePage({ params }: ChallengePageProps) {
       // Check premium access inline (avoiding dependency loop)
       if (
         foundChallenge.isPremium &&
-        !canAccess(foundChallenge.requiredPlan, foundChallenge.isPremium)
+        foundChallenge.requiredPlan !== "FREE" &&
+        !canAccess(foundChallenge.requiredPlan as "VIBED" | "CRACKED", foundChallenge.isPremium)
       ) {
         setShowPremiumModal(true);
         return;
@@ -603,7 +604,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
       <PremiumModal
         isOpen={showPremiumModal}
         onClose={() => setShowPremiumModal(false)}
-        requiredPlan={challenge?.requiredPlan as "PREMIUM" | "PRO"}
+        requiredPlan={challenge?.requiredPlan as "VIBED" | "CRACKED"}
         contentType="challenge"
         contentTitle={challenge?.title}
       />

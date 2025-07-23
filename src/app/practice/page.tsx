@@ -20,10 +20,7 @@ import {
   Puzzle,
   Calculator,
 } from "lucide-react";
-import {
-  challengeTypes,
-  difficultyLevels,
-} from "@/lib/challengeData";
+import { challengeTypes, difficultyLevels } from "@/lib/challengeData";
 
 export default function PracticePage() {
   const { data: session } = useSession();
@@ -34,11 +31,11 @@ export default function PracticePage() {
   const [selectedType, setSelectedType] = useState<string>("all");
 
   // Use TanStack Query hook for challenges with filters
-  const { 
-    data: challenges = [], 
-    isLoading: loading, 
+  const {
+    data: challenges = [],
+    isLoading: loading,
     error: challengesError,
-    isError: hasChallengesError
+    isError: hasChallengesError,
   } = useChallengesWithFilters({
     type: selectedType,
     difficulty: selectedDifficulty,
@@ -63,7 +60,8 @@ export default function PracticePage() {
       {
         title: challenge.title,
         isPremium: challenge.isPremium,
-        requiredPlan: challenge.requiredPlan === "FREE" ? "PREMIUM" : challenge.requiredPlan,
+        requiredPlan:
+          challenge.requiredPlan === "FREE" ? "VIBED" : challenge.requiredPlan,
         type: "challenge" as const,
       },
       () => {
@@ -126,7 +124,8 @@ export default function PracticePage() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <p className="text-red-600 dark:text-red-400 mb-4">
-              Error loading challenges: {challengesError?.message || "Unknown error"}
+              Error loading challenges:{" "}
+              {challengesError?.message || "Unknown error"}
             </p>
             <button
               onClick={() => window.location.reload()}
@@ -212,7 +211,11 @@ export default function PracticePage() {
               <Card
                 key={challenge.id}
                 isPremium={challenge.isPremium}
-                requiredPlan={challenge.requiredPlan === "FREE" ? "PREMIUM" : (challenge.requiredPlan as "PREMIUM" | "PRO")}
+                requiredPlan={
+                  challenge.requiredPlan === "FREE"
+                    ? "VIBED"
+                    : (challenge.requiredPlan as "VIBED" | "CRACKED")
+                }
                 onPremiumClick={() => handleChallengeClick(challenge)}
                 onClick={() => handleChallengeClick(challenge)}
                 title={challenge.title}
@@ -221,7 +224,9 @@ export default function PracticePage() {
                 actions={
                   <div className="flex items-center justify-between w-full">
                     <CardAction.TimeInfo time={challenge.estimatedTime} />
-                    <CardAction.Primary onClick={() => handleChallengeClick(challenge)}>
+                    <CardAction.Primary
+                      onClick={() => handleChallengeClick(challenge)}
+                    >
                       Start Challenge
                     </CardAction.Primary>
                   </div>

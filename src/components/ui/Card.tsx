@@ -7,7 +7,7 @@ interface CardProps {
   children: React.ReactNode;
   className?: string;
   isPremium?: boolean;
-  requiredPlan?: "PREMIUM" | "PRO";
+  requiredPlan?: "VIBED" | "CRACKED";
   onPremiumClick?: () => void;
   onClick?: () => void;
   disabled?: boolean;
@@ -19,9 +19,13 @@ interface CardProps {
 
 // Helper component for consistent action buttons
 export const CardAction = {
-  Primary: ({ children, onClick, disabled = false }: { 
-    children: React.ReactNode; 
-    onClick?: () => void; 
+  Primary: ({
+    children,
+    onClick,
+    disabled = false,
+  }: {
+    children: React.ReactNode;
+    onClick?: () => void;
     disabled?: boolean;
   }) => (
     <button
@@ -33,10 +37,14 @@ export const CardAction = {
       <ArrowRight className="h-4 w-4" />
     </button>
   ),
-  
-  Secondary: ({ children, onClick, disabled = false }: { 
-    children: React.ReactNode; 
-    onClick?: () => void; 
+
+  Secondary: ({
+    children,
+    onClick,
+    disabled = false,
+  }: {
+    children: React.ReactNode;
+    onClick?: () => void;
     disabled?: boolean;
   }) => (
     <button
@@ -47,9 +55,12 @@ export const CardAction = {
       {children}
     </button>
   ),
-  
-  Info: ({ children, icon }: { 
-    children: React.ReactNode; 
+
+  Info: ({
+    children,
+    icon,
+  }: {
+    children: React.ReactNode;
     icon?: React.ReactNode;
   }) => (
     <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
@@ -57,20 +68,20 @@ export const CardAction = {
       {children}
     </span>
   ),
-  
+
   TimeInfo: ({ time }: { time: string }) => (
     <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
       <Clock className="h-4 w-4" />
       {time}
     </span>
   ),
-}
+};
 
 export default function Card({
   children,
   className = "",
   isPremium = false,
-  requiredPlan = "PREMIUM",
+  requiredPlan = "VIBED",
   onPremiumClick,
   onClick,
   disabled = false,
@@ -143,7 +154,7 @@ export default function Card({
       {isPremium && (
         <div className="absolute top-4 left-4 z-10">
           <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 font-medium shadow-lg">
-            {requiredPlan === "PRO" ? (
+            {requiredPlan === "CRACKED" ? (
               <Sparkles className="w-3 h-3" />
             ) : (
               <Crown className="w-3 h-3" />
@@ -199,25 +210,19 @@ export default function Card({
       )}
 
       {/* Card Content */}
-      <div className={`flex flex-col h-full ${isPremium ? "opacity-30 pointer-events-none" : ""}`}>
+      <div
+        className={`flex flex-col h-full ${
+          isPremium ? "opacity-30 pointer-events-none" : ""
+        }`}
+      >
         {/* Main content area */}
-        <div className="p-6 flex-1">
-          {children}
-        </div>
-        
+        <div className="p-6 flex-1">{children}</div>
+
         {/* Footer/Actions section */}
         {(footer || actions) && (
           <div className="px-6 pb-6 pt-0 mt-auto border-t border-gray-100 dark:border-gray-700">
-            {footer && (
-              <div className="pt-4 mb-4">
-                {footer}
-              </div>
-            )}
-            {actions && (
-              <div className="pt-4">
-                {actions}
-              </div>
-            )}
+            {footer && <div className="pt-4 mb-4">{footer}</div>}
+            {actions && <div className="pt-4">{actions}</div>}
           </div>
         )}
       </div>
