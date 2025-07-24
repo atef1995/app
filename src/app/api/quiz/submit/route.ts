@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
         tutorialId,
         answers,
         timeSpent: timeSpent || 0,
-        mood: session.user.mood || "CHILL",
+        ChallengeMoodAdaptation: session.user.mood || "CHILL",
       },
       quizData
     );

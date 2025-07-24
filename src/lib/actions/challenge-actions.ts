@@ -64,7 +64,9 @@ interface ChallengeSubmissionResult {
 /**
  * Server action to mark a challenge as started
  */
-export async function startChallengeAction(challengeId: string): Promise<ChallengeStartResult> {
+export async function startChallengeAction(
+  challengeId: string
+): Promise<ChallengeStartResult> {
   try {
     const session = await getServerSession(authOptions);
 
@@ -138,7 +140,7 @@ export async function submitChallengeAction(
         code,
         passed,
         timeSpent: timeSpent || 0,
-        mood: session.user.mood || "CHILL",
+        ChallengeMoodAdaptation: session.user.mood || "CHILL",
       }
     );
 

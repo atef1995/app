@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -7,17 +7,19 @@ const TUTORIALS = [
     id: "6",
     slug: "asynchronous-javascript-mastery",
     title: "Asynchronous JavaScript Mastery",
-    description: "Master async programming with callbacks, promises, async/await, and modern JavaScript patterns",
+    description:
+      "Master async programming with callbacks, promises, async/await, and modern JavaScript patterns",
     mdxFile: "04-asynchronous-javascript-mastery", // Reference to actual MDX file
     difficulty: 3, // Advanced level
     order: 6,
     isPremium: true,
-    requiredPlan: "PRO",
+    requiredPlan: "CRACKED",
     quiz: {
       title: "Asynchronous JavaScript Mastery Quiz",
       questions: [
         {
-          question: "What is the main benefit of asynchronous programming in JavaScript?",
+          question:
+            "What is the main benefit of asynchronous programming in JavaScript?",
           options: [
             "It makes code run faster",
             "It prevents the main thread from blocking while waiting for operations",
@@ -56,7 +58,8 @@ const TUTORIALS = [
           difficulty: "medium",
         },
         {
-          question: "What's the main advantage of async/await over Promise chains?",
+          question:
+            "What's the main advantage of async/await over Promise chains?",
           options: [
             "It's faster",
             "It uses less memory",
@@ -69,7 +72,8 @@ const TUTORIALS = [
           difficulty: "medium",
         },
         {
-          question: "What happens if you don't use 'await' with an async function call?",
+          question:
+            "What happens if you don't use 'await' with an async function call?",
           options: [
             "It throws an error",
             "It returns a Promise instead of the resolved value",
@@ -82,7 +86,8 @@ const TUTORIALS = [
           difficulty: "medium",
         },
         {
-          question: "Which Fetch API method is used for POST requests with JSON data?",
+          question:
+            "Which Fetch API method is used for POST requests with JSON data?",
           options: [
             "fetch(url, { type: 'POST', data: json })",
             "fetch(url, { method: 'POST', body: JSON.stringify(data) })",
@@ -95,7 +100,8 @@ const TUTORIALS = [
           difficulty: "medium",
         },
         {
-          question: "What is the purpose of the AbortController in fetch requests?",
+          question:
+            "What is the purpose of the AbortController in fetch requests?",
           options: [
             "To retry failed requests",
             "To cancel ongoing requests",
@@ -121,7 +127,8 @@ const TUTORIALS = [
           difficulty: "medium",
         },
         {
-          question: "What's the difference between sequential and parallel async execution?",
+          question:
+            "What's the difference between sequential and parallel async execution?",
           options: [
             "No difference - they're the same",
             "Sequential waits for each operation, parallel runs them simultaneously",
@@ -173,13 +180,9 @@ const TUTORIALS = [
           difficulty: "hard",
         },
         {
-          question: "Tricky! What's the output order: console.log('1'); setTimeout(() => console.log('2'), 0); Promise.resolve().then(() => console.log('3')); console.log('4');",
-          options: [
-            "1, 2, 3, 4",
-            "1, 4, 2, 3",
-            "1, 4, 3, 2",
-            "1, 3, 4, 2",
-          ],
+          question:
+            "Tricky! What's the output order: console.log('1'); setTimeout(() => console.log('2'), 0); Promise.resolve().then(() => console.log('3')); console.log('4');",
+          options: ["1, 2, 3, 4", "1, 4, 2, 3", "1, 4, 3, 2", "1, 3, 4, 2"],
           correct: 2,
           explanation:
             "Synchronous code runs first (1, 4), then Promise microtasks (3), then setTimeout macrotasks (2). Microtasks have higher priority than macrotasks.",
@@ -199,7 +202,8 @@ const TUTORIALS = [
           difficulty: "hard",
         },
         {
-          question: "Advanced! What happens with: async function test() { return Promise.reject('error'); } test().catch(e => console.log(e));",
+          question:
+            "Advanced! What happens with: async function test() { return Promise.reject('error'); } test().catch(e => console.log(e));",
           options: [
             "Throws an unhandled error",
             "Logs 'error' to console",
@@ -218,7 +222,7 @@ const TUTORIALS = [
 
 async function seedTutorials() {
   try {
-    console.log('🌱 Starting tutorial seeding...');
+    console.log("🌱 Starting tutorial seeding...");
 
     for (const tutorialData of TUTORIALS) {
       const { quiz, ...tutorial } = tutorialData;
@@ -250,13 +254,15 @@ async function seedTutorials() {
           },
         });
 
-        console.log(`✅ Quiz created/updated: ${createdQuiz.title} with ${quiz.questions.length} questions`);
+        console.log(
+          `✅ Quiz created/updated: ${createdQuiz.title} with ${quiz.questions.length} questions`
+        );
       }
     }
 
-    console.log('🎉 Tutorial seeding completed successfully!');
+    console.log("🎉 Tutorial seeding completed successfully!");
   } catch (error) {
-    console.error('❌ Error seeding tutorials:', error);
+    console.error("❌ Error seeding tutorials:", error);
     throw error;
   } finally {
     await prisma.$disconnect();
@@ -264,8 +270,7 @@ async function seedTutorials() {
 }
 
 // Run the seeding
-seedTutorials()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+seedTutorials().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

@@ -53,7 +53,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
-  
+
   const [settings, setSettings] = useState<UserSettings>({
     name: "",
     email: "",
@@ -125,7 +125,7 @@ export default function SettingsPage() {
             setMood(newMood.id);
           }
         }
-        
+
         // Show success message
         alert("Settings saved successfully! 🎉");
       } else {
@@ -174,7 +174,9 @@ export default function SettingsPage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading settings...</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Loading settings...
+          </p>
         </div>
       </div>
     );
@@ -233,7 +235,7 @@ export default function SettingsPage() {
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                     Profile Information
                   </h2>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -306,7 +308,7 @@ export default function SettingsPage() {
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                     Notification Preferences
                   </h2>
-                  
+
                   <div className="space-y-4">
                     {[
                       {
@@ -318,19 +320,22 @@ export default function SettingsPage() {
                       {
                         key: "reminders",
                         label: "Learning Reminders",
-                        description: "Daily reminders to keep up with your studies",
+                        description:
+                          "Daily reminders to keep up with your studies",
                         icon: Clock,
                       },
                       {
                         key: "achievements",
                         label: "Achievement Alerts",
-                        description: "Get notified when you unlock new achievements",
+                        description:
+                          "Get notified when you unlock new achievements",
                         icon: Award,
                       },
                       {
                         key: "weeklyProgress",
                         label: "Weekly Progress Reports",
-                        description: "Summary of your learning progress each week",
+                        description:
+                          "Summary of your learning progress each week",
                         icon: Calendar,
                       },
                     ].map((notification) => (
@@ -353,7 +358,11 @@ export default function SettingsPage() {
                           <input
                             type="checkbox"
                             title={`Toggle ${notification.label}`}
-                            checked={settings.notifications[notification.key as keyof typeof settings.notifications]}
+                            checked={
+                              settings.notifications[
+                                notification.key as keyof typeof settings.notifications
+                              ]
+                            }
                             onChange={(e) =>
                               setSettings({
                                 ...settings,
@@ -379,7 +388,7 @@ export default function SettingsPage() {
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                     Learning Preferences
                   </h2>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -438,7 +447,10 @@ export default function SettingsPage() {
                             ...settings,
                             learning: {
                               ...settings.learning,
-                              difficulty: e.target.value as "easy" | "medium" | "hard",
+                              difficulty: e.target.value as
+                                | "easy"
+                                | "medium"
+                                | "hard",
                             },
                           })
                         }
@@ -483,25 +495,28 @@ export default function SettingsPage() {
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                     Privacy & Security
                   </h2>
-                  
+
                   <div className="space-y-4">
                     {[
                       {
                         key: "showProfile",
                         label: "Show Public Profile",
-                        description: "Allow others to see your profile and achievements",
+                        description:
+                          "Allow others to see your profile and achievements",
                         icon: Eye,
                       },
                       {
                         key: "shareProgress",
                         label: "Share Learning Progress",
-                        description: "Share your progress with friends and study groups",
+                        description:
+                          "Share your progress with friends and study groups",
                         icon: Target,
                       },
                       {
                         key: "allowAnalytics",
                         label: "Analytics & Improvement",
-                        description: "Help us improve the platform with usage analytics",
+                        description:
+                          "Help us improve the platform with usage analytics",
                         icon: Brain,
                       },
                     ].map((privacy) => (
@@ -524,7 +539,11 @@ export default function SettingsPage() {
                           <input
                             type="checkbox"
                             title={`Toggle ${privacy.label}`}
-                            checked={settings.privacy[privacy.key as keyof typeof settings.privacy]}
+                            checked={
+                              settings.privacy[
+                                privacy.key as keyof typeof settings.privacy
+                              ]
+                            }
                             onChange={(e) =>
                               setSettings({
                                 ...settings,
@@ -554,7 +573,8 @@ export default function SettingsPage() {
                             Delete Account
                           </h4>
                           <p className="text-sm text-red-700 dark:text-red-300">
-                            Permanently delete your account and all data. This action cannot be undone.
+                            Permanently delete your account and all data. This
+                            action cannot be undone.
                           </p>
                         </div>
                         <button
@@ -566,7 +586,9 @@ export default function SettingsPage() {
                           }`}
                         >
                           <Trash2 className="w-4 h-4" />
-                          {showDeleteConfirm ? "Confirm Delete" : "Delete Account"}
+                          {showDeleteConfirm
+                            ? "Confirm Delete"
+                            : "Delete Account"}
                         </button>
                       </div>
                     </div>

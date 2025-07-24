@@ -18,7 +18,7 @@ interface TutorialWithProgress extends TutorialWithQuiz {
   estimatedTime?: string;
   topics?: string[];
   isPremium: boolean;
-  requiredPlan: "FREE" | "PREMIUM" | "PRO";
+  requiredPlan: "FREE" | "VIBED" | "CRACKED";
 }
 
 // Constants
@@ -38,21 +38,25 @@ const getDifficultyLevel = (difficulty: number): string => {
 const validateTutorial = (tutorial: unknown): tutorial is TutorialWithQuiz => {
   const t = tutorial as Record<string, unknown>;
   return (
-    typeof t.id === 'string' &&
-    typeof t.title === 'string' &&
-    typeof t.slug === 'string' &&
-    typeof t.difficulty === 'number'
+    typeof t.id === "string" &&
+    typeof t.title === "string" &&
+    typeof t.slug === "string" &&
+    typeof t.difficulty === "number"
   );
 };
 
-const mapTutorialWithDefaults = async (tutorial: TutorialWithQuiz): Promise<TutorialWithProgress> => {
+const mapTutorialWithDefaults = async (
+  tutorial: TutorialWithQuiz
+): Promise<TutorialWithProgress> => {
   let estimatedTime: string = TUTORIAL_DEFAULTS.ESTIMATED_TIME;
   let topics: string[] = [...TUTORIAL_DEFAULTS.DEFAULT_TOPICS];
 
   // Load MDX metadata if available
   if (tutorial.mdxFile) {
     try {
-      const mdxResponse = await fetch(`/api/tutorials/mdx?file=${tutorial.mdxFile}`);
+      const mdxResponse = await fetch(
+        `/api/tutorials/mdx?file=${tutorial.mdxFile}`
+      );
       if (mdxResponse.ok) {
         const mdxData = await mdxResponse.json();
         if (mdxData.success && mdxData.data.frontmatter) {
@@ -65,7 +69,10 @@ const mapTutorialWithDefaults = async (tutorial: TutorialWithQuiz): Promise<Tuto
         }
       }
     } catch (error) {
-      console.warn(`Failed to load MDX metadata for ${tutorial.mdxFile}:`, error);
+      console.warn(
+        `Failed to load MDX metadata for ${tutorial.mdxFile}:`,
+        error
+      );
     }
   }
 
@@ -86,7 +93,7 @@ const fetchTutorials = async (): Promise<TutorialWithProgress[]> => {
   if (!response.ok) {
     throw new Error("Failed to fetch tutorials");
   }
-  
+
   const data = await response.json();
   if (!data.success) {
     throw new Error(data.error?.message || "Failed to fetch tutorials");
@@ -101,11 +108,14 @@ const fetchTutorials = async (): Promise<TutorialWithProgress[]> => {
   return mappedTutorials;
 };
 
-const fetchTutorialProgress = async (tutorialId: string, userId: string): Promise<TutorialProgress | null> => {
+const fetchTutorialProgress = async (
+  tutorialId: string,
+  userId: string
+): Promise<TutorialProgress | null> => {
   const response = await fetch(
     `/api/progress/tutorial?tutorialId=${tutorialId}&userId=${userId}`
   );
-  
+
   if (!response.ok) {
     // If progress doesn't exist, return null instead of throwing
     if (response.status === 404) {
@@ -113,7 +123,7 @@ const fetchTutorialProgress = async (tutorialId: string, userId: string): Promis
     }
     throw new Error(`Failed to fetch progress for tutorial ${tutorialId}`);
   }
-  
+
   const progressData = await response.json();
   return progressData.data;
 };
@@ -128,10 +138,13 @@ export const useTutorials = () => {
   });
 };
 
-export const useTutorialProgress = (tutorials: TutorialWithProgress[], userId?: string) => {
+export const useTutorialProgress = (
+  tutorials: TutorialWithProgress[],
+  userId?: string
+) => {
   // Only fetch progress if we have tutorials and userId
   const shouldFetch = Boolean(userId && tutorials.length > 0);
-  
+
   const progressQueries = useQueries({
     queries: tutorials.map((tutorial) => ({
       queryKey: ["tutorial-progress", tutorial.id, userId],

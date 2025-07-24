@@ -7,31 +7,32 @@ import { useSubscription } from "./useSubscription";
 interface PremiumContent {
   title: string;
   type: "tutorial" | "challenge" | "quiz";
-  requiredPlan: "PREMIUM" | "PRO";
+  requiredPlan: "VIBED" | "CRACKED";
 }
 
 // Simplified premium content handler that uses cached subscription data
 export const usePremiumContentHandler = () => {
   const { data: subscription } = useSubscription();
-  
+
   // Premium modal state
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const [selectedPremiumContent, setSelectedPremiumContent] = useState<PremiumContent | null>(null);
+  const [selectedPremiumContent, setSelectedPremiumContent] =
+    useState<PremiumContent | null>(null);
 
   // Check if user can access premium content
   const canAccess = useCallback(
-    (requiredPlan: "PREMIUM" | "PRO", isPremium = false): boolean => {
+    (requiredPlan: "VIBED" | "CRACKED", isPremium = false): boolean => {
       if (!isPremium) return true;
       if (!subscription) return false;
 
       const userPlan = subscription.plan;
 
-      if (requiredPlan === "PREMIUM") {
-        return userPlan === "PREMIUM" || userPlan === "PRO";
+      if (requiredPlan === "VIBED") {
+        return userPlan === "VIBED" || userPlan === "CRACKED";
       }
 
-      if (requiredPlan === "PRO") {
-        return userPlan === "PRO";
+      if (requiredPlan === "CRACKED") {
+        return userPlan === "CRACKED";
       }
 
       return false;
@@ -54,8 +55,8 @@ export const usePremiumContentHandler = () => {
         content.isPremium &&
         !canAccess(
           content.requiredPlan === "FREE"
-            ? "PREMIUM"
-            : (content.requiredPlan as "PREMIUM" | "PRO"),
+            ? "VIBED"
+            : (content.requiredPlan as "VIBED" | "CRACKED"),
           content.isPremium
         )
       ) {
@@ -64,8 +65,8 @@ export const usePremiumContentHandler = () => {
           type: content.type,
           requiredPlan:
             content.requiredPlan === "FREE"
-              ? "PREMIUM"
-              : (content.requiredPlan as "PREMIUM" | "PRO"),
+              ? "VIBED"
+              : (content.requiredPlan as "VIBED" | "CRACKED"),
         });
         setShowPremiumModal(true);
       } else {
@@ -79,11 +80,11 @@ export const usePremiumContentHandler = () => {
   const isPremiumLocked = useCallback(
     (content: { isPremium?: boolean; requiredPlan?: string }): boolean => {
       if (!content.isPremium) return false;
-      
+
       return !canAccess(
         content.requiredPlan === "FREE"
-          ? "PREMIUM"
-          : (content.requiredPlan as "PREMIUM" | "PRO"),
+          ? "VIBED"
+          : (content.requiredPlan as "VIBED" | "CRACKED"),
         content.isPremium
       );
     },

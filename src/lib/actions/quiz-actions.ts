@@ -108,7 +108,7 @@ export async function submitQuizAction(
         tutorialId,
         answers,
         timeSpent: timeSpent || 0,
-        mood: session.user.mood || "CHILL",
+        ChallengeMoodAdaptation: session.user.mood || "CHILL",
       },
       quizData
     );

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { Mood } from "@prisma/client";
+import { ChallengeMoodAdaptation } from "@prisma/client";
 import { AchievementService } from "./achievementService";
+import { MoodId } from "@/types/mood";
 
 // Define the completion status enum locally until Prisma client is regenerated
 export enum CompletionStatus {
@@ -14,7 +15,7 @@ export interface QuizSubmission {
   tutorialId: string;
   answers: number[];
   timeSpent: number;
-  mood: Mood;
+  ChallengeMoodAdaptation: ChallengeMoodAdaptation;
 }
 
 export interface ChallengeSubmission {
@@ -22,7 +23,7 @@ export interface ChallengeSubmission {
   code: string;
   passed: boolean;
   timeSpent: number;
-  mood: Mood;
+  ChallengeMoodAdaptation: ChallengeMoodAdaptation;
 }
 
 interface QuizQuestion {
@@ -73,7 +74,7 @@ export class ProgressService {
       questionsAnswered > 0 ? (correctAnswers / questionsAnswered) * 100 : 0;
 
     // For scoring purposes, we'll use the raw score as it represents their performance
-    // on the questions they were given, regardless of mood
+    // on the questions they were given, regardless of ChallengeMoodAdaptation
     const score = rawScore;
     const passed = score >= passingScore;
 
@@ -87,7 +88,7 @@ export class ProgressService {
         score,
         passed,
         timeSpent: submission.timeSpent,
-        mood: submission.mood,
+        mood: submission.ChallengeMoodAdaptation,
       },
     });
 
@@ -143,7 +144,14 @@ export class ProgressService {
     });
 
     // Check for achievements if quiz was passed
-    let achievements: Array<{ achievement: { id: string; title: string; description: string; icon: string } }> = [];
+    let achievements: Array<{
+      achievement: {
+        id: string;
+        title: string;
+        description: string;
+        icon: string;
+      };
+    }> = [];
     if (passed) {
       achievements = await AchievementService.checkAndUnlockAchievements({
         userId,
@@ -151,8 +159,8 @@ export class ProgressService {
         metadata: {
           score,
           timeSpent: submission.timeSpent,
-          mood: submission.mood,
-        }
+          mood: submission.ChallengeMoodAdaptation.mood as MoodId,
+        },
       });
     }
 
@@ -182,7 +190,7 @@ export class ProgressService {
         code: submission.code,
         passed: submission.passed,
         timeSpent: submission.timeSpent,
-        mood: submission.mood,
+        mood: submission.ChallengeMoodAdaptation.mood as MoodId,
       },
     });
 
@@ -227,15 +235,22 @@ export class ProgressService {
     });
 
     // Check for achievements if challenge was passed
-    let achievements: Array<{ achievement: { id: string; title: string; description: string; icon: string } }> = [];
+    let achievements: Array<{
+      achievement: {
+        id: string;
+        title: string;
+        description: string;
+        icon: string;
+      };
+    }> = [];
     if (submission.passed) {
       achievements = await AchievementService.checkAndUnlockAchievements({
         userId,
         action: "CHALLENGE_COMPLETED",
         metadata: {
           timeSpent: submission.timeSpent,
-          mood: submission.mood,
-        }
+          mood: submission.ChallengeMoodAdaptation.mood as MoodId,
+        },
       });
     }
 

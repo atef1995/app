@@ -52,7 +52,7 @@ export const basicChallenges: Challenge[] = [
     type: "array",
     estimatedTime: "10 minutes",
     isPremium: true,
-    requiredPlan: "PREMIUM",
+    requiredPlan: "VIBED",
     moodAdapted: {
       rush: "Array hunting time! 🎯 Find that maximum like you're on a treasure hunt!",
       chill:
@@ -94,7 +94,7 @@ export const basicChallenges: Challenge[] = [
     type: "logic",
     estimatedTime: "15 minutes",
     isPremium: true,
-    requiredPlan: "PRO",
+    requiredPlan: "CRACKED",
     moodAdapted: {
       rush: "Palindrome power! 🔄 Let's flip and reverse like a coding ninja!",
       chill:

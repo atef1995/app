@@ -63,7 +63,7 @@ export const algorithmChallenges: Challenge[] = [
     type: "algorithm",
     estimatedTime: "25 minutes",
     isPremium: true,
-    requiredPlan: "PREMIUM",
+    requiredPlan: "VIBED",
     moodAdapted: {
       rush: "Hunt down those pairs! 🎯 Use that algorithmic speed to find the solution!",
       chill:

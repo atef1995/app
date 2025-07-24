@@ -1,7 +1,11 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useTutorials, useTutorialProgress, type TutorialWithProgress } from "@/hooks/useTutorialQueries";
+import {
+  useTutorials,
+  useTutorialProgress,
+  type TutorialWithProgress,
+} from "@/hooks/useTutorialQueries";
 import { useCallback } from "react";
 import Link from "next/link";
 import Card, { CardAction } from "@/components/ui/Card";
@@ -24,7 +28,8 @@ import {
 // Constants for styling
 const DIFFICULTY_COLORS = {
   beginner: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200",
-  intermediate: "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200",
+  intermediate:
+    "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200",
   advanced: "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200",
 } as const;
 
@@ -73,19 +78,22 @@ export default function TutorialsPage() {
   );
 
   // Handle tutorial click
-  const handleTutorialClick = useCallback((tutorial: TutorialWithProgress) => {
-    handlePremiumContent(
-      {
-        title: tutorial.title,
-        isPremium: tutorial.isPremium,
-        requiredPlan: tutorial.requiredPlan,
-        type: "tutorial",
-      },
-      () => {
-        window.location.href = `/tutorials/${tutorial.slug}`;
-      }
-    );
-  }, [handlePremiumContent]);
+  const handleTutorialClick = useCallback(
+    (tutorial: TutorialWithProgress) => {
+      handlePremiumContent(
+        {
+          title: tutorial.title,
+          isPremium: tutorial.isPremium,
+          requiredPlan: tutorial.requiredPlan,
+          type: "tutorial",
+        },
+        () => {
+          window.location.href = `/tutorials/${tutorial.slug}`;
+        }
+      );
+    },
+    [handlePremiumContent]
+  );
 
   if (!session) {
     return (
@@ -168,17 +176,32 @@ export default function TutorialsPage() {
             <Card
               key={tutorial.id}
               isPremium={isLocked}
-              requiredPlan={tutorial.requiredPlan === "FREE" ? "PREMIUM" : (tutorial.requiredPlan as "PREMIUM" | "PRO")}
+              requiredPlan={
+                tutorial.requiredPlan === "FREE"
+                  ? "VIBED"
+                  : (tutorial.requiredPlan as "VIBED" | "CRACKED")
+              }
               onPremiumClick={() => handleTutorialClick(tutorial)}
-              onClick={!isLocked ? () => handleTutorialClick(tutorial) : undefined}
+              onClick={
+                !isLocked ? () => handleTutorialClick(tutorial) : undefined
+              }
               title={tutorial.title}
               description={tutorial.description || ""}
               className="h-full"
               actions={
                 <div className="flex items-center justify-between w-full">
-                  <CardAction.TimeInfo time={tutorial.estimatedTime || "5 min"} />
-                  <CardAction.Primary onClick={() => handleTutorialClick(tutorial)}>
-                    {isLocked ? "Unlock" : tutorial.progress?.quizPassed ? "Review" : "Start"} Tutorial
+                  <CardAction.TimeInfo
+                    time={tutorial.estimatedTime || "5 min"}
+                  />
+                  <CardAction.Primary
+                    onClick={() => handleTutorialClick(tutorial)}
+                  >
+                    {isLocked
+                      ? "Unlock"
+                      : tutorial.progress?.quizPassed
+                      ? "Review"
+                      : "Start"}{" "}
+                    Tutorial
                   </CardAction.Primary>
                 </div>
               }
@@ -187,7 +210,13 @@ export default function TutorialsPage() {
                 <div className="flex justify-center">
                   {getTutorialIcon(tutorial, "w-8 h-8")}
                 </div>
-                <span className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${DIFFICULTY_COLORS[tutorial.level as keyof typeof DIFFICULTY_COLORS]}`}>
+                <span
+                  className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${
+                    DIFFICULTY_COLORS[
+                      tutorial.level as keyof typeof DIFFICULTY_COLORS
+                    ]
+                  }`}
+                >
                   {tutorial.level}
                 </span>
               </div>
@@ -208,13 +237,14 @@ export default function TutorialsPage() {
                   </span>
                 </div>
               )}
-              {tutorial.progress?.quizAttempts && !tutorial.progress.quizPassed && (
-                <div className="mb-4">
-                  <span className="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-xs px-2 py-1 rounded-full flex items-center gap-1 font-medium w-fit">
-                    <Circle className="w-3 h-3" /> In Progress
-                  </span>
-                </div>
-              )}
+              {tutorial.progress?.quizAttempts &&
+                !tutorial.progress.quizPassed && (
+                  <div className="mb-4">
+                    <span className="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-xs px-2 py-1 rounded-full flex items-center gap-1 font-medium w-fit">
+                      <Circle className="w-3 h-3" /> In Progress
+                    </span>
+                  </div>
+                )}
 
               {/* Metadata */}
               <div className="space-y-2 mb-4">
@@ -281,7 +311,7 @@ export default function TutorialsPage() {
       <PremiumModal
         isOpen={showPremiumModal}
         onClose={() => setShowPremiumModal(false)}
-        requiredPlan={selectedPremiumContent?.requiredPlan || "PREMIUM"}
+        requiredPlan={selectedPremiumContent?.requiredPlan || "VIBED"}
         contentType={selectedPremiumContent?.type || "tutorial"}
         contentTitle={selectedPremiumContent?.title}
       />

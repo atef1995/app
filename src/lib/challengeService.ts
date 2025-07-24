@@ -1,8 +1,6 @@
 import { prisma } from "./prisma";
 import type { Challenge } from "@/types/practice";
 import {
-  ChallengeType,
-  Difficulty,
   Challenge as PrismaChallenge,
   ChallengeTest,
   ChallengeMoodAdaptation,
@@ -42,7 +40,10 @@ function convertDbChallengeToFrontend(dbChallenge: DbChallenge): Challenge {
       | "logic",
     estimatedTime: dbChallenge.estimatedTime,
     isPremium: dbChallenge.isPremium,
-    requiredPlan: dbChallenge.requiredPlan,
+    requiredPlan: (dbChallenge.requiredPlan || "FREE") as
+      | "FREE"
+      | "VIBED"
+      | "CRACKED",
     moodAdapted: moodAdaptations,
     starter: dbChallenge.starter,
     solution: dbChallenge.solution,
@@ -92,7 +93,9 @@ export async function getChallengeById(id: string): Promise<Challenge | null> {
   }
 }
 
-export async function getChallengeBySlug(slug: string): Promise<Challenge | null> {
+export async function getChallengeBySlug(
+  slug: string
+): Promise<Challenge | null> {
   try {
     const dbChallenge = await prisma.challenge.findUnique({
       where: { slug },
@@ -118,14 +121,14 @@ export async function getFilteredChallenges(filters: {
   difficulty?: string;
 }): Promise<Challenge[]> {
   try {
-    const where: { type?: ChallengeType; difficulty?: Difficulty } = {};
+    const where: { type?: string; difficulty?: string } = {};
 
-    if (filters.type) {
-      where.type = filters.type.toUpperCase() as ChallengeType;
+    if (filters.type && filters.type !== "all") {
+      where.type = filters.type.toUpperCase();
     }
 
-    if (filters.difficulty) {
-      where.difficulty = filters.difficulty.toUpperCase() as Difficulty;
+    if (filters.difficulty && filters.difficulty !== "all") {
+      where.difficulty = filters.difficulty.toUpperCase();
     }
 
     const dbChallenges = await prisma.challenge.findMany({

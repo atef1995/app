@@ -78,7 +78,7 @@ const QuizCard: React.FC<QuizCardProps> = ({
 }) => {
   const router = useRouter();
   const moodConfig = MOODS[userMood.toLowerCase()];
-  
+
   const difficultyColors = {
     easy: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
     medium:
@@ -122,7 +122,7 @@ const QuizCard: React.FC<QuizCardProps> = ({
     <>
       <Card
         isPremium={quiz.isPremium}
-        requiredPlan={quiz.requiredPlan as "PREMIUM" | "PRO"}
+        requiredPlan={quiz.requiredPlan as "VIBED" | "CRACKED"}
         onPremiumClick={() =>
           premiumHandler.handlePremiumContent(
             {
@@ -230,18 +230,16 @@ export default function QuizzesPage() {
   const router = useRouter();
 
   // Use TanStack Query hooks
-  const { 
-    data: quizzes = [], 
-    isLoading: loadingQuizzes, 
+  const {
+    data: quizzes = [],
+    isLoading: loadingQuizzes,
     error: quizzesError,
     isError: hasQuizzesError,
-    refetch: refetchQuizzes
+    refetch: refetchQuizzes,
   } = useQuizzes();
-  
-  const { 
-    data: tutorialProgress = {}, 
-    isLoading: loadingProgress 
-  } = useTutorialProgress(session?.user?.id);
+
+  const { data: tutorialProgress = {}, isLoading: loadingProgress } =
+    useTutorialProgress(session?.user?.id);
 
   // Pagination hook
   const {
@@ -341,13 +339,10 @@ export default function QuizzesPage() {
             </span>
             <span>•</span>
             <span>
-              {totalItems - Object.keys(tutorialProgress).length} not
-              started
+              {totalItems - Object.keys(tutorialProgress).length} not started
             </span>
             <span>•</span>
-            <span className="font-medium">
-              {totalItems} total quizzes
-            </span>
+            <span className="font-medium">{totalItems} total quizzes</span>
           </div>
         </div>
       )}
@@ -461,7 +456,9 @@ export default function QuizzesPage() {
         <PremiumModal
           isOpen={showPremiumModal}
           onClose={() => setShowPremiumModal(false)}
-          requiredPlan={selectedPremiumContent.requiredPlan as "PREMIUM" | "PRO"}
+          requiredPlan={
+            selectedPremiumContent.requiredPlan as "VIBED" | "CRACKED"
+          }
           contentType={selectedPremiumContent.type}
           contentTitle={selectedPremiumContent.title}
         />

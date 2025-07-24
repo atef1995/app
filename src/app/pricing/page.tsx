@@ -14,7 +14,7 @@ interface PlanFeature {
 
 interface StripePriceData {
   id: string;
-  planType: 'PREMIUM' | 'PRO';
+  planType: "VIBED" | "PRO";
   interval: string;
   amount: number;
   currency: string;
@@ -22,18 +22,18 @@ interface StripePriceData {
 }
 
 interface StripePrices {
-  PREMIUM: {
+  VIBED: {
     monthly?: StripePriceData;
     annual?: StripePriceData;
   };
-  PRO: {
+  CRACKED: {
     monthly?: StripePriceData;
     annual?: StripePriceData;
   };
 }
 
 interface PricingPlan {
-  id: "FREE" | "PREMIUM" | "PRO";
+  id: "FREE" | "VIBED" | "CRACKED";
   name: string;
   price: number;
   period: string;
@@ -55,15 +55,15 @@ export default function PricingPage() {
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const response = await fetch('/api/payments/prices');
+        const response = await fetch("/api/payments/prices");
         const data = await response.json();
         if (data.success) {
           setStripePrices(data.prices);
         } else {
-          console.error('Failed to fetch prices:', data.error);
+          console.error("Failed to fetch prices:", data.error);
         }
       } catch (error) {
-        console.error('Error fetching prices:', error);
+        console.error("Error fetching prices:", error);
       }
     };
 
@@ -71,10 +71,10 @@ export default function PricingPage() {
   }, []);
 
   // Get real price from Stripe or fallback to hardcoded
-  const getRealPrice = (planId: "PREMIUM" | "PRO", annual: boolean) => {
+  const getRealPrice = (planId: "VIBED" | "CRACKED", annual: boolean) => {
     if (!stripePrices) {
       // Fallback prices
-      return planId === "PREMIUM" ? (annual ? 89 : 9.98) : (annual ? 99 : 19.9);
+      return planId === "VIBED" ? (annual ? 89 : 9.98) : annual ? 99 : 19.9;
     }
 
     const planPrices = stripePrices[planId];
@@ -106,9 +106,9 @@ export default function PricingPage() {
       cta: "Start Free",
     },
     {
-      id: "PREMIUM",
+      id: "VIBED",
       name: "Vibed",
-      price: getRealPrice("PREMIUM", false),
+      price: getRealPrice("VIBED", false),
       period: "month",
       description: "For the motivated learner ready to level up their game 🚀",
       popular: true,
@@ -127,16 +127,21 @@ export default function PricingPage() {
       cta: "Get Vibed",
     },
     {
-      id: "PRO",
+      id: "CRACKED",
       name: "Cracked",
-      price: getRealPrice("PRO", false),
+      price: getRealPrice("CRACKED", false),
       period: "month",
-      description: "When you're ready to become absolutely cracked at coding 💪",
+      description:
+        "When you're ready to become absolutely cracked at coding 💪",
       emoji: "⚡",
       features: [
         { text: "Everything in Vibed", included: true },
         { text: "AI-Powered Code Reviews", included: true, highlight: true },
-        { text: "Advanced Analytics Dashboard", included: true, highlight: true },
+        {
+          text: "Advanced Analytics Dashboard",
+          included: true,
+          highlight: true,
+        },
         { text: "Custom Learning Paths", included: true },
         { text: "Offline Content Access", included: true },
         { text: "1-on-1 Mentorship Sessions", included: true },
@@ -221,10 +226,10 @@ export default function PricingPage() {
 
   const getDiscountedPrice = (plan: PricingPlan) => {
     if (plan.id === "FREE") return 0;
-    
-    const monthlyPrice = getRealPrice(plan.id as "PREMIUM" | "PRO", false);
-    const annualPrice = getRealPrice(plan.id as "PREMIUM" | "PRO", true);
-    
+
+    const monthlyPrice = getRealPrice(plan.id as "VIBED" | "CRACKED", false);
+    const annualPrice = getRealPrice(plan.id as "VIBED" | "CRACKED", true);
+
     return isAnnual ? annualPrice : monthlyPrice;
   };
 
@@ -247,7 +252,7 @@ export default function PricingPage() {
             {currentMood.id === "chill" &&
               "Take your time and pick the perfect plan for your learning journey. No pressure! 😊"}
           </p>
-          
+
           {/* Loading indicator for prices */}
           {!stripePrices && (
             <div className="mt-4 text-sm text-gray-500">
@@ -329,7 +334,13 @@ export default function PricingPage() {
                   </div>
                   {isAnnual && plan.id !== "FREE" && (
                     <div className="text-sm text-green-600 dark:text-green-400">
-                      Save ${(getRealPrice(plan.id as "PREMIUM" | "PRO", false) * 12 - getRealPrice(plan.id as "PREMIUM" | "PRO", true)).toFixed(2)} per year!
+                      Save $
+                      {(
+                        getRealPrice(plan.id as "VIBED" | "CRACKED", false) *
+                          12 -
+                        getRealPrice(plan.id as "VIBED" | "CRACKED", true)
+                      ).toFixed(2)}{" "}
+                      per year!
                     </div>
                   )}
                   <p className="text-gray-600 dark:text-gray-400 text-sm">
@@ -378,7 +389,7 @@ export default function PricingPage() {
                   onClick={() => handleUpgrade(plan.id)}
                   disabled={loading === plan.id}
                   className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
-                    plan.popular || plan.id === "PREMIUM"
+                    plan.popular || plan.id === "VIBED"
                       ? `${moodColors.button} text-white`
                       : plan.id === "FREE"
                       ? "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
@@ -396,7 +407,7 @@ export default function PricingPage() {
                 </button>
 
                 {/* Free trial note for premium plans */}
-                {plan.id === "PREMIUM" && (
+                {plan.id === "VIBED" && (
                   <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-2">
                     7-day free trial • Cancel anytime
                   </p>

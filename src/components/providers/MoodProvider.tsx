@@ -27,7 +27,7 @@ interface MoodProviderProps {
 
 export function MoodProvider({ children }: MoodProviderProps) {
   const { data: session } = useSession();
-  const [currentMoodId, setCurrentMoodId] = useState<MoodId>("chill");
+  const [currentMoodId, setCurrentMoodId] = useState<MoodId>(MoodId.CHILL);
   const [preferences, setPreferences] = useState<UserMoodPreferences | null>(
     null
   );
@@ -92,14 +92,14 @@ export function MoodProvider({ children }: MoodProviderProps) {
         } else {
           // Set default preferences
           const defaultPrefs: UserMoodPreferences = {
-            selectedMood: "chill",
+            selectedMood: MoodId.CHILL,
           };
           setPreferences(defaultPrefs);
         }
       } catch (error) {
         console.error("Error loading mood preferences:", error);
         const defaultPrefs: UserMoodPreferences = {
-          selectedMood: "chill",
+          selectedMood: MoodId.CHILL,
         };
         setPreferences(defaultPrefs);
       } finally {

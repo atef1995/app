@@ -84,7 +84,10 @@ export default function ChallengePage({ params }: ChallengePageProps) {
       if (
         foundChallenge.isPremium &&
         foundChallenge.requiredPlan !== "FREE" &&
-        !canAccess(foundChallenge.requiredPlan as "VIBED" | "CRACKED", foundChallenge.isPremium)
+        !canAccess(
+          foundChallenge.requiredPlan as "VIBED" | "CRACKED",
+          foundChallenge.isPremium
+        )
       ) {
         setShowPremiumModal(true);
         return;

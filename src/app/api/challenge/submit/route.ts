@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
         code,
         passed,
         timeSpent: timeSpent || 0,
-        mood: session.user.mood || "CHILL",
+        ChallengeMoodAdaptation: session.user.mood || "CHILL",
       }
     );
 

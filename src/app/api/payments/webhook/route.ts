@@ -345,7 +345,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     await prisma.payment.create({
       data: {
         userId,
-        plan: subscription.metadata?.plan || "PREMIUM",
+        plan: subscription.metadata?.plan || "VIBED",
         amount: invoice.amount_paid,
         currency: invoice.currency,
         status: "COMPLETED",
@@ -390,7 +390,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     await prisma.payment.create({
       data: {
         userId,
-        plan: subscription.metadata?.plan || "PREMIUM",
+        plan: subscription.metadata?.plan || "VIBED",
         amount: invoice.amount_due,
         currency: invoice.currency,
         status: "FAILED",

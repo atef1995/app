@@ -8,7 +8,7 @@ import { Lock, Crown, Sparkles, Zap, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 interface PremiumLockProps {
-  requiredPlan?: "PREMIUM" | "PRO";
+  requiredPlan?: "VIBED" | "CRACKED";
   isPremium?: boolean;
   contentType?: "tutorial" | "challenge" | "quiz";
   children: React.ReactNode;
@@ -16,7 +16,7 @@ interface PremiumLockProps {
 }
 
 export default function PremiumLock({
-  requiredPlan = "PREMIUM",
+  requiredPlan = "VIBED",
   isPremium = false,
   contentType = "tutorial",
   children,
@@ -114,7 +114,7 @@ export default function PremiumLock({
           <div
             className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r ${moodColors.gradient} text-white shadow-lg`}
           >
-            {requiredPlan === "PRO" ? (
+            {requiredPlan === "CRACKED" ? (
               <Sparkles className="w-6 h-6" />
             ) : (
               <Crown className="w-6 h-6" />
@@ -168,8 +168,7 @@ export default function PremiumLock({
         {subscription && (
           <div className="mt-3 text-center">
             <p className="text-xs text-gray-400 dark:text-gray-500">
-              Current:{" "}
-              <span className="font-medium">{subscription.plan}</span>
+              Current: <span className="font-medium">{subscription.plan}</span>
             </p>
           </div>
         )}

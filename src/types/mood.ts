@@ -22,7 +22,14 @@ export interface MoodConfig {
   };
 }
 
-export type MoodId = "chill" | "rush" | "grind";
+// export type MoodId = "chill" | "rush" | "grind";
+export enum MoodId {
+  CHILL = "chill",
+  RUSH = "rush",
+  GRIND = "grind",
+  CRACKED = "cracked",
+  FOCUSED = "FOCUSED",
+}
 
 export interface UserMoodPreferences {
   selectedMood: MoodId;

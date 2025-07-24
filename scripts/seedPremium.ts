@@ -17,7 +17,7 @@ async function seedPremiumContent() {
       order: 10,
       published: true,
       isPremium: true,
-      requiredPlan: "PREMIUM",
+      requiredPlan: "VIBED",
       mdxFile: "advanced-javascript-concepts.mdx",
     },
   });
@@ -35,7 +35,7 @@ async function seedPremiumContent() {
       order: 20,
       published: true,
       isPremium: true,
-      requiredPlan: "PRO",
+      requiredPlan: "CRACKED",
       mdxFile: "enterprise-javascript-architecture.mdx",
     },
   });

@@ -23,8 +23,8 @@ export default function SuccessPage() {
     if (success === "true" && sessionId) {
       // Fetch updated subscription info
       fetch("/api/payments/subscription")
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           if (data.success) {
             setSubscriptionData(data.data);
           }
@@ -40,21 +40,24 @@ export default function SuccessPage() {
     switch (currentMood.id) {
       case "rush":
         return {
-          gradient: "from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20",
+          gradient:
+            "from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20",
           accent: "text-orange-600 dark:text-orange-400",
           button: "bg-orange-500 hover:bg-orange-600",
           border: "border-orange-500",
         };
       case "grind":
         return {
-          gradient: "from-gray-50 via-slate-50 to-blue-50 dark:from-gray-900/20 dark:via-slate-900/20 dark:to-blue-900/20",
+          gradient:
+            "from-gray-50 via-slate-50 to-blue-50 dark:from-gray-900/20 dark:via-slate-900/20 dark:to-blue-900/20",
           accent: "text-blue-600 dark:text-blue-400",
           button: "bg-blue-500 hover:bg-blue-600",
           border: "border-blue-500",
         };
       default: // chill
         return {
-          gradient: "from-purple-50 via-pink-50 to-indigo-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-indigo-900/20",
+          gradient:
+            "from-purple-50 via-pink-50 to-indigo-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-indigo-900/20",
           accent: "text-purple-600 dark:text-purple-400",
           button: "bg-purple-500 hover:bg-purple-600",
           border: "border-purple-500",
@@ -66,7 +69,9 @@ export default function SuccessPage() {
 
   if (isLoading) {
     return (
-      <div className={`min-h-screen bg-gradient-to-br ${moodColors.gradient} flex items-center justify-center`}>
+      <div
+        className={`min-h-screen bg-gradient-to-br ${moodColors.gradient} flex items-center justify-center`}
+      >
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
       </div>
     );
@@ -82,7 +87,8 @@ export default function SuccessPage() {
               Oops! Something went wrong
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
-              It looks like there was an issue with your payment. Don&apos;t worry, you haven&apos;t been charged!
+              It looks like there was an issue with your payment. Don&apos;t
+              worry, you haven&apos;t been charged!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -104,9 +110,9 @@ export default function SuccessPage() {
     );
   }
 
-  const plan = subscriptionData?.subscription?.plan || "PREMIUM";
-  const planName = plan === "PRO" ? "Cracked" : "Vibed";
-  const planEmoji = plan === "PRO" ? "⚡" : "🔥";
+  const plan = subscriptionData?.subscription?.plan || "VIBED";
+  const planName = plan === "CRACKED" ? "Cracked" : "Vibed";
+  const planEmoji = plan === "CRACKED" ? "⚡" : "🔥";
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${moodColors.gradient}`}>
@@ -115,17 +121,22 @@ export default function SuccessPage() {
           {/* Success Animation */}
           <div className="mb-8">
             <div className="relative inline-flex items-center justify-center">
-              <div className={`w-24 h-24 rounded-full ${moodColors.button} flex items-center justify-center mb-4 animate-pulse`}>
+              <div
+                className={`w-24 h-24 rounded-full ${moodColors.button} flex items-center justify-center mb-4 animate-pulse`}
+              >
                 <Check className="w-12 h-12 text-white" />
               </div>
-              <Sparkles className={`absolute -top-2 -right-2 w-6 h-6 ${moodColors.accent} animate-bounce`} />
+              <Sparkles
+                className={`absolute -top-2 -right-2 w-6 h-6 ${moodColors.accent} animate-bounce`}
+              />
             </div>
           </div>
 
           {/* Success Message */}
           <h1 className="text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             {currentMood.id === "rush" && "🚀 You're Officially Cracked!"}
-            {currentMood.id === "grind" && "💪 Welcome to Your Learning Journey!"}
+            {currentMood.id === "grind" &&
+              "💪 Welcome to Your Learning Journey!"}
             {currentMood.id === "chill" && "✨ You're All Set to Vibe!"}
           </h1>
 
@@ -136,15 +147,12 @@ export default function SuccessPage() {
           </h2>
 
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-            {currentMood.id === "rush" && 
-              "Time to absolutely demolish those coding challenges! Your unlimited access is ready and waiting. Let's goooo! 🔥"
-            }
-            {currentMood.id === "grind" && 
-              "Your systematic approach to learning just got a massive upgrade. Access all tutorials, challenges, and quizzes to build rock-solid fundamentals."
-            }
-            {currentMood.id === "chill" && 
-              "Take your time and enjoy the journey! You now have access to everything at your own pace. No pressure, just pure learning vibes. 😊"
-            }
+            {currentMood.id === "rush" &&
+              "Time to absolutely demolish those coding challenges! Your unlimited access is ready and waiting. Let's goooo! 🔥"}
+            {currentMood.id === "grind" &&
+              "Your systematic approach to learning just got a massive upgrade. Access all tutorials, challenges, and quizzes to build rock-solid fundamentals."}
+            {currentMood.id === "chill" &&
+              "Take your time and enjoy the journey! You now have access to everything at your own pace. No pressure, just pure learning vibes. 😊"}
           </p>
 
           {/* What's Included */}
@@ -155,37 +163,53 @@ export default function SuccessPage() {
             <div className="grid sm:grid-cols-2 gap-4 text-left">
               <div className="flex items-center gap-3">
                 <Check className={`w-5 h-5 ${moodColors.accent}`} />
-                <span className="text-gray-700 dark:text-gray-300">Unlimited Tutorials</span>
+                <span className="text-gray-700 dark:text-gray-300">
+                  Unlimited Tutorials
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <Check className={`w-5 h-5 ${moodColors.accent}`} />
-                <span className="text-gray-700 dark:text-gray-300">Unlimited Challenges</span>
+                <span className="text-gray-700 dark:text-gray-300">
+                  Unlimited Challenges
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <Check className={`w-5 h-5 ${moodColors.accent}`} />
-                <span className="text-gray-700 dark:text-gray-300">Quizzes & Assessments</span>
+                <span className="text-gray-700 dark:text-gray-300">
+                  Quizzes & Assessments
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <Check className={`w-5 h-5 ${moodColors.accent}`} />
-                <span className="text-gray-700 dark:text-gray-300">Progress Analytics</span>
+                <span className="text-gray-700 dark:text-gray-300">
+                  Progress Analytics
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <Check className={`w-5 h-5 ${moodColors.accent}`} />
-                <span className="text-gray-700 dark:text-gray-300">Priority Support</span>
+                <span className="text-gray-700 dark:text-gray-300">
+                  Priority Support
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <Check className={`w-5 h-5 ${moodColors.accent}`} />
-                <span className="text-gray-700 dark:text-gray-300">Mood-Adaptive Learning</span>
+                <span className="text-gray-700 dark:text-gray-300">
+                  Mood-Adaptive Learning
+                </span>
               </div>
-              {plan === "PRO" && (
+              {plan === "CRACKED" && (
                 <>
                   <div className="flex items-center gap-3">
                     <Check className={`w-5 h-5 ${moodColors.accent}`} />
-                    <span className="text-gray-700 dark:text-gray-300">AI Code Reviews</span>
+                    <span className="text-gray-700 dark:text-gray-300">
+                      AI Code Reviews
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Check className={`w-5 h-5 ${moodColors.accent}`} />
-                    <span className="text-gray-700 dark:text-gray-300">1-on-1 Mentorship</span>
+                    <span className="text-gray-700 dark:text-gray-300">
+                      1-on-1 Mentorship
+                    </span>
                   </div>
                 </>
               )}

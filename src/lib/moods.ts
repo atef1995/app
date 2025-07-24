@@ -1,5 +1,7 @@
+import { MoodId } from "@/types/mood";
+
 export interface MoodConfig {
-  id: "chill" | "rush" | "grind";
+  id: MoodId;
   name: string;
   description: string;
   emoji: string;
@@ -24,7 +26,7 @@ export interface MoodConfig {
 
 export const MOODS: Record<string, MoodConfig> = {
   chill: {
-    id: "chill",
+    id: MoodId.CHILL,
     name: "Chill",
     description: "Relaxed learning at your own pace",
     emoji: "😌",
@@ -47,7 +49,7 @@ export const MOODS: Record<string, MoodConfig> = {
     },
   },
   rush: {
-    id: "rush",
+    id: MoodId.RUSH,
     name: "Rush",
     description: "Fast-paced learning with energy",
     emoji: "⚡",
@@ -70,7 +72,7 @@ export const MOODS: Record<string, MoodConfig> = {
     },
   },
   grind: {
-    id: "grind",
+    id: MoodId.GRIND,
     name: "Grind",
     description: "Intense focus and challenging content",
     emoji: "🔥",
