@@ -88,7 +88,7 @@ export class ProgressService {
         score,
         passed,
         timeSpent: submission.timeSpent,
-        mood: submission.ChallengeMoodAdaptation,
+        mood: submission.ChallengeMoodAdaptation.mood,
       },
     });
 
