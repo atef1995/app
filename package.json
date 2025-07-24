@@ -8,6 +8,7 @@
     "build:production": "NODE_ENV=production next build",
     "start": "next start",
     "start:production": "NODE_ENV=production next start",
+    "postinstall": "prisma generate",
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
