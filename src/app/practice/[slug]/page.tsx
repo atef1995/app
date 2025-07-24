@@ -404,7 +404,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
                 {currentMood.name} Energy 🎯
               </h2>
               <p className="text-purple-700 dark:text-purple-300">
-                {challenge.moodAdapted[currentMood.id]}
+                {challenge.moodAdapted[currentMood.id.toLowerCase() as keyof typeof challenge.moodAdapted]}
               </p>
             </div>
 

@@ -256,7 +256,7 @@ export default function PracticePage() {
                 {/* Mood-adapted description */}
                 <div className={`${moodColors.bg} rounded-lg p-3`}>
                   <p className={`${moodColors.text} text-xs leading-relaxed`}>
-                    {challenge.moodAdapted[currentMood.id]}
+                    {challenge.moodAdapted[currentMood.id.toLowerCase() as keyof typeof challenge.moodAdapted]}
                   </p>
                 </div>
               </Card>

@@ -1,10 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { MoodConfig, MoodId } from "@/types/mood";
-import {
-  Achievement,
-  ChallengeMoodAdaptation,
-  UserAchievement,
-} from "@prisma/client";
+import { MoodId } from "@/types/mood";
+import { Achievement, UserAchievement } from "@prisma/client";
 
 interface AchievementCheck {
   userId: string;

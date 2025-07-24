@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { AlertTriangle, ArrowLeft, Mail, Github } from "lucide-react";
+import { Suspense } from "react";
 
-export default function AuthError() {
+function AuthErrorContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
 
@@ -187,5 +188,19 @@ export default function AuthError() {
         )}
       </motion.div>
     </div>
+  );
+}
+
+export default function AuthError() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          Loading...
+        </div>
+      }
+    >
+      <AuthErrorContent />
+    </Suspense>
   );
 }

@@ -1,5 +1,5 @@
 export interface MoodConfig {
-  id: "chill" | "rush" | "grind";
+  id: MoodId;
   name: string;
   description: string;
   emoji: string;

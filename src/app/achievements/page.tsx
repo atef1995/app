@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -43,11 +43,11 @@ interface AchievementStats {
   totalCount: number;
 }
 
-export default function AchievementsPage() {
+function AchievementsPageContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
-  const highlightId = searchParams.get('highlight');
-  
+  const highlightId = searchParams.get("highlight");
+
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [stats, setStats] = useState<AchievementStats>({
     totalPoints: 0,
@@ -58,7 +58,8 @@ export default function AchievementsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [shareMenuOpen, setShareMenuOpen] = useState<string | null>(null);
   const [copySuccess, setCopySuccess] = useState<string | null>(null);
-  const [sharedAchievement, setSharedAchievement] = useState<Achievement | null>(null);
+  const [sharedAchievement, setSharedAchievement] =
+    useState<Achievement | null>(null);
   const [showSharedModal, setShowSharedModal] = useState(false);
 
   const categories = [
@@ -74,7 +75,8 @@ export default function AchievementsPage() {
     COMMON: "border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800",
     RARE: "border-blue-300 bg-blue-50 dark:border-blue-600 dark:bg-blue-900/20",
     EPIC: "border-purple-300 bg-purple-50 dark:border-purple-600 dark:bg-purple-900/20",
-    LEGENDARY: "border-yellow-300 bg-yellow-50 dark:border-yellow-600 dark:bg-yellow-900/20",
+    LEGENDARY:
+      "border-yellow-300 bg-yellow-50 dark:border-yellow-600 dark:bg-yellow-900/20",
   };
 
   const rarityText = {
@@ -90,29 +92,35 @@ export default function AchievementsPage() {
   };
 
   const generateShareUrl = (achievement: Achievement) => {
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-    const userParam = session?.user?.id ? `?sharedBy=${session.user.id}` : '';
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+    const userParam = session?.user?.id ? `?sharedBy=${session.user.id}` : "";
     return `${baseUrl}/achievements/shared/${achievement.id}${userParam}`;
   };
 
   const shareToTwitter = (achievement: Achievement) => {
     const text = generateShareText(achievement);
     const url = generateShareUrl(achievement);
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-    window.open(twitterUrl, '_blank', 'noopener,noreferrer');
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+      text
+    )}&url=${encodeURIComponent(url)}`;
+    window.open(twitterUrl, "_blank", "noopener,noreferrer");
   };
 
   const shareToFacebook = (achievement: Achievement) => {
     const url = generateShareUrl(achievement);
-    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-    window.open(facebookUrl, '_blank', 'noopener,noreferrer');
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+      url
+    )}`;
+    window.open(facebookUrl, "_blank", "noopener,noreferrer");
   };
 
   const shareToLinkedIn = (achievement: Achievement) => {
     const text = generateShareText(achievement);
     const url = generateShareUrl(achievement);
-    const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&summary=${encodeURIComponent(text)}`;
-    window.open(linkedinUrl, '_blank', 'noopener,noreferrer');
+    const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+      url
+    )}&summary=${encodeURIComponent(text)}`;
+    window.open(linkedinUrl, "_blank", "noopener,noreferrer");
   };
 
   const copyShareLink = async (achievement: Achievement) => {
@@ -122,12 +130,12 @@ export default function AchievementsPage() {
       setCopySuccess(achievement.id);
       setTimeout(() => setCopySuccess(null), 2000);
     } catch (err) {
-      console.error('Failed to copy link:', err);
+      console.error("Failed to copy link:", err);
     }
   };
 
   const nativeShare = async (achievement: Achievement) => {
-    if (typeof navigator !== 'undefined' && 'share' in navigator) {
+    if (typeof navigator !== "undefined" && "share" in navigator) {
       try {
         await navigator.share({
           title: `Achievement Unlocked: ${achievement.title}`,
@@ -135,25 +143,31 @@ export default function AchievementsPage() {
           url: generateShareUrl(achievement),
         });
       } catch (err) {
-        console.error('Error sharing:', err);
+        console.error("Error sharing:", err);
       }
     }
   };
 
   const shareOverallProgress = () => {
-    const progressPercentage = Math.round((stats.unlockedCount / stats.totalCount) * 100);
+    const progressPercentage = Math.round(
+      (stats.unlockedCount / stats.totalCount) * 100
+    );
     const text = `🚀 My coding journey on Vibed to Cracked:\n\n🏆 ${stats.unlockedCount}/${stats.totalCount} achievements unlocked (${progressPercentage}%)\n⭐ ${stats.totalPoints} total points earned\n\nJoin me in learning to code! 💻\n\n#VibedToCracked #LearnToCode #CodingJourney`;
-    
-    if (typeof navigator !== 'undefined' && 'share' in navigator) {
-      navigator.share({
-        title: 'My Coding Progress - Vibed to Cracked',
-        text: text,
-        url: typeof window !== 'undefined' ? window.location.origin : '',
-      }).catch(err => console.error('Error sharing:', err));
+
+    if (typeof navigator !== "undefined" && "share" in navigator) {
+      navigator
+        .share({
+          title: "My Coding Progress - Vibed to Cracked",
+          text: text,
+          url: typeof window !== "undefined" ? window.location.origin : "",
+        })
+        .catch((err) => console.error("Error sharing:", err));
     } else {
       // Fallback to Twitter sharing
-      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
-      window.open(twitterUrl, '_blank', 'noopener,noreferrer');
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+        text
+      )}`;
+      window.open(twitterUrl, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -205,22 +219,26 @@ export default function AchievementsPage() {
   // Close share menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (shareMenuOpen && !(event.target as Element).closest('.share-menu-container')) {
+      if (
+        shareMenuOpen &&
+        !(event.target as Element).closest(".share-menu-container")
+      ) {
         setShareMenuOpen(null);
       }
     };
 
     if (shareMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [shareMenuOpen]);
 
   const filteredAchievements = achievements.filter(
-    (achievement) => selectedCategory === "all" || achievement.category === selectedCategory
+    (achievement) =>
+      selectedCategory === "all" || achievement.category === selectedCategory
   );
 
   if (loading) {
@@ -228,7 +246,9 @@ export default function AchievementsPage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading achievements...</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Loading achievements...
+          </p>
         </div>
       </div>
     );
@@ -253,7 +273,7 @@ export default function AchievementsPage() {
               Unlock rewards for your learning journey
             </p>
           </div>
-          
+
           {/* Share Overall Progress */}
           {stats.unlockedCount > 0 && (
             <button
@@ -277,7 +297,9 @@ export default function AchievementsPage() {
                 <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {stats.totalPoints}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Points</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Total Points
+                </p>
               </div>
             </div>
           </div>
@@ -291,7 +313,9 @@ export default function AchievementsPage() {
                 <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {stats.unlockedCount}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Unlocked</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Unlocked
+                </p>
               </div>
             </div>
           </div>
@@ -305,7 +329,9 @@ export default function AchievementsPage() {
                 <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {Math.round((stats.unlockedCount / stats.totalCount) * 100)}%
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Progress</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Progress
+                </p>
               </div>
             </div>
           </div>
@@ -338,10 +364,14 @@ export default function AchievementsPage() {
               key={achievement.id}
               className={`relative rounded-lg border-2 p-6 transition-all hover:shadow-md ${
                 achievement.isUnlocked
-                  ? rarityColors[achievement.rarity as keyof typeof rarityColors]
+                  ? rarityColors[
+                      achievement.rarity as keyof typeof rarityColors
+                    ]
                   : "border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-800/50"
               } ${achievement.isUnlocked ? "" : "opacity-75"} ${
-                highlightId === achievement.id ? "ring-4 ring-blue-500 ring-opacity-50 scale-105" : ""
+                highlightId === achievement.id
+                  ? "ring-4 ring-blue-500 ring-opacity-50 scale-105"
+                  : ""
               }`}
             >
               {/* Rarity Badge */}
@@ -349,7 +379,9 @@ export default function AchievementsPage() {
                 <span
                   className={`text-xs font-medium px-2 py-1 rounded-full ${
                     achievement.isUnlocked
-                      ? rarityText[achievement.rarity as keyof typeof rarityText]
+                      ? rarityText[
+                          achievement.rarity as keyof typeof rarityText
+                        ]
                       : "text-gray-500 dark:text-gray-400"
                   } bg-white dark:bg-gray-800 border`}
                 >
@@ -369,28 +401,35 @@ export default function AchievementsPage() {
                 <div className="absolute top-3 left-3">
                   <div className="relative share-menu-container">
                     <button
-                      onClick={() => setShareMenuOpen(shareMenuOpen === achievement.id ? null : achievement.id)}
+                      onClick={() =>
+                        setShareMenuOpen(
+                          shareMenuOpen === achievement.id
+                            ? null
+                            : achievement.id
+                        )
+                      }
                       className="p-2 rounded-full bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all border"
                       title="Share achievement"
                     >
                       <Share2 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                     </button>
-                    
+
                     {/* Share Dropdown */}
                     {shareMenuOpen === achievement.id && (
                       <div className="absolute top-12 left-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-2 z-10 min-w-48">
                         <div className="space-y-1">
                           {/* Native Share (if supported) */}
-                          {typeof navigator !== 'undefined' && 'share' in navigator && (
-                            <button
-                              onClick={() => nativeShare(achievement)}
-                              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                              Share
-                            </button>
-                          )}
-                          
+                          {typeof navigator !== "undefined" &&
+                            "share" in navigator && (
+                              <button
+                                onClick={() => nativeShare(achievement)}
+                                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                                Share
+                              </button>
+                            )}
+
                           {/* Twitter */}
                           <button
                             onClick={() => shareToTwitter(achievement)}
@@ -399,7 +438,7 @@ export default function AchievementsPage() {
                             <Twitter className="w-4 h-4 text-blue-400" />
                             Twitter
                           </button>
-                          
+
                           {/* Facebook */}
                           <button
                             onClick={() => shareToFacebook(achievement)}
@@ -408,7 +447,7 @@ export default function AchievementsPage() {
                             <Facebook className="w-4 h-4 text-blue-600" />
                             Facebook
                           </button>
-                          
+
                           {/* LinkedIn */}
                           <button
                             onClick={() => shareToLinkedIn(achievement)}
@@ -417,14 +456,16 @@ export default function AchievementsPage() {
                             <Linkedin className="w-4 h-4 text-blue-700" />
                             LinkedIn
                           </button>
-                          
+
                           {/* Copy Link */}
                           <button
                             onClick={() => copyShareLink(achievement)}
                             className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
                           >
                             <Copy className="w-4 h-4" />
-                            {copySuccess === achievement.id ? 'Copied!' : 'Copy Link'}
+                            {copySuccess === achievement.id
+                              ? "Copied!"
+                              : "Copy Link"}
                           </button>
                         </div>
                       </div>
@@ -448,13 +489,19 @@ export default function AchievementsPage() {
                   <div className="mb-4">
                     <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
                       <span>Progress</span>
-                      <span>{achievement.progress}/{achievement.maxProgress}</span>
+                      <span>
+                        {achievement.progress}/{achievement.maxProgress}
+                      </span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                       <div
                         className="bg-blue-600 dark:bg-blue-500 h-2 rounded-full transition-all duration-300"
                         style={{
-                          width: `${Math.min((achievement.progress / achievement.maxProgress) * 100, 100)}%`,
+                          width: `${Math.min(
+                            (achievement.progress / achievement.maxProgress) *
+                              100,
+                            100
+                          )}%`,
                         }}
                       />
                     </div>
@@ -472,7 +519,8 @@ export default function AchievementsPage() {
                 {/* Unlock Date */}
                 {achievement.isUnlocked && achievement.unlockedAt && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    Unlocked {new Date(achievement.unlockedAt).toLocaleDateString()}
+                    Unlocked{" "}
+                    {new Date(achievement.unlockedAt).toLocaleDateString()}
                   </p>
                 )}
               </div>
@@ -488,7 +536,8 @@ export default function AchievementsPage() {
               No achievements found
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Try selecting a different category or start learning to unlock achievements!
+              Try selecting a different category or start learning to unlock
+              achievements!
             </p>
           </div>
         )}
@@ -510,9 +559,13 @@ export default function AchievementsPage() {
             <div className="text-center">
               <div className="text-6xl mb-4">{sharedAchievement.icon}</div>
               <div className="mb-2">
-                <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                  rarityText[sharedAchievement.rarity as keyof typeof rarityText]
-                } bg-gray-100 dark:bg-gray-700 border`}>
+                <span
+                  className={`text-xs font-medium px-2 py-1 rounded-full ${
+                    rarityText[
+                      sharedAchievement.rarity as keyof typeof rarityText
+                    ]
+                  } bg-gray-100 dark:bg-gray-700 border`}
+                >
                   {sharedAchievement.rarity}
                 </span>
               </div>
@@ -522,7 +575,7 @@ export default function AchievementsPage() {
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 {sharedAchievement.description}
               </p>
-              
+
               {/* Points */}
               <div className="flex items-center justify-center gap-2 text-lg mb-6">
                 <Star className="w-5 h-5 text-yellow-500" />
@@ -536,10 +589,10 @@ export default function AchievementsPage() {
                 {session ? (
                   <>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {achievements.find(a => a.id === sharedAchievement.id)?.isUnlocked 
+                      {achievements.find((a) => a.id === sharedAchievement.id)
+                        ?.isUnlocked
                         ? "You've already unlocked this achievement! 🎉"
-                        : "You haven't unlocked this achievement yet. Keep learning!"
-                      }
+                        : "You haven't unlocked this achievement yet. Keep learning!"}
                     </p>
                     <Link
                       href="/dashboard"
@@ -575,5 +628,19 @@ export default function AchievementsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AchievementsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          Loading achievements...
+        </div>
+      }
+    >
+      <AchievementsPageContent />
+    </Suspense>
   );
 }

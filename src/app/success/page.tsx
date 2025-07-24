@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
 import { Check, Sparkles, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
-export default function SuccessPage() {
+function SuccessContent() {
   const { data: session } = useSession();
   const { currentMood } = useMood();
   const searchParams = useSearchParams();
@@ -241,5 +241,13 @@ export default function SuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SuccessContent />
+    </Suspense>
   );
 }
