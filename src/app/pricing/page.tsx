@@ -14,7 +14,7 @@ interface PlanFeature {
 
 interface StripePriceData {
   id: string;
-  planType: "VIBED" | "PRO";
+  planType: "VIBED" | "CRACKED";
   interval: string;
   amount: number;
   currency: string;

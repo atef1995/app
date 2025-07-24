@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-async function updateEnterpriseToPro() {
+async function updateEnterpriseToCracked() {
   try {
     // First, let's see what records have ENTERPRISE
     console.log("Checking for records with ENTERPRISE plan...");
@@ -26,18 +26,20 @@ async function updateEnterpriseToPro() {
     // Update tutorials
     const tutorialUpdate = await prisma.$executeRaw`
       UPDATE tutorials 
-      SET requiredPlan = 'PRO' 
+      SET requiredPlan = 'CRACKED' 
       WHERE requiredPlan = 'ENTERPRISE'
     `;
-    console.log(`Updated ${tutorialUpdate} tutorials from ENTERPRISE to PRO`);
+    console.log(
+      `Updated ${tutorialUpdate} tutorials from ENTERPRISE to CRACKED`
+    );
 
     // Update users
     const userUpdate = await prisma.$executeRaw`
       UPDATE users 
-      SET subscription = 'PRO' 
+      SET subscription = 'CRACKED' 
       WHERE subscription = 'ENTERPRISE'
     `;
-    console.log(`Updated ${userUpdate} users from ENTERPRISE to PRO`);
+    console.log(`Updated ${userUpdate} users from ENTERPRISE to CRACKED`);
 
     console.log("Migration completed successfully!");
   } catch (error) {
@@ -47,4 +49,4 @@ async function updateEnterpriseToPro() {
   }
 }
 
-updateEnterpriseToPro();
+updateEnterpriseToCracked();
