@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   User,
   LogOut,
@@ -73,9 +72,6 @@ export function GlobalHeader() {
               </div>
             )}
 
-            {/* Theme Toggle */}
-            <ThemeToggle />
-
             {/* User Menu */}
             {session ? (
               <div className="relative">
@@ -132,7 +128,7 @@ export function GlobalHeader() {
             ) : (
               <Link
                 href="/auth/signin"
-                className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+                className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base active:scale-95"
               >
                 <span className="hidden sm:inline">Sign In</span>
                 <span className="sm:hidden">Sign In</span>

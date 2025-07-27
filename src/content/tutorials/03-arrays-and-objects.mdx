@@ -520,9 +520,12 @@ let doubled = numbers.map((num) => num * 2);
 
 Practice with these exercises:
 
-### Exercise 1: Student Gradebook
 
-```javascript
+<InteractiveCodeBlock
+  title="Exercise 1:"
+  description="Student Gradebook"
+>
+{`
 // Create a gradebook system
 let gradebook = {
   students: [],
@@ -548,11 +551,16 @@ let gradebook = {
 gradebook.addStudent("Alice");
 gradebook.addGrade("Alice", "Math", 85);
 gradebook.addGrade("Alice", "Science", 92);
-```
+gradebook.getTopStudent();
+`}
+</InteractiveCodeBlock>
 
-### Exercise 2: Inventory Management
 
-```javascript
+<InteractiveCodeBlock
+  title="Exercise 2"
+  description="Inventory Management"
+>
+{`
 // Create an inventory system for a store
 let inventory = {
   items: [],
@@ -573,11 +581,15 @@ let inventory = {
     // Return items with quantity below threshold
   },
 };
-```
+`}
+</InteractiveCodeBlock>
 
-### Exercise 3: Playlist Manager
 
-```javascript
+<InteractiveCodeBlock
+  title="Exercise 3"
+  description="Playlist Manager"
+>
+{`
 // Create a music playlist system
 let playlist = {
   name: "My Favorites",
@@ -603,7 +615,8 @@ let playlist = {
     // Randomly reorder songs array
   },
 };
-```
+`}
+</InteractiveCodeBlock>
 
 ## Common Mistakes to Avoid
 

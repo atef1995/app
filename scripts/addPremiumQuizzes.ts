@@ -4,10 +4,10 @@ import { slugify } from "../src/lib/slugify";
 const prisma = new PrismaClient();
 
 async function addPremiumQuizzes() {
-  console.log("🌱 Adding premium quiz fields and seeding premium quizzes...");
+  console.log("🌱 Adding VIBED quiz fields and seeding VIBED quizzes...");
 
   try {
-    // First, let's mark some existing quizzes as premium
+    // First, let's mark some existing quizzes as VIBED
     const existingQuizzes = await prisma.quiz.findMany({
       include: {
         tutorial: true,
@@ -16,7 +16,7 @@ async function addPremiumQuizzes() {
 
     console.log(`Found ${existingQuizzes.length} existing quizzes`);
 
-    // Update the second and third quizzes to be premium
+    // Update the second and third quizzes to be VIBED
     if (existingQuizzes.length >= 2) {
       await prisma.quiz.update({
         where: { id: existingQuizzes[1].id },
@@ -39,7 +39,7 @@ async function addPremiumQuizzes() {
       console.log(`✅ Updated "${existingQuizzes[2].title}" to CRACKED`);
     }
 
-    // Create a new premium tutorial and quiz
+    // Create a new VIBED tutorial and quiz
     const premiumTutorial = await prisma.tutorial.upsert({
       where: { slug: "advanced-functions-and-scope" },
       update: {},
@@ -56,7 +56,7 @@ async function addPremiumQuizzes() {
       },
     });
 
-    // Create the premium quiz for this tutorial
+    // Create the VIBED quiz for this tutorial
     const premiumQuiz = await prisma.quiz.create({
       data: {
         tutorialId: premiumTutorial.id,
@@ -117,9 +117,9 @@ async function addPremiumQuizzes() {
       },
     });
 
-    console.log(`✅ Created premium quiz: "${premiumQuiz.title}"`);
+    console.log(`✅ Created VIBED quiz: "${premiumQuiz.title}"`);
 
-    // Create another PRO level tutorial and quiz
+    // Create another CRACKED level tutorial and quiz
     const proTutorial = await prisma.tutorial.upsert({
       where: { slug: "asynchronous-javascript-mastery" },
       update: {},
@@ -210,11 +210,11 @@ async function addPremiumQuizzes() {
 
     console.log("\n✅ Premium quizzes setup completed!");
     console.log("📊 Summary:");
-    console.log("- Updated existing quizzes with premium tiers");
+    console.log("- Updated existing quizzes with VIBED tiers");
     console.log("- Created 1 VIBED quiz (Advanced Functions)");
     console.log("- Created 1 CRACKED quiz (Async JavaScript)");
   } catch (error) {
-    console.error("❌ Error adding premium quizzes:", error);
+    console.error("❌ Error adding VIBED quizzes:", error);
     throw error;
   }
 }

@@ -35,7 +35,9 @@ JavaScript has three ways to declare variables:
 {`let userName = "Alex";
 console.log("Original name:", userName);
 
-userName = "Sam"; // Can be reassigned console.log("New name:", userName);`}
+userName = "Sam"; 
+// Can be reassigned 
+console.log("New name:", userName);`}
 
 </InteractiveCodeBlock>
 
@@ -47,17 +49,22 @@ userName = "Sam"; // Can be reassigned console.log("New name:", userName);`}
 ### 2. `const` - Constants
 
 <InteractiveCodeBlock title="Working with const" description="See what happens with constants:">
+{`
 const pi = 3.14159;
 const siteName = "Vibed to Cracked";
 
 console.log("Pi:", pi);
 
+
 console.log("Site:", siteName);
+
 
 // Try uncommenting the next line to see the error:
 
+
 // pi = 3.14; // ❌ Error! Cannot reassign
 
+`}
 </InteractiveCodeBlock>
 
 **Use `const` when:**
@@ -101,16 +108,20 @@ JavaScript has several built-in data types. Understanding **data types** is cruc
 JavaScript uses **IEEE 754 double-precision floating-point** format for all numbers. This means there's only one number type (unlike languages with int, float, double, etc.).
 
 <InteractiveCodeBlock title="Working with Numbers" description="JavaScript handles all numbers as the same type:">
+{`
 let age = 25;
 let price = 19.99;
 let negative = -10;
 
-console.log("Age:", age); console.log("Price:", price); console.log("Negative:", negative);
+console.log("Age:", age); 
+console.log("Price:", price); 
+console.log("Negative:", negative);
 
 // Try some math operations
 
-console.log("Age + 5:", age + 5); console.log("Price _ 2:", price _ 2);
-
+console.log("Age + 5:", age + 5); 
+console.log("Price - 2:", price - 2);
+`}
 </InteractiveCodeBlock>
 
 #### 2. String
@@ -120,6 +131,7 @@ Strings represent text data. JavaScript strings are **UTF-16 encoded** and **imm
 > **💡 Template Literals** The backtick syntax (\`\`) allows **template literals** with embedded expressions using `${expression}`. This is much cleaner than string concatenation with `+` operators.
 
 <InteractiveCodeBlock title="String Manipulation" description="Explore different ways to work with text:">
+
 let firstName = "John";
 let lastName = "Doe";
 let fullName = `${firstName} ${lastName}`; // Template literal
@@ -139,17 +151,20 @@ Booleans represent logical values and are fundamental to **conditional logic** a
 > **💡 Truthy and Falsy** In JavaScript, values can be **truthy** or **falsy** when evaluated in a boolean context. Falsy values include: `false`, `0`, `""`, `null`, `undefined`, and `NaN`. Everything else is truthy!
 
 <InteractiveCodeBlock title="Boolean Logic" description="True or false - the foundation of programming logic:">
+{`
 let isActive = true;
 let isComplete = false;
 
-console.log("Is active:", isActive); console.log("Is complete:", isComplete);
+console.log("Is active:", isActive); 
+console.log("Is complete:", isComplete);
 
-// Boolean operations console.log("Both true:", isActive && isComplete);
+// Boolean operations 
+console.log("Both true:", isActive && isComplete);
 
 console.log("At least one true:", isActive || isComplete);
 
 console.log("Not active:", !isActive);
-
+`}
 </InteractiveCodeBlock>
 
 #### 4. Undefined
