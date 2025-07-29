@@ -2,6 +2,7 @@
   "name": "app",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -9,6 +10,7 @@
     "start": "next start",
     "start:production": "NODE_ENV=production next start",
     "postinstall": "prisma generate",
+    "postbuild": "next-sitemap",
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -47,6 +49,7 @@
     "next": "15.4.1",
     "next-auth": "^4.24.11",
     "next-mdx-remote": "^5.0.0",
+    "next-sitemap": "^4.2.3",
     "next-themes": "^0.4.6",
     "prisma": "^6.12.0",
     "react": "19.1.0",
@@ -73,7 +76,8 @@
     "jest-environment-jsdom": "^30.0.4",
     "tailwindcss": "^4",
     "ts-jest": "^29.4.0",
+    "ts-node": "^10.9.2",
     "tsx": "^4.20.3",
-    "typescript": "^5"
+    "typescript": "^5.8.3"
   }
 }

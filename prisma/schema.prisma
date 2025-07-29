@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Account {
@@ -37,39 +37,37 @@ model Session {
 }
 
 model User {
-  id                 String              @id @default(cuid())
-  name               String?
-  username           String?             @unique
-  email              String              @unique
-  emailVerified      DateTime?
-  image              String?
-  mood               String              @default("CHILL")
-  subscription       String              @default("FREE")
-  subscriptionStatus String              @default("INACTIVE")
-  subscriptionEndsAt DateTime?
-  stripeCustomerId   String?
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  accounts           Account[]
-  challengeAttempts  ChallengeAttempt[]
-  challengeProgress  ChallengeProgress[]
-  payments           Payment[]
-  progress           Progress[]
-  quizAttempts       QuizAttempt[]
-  sessions           Session[]
-  subscriptions      Subscription[]
-  tutorialProgress   TutorialProgress[]
-  userSettings       UserSettings?
-
-  // Achievements and Social
-  achievements           UserAchievement[]
-  friendRequestsSent     FriendRequest[]   @relation("FriendRequestSender")
-  friendRequestsReceived FriendRequest[]   @relation("FriendRequestReceiver")
-  friendships1           Friendship[]      @relation("User1")
-  friendships2           Friendship[]      @relation("User2")
-  progressShares         ProgressShare[]
-  reactions              Reaction[]
+  id                     String              @id @default(cuid())
+  name                   String?
+  username               String?             @unique
+  email                  String              @unique
+  emailVerified          DateTime?
+  image                  String?
+  mood                   String              @default("CHILL")
+  subscription           String              @default("FREE")
+  subscriptionStatus     String              @default("INACTIVE")
+  subscriptionEndsAt     DateTime?
+  stripeCustomerId       String?
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
+  accounts               Account[]
+  challengeAttempts      ChallengeAttempt[]
+  challengeProgress      ChallengeProgress[]
+  friendRequestsReceived FriendRequest[]     @relation("FriendRequestReceiver")
+  friendRequestsSent     FriendRequest[]     @relation("FriendRequestSender")
+  friendships1           Friendship[]        @relation("User1")
+  friendships2           Friendship[]        @relation("User2")
   notifications          Notification[]
+  payments               Payment[]
+  progress               Progress[]
+  progressShares         ProgressShare[]
+  quizAttempts           QuizAttempt[]
+  reactions              Reaction[]
+  sessions               Session[]
+  subscriptions          Subscription[]
+  tutorialProgress       TutorialProgress[]
+  achievements           UserAchievement[]
+  userSettings           UserSettings?
 
   @@map("users")
 }
@@ -306,83 +304,68 @@ model Subscription {
 }
 
 model UserSettings {
-  id            String @id @default(cuid())
-  userId        String @unique
-  preferredMood String @default("CHILL")
-
-  // Notification preferences
-  emailNotifications       Boolean @default(true)
-  reminderNotifications    Boolean @default(true)
-  achievementNotifications Boolean @default(true)
-  weeklyProgressReports    Boolean @default(false)
-
-  // Privacy settings
-  showPublicProfile Boolean @default(true)
-  shareProgress     Boolean @default(false)
-  allowAnalytics    Boolean @default(true)
-
-  // Learning preferences
-  dailyGoalMinutes Int     @default(30)
-  reminderTime     String  @default("18:00")
-  difficulty       String  @default("MEDIUM")
-  autoSubmit       Boolean @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                       String   @id @default(cuid())
+  userId                   String   @unique
+  preferredMood            String   @default("CHILL")
+  emailNotifications       Boolean  @default(true)
+  reminderNotifications    Boolean  @default(true)
+  achievementNotifications Boolean  @default(true)
+  weeklyProgressReports    Boolean  @default(false)
+  showPublicProfile        Boolean  @default(true)
+  shareProgress            Boolean  @default(false)
+  allowAnalytics           Boolean  @default(true)
+  dailyGoalMinutes         Int      @default(30)
+  reminderTime             String   @default("18:00")
+  difficulty               String   @default("MEDIUM")
+  autoSubmit               Boolean  @default(false)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  user                     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_settings")
 }
 
-// Achievements System
 model Achievement {
-  id          String @id @default(cuid())
-  key         String @unique // e.g., "first_quiz", "speed_demon", "streak_week"
-  title       String
-  description String
-  icon        String // emoji or icon name
-  category    String // "learning", "streak", "social", "challenge"
-  rarity      String @default("COMMON") // "COMMON", "RARE", "EPIC", "LEGENDARY"
-  points      Int    @default(10)
-
-  // Requirements for unlocking
-  requirementType  String // "quiz_count", "streak_days", "challenges_solved", etc.
-  requirementValue Int // e.g., 5 for "complete 5 quizzes"
-
-  isHidden  Boolean  @default(false) // Hidden until unlocked
-  createdAt DateTime @default(now())
-
+  id               String            @id @default(cuid())
+  key              String            @unique
+  title            String
+  description      String
+  icon             String
+  category         String
+  rarity           String            @default("COMMON")
+  points           Int               @default(10)
+  requirementType  String
+  requirementValue Int
+  isHidden         Boolean           @default(false)
+  createdAt        DateTime          @default(now())
   userAchievements UserAchievement[]
 
   @@map("achievements")
 }
 
 model UserAchievement {
-  id            String   @id @default(cuid())
+  id            String      @id @default(cuid())
   userId        String
   achievementId String
-  unlockedAt    DateTime @default(now())
-  notified      Boolean  @default(false)
-
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  unlockedAt    DateTime    @default(now())
+  notified      Boolean     @default(false)
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, achievementId])
   @@map("user_achievements")
 }
 
-// Social System
 model FriendRequest {
   id          String    @id @default(cuid())
   senderId    String
   receiverId  String
-  status      String    @default("PENDING") // "PENDING", "ACCEPTED", "DECLINED"
+  status      String    @default("PENDING")
   message     String?
   createdAt   DateTime  @default(now())
   respondedAt DateTime?
-
-  sender   User @relation("FriendRequestSender", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver User @relation("FriendRequestReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  receiver    User      @relation("FriendRequestReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender      User      @relation("FriendRequestSender", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@unique([senderId, receiverId])
   @@map("friend_requests")
@@ -393,39 +376,36 @@ model Friendship {
   user1Id   String
   user2Id   String
   createdAt DateTime @default(now())
-
-  user1 User @relation("User1", fields: [user1Id], references: [id], onDelete: Cascade)
-  user2 User @relation("User2", fields: [user2Id], references: [id], onDelete: Cascade)
+  user1     User     @relation("User1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2     User     @relation("User2", fields: [user2Id], references: [id], onDelete: Cascade)
 
   @@unique([user1Id, user2Id])
   @@map("friendships")
 }
 
 model ProgressShare {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   userId      String
-  type        String // "achievement", "quiz_completed", "streak", "challenge_solved"
+  type        String
   title       String
   description String?
-  data        Json? // Additional data (score, time, etc.)
-  visibility  String   @default("FRIENDS") // "PUBLIC", "FRIENDS", "PRIVATE"
-  createdAt   DateTime @default(now())
-
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reactions Reaction[]
+  data        Json?
+  visibility  String     @default("FRIENDS")
+  createdAt   DateTime   @default(now())
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reactions   Reaction[]
 
   @@map("progress_shares")
 }
 
 model Reaction {
-  id              String   @id @default(cuid())
+  id              String        @id @default(cuid())
   userId          String
   progressShareId String
-  type            String // "like", "love", "fire", "clap", "mind_blown"
-  createdAt       DateTime @default(now())
-
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  progressShare ProgressShare @relation(fields: [progressShareId], references: [id], onDelete: Cascade)
+  type            String
+  createdAt       DateTime      @default(now())
+  progressShare   ProgressShare @relation(fields: [progressShareId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, progressShareId])
   @@map("reactions")
@@ -433,15 +413,14 @@ model Reaction {
 
 model Notification {
   id        String   @id @default(cuid())
-  userId    String // Recipient
-  type      String // "friend_request", "friend_accepted", "reaction", "achievement", "mention"
+  userId    String
+  type      String
   title     String
   message   String
-  data      Json? // Additional context data
+  data      Json?
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
 }

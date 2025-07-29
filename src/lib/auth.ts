@@ -20,30 +20,34 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     session: async ({ session, user }) => {
       console.log("Session callback - session:", session, "user:", user);
-      if (session?.user && user) {
-        session.user.id = user.id;
-        // Add mood to session
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
-          select: { mood: true, subscription: true, username: true },
-        });
-        session.user.mood = dbUser?.mood || "CHILL";
-        session.user.subscription = dbUser?.subscription || "FREE";
-
-        // Ensure user has a username, generate if missing
-        if (!dbUser?.username) {
-          const newUsername = await generateUniqueUsername(
-            user.name,
-            user.email
-          );
-          await prisma.user.update({
+      try {
+        if (session?.user && user) {
+          session.user.id = user.id;
+          // Add mood to session
+          const dbUser = await prisma.user.findUnique({
             where: { id: user.id },
-            data: { username: newUsername },
+            select: { mood: true, subscription: true, username: true },
           });
-          console.log(
-            `Generated username "${newUsername}" for user ${user.email} during session`
-          );
+          session.user.mood = dbUser?.mood || "CHILL";
+          session.user.subscription = dbUser?.subscription || "FREE";
+
+          // Ensure user has a username, generate if missing
+          if (!dbUser?.username) {
+            const newUsername = await generateUniqueUsername(
+              user.name,
+              user.email
+            );
+            await prisma.user.update({
+              where: { id: user.id },
+              data: { username: newUsername },
+            });
+            console.log(
+              `Generated username "${newUsername}" for user ${user.email} during session`
+            );
+          }
         }
+      } catch (error) {
+        console.error(error);
       }
       return session;
     },
@@ -93,4 +97,15 @@ export const authOptions: NextAuthOptions = {
     error: "/auth/error",
   },
   debug: process.env.NODE_ENV === "development",
+  logger: {
+    error(code, metadata) {
+      console.error("NextAuth error", code, metadata);
+    },
+    warn(code) {
+      console.warn("NextAuth warning", code);
+    },
+    debug(code, metadata) {
+      console.debug("NextAuth debug", code, metadata);
+    },
+  },
 };

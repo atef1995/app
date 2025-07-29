@@ -246,7 +246,7 @@ const achievements = [
   },
 ];
 
-export async function seedAchievements() {
+async function seedAchievements() {
   console.log("🏆 Seeding achievements...");
 
   for (const achievement of achievements) {
@@ -260,4 +260,4 @@ export async function seedAchievements() {
   console.log(`✅ Seeded ${achievements.length} achievements`);
 }
 
-export default seedAchievements;
+seedAchievements();

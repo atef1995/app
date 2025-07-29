@@ -76,16 +76,16 @@ async function main() {
 
   // Get existing quiz slugs to avoid conflicts
   const existingQuizzes = await prisma.quiz.findMany({
-    select: { slug: true }
+    select: { slug: true },
   });
-  const existingSlugs = existingQuizzes.map(q => q.slug).filter(Boolean);
+  const existingSlugs = existingQuizzes.map((q) => q.slug).filter(Boolean);
 
   // Now process quizzes - create single Quiz records with questions as JSON
   const quizArray = Object.values(quizzes);
 
   for (const quiz of quizArray) {
     const tutorialId = quiz.tutorialId.toString();
-    
+
     // Generate unique slug for the quiz
     const baseSlug = slugify(quiz.title);
     const uniqueSlug = generateUniqueSlug(baseSlug, existingSlugs);

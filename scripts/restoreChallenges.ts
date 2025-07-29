@@ -13,19 +13,23 @@ async function main() {
   await prisma.challengeTest.deleteMany();
   await prisma.challengeMoodAdaptation.deleteMany();
   await prisma.challenge.deleteMany();
-  
+
   console.log("🗑️ Cleared existing challenge data");
 
   // Combine all challenges
   const allChallenges = [...basicChallenges, ...algorithmChallenges];
-  
+
   for (const challengeData of allChallenges) {
     try {
       console.log(`📝 Creating challenge: ${challengeData.title}`);
-
+      if (!challengeData.estimatedTime) {
+        console.warn(
+          `⚠️  estimatedTime is missing for challenge: ${challengeData.title}`
+        );
+      }
       // Generate unique slug
       const baseSlug = slugify(challengeData.title);
-      const slug = await generateUniqueSlug(baseSlug, 'challenge');
+      const slug = await generateUniqueSlug(baseSlug, [baseSlug]);
 
       // Create challenge
       const challenge = await prisma.challenge.create({
@@ -34,20 +38,23 @@ async function main() {
           title: challengeData.title,
           description: challengeData.description,
           difficulty: challengeData.difficulty,
-          category: challengeData.category,
-          initialCode: challengeData.initialCode,
           solution: challengeData.solution,
+          estimatedTime: challengeData.estimatedTime,
+          starter: challengeData.initialCode,
           createdAt: new Date(),
           updatedAt: new Date(),
+          requiredPlan: challengeData.requiredPlan,
         },
       });
 
       // Create mood adaptations
-      for (const [moodId, adaptation] of Object.entries(challengeData.moodAdapted)) {
+      for (const [moodId, adaptation] of Object.entries(
+        challengeData.moodAdapted
+      )) {
         await prisma.challengeMoodAdaptation.create({
           data: {
             challengeId: challenge.id,
-            moodId,
+            mood: moodId,
             title: adaptation.title,
             description: adaptation.description,
             timerSeconds: adaptation.timerSeconds,
@@ -61,16 +68,27 @@ async function main() {
         await prisma.challengeTest.create({
           data: {
             challengeId: challenge.id,
-            input: typeof test.input === 'string' ? test.input : JSON.stringify(test.input),
-            expected: typeof test.expected === 'string' ? test.expected : JSON.stringify(test.expected),
+            input:
+              typeof test.input === "string"
+                ? test.input
+                : JSON.stringify(test.input),
+            expected:
+              typeof test.expected === "string"
+                ? test.expected
+                : JSON.stringify(test.expected),
             description: test.description,
           },
         });
       }
 
-      console.log(`✅ Created challenge: ${challenge.title} (${challenge.slug})`);
+      console.log(
+        `✅ Created challenge: ${challenge.title} (${challenge.slug})`
+      );
     } catch (error) {
-      console.error(`❌ Error creating challenge ${challengeData.title}:`, error);
+      console.error(
+        `❌ Error creating challenge ${challengeData.title}:`,
+        error
+      );
     }
   }
 

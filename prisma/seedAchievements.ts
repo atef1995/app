@@ -413,15 +413,11 @@ async function seedAchievements() {
   console.log(`🎉 Successfully seeded ${achievements.length} achievements!`);
 }
 
-export default seedAchievements;
-
-if (require.main === module) {
-  seedAchievements()
-    .catch((e) => {
-      console.error("❌ Error seeding achievements:", e);
-      process.exit(1);
-    })
-    .finally(async () => {
-      await prisma.$disconnect();
-    });
-}
+seedAchievements()
+  .catch((e) => {
+    console.error("❌ Error seeding achievements:", e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
