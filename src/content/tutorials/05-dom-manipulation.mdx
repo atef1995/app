@@ -1,0 +1,151 @@
+# Learn How to Manipulate the DOM with JavaScript
+
+The **Document Object Model (DOM)** is a programming interface for HTML and XML documents. JavaScript allows you to interact with and manipulate the DOM to change how a webpage looks or behaves in real time — no reload required!
+
+## 1. Accessing DOM Elements
+
+To manipulate anything in the DOM, you first need to select it.
+
+<InteractiveCodeBlock
+  title="Selecting Elements"
+  description="Use `getElementById`, `querySelector`, or `getElementsByClassName` to select elements:"
+>
+  const title = document.getElementById("main-title");
+  const firstButton = document.querySelector("button");
+  const allItems = document.getElementsByClassName("item");
+
+  console.log(title, firstButton, allItems);
+</InteractiveCodeBlock>
+
+## 2. Changing Text Content
+
+Once you have an element, you can change its content using `.textContent` or `.innerHTML`.
+
+<InteractiveCodeBlock
+  title="Change Text Content"
+  description="Set new text using `.textContent`:"
+>
+  const heading = document.querySelector("h1");
+  heading.textContent = "DOM is Powerful!";
+</InteractiveCodeBlock>
+
+<InteractiveCodeBlock
+  title="Change HTML Content"
+  description="Use `.innerHTML` to inject HTML:"
+>
+  const paragraph = document.querySelector("#intro");
+  paragraph.innerHTML = "Updated <strong>HTML</strong> content.";
+</InteractiveCodeBlock>
+
+## 3. Changing Styles Dynamically
+
+Manipulate an element’s style directly using the `.style` property.
+
+<InteractiveCodeBlock
+  title="Change Style"
+  description="Set inline styles dynamically:"
+>
+  const box = document.querySelector(".box");
+  box.style.backgroundColor = "skyblue";
+  box.style.border = "2px solid navy";
+</InteractiveCodeBlock>
+
+## 4. Adding and Removing Classes
+
+Use `classList` to toggle, add, or remove classes without touching raw class strings.
+
+<InteractiveCodeBlock
+  title="Add/Remove Classes"
+  description="Use `classList` to modify CSS classes:"
+>
+  const element = document.querySelector(".message");
+  element.classList.add("visible");
+  element.classList.remove("hidden");
+  element.classList.toggle("highlighted");
+</InteractiveCodeBlock>
+
+## 5. Creating and Inserting Elements
+
+JavaScript lets you create new elements and insert them into the DOM.
+
+<InteractiveCodeBlock
+  title="Create and Append Element"
+  description="Use `createElement` and `appendChild`:"
+>
+  const newDiv = document.createElement("div");
+  newDiv.textContent = "I was added with JS!";
+  newDiv.className = "new-box";
+
+  const container = document.querySelector("#container");
+  container.appendChild(newDiv);
+</InteractiveCodeBlock>
+
+## 6. Removing Elements
+
+You can remove any element from the DOM using `.remove()`.
+
+<InteractiveCodeBlock
+  title="Remove Element"
+  description="Call `.remove()` on the element you want to delete:"
+>
+  const unwanted = document.querySelector(".ad-banner");
+  unwanted.remove();
+</InteractiveCodeBlock>
+
+## 7. Handling Events
+
+Events let you make pages interactive. Attach event listeners using `.addEventListener`.
+
+<InteractiveCodeBlock
+  title="Add Event Listener"
+  description="Listen for a click event on a button:"
+>
+  const button = document.querySelector("#clickMe");
+
+  button.addEventListener("click", function () {
+    alert("Button was clicked!");
+  });
+</InteractiveCodeBlock>
+
+## 8. Combining All Together
+
+You can combine multiple DOM operations to build dynamic behavior.
+
+<InteractiveCodeBlock
+  title="Full Example: Toggle Visibility"
+  description="Show/hide a box when a button is clicked:"
+>
+  const button = document.querySelector("#toggleBtn");
+  const box = document.querySelector("#box");
+
+  button.addEventListener("click", () => {
+    box.classList.toggle("hidden");
+  });
+</InteractiveCodeBlock>
+
+---
+
+## Summary
+
+| Task | Method |
+|------|--------|
+| Select element | `querySelector`, `getElementById`, etc. |
+| Change text | `.textContent`, `.innerHTML` |
+| Modify style | `.style` |
+| Add/remove classes | `.classList.add/remove/toggle` |
+| Create new elements | `document.createElement`, `appendChild` |
+| Delete elements | `.remove()` |
+| Add interactivity | `.addEventListener` |
+
+---
+
+## Practice Exercise
+
+Try building a **To-Do List App** where users can:
+
+- Add new items
+- Remove items by clicking a delete button
+- Mark items as done (toggle class)
+
+If you'd like, I can walk you through a simple version of that too!
+

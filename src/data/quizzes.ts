@@ -1,3 +1,5 @@
+import { title } from "process";
+
 // Quiz data for tutorial 1: Variables and Data Types
 export const quiz1 = {
   id: 1,
@@ -246,10 +248,154 @@ export const quiz3 = {
   ],
 };
 
+const domManipulationQuiz = {
+  id: 5,
+  tutorialId: 5,
+  title: "DOM Manipulation with JavaScript",
+  questions: [
+    {
+      id: 1,
+      question: "Which method is used to select an element by its ID?",
+      options: [
+        "document.querySelector('#id')",
+        "document.getElementByClass('id')",
+        "document.getElementById('id')",
+        "document.selectElementById('id')",
+      ],
+      correct: 2,
+      explanation:
+        "`document.getElementById('id')` is the standard method for selecting an element by its ID.",
+      difficulty: "easy",
+    },
+    {
+      id: 2,
+      question: "What does `element.textContent` do?",
+      options: [
+        "Changes the tag name",
+        "Sets or gets the text inside an element",
+        "Executes HTML inside the element",
+        "Applies inline styles",
+      ],
+      correct: 1,
+      explanation:
+        "`textContent` sets or retrieves the plain text inside an element, without interpreting HTML.",
+      difficulty: "easy",
+    },
+    {
+      id: 3,
+      question:
+        "Which property is used to change an element's inline CSS with JavaScript?",
+      options: [
+        "element.css",
+        "element.classList",
+        "element.innerStyle",
+        "element.style",
+      ],
+      correct: 3,
+      explanation:
+        "`element.style` allows you to set or get inline CSS properties like `color`, `backgroundColor`, etc.",
+      difficulty: "easy",
+    },
+    {
+      id: 4,
+      question: "How do you create a new DOM element in JavaScript?",
+      options: [
+        "new HTMLElement('div')",
+        "document.newElement('div')",
+        "document.createElement('div')",
+        "create.div()",
+      ],
+      correct: 2,
+      explanation:
+        "`document.createElement('div')` creates a new DOM element of the specified tag type.",
+      difficulty: "medium",
+    },
+    {
+      id: 5,
+      question: "Which method attaches a child to a parent DOM node?",
+      options: ["append()", "appendChild()", "addNode()", "attachElement()"],
+      correct: 1,
+      explanation:
+        "`appendChild()` inserts a node as the last child of a parent element.",
+      difficulty: "medium",
+    },
+    {
+      id: 6,
+      question: "How do you listen to a click event on a button element?",
+      options: [
+        "button.addListener('click', function...)",
+        "button.onClick(function...)",
+        "button.event('click', callback)",
+        "button.addEventListener('click', function...)",
+      ],
+      correct: 3,
+      explanation:
+        "`addEventListener('click', ...)` is the correct way to attach a click event listener to a DOM element.",
+      difficulty: "medium",
+    },
+    {
+      id: 7,
+      question: "What does `classList.toggle('active')` do?",
+      options: [
+        "Always adds the class",
+        "Always removes the class",
+        "Adds the class if it's missing, removes it if it's present",
+        "Changes the class name to 'active'",
+      ],
+      correct: 2,
+      explanation:
+        "`toggle()` checks if the class exists; if it does, it removes it, otherwise it adds it. Great for show/hide logic.",
+      difficulty: "medium",
+    },
+    {
+      id: 8,
+      question: "What happens when you use `element.remove()`?",
+      options: [
+        "It disables the element",
+        "It removes the element from the DOM entirely",
+        "It clears the content inside the element",
+        "It hides the element with CSS",
+      ],
+      correct: 1,
+      explanation:
+        "`element.remove()` deletes the element from the DOM structure, making it no longer available visually or via JavaScript.",
+      difficulty: "easy",
+    },
+    {
+      id: 9,
+      question:
+        "What is the difference between `.innerHTML` and `.textContent`?",
+      options: [
+        "`innerHTML` includes HTML tags; `textContent` only includes text",
+        "They are exactly the same",
+        "`textContent` includes HTML tags; `innerHTML` does not",
+        "`innerHTML` can only be used on inputs",
+      ],
+      correct: 0,
+      explanation:
+        "`innerHTML` can parse and insert HTML markup; `textContent` will treat everything as plain text, escaping any tags.",
+      difficulty: "medium",
+    },
+    {
+      id: 10,
+      question:
+        "Which method selects the **first** matching element from the DOM?",
+      options: [
+        "document.getElementByClassName()",
+        "document.querySelectorAll()",
+        "document.querySelector()",
+        "document.getElementsByTagName()",
+      ],
+      correct: 2,
+      explanation:
+        "`querySelector()` returns the first element that matches a given CSS selector. `querySelectorAll()` returns a list.",
+      difficulty: "medium",
+    },
+  ],
+};
+
 export const quizzes = {
-  1: quiz1,
-  2: quiz2,
-  3: quiz3,
+  4: domManipulationQuiz,
 };
 
 export type Quiz = typeof quiz1;

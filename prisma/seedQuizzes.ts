@@ -10,48 +10,6 @@ async function main() {
   // First, create Tutorial records
   const tutorials = [
     {
-      id: "1",
-      slug: "variables-and-data-types",
-      title: "Variables and Data Types",
-      description:
-        "Learn about JavaScript variables, data types, and how to work with them.",
-      content:
-        "This tutorial covers the fundamentals of JavaScript variables and data types.",
-      difficulty: 1,
-      order: 1,
-      published: true,
-    },
-    {
-      id: "2",
-      slug: "functions-and-scope",
-      title: "Functions and Scope",
-      description: "Understanding JavaScript functions, parameters, and scope.",
-      content: "This tutorial covers JavaScript functions and how scope works.",
-      difficulty: 2,
-      order: 2,
-      published: true,
-    },
-    {
-      id: "3",
-      slug: "arrays-and-objects",
-      title: "Arrays and Objects",
-      description: "Working with JavaScript arrays and objects.",
-      content: "This tutorial covers JavaScript arrays and objects.",
-      difficulty: 2,
-      order: 3,
-      published: true,
-    },
-    {
-      id: "4",
-      slug: "control-structures",
-      title: "Control Structures",
-      description: "Learn about if statements, loops, and conditional logic.",
-      content: "This tutorial covers JavaScript control structures.",
-      difficulty: 2,
-      order: 4,
-      published: true,
-    },
-    {
       id: "5",
       slug: "dom-manipulation",
       title: "DOM Manipulation",
@@ -60,6 +18,7 @@ async function main() {
       difficulty: 3,
       order: 5,
       published: true,
+      mdxFile: "05-dom-manipulation",
     },
   ];
 

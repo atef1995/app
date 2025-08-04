@@ -1,4 +1,5 @@
 import { BUTTON_COLOR } from "@/types/button";
+import { Circle } from "lucide-react";
 import React from "react";
 
 interface ButtonProps {
@@ -6,15 +7,27 @@ interface ButtonProps {
   className?: string;
   color: BUTTON_COLOR;
   children: React.ReactNode;
-  key: string;
+  uniqueKey: string | number;
+  loading: boolean;
+  id: string;
 }
 
-const Button = ({ onClick, className, color, children, key }: ButtonProps) => {
+const Button = ({
+  onClick,
+  className,
+  color,
+  children,
+  uniqueKey,
+  loading,
+  id,
+}: ButtonProps) => {
   return (
     <button
-      key={key}
+      id={id}
+      disabled={loading}
+      key={uniqueKey}
       onClick={onClick}
-      className={`w-full flex items-center justify-center gap-3 px-6 py-3 rounded-lg font-semibold active:scale-95 cursor-pointer transition-all ${color} ${className}`}
+      className={`w-full flex items-center justify-center gap-3 px-6 py-3 rounded-lg font-semibold active:scale-95 cursor-pointer transition-all disabled:opacity-80 disabled:bg-gray-500 disabled:hover:bg-gray-500 disabled:cursor-wait ${color} ${className}`}
     >
       {children}
     </button>

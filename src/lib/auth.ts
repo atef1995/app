@@ -97,15 +97,4 @@ export const authOptions: NextAuthOptions = {
     error: "/auth/error",
   },
   debug: process.env.NODE_ENV === "development",
-  logger: {
-    error(code, metadata) {
-      console.error("NextAuth error", code, metadata);
-    },
-    warn(code) {
-      console.warn("NextAuth warning", code);
-    },
-    debug(code, metadata) {
-      console.debug("NextAuth debug", code, metadata);
-    },
-  },
 };
