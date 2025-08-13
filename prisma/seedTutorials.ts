@@ -44,6 +44,99 @@ const TUTORIALS = [
           explanation:
             "Array is an object type, not a primitive. Primitives are string, number, boolean, null, undefined, symbol, and bigint.",
         },
+        {
+          question: "What is the difference between 'let' and 'const'?",
+          options: [
+            "No difference",
+            "let can be reassigned, const cannot",
+            "const is faster",
+            "let is block-scoped, const is function-scoped"
+          ],
+          correct: 1,
+          explanation:
+            "Variables declared with 'let' can be reassigned, while 'const' variables cannot be reassigned after initialization.",
+        },
+        {
+          question: "Which of these will cause a ReferenceError?",
+          options: [
+            "Using a var variable before declaration",
+            "Using a let variable before declaration",
+            "Using a const variable after declaration",
+            "Declaring the same var twice"
+          ],
+          correct: 1,
+          explanation:
+            "Accessing a 'let' or 'const' variable before its declaration causes a ReferenceError due to the temporal dead zone.",
+        },
+        {
+          question: "What is the result of: typeof undefined?",
+          options: ["null", "undefined", "object", "string"],
+          correct: 1,
+          explanation:
+            "The typeof operator returns 'undefined' for undefined values.",
+        },
+        {
+          question: "Which statement about var is TRUE?",
+          options: [
+            "var is block-scoped",
+            "var variables are hoisted",
+            "var cannot be redeclared",
+            "var requires initialization"
+          ],
+          correct: 1,
+          explanation:
+            "Variables declared with 'var' are hoisted to the top of their scope and initialized with undefined.",
+        },
+        {
+          question: "What happens when you declare a variable without any keyword?",
+          options: [
+            "Creates a local variable",
+            "Creates a global variable",
+            "Throws a syntax error",
+            "Creates a constant"
+          ],
+          correct: 1,
+          explanation:
+            "In non-strict mode, variables declared without a keyword become global variables, which is generally bad practice.",
+        },
+        {
+          question: "Which is the correct way to declare multiple variables?",
+          options: [
+            "let a, b, c;",
+            "let a; b; c;",
+            "let a + b + c;",
+            "let (a, b, c);"
+          ],
+          correct: 0,
+          explanation:
+            "Multiple variables can be declared in one statement using commas: let a, b, c;",
+        },
+        {
+          question: "What is the data type of NaN?",
+          options: ["NaN", "undefined", "number", "string"],
+          correct: 2,
+          explanation:
+            "NaN (Not a Number) is ironically of type 'number' in JavaScript.",
+        },
+        {
+          question: "How do you check if a variable is NaN?",
+          options: [
+            "variable === NaN",
+            "typeof variable === 'NaN'",
+            "Number.isNaN(variable)",
+            "variable == NaN"
+          ],
+          correct: 2,
+          explanation:
+            "Number.isNaN() is the reliable way to check for NaN. NaN is not equal to itself, so === NaN always returns false.",
+        },
+        {
+          question: "What does the following return: typeof typeof 42?",
+          options: ["number", "string", "undefined", "object"],
+          correct: 1,
+          explanation:
+            "typeof 42 returns 'number' (a string), then typeof 'number' returns 'string'.",
+        },
       ],
     },
   },

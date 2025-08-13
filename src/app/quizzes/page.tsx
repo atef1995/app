@@ -240,6 +240,9 @@ export default function QuizzesPage() {
 
   const { data: tutorialProgress = {}, isLoading: loadingProgress } =
     useTutorialProgress(session?.user?.id);
+  if (process.env.NODE_ENV === "development") {
+    console.log(tutorialProgress);
+  }
 
   // Pagination hook
   const {
@@ -322,9 +325,8 @@ export default function QuizzesPage() {
             <span>Progress:</span>
             <span>
               {
-                Object.values(tutorialProgress).filter(
-                  (p) => p.status === "COMPLETED"
-                ).length
+                Object.values(tutorialProgress).filter((p) => p.quizPassed)
+                  .length
               }{" "}
               completed
             </span>

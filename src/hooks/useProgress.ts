@@ -7,6 +7,7 @@ interface TutorialProgress {
   status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
   bestScore?: number;
   quizAttempts: number;
+  quizPassed: boolean;
 }
 
 interface ChallengeProgress {
@@ -20,7 +21,13 @@ interface ChallengeProgress {
 interface ProjectProgress {
   projectId: string;
   status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
-  submissionStatus?: "DRAFT" | "SUBMITTED" | "UNDER_REVIEW" | "REVIEWED" | "APPROVED" | "NEEDS_REVISION";
+  submissionStatus?:
+    | "DRAFT"
+    | "SUBMITTED"
+    | "UNDER_REVIEW"
+    | "REVIEWED"
+    | "APPROVED"
+    | "NEEDS_REVISION";
   grade?: number;
   timeSpent?: number;
   completedAt?: string;
@@ -57,65 +64,65 @@ interface ProgressResponse {
 // Fetch functions for different progress types
 const fetchTutorialProgress = async (): Promise<TutorialProgress[]> => {
   const response = await fetch("/api/progress?type=tutorial");
-  
+
   if (!response.ok) {
     throw new Error(`Failed to fetch tutorial progress: ${response.status}`);
   }
-  
+
   const data: ProgressResponse = await response.json();
-  
+
   if (!data.success) {
     throw new Error("Failed to fetch tutorial progress from API");
   }
-  
+
   return (data.progress || []) as TutorialProgress[];
 };
 
 const fetchChallengeProgress = async (): Promise<ChallengeProgress[]> => {
   const response = await fetch("/api/progress?type=challenge");
-  
+
   if (!response.ok) {
     throw new Error(`Failed to fetch challenge progress: ${response.status}`);
   }
-  
+
   const data: ProgressResponse = await response.json();
-  
+
   if (!data.success) {
     throw new Error("Failed to fetch challenge progress from API");
   }
-  
+
   return (data.progress || []) as ChallengeProgress[];
 };
 
 const fetchProjectProgress = async (): Promise<ProjectProgress[]> => {
   const response = await fetch("/api/progress?type=project");
-  
+
   if (!response.ok) {
     throw new Error(`Failed to fetch project progress: ${response.status}`);
   }
-  
+
   const data: ProgressResponse = await response.json();
-  
+
   if (!data.success) {
     throw new Error("Failed to fetch project progress from API");
   }
-  
+
   return (data.progress || []) as ProjectProgress[];
 };
 
 const fetchProgressStats = async (): Promise<ProgressStats> => {
   const response = await fetch("/api/progress?type=stats");
-  
+
   if (!response.ok) {
     throw new Error(`Failed to fetch progress stats: ${response.status}`);
   }
-  
+
   const data: ProgressResponse = await response.json();
-  
+
   if (!data.success) {
     throw new Error("Failed to fetch progress stats from API");
   }
-  
+
   return data.stats as ProgressStats;
 };
 
@@ -195,4 +202,9 @@ export const useProgressStats = (userId?: string) => {
   });
 };
 
-export type { TutorialProgress, ChallengeProgress, ProjectProgress, ProgressStats };
+export type {
+  TutorialProgress,
+  ChallengeProgress,
+  ProjectProgress,
+  ProgressStats,
+};

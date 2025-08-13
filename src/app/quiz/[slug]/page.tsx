@@ -81,14 +81,18 @@ export default function QuizPage({
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const response = await fetch(`/api/quizzes/slug/${resolvedParams.slug}`);
+        const response = await fetch(
+          `/api/quizzes/slug/${resolvedParams.slug}`
+        );
         if (response.ok) {
           const data = await response.json();
           setQuiz(data.quiz);
-          
+
           // Fetch tutorial navigation if quiz has tutorial info
           if (data.quiz?.tutorialId) {
-            const navResponse = await fetch(`/api/tutorials/navigation?tutorialId=${data.quiz.tutorialId}`);
+            const navResponse = await fetch(
+              `/api/tutorials/navigation?tutorialId=${data.quiz.tutorialId}`
+            );
             if (navResponse.ok) {
               const navData = await navResponse.json();
               if (navData.success) {
@@ -183,11 +187,18 @@ export default function QuizPage({
     if (cheatAttempts >= 4) {
       setTimeout(() => {
         alert("Too many cheat attempts! Time to actually study 📚");
-        const redirectSlug = tutorialNavigation?.current?.slug || resolvedParams.slug;
+        const redirectSlug =
+          tutorialNavigation?.current?.slug || resolvedParams.slug;
         router.push(`/tutorials/${redirectSlug}`);
       }, 3500);
     }
-  }, [cheatAttempts, router, resolvedParams.slug, cheatMessages, tutorialNavigation]);
+  }, [
+    cheatAttempts,
+    router,
+    resolvedParams.slug,
+    cheatMessages,
+    tutorialNavigation,
+  ]);
 
   // Define functions early to avoid conditional hook calls
   const calculateScore = useCallback(() => {
@@ -284,13 +295,7 @@ export default function QuizPage({
       ...prev,
       showResults: true,
     }));
-  }, [
-    quiz,
-    currentMood.id,
-    quizState.startTime,
-    quizState.answers,
-    toast,
-  ]);
+  }, [quiz, currentMood.id, quizState.startTime, quizState.answers, toast]);
 
   useEffect(() => {
     if (!session) {
@@ -326,6 +331,9 @@ export default function QuizPage({
 
   // Enhanced anti-cheat system with dev tools detection
   useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      return;
+    }
     let devToolsOpen = false;
 
     // Detect dev tools by checking window dimensions and console
@@ -661,7 +669,11 @@ export default function QuizPage({
 
                 <div className="flex gap-4 justify-center">
                   <Link
-                    href={tutorialNavigation?.current?.slug ? `/tutorials/${tutorialNavigation.current.slug}` : `/tutorials`}
+                    href={
+                      tutorialNavigation?.current?.slug
+                        ? `/tutorials/${tutorialNavigation.current.slug}`
+                        : `/tutorials`
+                    }
                     className="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
                   >
                     Review Tutorial
