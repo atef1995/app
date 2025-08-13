@@ -5,7 +5,7 @@ import { MoodProvider } from "@/components/providers/MoodProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { ToastProvider } from "@/components/providers/ToastProvider";
-import { GlobalHeader } from "@/components/GlobalHeader";
+import { Header } from "@/components/Header";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -39,7 +39,7 @@ export default function RootLayout({
             <AuthProvider>
               <MoodProvider>
                 <ToastProvider>
-                  <GlobalHeader />
+                  <Header />
                   <main>{children}</main>
                 </ToastProvider>
               </MoodProvider>

@@ -11,6 +11,7 @@ import { ContentGrid } from "@/components/ui/ContentGrid";
 import { usePremiumContentHandler } from "@/hooks/usePremiumContentHandler";
 import { useMoodColors } from "@/hooks/useMoodColors";
 import { useChallengesWithFilters } from "@/hooks/useChallenges";
+import { useChallengeProgress } from "@/hooks/useProgress";
 import {
   Search,
   Monitor,
@@ -19,6 +20,8 @@ import {
   Folder,
   Puzzle,
   Calculator,
+  CheckCircle,
+  Clock,
 } from "lucide-react";
 import { challengeTypes, difficultyLevels } from "@/lib/challengeData";
 
@@ -40,6 +43,10 @@ export default function PracticePage() {
     type: selectedType,
     difficulty: selectedDifficulty,
   });
+
+  // Get challenge progress for completion status
+  const { data: challengeProgress = {}, isLoading: progressLoading } =
+    useChallengeProgress(session?.user?.id);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -107,6 +114,35 @@ export default function PracticePage() {
             className={`${iconClass} text-gray-600 dark:text-gray-400`}
           />
         );
+    }
+  };
+
+  const getChallengeStatus = (challengeId: string) => {
+    const progress = challengeProgress[challengeId];
+    if (!progress) return "NOT_STARTED";
+    return progress.status;
+  };
+
+  const getStatusIndicator = (challengeId: string) => {
+    const status = getChallengeStatus(challengeId);
+
+    switch (status) {
+      case "COMPLETED":
+        return (
+          <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+            <CheckCircle className="h-4 w-4" />
+            <span className="text-xs font-medium">Completed</span>
+          </div>
+        );
+      case "IN_PROGRESS":
+        return (
+          <div className="flex items-center gap-1 text-yellow-600 dark:text-yellow-400">
+            <Clock className="h-4 w-4" />
+            <span className="text-xs font-medium">In Progress</span>
+          </div>
+        );
+      default:
+        return null;
     }
   };
 
@@ -227,7 +263,11 @@ export default function PracticePage() {
                     <CardAction.Primary
                       onClick={() => handleChallengeClick(challenge)}
                     >
-                      Start Challenge
+                      {getChallengeStatus(challenge.id) === "COMPLETED"
+                        ? "Review Challenge"
+                        : getChallengeStatus(challenge.id) === "IN_PROGRESS"
+                        ? "Continue Challenge"
+                        : "Start Challenge"}
                     </CardAction.Primary>
                   </div>
                 }
@@ -236,13 +276,24 @@ export default function PracticePage() {
                   <div className="flex justify-center">
                     {getTypeIcon(challenge.type)}
                   </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getDifficultyColor(
-                      challenge.difficulty
-                    )}`}
-                  >
-                    {challenge.difficulty.toUpperCase()}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {progressLoading ? (
+                      <div className="flex items-center gap-1">
+                        <span className="p-2 rounded-full  text-xs font-medium blur-sm animate-pulse bg-gray-500/50">
+                          Completed
+                        </span>
+                      </div>
+                    ) : (
+                      getStatusIndicator(challenge.id)
+                    )}
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${getDifficultyColor(
+                        challenge.difficulty
+                      )}`}
+                    >
+                      {challenge.difficulty.toUpperCase()}
+                    </span>
+                  </div>
                 </div>
 
                 <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
@@ -256,7 +307,11 @@ export default function PracticePage() {
                 {/* Mood-adapted description */}
                 <div className={`${moodColors.bg} rounded-lg p-3`}>
                   <p className={`${moodColors.text} text-xs leading-relaxed`}>
-                    {challenge.moodAdapted[currentMood.id.toLowerCase() as keyof typeof challenge.moodAdapted]}
+                    {
+                      challenge.moodAdapted[
+                        currentMood.id.toLowerCase() as keyof typeof challenge.moodAdapted
+                      ]
+                    }
                   </p>
                 </div>
               </Card>

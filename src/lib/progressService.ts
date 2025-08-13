@@ -26,6 +26,14 @@ export interface ChallengeSubmission {
   ChallengeMoodAdaptation: ChallengeMoodAdaptation;
 }
 
+export interface ProjectSubmission {
+  projectId: string;
+  status: "DRAFT" | "SUBMITTED" | "UNDER_REVIEW" | "REVIEWED" | "APPROVED" | "NEEDS_REVISION";
+  grade?: number;
+  timeSpent: number;
+  mood: string;
+}
+
 interface QuizQuestion {
   id: number;
   question: string;
@@ -327,9 +335,11 @@ export class ProgressService {
     const [
       tutorialStats,
       challengeStats,
+      projectStats,
       recentActivity,
       totalTutorials,
       totalChallenges,
+      totalProjects,
     ] = await Promise.all([
       // Tutorial stats
       prisma.tutorialProgress.groupBy({
@@ -349,7 +359,16 @@ export class ProgressService {
         },
       }),
 
-      // Recent activity
+      // Project stats
+      prisma.projectProgress.groupBy({
+        by: ["status"],
+        where: { userId },
+        _count: {
+          status: true,
+        },
+      }),
+
+      // Recent activity (combine challenges and projects)
       prisma.challengeAttempt.findMany({
         where: { userId },
         include: {
@@ -363,7 +382,7 @@ export class ProgressService {
         orderBy: {
           createdAt: "desc",
         },
-        take: 10,
+        take: 5,
       }),
 
       // Total available tutorials
@@ -371,6 +390,9 @@ export class ProgressService {
 
       // Total available challenges
       prisma.challenge.count(),
+
+      // Total available projects
+      prisma.project.count({ where: { published: true } }),
     ]);
 
     const completedTutorials =
@@ -401,6 +423,17 @@ export class ProgressService {
         failedChallenges
     );
 
+    const completedProjects =
+      projectStats.find((s) => s.status === CompletionStatus.COMPLETED)?._count
+        .status || 0;
+    const inProgressProjects =
+      projectStats.find((s) => s.status === CompletionStatus.IN_PROGRESS)
+        ?._count.status || 0;
+    const notStartedProjects = Math.max(
+      0,
+      totalProjects - completedProjects - inProgressProjects
+    );
+
     return {
       tutorials: {
         completed: completedTutorials,
@@ -414,6 +447,12 @@ export class ProgressService {
         failed: failedChallenges,
         notStarted: notStartedChallenges,
         total: totalChallenges,
+      },
+      projects: {
+        completed: completedProjects,
+        inProgress: inProgressProjects,
+        notStarted: notStartedProjects,
+        total: totalProjects,
       },
       recentActivity,
     };
@@ -463,6 +502,131 @@ export class ProgressService {
         challengeId,
         status: CompletionStatus.IN_PROGRESS,
         lastAttemptAt: new Date(),
+      },
+    });
+  }
+
+  /**
+   * Submit a project submission and update project progress
+   */
+  static async submitProjectSubmission(
+    userId: string,
+    submission: ProjectSubmission
+  ) {
+    const isCompleted = ["REVIEWED", "APPROVED"].includes(submission.status);
+    const grade = submission.grade || 0;
+
+    // Update or create project progress
+    const progress = await prisma.projectProgress.upsert({
+      where: {
+        userId_projectId: {
+          userId,
+          projectId: submission.projectId,
+        },
+      },
+      update: {
+        status: isCompleted 
+          ? CompletionStatus.COMPLETED 
+          : CompletionStatus.IN_PROGRESS,
+        grade: submission.grade || undefined,
+        timeSpent: {
+          increment: submission.timeSpent,
+        },
+        submissionStatus: submission.status,
+        completedAt: isCompleted ? new Date() : null,
+        updatedAt: new Date(),
+      },
+      create: {
+        userId,
+        projectId: submission.projectId,
+        status: isCompleted 
+          ? CompletionStatus.COMPLETED 
+          : CompletionStatus.IN_PROGRESS,
+        grade: submission.grade,
+        timeSpent: submission.timeSpent,
+        submissionStatus: submission.status,
+        completedAt: isCompleted ? new Date() : null,
+      },
+    });
+
+    // Check for achievements if project was completed
+    let achievements: Array<{
+      achievement: {
+        id: string;
+        title: string;
+        description: string;
+        icon: string;
+      };
+    }> = [];
+    if (isCompleted) {
+      achievements = await AchievementService.checkAndUnlockAchievements({
+        userId,
+        action: "PROJECT_COMPLETED",
+        metadata: {
+          grade: grade,
+          timeSpent: submission.timeSpent,
+          mood: submission.mood as MoodId,
+        },
+      });
+    }
+
+    return {
+      progress,
+      completed: isCompleted,
+      grade: submission.grade,
+      achievements,
+    };
+  }
+
+  /**
+   * Get user's project progress
+   */
+  static async getProjectProgress(userId: string, projectId?: string) {
+    if (projectId) {
+      return prisma.projectProgress.findUnique({
+        where: {
+          userId_projectId: {
+            userId,
+            projectId,
+          },
+        },
+        include: {
+          project: true,
+        },
+      });
+    }
+
+    return prisma.projectProgress.findMany({
+      where: { userId },
+      include: {
+        project: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+  }
+
+  /**
+   * Mark project as started (when user first views it)
+   */
+  static async markProjectStarted(userId: string, projectId: string) {
+    return prisma.projectProgress.upsert({
+      where: {
+        userId_projectId: {
+          userId,
+          projectId,
+        },
+      },
+      update: {
+        status: CompletionStatus.IN_PROGRESS,
+        updatedAt: new Date(),
+      },
+      create: {
+        userId,
+        projectId,
+        status: CompletionStatus.IN_PROGRESS,
+        submissionStatus: "DRAFT",
       },
     });
   }

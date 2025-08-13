@@ -1,0 +1,325 @@
+---
+title: "Constructor Functions and Prototypes"
+description: "Master constructor functions and JavaScript's prototype system for creating reusable object blueprints"
+difficulty: 2
+order: 2
+published: true
+isPremium: false
+requiredPlan: "FREE"
+category: "oop"
+estimatedTime: "20 minutes"
+---
+
+# Constructor Functions and Prototypes
+
+Now that you understand basic objects, let's explore how to create multiple objects with the same structure using constructor functions and JavaScript's powerful prototype system.
+
+## Constructor Functions
+
+Constructor functions are regular functions that serve as templates for creating multiple objects with similar properties and methods:
+
+```javascript
+// Constructor function (note the capital letter)
+function Person(name, age, profession) {
+  this.name = name;
+  this.age = age;
+  this.profession = profession;
+  
+  this.introduce = function() {
+    return `Hi, I'm ${this.name}, a ${this.age}-year-old ${this.profession}.`;
+  };
+}
+
+// Creating instances using the 'new' keyword
+const person1 = new Person("Alice", 28, "developer");
+const person2 = new Person("Bob", 34, "designer");
+
+console.log(person1.introduce()); // "Hi, I'm Alice, a 28-year-old developer."
+console.log(person2.introduce()); // "Hi, I'm Bob, a 34-year-old designer."
+```
+
+## The Problem with Constructor Functions
+
+Each instance created with a constructor function gets its own copy of every method:
+
+```javascript
+function Car(make, model) {
+  this.make = make;
+  this.model = model;
+  
+  // This method is recreated for every instance!
+  this.getInfo = function() {
+    return `${this.make} ${this.model}`;
+  };
+}
+
+const car1 = new Car("Toyota", "Camry");
+const car2 = new Car("Honda", "Civic");
+
+console.log(car1.getInfo === car2.getInfo); // false - different function objects!
+```
+
+This is inefficient for methods that should be shared among all instances.
+
+## Enter Prototypes
+
+JavaScript's prototype system solves this problem by allowing objects to share methods:
+
+```javascript
+function Car(make, model) {
+  this.make = make;
+  this.model = model;
+}
+
+// Add methods to the prototype
+Car.prototype.getInfo = function() {
+  return `${this.make} ${this.model}`;
+};
+
+Car.prototype.start = function() {
+  return `${this.make} ${this.model} is starting...`;
+};
+
+Car.prototype.stop = function() {
+  return `${this.make} ${this.model} has stopped.`;
+};
+
+const car1 = new Car("Toyota", "Camry");
+const car2 = new Car("Honda", "Civic");
+
+console.log(car1.getInfo === car2.getInfo); // true - same function object!
+console.log(car1.start()); // "Toyota Camry is starting..."
+console.log(car2.stop());  // "Honda Civic has stopped."
+```
+
+## How Prototypes Work
+
+Every JavaScript object has a hidden `[[Prototype]]` property (accessible via `__proto__` or `Object.getPrototypeOf()`):
+
+```javascript
+function Animal(species) {
+  this.species = species;
+}
+
+Animal.prototype.makeSound = function() {
+  return "Some generic animal sound";
+};
+
+Animal.prototype.info = function() {
+  return `This is a ${this.species}`;
+};
+
+const dog = new Animal("dog");
+
+console.log(dog.species); // "dog" (own property)
+console.log(dog.makeSound()); // "Some generic animal sound" (from prototype)
+
+// Checking the prototype chain
+console.log(dog.__proto__ === Animal.prototype); // true
+console.log(Object.getPrototypeOf(dog) === Animal.prototype); // true (preferred way)
+```
+
+## Prototype Chain
+
+JavaScript looks for properties and methods in this order:
+1. On the object itself
+2. On the object's prototype
+3. On the prototype's prototype (and so on)
+4. Until it reaches `null`
+
+```javascript
+function Vehicle(type) {
+  this.type = type;
+}
+
+Vehicle.prototype.move = function() {
+  return `${this.type} is moving`;
+};
+
+function Bicycle(brand) {
+  this.brand = brand;
+  this.type = "bicycle"; // Own property
+}
+
+// Set up inheritance
+Bicycle.prototype = Object.create(Vehicle.prototype);
+Bicycle.prototype.constructor = Bicycle;
+
+Bicycle.prototype.pedal = function() {
+  return `Pedaling the ${this.brand} bicycle`;
+};
+
+const myBike = new Bicycle("Trek");
+
+console.log(myBike.pedal()); // "Pedaling the Trek bicycle" (from Bicycle.prototype)
+console.log(myBike.move());  // "bicycle is moving" (from Vehicle.prototype)
+console.log(myBike.brand);   // "Trek" (own property)
+console.log(myBike.type);    // "bicycle" (own property)
+```
+
+## Adding Properties to Prototypes
+
+You can add properties to prototypes, but be careful with reference types:
+
+```javascript
+function Student(name) {
+  this.name = name;
+}
+
+// Adding a primitive property
+Student.prototype.school = "Default School";
+
+// Adding a reference type (arrays/objects) can be problematic
+Student.prototype.subjects = []; // DON'T DO THIS!
+
+const student1 = new Student("Alice");
+const student2 = new Student("Bob");
+
+console.log(student1.school); // "Default School"
+console.log(student2.school); // "Default School"
+
+// Modifying prototype property affects all instances
+student1.subjects.push("Math");
+console.log(student2.subjects); // ["Math"] - Unexpected sharing!
+
+// Better approach: initialize arrays/objects in constructor
+function BetterStudent(name) {
+  this.name = name;
+  this.subjects = []; // Each instance gets its own array
+}
+
+BetterStudent.prototype.school = "Default School";
+BetterStudent.prototype.addSubject = function(subject) {
+  this.subjects.push(subject);
+};
+```
+
+## Checking Properties and Prototypes
+
+Use these methods to inspect objects and their prototypes:
+
+```javascript
+function Book(title, author) {
+  this.title = title;
+  this.author = author;
+}
+
+Book.prototype.getDescription = function() {
+  return `"${this.title}" by ${this.author}`;
+};
+
+const book = new Book("1984", "George Orwell");
+
+// Check if property exists on object itself
+console.log(book.hasOwnProperty("title")); // true
+console.log(book.hasOwnProperty("getDescription")); // false (it's on prototype)
+
+// Check if property exists anywhere in prototype chain
+console.log("title" in book); // true
+console.log("getDescription" in book); // true
+
+// Get all own properties
+console.log(Object.keys(book)); // ["title", "author"]
+
+// Get all enumerable properties (including prototype)
+for (let prop in book) {
+  console.log(prop); // "title", "author", "getDescription"
+}
+
+// Get only own properties in a for...in loop
+for (let prop in book) {
+  if (book.hasOwnProperty(prop)) {
+    console.log(prop); // "title", "author"
+  }
+}
+```
+
+## Practical Example: Building a Library System
+
+```javascript
+// Constructor for books
+function Book(title, author, isbn, availableCopies = 1) {
+  this.title = title;
+  this.author = author;
+  this.isbn = isbn;
+  this.availableCopies = availableCopies;
+  this.totalCopies = availableCopies;
+}
+
+// Methods on prototype for memory efficiency
+Book.prototype.getInfo = function() {
+  return `"${this.title}" by ${this.author} (ISBN: ${this.isbn})`;
+};
+
+Book.prototype.isAvailable = function() {
+  return this.availableCopies > 0;
+};
+
+Book.prototype.checkOut = function() {
+  if (this.isAvailable()) {
+    this.availableCopies--;
+    return `Successfully checked out "${this.title}"`;
+  } else {
+    return `"${this.title}" is currently unavailable`;
+  }
+};
+
+Book.prototype.returnBook = function() {
+  if (this.availableCopies < this.totalCopies) {
+    this.availableCopies++;
+    return `Successfully returned "${this.title}"`;
+  } else {
+    return `All copies of "${this.title}" are already in the library`;
+  }
+};
+
+// Constructor for library
+function Library(name) {
+  this.name = name;
+  this.books = [];
+}
+
+Library.prototype.addBook = function(book) {
+  this.books.push(book);
+  return `Added "${book.title}" to ${this.name}`;
+};
+
+Library.prototype.findBook = function(title) {
+  return this.books.find(book => 
+    book.title.toLowerCase() === title.toLowerCase()
+  );
+};
+
+Library.prototype.listAvailableBooks = function() {
+  const available = this.books.filter(book => book.isAvailable());
+  return available.map(book => book.getInfo());
+};
+
+// Usage
+const myLibrary = new Library("City Central Library");
+
+const book1 = new Book("The Great Gatsby", "F. Scott Fitzgerald", "978-0743273565", 3);
+const book2 = new Book("To Kill a Mockingbird", "Harper Lee", "978-0061120084", 2);
+
+console.log(myLibrary.addBook(book1));
+console.log(myLibrary.addBook(book2));
+
+console.log(book1.checkOut()); // "Successfully checked out 'The Great Gatsby'"
+console.log(book1.checkOut()); // "Successfully checked out 'The Great Gatsby'"
+console.log(book1.checkOut()); // "Successfully checked out 'The Great Gatsby'"
+console.log(book1.checkOut()); // "'The Great Gatsby' is currently unavailable"
+
+console.log(myLibrary.listAvailableBooks()); 
+// ['"To Kill a Mockingbird" by Harper Lee (ISBN: 978-0061120084)']
+```
+
+## Key Takeaways
+
+1. **Constructor functions** create object templates using the `new` keyword
+2. **Prototypes** allow sharing methods among all instances for memory efficiency
+3. **Prototype chain** enables inheritance and property lookup
+4. **Use `hasOwnProperty()`** to check if a property belongs to the object itself
+5. **Initialize arrays/objects in constructors**, not on prototypes
+6. **Capital letter naming** convention for constructor functions
+
+Understanding prototypes is crucial for mastering JavaScript's object-oriented capabilities. In the next tutorial, we'll explore ES6 classes, which provide a more familiar syntax for working with prototypes!

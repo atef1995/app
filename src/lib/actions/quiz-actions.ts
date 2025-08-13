@@ -108,7 +108,12 @@ export async function submitQuizAction(
         tutorialId,
         answers,
         timeSpent: timeSpent || 0,
-        ChallengeMoodAdaptation: session.user.mood || "CHILL",
+        ChallengeMoodAdaptation: {
+          id: "quiz-mood", // temporary ID for quiz submissions
+          challengeId: tutorialId, // use tutorialId as challengeId for quiz context
+          mood: session.user.mood || "CHILL",
+          content: "quiz-submission", // default content for quiz submissions
+        },
       },
       quizData
     );

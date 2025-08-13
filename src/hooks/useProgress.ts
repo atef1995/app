@@ -17,6 +17,15 @@ interface ChallengeProgress {
   lastAttemptAt?: string;
 }
 
+interface ProjectProgress {
+  projectId: string;
+  status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
+  submissionStatus?: "DRAFT" | "SUBMITTED" | "UNDER_REVIEW" | "REVIEWED" | "APPROVED" | "NEEDS_REVISION";
+  grade?: number;
+  timeSpent?: number;
+  completedAt?: string;
+}
+
 interface ProgressStats {
   tutorials: {
     completed: number;
@@ -31,11 +40,17 @@ interface ProgressStats {
     notStarted: number;
     total: number;
   };
+  projects: {
+    completed: number;
+    inProgress: number;
+    notStarted: number;
+    total: number;
+  };
 }
 
 interface ProgressResponse {
   success: boolean;
-  progress?: TutorialProgress[] | ChallengeProgress[];
+  progress?: TutorialProgress[] | ChallengeProgress[] | ProjectProgress[];
   stats?: ProgressStats;
 }
 
@@ -70,6 +85,22 @@ const fetchChallengeProgress = async (): Promise<ChallengeProgress[]> => {
   }
   
   return (data.progress || []) as ChallengeProgress[];
+};
+
+const fetchProjectProgress = async (): Promise<ProjectProgress[]> => {
+  const response = await fetch("/api/progress?type=project");
+  
+  if (!response.ok) {
+    throw new Error(`Failed to fetch project progress: ${response.status}`);
+  }
+  
+  const data: ProgressResponse = await response.json();
+  
+  if (!data.success) {
+    throw new Error("Failed to fetch project progress from API");
+  }
+  
+  return (data.progress || []) as ProjectProgress[];
 };
 
 const fetchProgressStats = async (): Promise<ProgressStats> => {
@@ -130,6 +161,27 @@ export const useChallengeProgress = (userId?: string) => {
   });
 };
 
+// Hook for fetching project progress
+export const useProjectProgress = (userId?: string) => {
+  return useQuery({
+    queryKey: ["progress", "project", userId],
+    queryFn: fetchProjectProgress,
+    enabled: !!userId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
+    refetchOnWindowFocus: true,
+    select: (data: ProjectProgress[]) => {
+      // Convert array to object with projectId as key
+      const progressMap: Record<string, ProjectProgress> = {};
+      data.forEach((p) => {
+        progressMap[p.projectId] = p;
+      });
+      return progressMap;
+    },
+  });
+};
+
 // Hook for fetching dashboard progress stats
 export const useProgressStats = (userId?: string) => {
   return useQuery({
@@ -143,4 +195,4 @@ export const useProgressStats = (userId?: string) => {
   });
 };
 
-export type { TutorialProgress, ChallengeProgress, ProgressStats };
+export type { TutorialProgress, ChallengeProgress, ProjectProgress, ProgressStats };

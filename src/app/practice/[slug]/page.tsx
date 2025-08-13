@@ -12,6 +12,7 @@ import CodeEditor from "@/components/CodeEditor";
 import { Challenge } from "@/types/practice";
 import { getChallengeBySlug } from "@/lib/challengeData";
 import PremiumModal from "@/components/ui/PremiumModal";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Define achievement type
 interface UnlockedAchievement {
@@ -31,6 +32,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
   const { data: session } = useSession();
   const { currentMood } = useMood();
   const toast = useToastContext();
+  const queryClient = useQueryClient();
   const { canAccess, showPremiumModal, setShowPremiumModal } =
     useUnifiedSubscription();
   const [resolvedParams, setResolvedParams] = useState<{ slug: string } | null>(
@@ -214,6 +216,8 @@ export default function ChallengePage({ params }: ChallengePageProps) {
             timeSpent
           );
 
+          console.log("Challenge submission result:", result);
+
           // Show achievement notifications if any were unlocked
           if (
             result.success &&
@@ -225,6 +229,19 @@ export default function ChallengePage({ params }: ChallengePageProps) {
                 `🏆 Achievement Unlocked!`,
                 `${achievement.achievement.icon} ${achievement.achievement.title} - ${achievement.achievement.description}`
               );
+            });
+          }
+
+          // If the challenge was completed, show success message and refresh progress
+          if (result.success && allPassed) {
+            toast.success(
+              "Challenge Completed!",
+              "Great job! Your solution passed all tests."
+            );
+            
+            // Invalidate challenge progress query to refresh completion status
+            queryClient.invalidateQueries({
+              queryKey: ["progress", "challenge", session.user.id]
             });
           }
         } catch (error) {

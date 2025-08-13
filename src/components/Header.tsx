@@ -14,10 +14,11 @@ import {
   Crown,
   Trophy,
   Users,
+  Building,
 } from "lucide-react";
 import { useState } from "react";
 
-export function GlobalHeader() {
+export function Header() {
   const { data: session } = useSession();
   const { currentMood } = useMood();
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -30,6 +31,7 @@ export function GlobalHeader() {
     { href: "/achievements", label: "Achievements", icon: Trophy },
     { href: "/social", label: "Social", icon: Users },
     { href: "/pricing", label: "Pricing", icon: Crown },
+    { href: "/projects", label: "Projects", icon: Building },
   ];
 
   return (

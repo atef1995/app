@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get("type"); // "tutorial" | "challenge" | "stats"
+    const type = searchParams.get("type"); // "tutorial" | "challenge" | "project" | "stats"
     const id = searchParams.get("id");
 
     if (type === "tutorial") {
@@ -25,6 +25,14 @@ export async function GET(request: NextRequest) {
 
     if (type === "challenge") {
       const progress = await ProgressService.getChallengeProgress(
+        session.user.id,
+        id || undefined
+      );
+      return NextResponse.json({ success: true, progress });
+    }
+
+    if (type === "project") {
+      const progress = await ProgressService.getProjectProgress(
         session.user.id,
         id || undefined
       );

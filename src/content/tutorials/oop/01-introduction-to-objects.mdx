@@ -1,0 +1,251 @@
+---
+title: "Introduction to Objects in JavaScript"
+description: "Learn the fundamentals of object-oriented programming in JavaScript, including object creation, properties, and methods"
+difficulty: 1
+order: 1
+published: true
+isPremium: false
+requiredPlan: "FREE"
+category: "oop"
+estimatedTime: "15 minutes"
+---
+
+# Introduction to Objects in JavaScript
+
+Welcome to the world of Object-Oriented Programming (OOP) in JavaScript! Objects are one of the most fundamental concepts in JavaScript and form the backbone of modern web development.
+
+## What is an Object?
+
+An object in JavaScript is a collection of key-value pairs where keys are strings (or Symbols) and values can be any data type. Think of objects as containers that hold related data and functionality together.
+
+```javascript
+// A simple object representing a person
+const person = {
+  name: "Alice",
+  age: 30,
+  city: "New York",
+  greet: function() {
+    return `Hello, I'm ${this.name}!`;
+  }
+};
+
+console.log(person.name); // "Alice"
+console.log(person.greet()); // "Hello, I'm Alice!"
+```
+
+## Creating Objects
+
+There are several ways to create objects in JavaScript:
+
+### 1. Object Literal Syntax (Most Common)
+
+```javascript
+const car = {
+  brand: "Toyota",
+  model: "Camry",
+  year: 2023,
+  start: function() {
+    console.log("Engine started!");
+  }
+};
+```
+
+### 2. Using the Object Constructor
+
+```javascript
+const book = new Object();
+book.title = "JavaScript: The Good Parts";
+book.author = "Douglas Crockford";
+book.pages = 176;
+```
+
+### 3. Using Object.create()
+
+```javascript
+const animal = {
+  species: "Unknown",
+  makeSound: function() {
+    console.log("Some sound");
+  }
+};
+
+const dog = Object.create(animal);
+dog.species = "Canine";
+dog.breed = "Golden Retriever";
+```
+
+## Accessing Object Properties
+
+You can access object properties using two methods:
+
+### Dot Notation (Preferred)
+
+```javascript
+const student = {
+  name: "John",
+  grade: 85,
+  subjects: ["Math", "Science", "English"]
+};
+
+console.log(student.name); // "John"
+console.log(student.grade); // 85
+```
+
+### Bracket Notation
+
+```javascript
+console.log(student["name"]); // "John"
+console.log(student["grade"]); // 85
+
+// Useful when property names have spaces or are dynamic
+const propertyName = "subjects";
+console.log(student[propertyName]); // ["Math", "Science", "English"]
+```
+
+## Adding and Modifying Properties
+
+Objects are mutable, meaning you can change their properties after creation:
+
+```javascript
+const profile = {
+  username: "coder123",
+  email: "coder@example.com"
+};
+
+// Adding new properties
+profile.isActive = true;
+profile.lastLogin = new Date();
+
+// Modifying existing properties
+profile.email = "newemail@example.com";
+
+console.log(profile);
+// {
+//   username: "coder123",
+//   email: "newemail@example.com",
+//   isActive: true,
+//   lastLogin: 2023-12-01T10:30:00.000Z
+// }
+```
+
+## Object Methods
+
+Methods are functions that belong to an object. They can access the object's properties using the `this` keyword:
+
+```javascript
+const calculator = {
+  result: 0,
+  
+  add: function(num) {
+    this.result += num;
+    return this;
+  },
+  
+  subtract: function(num) {
+    this.result -= num;
+    return this;
+  },
+  
+  multiply: function(num) {
+    this.result *= num;
+    return this;
+  },
+  
+  getValue: function() {
+    return this.result;
+  },
+  
+  reset: function() {
+    this.result = 0;
+    return this;
+  }
+};
+
+// Method chaining
+const finalResult = calculator
+  .add(10)
+  .multiply(3)
+  .subtract(5)
+  .getValue();
+
+console.log(finalResult); // 25
+```
+
+## The `this` Keyword
+
+The `this` keyword refers to the object that is calling the method:
+
+```javascript
+const team = {
+  name: "JavaScript Developers",
+  members: ["Alice", "Bob", "Charlie"],
+  
+  addMember: function(member) {
+    this.members.push(member);
+    console.log(`${member} added to ${this.name}`);
+  },
+  
+  listMembers: function() {
+    console.log(`Members of ${this.name}:`);
+    this.members.forEach(member => console.log(`- ${member}`));
+  }
+};
+
+team.addMember("Diana"); // "Diana added to JavaScript Developers"
+team.listMembers();
+// Members of JavaScript Developers:
+// - Alice
+// - Bob
+// - Charlie
+// - Diana
+```
+
+## Practical Exercise
+
+Try creating a `bankAccount` object with the following properties and methods:
+
+```javascript
+const bankAccount = {
+  accountNumber: "12345",
+  balance: 1000,
+  accountHolder: "Jane Doe",
+  
+  deposit: function(amount) {
+    if (amount > 0) {
+      this.balance += amount;
+      console.log(`Deposited $${amount}. New balance: $${this.balance}`);
+    } else {
+      console.log("Invalid deposit amount");
+    }
+  },
+  
+  withdraw: function(amount) {
+    if (amount > 0 && amount <= this.balance) {
+      this.balance -= amount;
+      console.log(`Withdrew $${amount}. New balance: $${this.balance}`);
+    } else {
+      console.log("Invalid withdrawal amount or insufficient funds");
+    }
+  },
+  
+  getBalance: function() {
+    return this.balance;
+  }
+};
+
+// Test the bank account
+bankAccount.deposit(200);  // Deposited $200. New balance: $1200
+bankAccount.withdraw(150); // Withdrew $150. New balance: $1050
+console.log(bankAccount.getBalance()); // 1050
+```
+
+## Key Takeaways
+
+1. **Objects are collections** of key-value pairs that group related data and functionality
+2. **Properties** store data, while **methods** are functions that operate on that data
+3. **Use dot notation** for accessing properties when possible
+4. **The `this` keyword** refers to the object calling the method
+5. **Objects are mutable** - you can modify them after creation
+6. **Method chaining** is possible when methods return the object (`this`)
+
+Objects are the foundation of JavaScript programming and understanding them is crucial for building complex applications. In the next tutorial, we'll explore more advanced object concepts like prototypes and inheritance!

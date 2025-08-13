@@ -128,6 +128,40 @@ const fetchTutorialProgress = async (
   return progressData.data;
 };
 
+const fetchCategories = async (): Promise<string[]> => {
+  const response = await fetch("/api/tutorials/categories");
+  if (!response.ok) {
+    throw new Error("Failed to fetch categories");
+  }
+
+  const data = await response.json();
+  if (!data.success) {
+    throw new Error(data.error || "Failed to fetch categories");
+  }
+
+  return data.categories;
+};
+
+const fetchTutorialsByCategory = async (category: string): Promise<TutorialWithProgress[]> => {
+  const response = await fetch(`/api/tutorials/category/${encodeURIComponent(category)}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch tutorials for category: ${category}`);
+  }
+
+  const data = await response.json();
+  if (!data.success) {
+    throw new Error(data.error || "Failed to fetch tutorials for category");
+  }
+
+  // Validate and map tutorials
+  const validTutorials = data.tutorials.filter(validateTutorial);
+  const mappedTutorials = await Promise.all(
+    validTutorials.map(mapTutorialWithDefaults)
+  );
+
+  return mappedTutorials;
+};
+
 // Custom hooks
 export const useTutorials = () => {
   return useQuery({
@@ -170,6 +204,25 @@ export const useTutorialProgress = (
     isProgressLoading: isLoading,
     progressError: hasError,
   };
+};
+
+export const useCategories = () => {
+  return useQuery({
+    queryKey: ["tutorial-categories"],
+    queryFn: fetchCategories,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
+  });
+};
+
+export const useTutorialsByCategory = (category: string) => {
+  return useQuery({
+    queryKey: ["tutorials-by-category", category],
+    queryFn: () => fetchTutorialsByCategory(category),
+    enabled: Boolean(category),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
 };
 
 // Export types

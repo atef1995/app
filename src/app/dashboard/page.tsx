@@ -25,13 +25,13 @@ interface ProgressStats {
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
-  
+
   // Use TanStack Query hook for progress stats
-  const { 
-    data: progressStats, 
+  const {
+    data: progressStats,
     isLoading: loadingProgress,
     error: progressError,
-    isError: hasProgressError
+    isError: hasProgressError,
   } = useProgressStats(session?.user?.id);
 
   if (status === "loading") {
@@ -143,7 +143,8 @@ export default function DashboardPage() {
           ) : hasProgressError ? (
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl text-center">
               <p className="text-red-600 dark:text-red-400 mb-4">
-                Error loading progress: {progressError?.message || "Unknown error"}
+                Error loading progress:{" "}
+                {progressError?.message || "Unknown error"}
               </p>
               <button
                 onClick={() => window.location.reload()}
@@ -156,6 +157,7 @@ export default function DashboardPage() {
             <ProgressStats
               tutorialStats={progressStats.tutorials}
               challengeStats={progressStats.challenges}
+              projectStats={progressStats.projects}
             />
           ) : (
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl">

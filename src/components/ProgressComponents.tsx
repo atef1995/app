@@ -5,13 +5,15 @@ interface ProgressBadgeProps {
   status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
   score?: number;
   attempts?: number;
-  type: "tutorial" | "challenge";
+  grade?: number;
+  type: "tutorial" | "challenge" | "project";
 }
 
 export function ProgressBadge({
   status,
   score,
   attempts,
+  grade,
   type,
 }: ProgressBadgeProps) {
   const getStatusIcon = () => {
@@ -47,13 +49,21 @@ export function ProgressBadge({
   const getStatusText = () => {
     switch (status) {
       case "COMPLETED":
-        return type === "tutorial"
-          ? `Completed${score ? ` (${score}%)` : ""}`
-          : "Passed";
+        if (type === "tutorial") {
+          return `Completed${score ? ` (${score}%)` : ""}`;
+        } else if (type === "project") {
+          return `Completed${grade ? ` (${Math.round(grade)}%)` : ""}`;
+        } else {
+          return "Passed";
+        }
       case "IN_PROGRESS":
-        return type === "tutorial"
-          ? `In Progress${attempts ? ` (${attempts} attempts)` : ""}`
-          : `Attempting${attempts ? ` (${attempts} tries)` : ""}`;
+        if (type === "tutorial") {
+          return `In Progress${attempts ? ` (${attempts} attempts)` : ""}`;
+        } else if (type === "project") {
+          return "In Progress";
+        } else {
+          return `Attempting${attempts ? ` (${attempts} tries)` : ""}`;
+        }
       case "FAILED":
         return `Failed${attempts ? ` (${attempts} attempts)` : ""}`;
       default:
@@ -85,14 +95,22 @@ interface ProgressStatsProps {
     notStarted: number;
     total: number; // Total available challenges in the system
   };
+  projectStats: {
+    completed: number;
+    inProgress: number;
+    notStarted: number;
+    total: number; // Total available projects in the system
+  };
 }
 
 export function ProgressStats({
   tutorialStats,
   challengeStats,
+  projectStats,
 }: ProgressStatsProps) {
   const totalTutorials = tutorialStats.total;
   const totalChallenges = challengeStats.total;
+  const totalProjects = projectStats.total;
 
   const tutorialProgress =
     totalTutorials > 0 ? (tutorialStats.completed / totalTutorials) * 100 : 0;
@@ -100,6 +118,8 @@ export function ProgressStats({
     totalChallenges > 0
       ? (challengeStats.completed / totalChallenges) * 100
       : 0;
+  const projectProgress =
+    totalProjects > 0 ? (projectStats.completed / totalProjects) * 100 : 0;
 
   // Clamp progress values between 0 and 100
   const clampedTutorialProgress = Math.min(100, Math.max(0, tutorialProgress));
@@ -107,6 +127,7 @@ export function ProgressStats({
     100,
     Math.max(0, challengeProgress)
   );
+  const clampedProjectProgress = Math.min(100, Math.max(0, projectProgress));
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl">
@@ -167,8 +188,34 @@ export function ProgressStats({
           </div>
         </div>
 
+        {/* Project Progress */}
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Projects
+            </span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {projectStats.completed}/{totalProjects} completed
+            </span>
+          </div>
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            {/* Dynamic width required for progress indicator */}
+            <div
+              className="bg-green-600 dark:bg-green-500 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${clampedProjectProgress}%` }}
+            ></div>
+          </div>
+          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <span>
+              {projectStats.inProgress} in progress •{" "}
+              {projectStats.notStarted} not started
+            </span>
+            <span>{Math.round(projectProgress)}% complete</span>
+          </div>
+        </div>
+
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+        <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
               {tutorialStats.completed}
@@ -183,6 +230,14 @@ export function ProgressStats({
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400">
               Challenges Passed
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+              {projectStats.completed}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Projects Completed
             </div>
           </div>
         </div>
