@@ -140,7 +140,12 @@ export async function submitChallengeAction(
         code,
         passed,
         timeSpent: timeSpent || 0,
-        ChallengeMoodAdaptation: { mood: session.user.mood || "CHILL" },
+        ChallengeMoodAdaptation: {
+          id: "challenge-mood",
+          challengeId,
+          mood: session.user.mood || "CHILL",
+          content: "challenge-submission",
+        },
       }
     );
 

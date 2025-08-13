@@ -1,5 +1,4 @@
 import { BUTTON_COLOR } from "@/types/button";
-import { Circle } from "lucide-react";
 import React from "react";
 
 interface ButtonProps {

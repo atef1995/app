@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { ChallengeMoodAdaptation } from "@prisma/client";
 import { AchievementService } from "./achievementService";
 import { MoodId } from "@/types/mood";
+import { AchievementAction, AchievementMetadata } from "@/types/common";
 
 // Define the completion status enum locally until Prisma client is regenerated
 export enum CompletionStatus {
@@ -561,12 +562,13 @@ export class ProgressService {
     if (isCompleted) {
       achievements = await AchievementService.checkAndUnlockAchievements({
         userId,
-        action: "PROJECT_COMPLETED",
+        action: "PROJECT_COMPLETED" as AchievementAction,
         metadata: {
           grade: grade,
           timeSpent: submission.timeSpent,
-          mood: submission.mood as MoodId,
-        },
+          mood: submission.mood,
+          projectId: submission.projectId,
+        } as AchievementMetadata,
       });
     }
 

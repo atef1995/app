@@ -28,7 +28,7 @@ export default function ProjectsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const projectsQuery = useProjects(selectedCategory || undefined);
-  const categoriesQuery = useCategories();
+  const categoriesQuery = useCategories(1, 100); // Get all categories in one page
 
   if (!session) {
     return (
@@ -96,7 +96,7 @@ export default function ProjectsPage() {
   }
 
   const projects = projectsQuery.data || [];
-  const categories = categoriesQuery.data || [];
+  const categories = categoriesQuery.data?.data || [];
   
   // Group projects by category for stats
   const projectsByCategory = projects.reduce((acc, project) => {

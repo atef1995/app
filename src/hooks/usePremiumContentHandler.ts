@@ -2,11 +2,12 @@
 
 import { useState, useCallback } from "react";
 import { useSubscription } from "./useSubscription";
+import { ContentType } from "@/types/common";
 
 // Premium content interface
 interface PremiumContent {
   title: string;
-  type: "tutorial" | "challenge" | "quiz";
+  type: "tutorial" | "challenge" | "quiz" | "project";
   requiredPlan: "VIBED" | "CRACKED";
 }
 
@@ -47,7 +48,7 @@ export const usePremiumContentHandler = () => {
         title: string;
         isPremium?: boolean;
         requiredPlan?: string;
-        type: "tutorial" | "challenge" | "quiz";
+        type: ContentType;
       },
       onAccess: () => void
     ) => {

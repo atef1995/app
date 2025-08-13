@@ -14,7 +14,7 @@ import PremiumModal from "@/components/ui/PremiumModal";
 import { PageLayout } from "@/components/ui/PageLayout";
 import { MoodInfoCard } from "@/components/ui/MoodInfoCard";
 import { ContentGrid } from "@/components/ui/ContentGrid";
-import { useMood } from "@/components/providers/MoodProvider";
+import Pagination from "@/components/ui/Pagination";
 import { usePremiumContentHandler } from "@/hooks/usePremiumContentHandler";
 import {
   ArrowLeft,
@@ -99,8 +99,10 @@ export default function CategoryPage() {
   const params = useParams();
   const category = params?.category as string;
   const { data: session } = useSession();
-  const { currentMood } = useMood();
+  // const { currentMood } = useMood(); // Removed unused variable
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
 
   const {
     handlePremiumContent,
@@ -110,15 +112,46 @@ export default function CategoryPage() {
     setShowPremiumModal,
   } = usePremiumContentHandler();
 
-  // Fetch tutorials for this category
-  const categoryTutorialsQuery = useTutorialsByCategory(category);
-  const tutorials = categoryTutorialsQuery.data || [];
+  // Fetch tutorials for this category with server-side pagination
+  const categoryTutorialsQuery = useTutorialsByCategory(category, currentPage, itemsPerPage);
+  const tutorialsData = categoryTutorialsQuery.data?.data || [];
+  const pagination = categoryTutorialsQuery.data?.pagination;
 
   // Progress data
   const { tutorialsWithProgress } = useTutorialProgress(
-    tutorials,
+    tutorialsData,
     session?.user?.id
   );
+
+  // Get category metadata
+  const categoryMeta =
+    categoryMetadata[category as keyof typeof categoryMetadata];
+
+  // Use server-side pagination data instead of client-side calculations
+  const totalItems = pagination?.totalCount || 0;
+  const totalPages = pagination?.totalPages || 1;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top of tutorials list
+    const tutorialsSection = document.getElementById('tutorials-section');
+    if (tutorialsSection) {
+      tutorialsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
+  // Calculate stats
+  const completedCount = tutorialsWithProgress.filter(
+    (t) => t.progress?.quizPassed
+  ).length;
+  const inProgressCount = tutorialsWithProgress.filter(
+    (t) => t.progress?.quizAttempts && !t.progress.quizPassed
+  ).length;
 
   // Handle tutorial click
   const handleTutorialClick = (tutorial: TutorialWithProgress) => {
@@ -134,10 +167,6 @@ export default function CategoryPage() {
       }
     );
   };
-
-  // Get category metadata
-  const categoryMeta =
-    categoryMetadata[category as keyof typeof categoryMetadata];
 
   if (!session) {
     return (
@@ -226,13 +255,6 @@ export default function CategoryPage() {
     );
   }
 
-  // Calculate stats
-  const completedCount = tutorialsWithProgress.filter(
-    (t) => t.progress?.quizPassed
-  ).length;
-  const inProgressCount = tutorialsWithProgress.filter(
-    (t) => t.progress?.quizAttempts && !t.progress.quizPassed
-  ).length;
 
   return (
     <PageLayout
@@ -350,6 +372,7 @@ export default function CategoryPage() {
       </div>
 
       {/* Tutorials List */}
+      <div id="tutorials-section">
       {tutorialsWithProgress.length === 0 ? (
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
@@ -362,6 +385,8 @@ export default function CategoryPage() {
       ) : (
         <ContentGrid className={viewMode === "list" ? "grid-cols-1" : ""}>
           {tutorialsWithProgress.map((tutorial, index) => {
+            // Calculate the actual index in the full list for numbering
+            const actualIndex = ((currentPage - 1) * itemsPerPage) + index;
             const isLocked = isPremiumLocked(tutorial);
 
             return (
@@ -373,7 +398,7 @@ export default function CategoryPage() {
                 onClick={
                   !isLocked ? () => handleTutorialClick(tutorial) : undefined
                 }
-                title={`${index + 1}. ${tutorial.title}`}
+                title={`${actualIndex + 1}. ${tutorial.title}`}
                 description={tutorial.description || ""}
                 className="h-full"
                 actions={
@@ -397,7 +422,7 @@ export default function CategoryPage() {
                 {/* Tutorial Header */}
                 <div className="mb-4">
                   <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
-                    {index + 1}. {tutorial.title}
+                    {actualIndex + 1}. {tutorial.title}
                   </h3>
                   {tutorial.description && (
                     <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
@@ -454,6 +479,25 @@ export default function CategoryPage() {
           })}
         </ContentGrid>
       )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-8">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            showInfo={true}
+            showSizeSelector={true}
+            sizeOptions={[6, 12, 18, 24]}
+            onSizeChange={handleItemsPerPageChange}
+            className="justify-center"
+          />
+        </div>
+      )}
+      </div>
 
       {/* Premium Modal */}
       <PremiumModal

@@ -283,7 +283,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
     }
 
     setIsRunning(false);
-  }, [challenge, userCode, session?.user?.id, toast]);
+  }, [challenge, userCode, session?.user?.id, toast, queryClient]);
 
   // Timer countdown effect
   useEffect(() => {

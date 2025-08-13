@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(move:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": []
   }

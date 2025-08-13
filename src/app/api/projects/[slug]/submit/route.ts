@@ -3,13 +3,9 @@ import { getServerSession } from "next-auth";
 import { ProjectService } from "@/lib/projectService";
 import { authOptions } from "@/lib/auth";
 
-interface Params {
-  slug: string;
-}
-
 export async function POST(
   request: NextRequest,
-  { params }: { params: Params }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -24,7 +20,7 @@ export async function POST(
       );
     }
 
-    const { slug } = params;
+    const { slug } = await params;
     const body = await request.json();
     
     // Get the project to validate it exists
@@ -85,7 +81,7 @@ export async function POST(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Params }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -100,7 +96,7 @@ export async function GET(
       );
     }
 
-    const { slug } = params;
+    const { slug } = await params;
     
     // Get the project to get its ID
     const project = await ProjectService.getProjectBySlug(slug);

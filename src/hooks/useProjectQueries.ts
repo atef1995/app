@@ -3,7 +3,9 @@ import {
   ProjectWithDetails,
   ProjectSubmissionWithDetails,
   ProjectReviewAssignmentWithDetails,
-} from "@/lib/projectService";
+  CreateProjectSubmissionRequest,
+  ProjectReviewRequest,
+} from "@/types/project";
 
 // Fetch functions
 const fetchProjects = async (category?: string): Promise<ProjectWithDetails[]> => {
@@ -219,7 +221,7 @@ export const useSubmitProject = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ slug, data }: { slug: string; data: any }) =>
+    mutationFn: ({ slug, data }: { slug: string; data: CreateProjectSubmissionRequest }) =>
       submitProject(slug, data),
     onSuccess: (_, { slug }) => {
       // Invalidate and refetch submission data
@@ -245,7 +247,7 @@ export const useSubmitReview = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ assignmentId, reviewData }: { assignmentId: string; reviewData: any }) =>
+    mutationFn: ({ assignmentId, reviewData }: { assignmentId: string; reviewData: ProjectReviewRequest }) =>
       submitReview(assignmentId, reviewData),
     onSuccess: () => {
       // Invalidate review assignments and showcase

@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -12,6 +13,7 @@ import CategoryCard from "@/components/ui/CategoryCard";
 import { PageLayout } from "@/components/ui/PageLayout";
 import { MoodInfoCard } from "@/components/ui/MoodInfoCard";
 import { ContentGrid } from "@/components/ui/ContentGrid";
+import Pagination from "@/components/ui/Pagination";
 import { useMood } from "@/components/providers/MoodProvider";
 
 // Category metadata
@@ -56,22 +58,56 @@ export default function TutorialsPage() {
   const { data: session } = useSession();
   const { currentMood } = useMood();
   const router = useRouter();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(6);
 
 
-  // Fetch data
-  const categoriesQuery = useCategories();
-  const allTutorialsQuery = useTutorials();
+  // Fetch data with server-side pagination
+  const categoriesQuery = useCategories(currentPage, itemsPerPage);
+  const allTutorialsQuery = useTutorials(); // Keep this non-paginated for stats
 
+  // Get categories data from paginated response
+  const categories = categoriesQuery.data?.data || [];
+  const categoryPagination = categoriesQuery.data?.pagination;
+  
   // Progress data
-  const allTutorials = allTutorialsQuery.data || [];
+  const allTutorials = allTutorialsQuery.data?.data || [];
   const { tutorialsWithProgress } = useTutorialProgress(
     allTutorials,
     session?.user?.id
   );
 
+  // Use server-side pagination data instead of client-side calculations
+  const totalItems = categoryPagination?.totalCount || 0;
+  const totalPages = categoryPagination?.totalPages || 1;
 
-  // Calculate category stats
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to categories section
+    const categoriesSection = document.getElementById('categories-section');
+    if (categoriesSection) {
+      categoriesSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
+  // Calculate category stats (fallback to default values if allTutorials is not available)
   const getCategoryStats = (category: string) => {
+    if (!allTutorials.length) {
+      // Fallback when tutorials are not loaded yet
+      return {
+        total: 0,
+        completed: 0,
+        duration:
+          categoryMetadata[category as keyof typeof categoryMetadata]?.duration ||
+          "2-3 hours",
+      };
+    }
+
     const categoryTuts = allTutorials.filter((t) => t.category === category);
     const completed = categoryTuts.filter((t) => {
       const progress = tutorialsWithProgress.find(
@@ -153,7 +189,6 @@ export default function TutorialsPage() {
     );
   }
 
-  const categories = categoriesQuery.data || [];
 
   return (
     <PageLayout
@@ -164,7 +199,7 @@ export default function TutorialsPage() {
       <MoodInfoCard className="mb-8" />
 
       {/* Categories Grid */}
-      <div className="mb-8">
+      <div className="mb-8" id="categories-section">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
           Choose a Learning Path
         </h2>
@@ -191,6 +226,25 @@ export default function TutorialsPage() {
             );
           })}
         </ContentGrid>
+
+        {/* Categories Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+              showInfo={true}
+              showSizeSelector={true}
+              sizeOptions={[3, 6, 9, 12]}
+              onSizeChange={handleItemsPerPageChange}
+              className="justify-center"
+              compact={false}
+            />
+          </div>
+        )}
       </div>
 
       {/* Quick Stats */}
@@ -236,8 +290,8 @@ export default function TutorialsPage() {
             More Content Coming Soon!
           </h2>
           <p className="text-gray-600 dark:text-gray-300 mb-4">
-            We're constantly adding new tutorials and categories. Have a
-            topic you{"'"}d like to see covered?
+            We&apos;re constantly adding new tutorials and categories. Have a
+            topic you&apos;d like to see covered?
           </p>
           <button className="bg-purple-600 dark:bg-purple-700 text-white py-2 px-6 rounded-lg font-semibold hover:bg-purple-700 dark:hover:bg-purple-800 transition-colors">
             Suggest a Tutorial

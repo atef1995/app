@@ -1,152 +1,24 @@
 import { prisma } from "@/lib/prisma";
 import { ProgressService } from "./progressService";
-
-export interface ProjectRequirement {
-  id: string;
-  title: string;
-  description: string;
-  type: "FEATURE" | "TECHNICAL" | "DESIGN" | "TESTING";
-  priority: "MUST_HAVE" | "SHOULD_HAVE" | "NICE_TO_HAVE";
-  points?: number;
-}
-
-export interface ProjectResource {
-  id: string;
-  title: string;
-  url: string;
-  type: "DOCUMENTATION" | "TUTORIAL" | "EXAMPLE" | "TOOL";
-  description?: string;
-}
-
-export interface ProjectRubricCriteria {
-  id: string;
-  name: string;
-  description: string;
-  maxPoints: number;
-  weight: number; // 0-1, how much this criteria affects overall score
-}
-
-export interface ProjectWithDetails {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  requirements: ProjectRequirement[];
-  category: string;
-  difficulty: number;
-  estimatedHours: number;
-  order: number;
-  published: boolean;
-  isPremium: boolean;
-  requiredPlan: "FREE" | "VIBED" | "CRACKED";
-  submissionType: "CODE" | "LINK" | "FILE";
-  reviewType: "PEER" | "INSTRUCTOR" | "AUTO";
-  minReviews: number;
-  dueDate: Date | null;
-  resources: ProjectResource[];
-  rubric: ProjectRubricCriteria[];
-  createdAt: Date;
-  updatedAt: Date;
-  _count?: {
-    submissions: number;
-  };
-}
-
-export interface ProjectSubmissionWithDetails {
-  id: string;
-  userId: string;
-  projectId: string;
-  title: string | null;
-  description: string | null;
-  submissionUrl: string | null;
-  submissionFiles: any;
-  sourceCode: string | null;
-  notes: string | null;
-  status: "DRAFT" | "SUBMITTED" | "UNDER_REVIEW" | "REVIEWED" | "APPROVED" | "NEEDS_REVISION";
-  submittedAt: Date | null;
-  reviewedAt: Date | null;
-  grade: number | null;
-  isPublic: boolean;
-  allowFeedback: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  user: {
-    id: string;
-    name: string | null;
-    username: string | null;
-    image: string | null;
-  };
-  project: {
-    id: string;
-    title: string;
-    category: string;
-    difficulty: number;
-  };
-  reviews: ProjectReviewWithDetails[];
-  _count?: {
-    reviews: number;
-  };
-}
-
-export interface ProjectReviewWithDetails {
-  id: string;
-  submissionId: string;
-  reviewerId: string;
-  assignmentId: string | null;
-  type: "PEER" | "INSTRUCTOR" | "SELF";
-  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "OVERDUE";
-  overallScore: number | null;
-  criteriaScores: Record<string, number>;
-  strengths: string | null;
-  improvements: string | null;
-  suggestions: string | null;
-  isConstructive: boolean | null;
-  timeSpent: number | null;
-  submittedAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-  reviewer: {
-    id: string;
-    name: string | null;
-    username: string | null;
-    image: string | null;
-  };
-}
-
-export interface ProjectReviewAssignmentWithDetails {
-  id: string;
-  submissionId: string;
-  reviewerId: string;
-  assignedBy: string;
-  priority: number;
-  status: "ASSIGNED" | "ACCEPTED" | "DECLINED" | "COMPLETED" | "OVERDUE";
-  dueDate: Date;
-  acceptedAt: Date | null;
-  completedAt: Date | null;
-  declinedReason: string | null;
-  remindersSent: number;
-  createdAt: Date;
-  updatedAt: Date;
-  reviewer: {
-    id: string;
-    name: string | null;
-    username: string | null;
-    image: string | null;
-  };
-  submission: {
-    id: string;
-    title: string | null;
-    project: {
-      id: string;
-      title: string;
-    };
-    user: {
-      id: string;
-      name: string | null;
-      username: string | null;
-    };
-  };
-}
+import {
+  ProjectWithDetails,
+  ProjectSubmissionWithDetails,
+  ProjectReviewAssignmentWithDetails,
+  ProjectRequirement,
+  ProjectResource,
+  ProjectRubricCriteria,
+  CreateProjectSubmissionRequest,
+  ProjectReviewRequest,
+  ProjectStats,
+} from "@/types/project";
+import {
+  SubscriptionPlan,
+  ProjectSubmissionType,
+  ProjectReviewType,
+  ProjectReviewStatus,
+  ProjectSubmissionStatus,
+  ReviewAssignmentStatus,
+} from "@/types/common";
 
 /**
  * Service for handling project operations
@@ -168,18 +40,18 @@ export class ProjectService {
             },
           },
         },
-        orderBy: [
-          { category: "asc" },
-          { order: "asc" },
-        ],
+        orderBy: [{ category: "asc" }, { order: "asc" }],
       });
 
       return projects.map((project) => ({
         ...project,
-        requirements: project.requirements as ProjectRequirement[],
-        resources: (project.resources as ProjectResource[]) || [],
-        rubric: (project.rubric as ProjectRubricCriteria[]) || [],
-        requiredPlan: project.requiredPlan as "FREE" | "VIBED" | "CRACKED",
+        requirements:
+          (project.requirements as unknown as ProjectRequirement[]) || [],
+        resources: (project.resources as unknown as ProjectResource[]) || [],
+        rubric: (project.rubric as unknown as ProjectRubricCriteria[]) || [],
+        requiredPlan: project.requiredPlan as SubscriptionPlan,
+        submissionType: project.submissionType as ProjectSubmissionType,
+        reviewType: project.reviewType as ProjectReviewType,
       }));
     } catch (error) {
       console.error("Error in getAllProjects:", error);
@@ -190,7 +62,9 @@ export class ProjectService {
   /**
    * Get projects by category
    */
-  static async getProjectsByCategory(category: string): Promise<ProjectWithDetails[]> {
+  static async getProjectsByCategory(
+    category: string
+  ): Promise<ProjectWithDetails[]> {
     try {
       const projects = await prisma.project.findMany({
         where: {
@@ -211,10 +85,13 @@ export class ProjectService {
 
       return projects.map((project) => ({
         ...project,
-        requirements: project.requirements as ProjectRequirement[],
-        resources: (project.resources as ProjectResource[]) || [],
-        rubric: (project.rubric as ProjectRubricCriteria[]) || [],
-        requiredPlan: project.requiredPlan as "FREE" | "VIBED" | "CRACKED",
+        requirements:
+          (project.requirements as unknown as ProjectRequirement[]) || [],
+        resources: (project.resources as unknown as ProjectResource[]) || [],
+        rubric: (project.rubric as unknown as ProjectRubricCriteria[]) || [],
+        requiredPlan: project.requiredPlan as SubscriptionPlan,
+        submissionType: project.submissionType as ProjectSubmissionType,
+        reviewType: project.reviewType as ProjectReviewType,
       }));
     } catch (error) {
       console.error("Error in getProjectsByCategory:", error);
@@ -225,7 +102,10 @@ export class ProjectService {
   /**
    * Get a specific project by slug
    */
-  static async getProjectBySlug(slug: string, userId?: string): Promise<ProjectWithDetails | null> {
+  static async getProjectBySlug(
+    slug: string,
+    userId?: string
+  ): Promise<ProjectWithDetails | null> {
     try {
       const project = await prisma.project.findUnique({
         where: {
@@ -250,10 +130,13 @@ export class ProjectService {
 
       return {
         ...project,
-        requirements: project.requirements as ProjectRequirement[],
-        resources: (project.resources as ProjectResource[]) || [],
-        rubric: (project.rubric as ProjectRubricCriteria[]) || [],
-        requiredPlan: project.requiredPlan as "FREE" | "VIBED" | "CRACKED",
+        requirements:
+          (project.requirements as unknown as ProjectRequirement[]) || [],
+        resources: (project.resources as unknown as ProjectResource[]) || [],
+        rubric: (project.rubric as unknown as ProjectRubricCriteria[]) || [],
+        requiredPlan: project.requiredPlan as SubscriptionPlan,
+        submissionType: project.submissionType as ProjectSubmissionType,
+        reviewType: project.reviewType as ProjectReviewType,
       };
     } catch (error) {
       console.error("Error in getProjectBySlug:", error);
@@ -320,10 +203,13 @@ export class ProjectService {
 
       return {
         ...submission,
-        criteriaScores: {},
+        status: submission.status as ProjectSubmissionStatus,
         reviews: submission.reviews.map((review) => ({
           ...review,
-          criteriaScores: (review.criteriaScores as Record<string, number>) || {},
+          type: review.type as ProjectReviewType,
+          status: review.status as ProjectReviewStatus,
+          criteriaScores:
+            (review.criteriaScores as Record<string, number>) || {},
         })),
       };
     } catch (error) {
@@ -338,15 +224,7 @@ export class ProjectService {
   static async upsertSubmission(
     userId: string,
     projectId: string,
-    data: {
-      title?: string;
-      description?: string;
-      submissionUrl?: string;
-      submissionFiles?: any;
-      sourceCode?: string;
-      notes?: string;
-      status?: "DRAFT" | "SUBMITTED";
-    }
+    data: CreateProjectSubmissionRequest
   ): Promise<ProjectSubmissionWithDetails> {
     try {
       const submission = await prisma.projectSubmission.upsert({
@@ -402,7 +280,7 @@ export class ProjectService {
       // If submitted, trigger peer review assignment and mark progress
       if (data.status === "SUBMITTED") {
         await this.assignPeerReviewers(submission.id);
-        
+
         // Track progress when project is submitted
         await ProgressService.submitProjectSubmission(userId, {
           projectId,
@@ -415,9 +293,13 @@ export class ProjectService {
 
       return {
         ...submission,
+        status: submission.status as ProjectSubmissionStatus,
         reviews: submission.reviews.map((review) => ({
           ...review,
-          criteriaScores: (review.criteriaScores as Record<string, number>) || {},
+          type: review.type as ProjectReviewType,
+          status: review.status as ProjectReviewStatus,
+          criteriaScores:
+            (review.criteriaScores as Record<string, number>) || {},
         })),
       };
     } catch (error) {
@@ -468,13 +350,13 @@ export class ProjectService {
             },
           },
         },
-        orderBy: [
-          { priority: "desc" },
-          { createdAt: "asc" },
-        ],
+        orderBy: [{ priority: "desc" }, { createdAt: "asc" }],
       });
 
-      return assignments;
+      return assignments.map(assignment => ({
+        ...assignment,
+        status: assignment.status as ReviewAssignmentStatus,
+      }));
     } catch (error) {
       console.error("Error in getReviewAssignments:", error);
       throw new Error("Failed to fetch review assignments");
@@ -484,7 +366,10 @@ export class ProjectService {
   /**
    * Accept a review assignment
    */
-  static async acceptReviewAssignment(assignmentId: string, userId: string): Promise<void> {
+  static async acceptReviewAssignment(
+    assignmentId: string,
+    userId: string
+  ): Promise<void> {
     try {
       await prisma.projectReviewAssignment.update({
         where: {
@@ -508,14 +393,7 @@ export class ProjectService {
   static async submitReview(
     assignmentId: string,
     reviewerId: string,
-    data: {
-      overallScore: number;
-      criteriaScores: Record<string, number>;
-      strengths?: string;
-      improvements?: string;
-      suggestions?: string;
-      timeSpent?: number;
-    }
+    data: ProjectReviewRequest
   ): Promise<void> {
     try {
       await prisma.$transaction(async (tx) => {
@@ -578,9 +456,13 @@ export class ProjectService {
             select: { overallScore: true },
           });
 
-          const averageGrade = reviews.length > 0 
-            ? reviews.reduce((sum, review) => sum + (review.overallScore || 0), 0) / reviews.length
-            : 0;
+          const averageGrade =
+            reviews.length > 0
+              ? reviews.reduce(
+                  (sum, review) => sum + (review.overallScore || 0),
+                  0
+                ) / reviews.length
+              : 0;
 
           // Update submission status
           await tx.projectSubmission.update({
@@ -719,7 +601,10 @@ export class ProjectService {
       // Filter out users who are already overloaded with reviews
       const MAX_CONCURRENT_REVIEWS = 3;
       const availableReviewers = potentialReviewers
-        .filter((user) => user.projectReviewAssignments.length < MAX_CONCURRENT_REVIEWS)
+        .filter(
+          (user) =>
+            user.projectReviewAssignments.length < MAX_CONCURRENT_REVIEWS
+        )
         .map((user) => user.id);
 
       // If not enough reviewers, fall back to instructor review
@@ -767,7 +652,7 @@ export class ProjectService {
   /**
    * Get user's project statistics
    */
-  static async getUserProjectStats(userId: string) {
+  static async getUserProjectStats(userId: string): Promise<ProjectStats> {
     try {
       const [userProgress, totalProjects, recentActivity] = await Promise.all([
         // User's project progress
@@ -786,11 +671,40 @@ export class ProjectService {
         prisma.projectSubmission.findMany({
           where: { userId },
           include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                image: true,
+              },
+            },
             project: {
               select: {
+                id: true,
                 title: true,
                 category: true,
                 difficulty: true,
+              },
+            },
+            reviews: {
+              include: {
+                reviewer: {
+                  select: {
+                    id: true,
+                    name: true,
+                    username: true,
+                    image: true,
+                  },
+                },
+              },
+              orderBy: {
+                createdAt: "desc",
+              },
+            },
+            _count: {
+              select: {
+                reviews: true,
               },
             },
           },
@@ -801,16 +715,32 @@ export class ProjectService {
         }),
       ]);
 
-      const completedProjects = userProgress.find((p) => p.status === "COMPLETED")?._count.status || 0;
-      const inProgressProjects = userProgress.find((p) => p.status === "IN_PROGRESS")?._count.status || 0;
-      const notStartedProjects = Math.max(0, totalProjects - completedProjects - inProgressProjects);
+      const completedProjects =
+        userProgress.find((p) => p.status === "COMPLETED")?._count.status || 0;
+      const inProgressProjects =
+        userProgress.find((p) => p.status === "IN_PROGRESS")?._count.status ||
+        0;
+      const notStartedProjects = Math.max(
+        0,
+        totalProjects - completedProjects - inProgressProjects
+      );
 
       return {
         completed: completedProjects,
         inProgress: inProgressProjects,
         notStarted: notStartedProjects,
         total: totalProjects,
-        recentActivity,
+        recentActivity: recentActivity.map(submission => ({
+          ...submission,
+          status: submission.status as ProjectSubmissionStatus,
+          reviews: submission.reviews.map((review) => ({
+            ...review,
+            type: review.type as ProjectReviewType,
+            status: review.status as ProjectReviewStatus,
+            criteriaScores:
+              (review.criteriaScores as Record<string, number>) || {},
+          })),
+        })),
       };
     } catch (error) {
       console.error("Error in getUserProjectStats:", error);
@@ -879,18 +809,19 @@ export class ProjectService {
             },
           },
         },
-        orderBy: [
-          { reviewedAt: "desc" },
-          { grade: "desc" },
-        ],
+        orderBy: [{ reviewedAt: "desc" }, { grade: "desc" }],
         take: limit,
       });
 
       return submissions.map((submission) => ({
         ...submission,
+        status: submission.status as ProjectSubmissionStatus,
         reviews: submission.reviews.map((review) => ({
           ...review,
-          criteriaScores: (review.criteriaScores as Record<string, number>) || {},
+          type: review.type as ProjectReviewType,
+          status: review.status as ProjectReviewStatus,
+          criteriaScores:
+            (review.criteriaScores as Record<string, number>) || {},
         })),
       }));
     } catch (error) {

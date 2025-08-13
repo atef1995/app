@@ -3,13 +3,9 @@ import { getServerSession } from "next-auth";
 import { ProjectService } from "@/lib/projectService";
 import { authOptions } from "@/lib/auth";
 
-interface Params {
-  id: string;
-}
-
 export async function POST(
   request: NextRequest,
-  { params }: { params: Params }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -24,7 +20,7 @@ export async function POST(
       );
     }
 
-    const { id: assignmentId } = params;
+    const { id: assignmentId } = await params;
     const body = await request.json();
     
     const {

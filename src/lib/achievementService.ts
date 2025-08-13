@@ -1,24 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { MoodId } from "@/types/mood";
+import { AchievementAction, AchievementMetadata } from "@/types/common";
 import { Achievement, UserAchievement } from "@prisma/client";
 
 interface AchievementCheck {
   userId: string;
-  action:
-    | "QUIZ_COMPLETED"
-    | "CHALLENGE_COMPLETED"
-    | "TUTORIAL_STARTED"
-    | "STREAK_UPDATED"
-    | "POINTS_EARNED";
-  metadata?: {
-    score?: number;
-    timeSpent?: number;
-    streak?: number;
-    points?: number;
-    difficulty?: string;
-    mood?: MoodId;
-    tutorialId?: string;
-  };
+  action: AchievementAction;
+  metadata?: AchievementMetadata;
 }
 
 export class AchievementService {

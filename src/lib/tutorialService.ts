@@ -39,7 +39,7 @@ export class TutorialService {
   /**
    * Get all published tutorials with their quizzes
    */
-  static async getAllTutorials(): Promise<TutorialWithQuiz[]> {
+  static async getAllTutorials(limit?: number, offset?: number): Promise<TutorialWithQuiz[]> {
     try {
       const tutorials = await prisma.tutorial.findMany({
         where: {
@@ -51,6 +51,8 @@ export class TutorialService {
         orderBy: {
           order: "asc",
         },
+        take: limit,
+        skip: offset,
       });
 
     return tutorials.map((tutorial) => ({
@@ -204,7 +206,7 @@ export class TutorialService {
   /**
    * Get tutorials by category
    */
-  static async getTutorialsByCategory(category: string): Promise<TutorialWithQuiz[]> {
+  static async getTutorialsByCategory(category: string, limit?: number, offset?: number): Promise<TutorialWithQuiz[]> {
     const tutorials = await prisma.tutorial.findMany({
       where: {
         published: true,
@@ -216,6 +218,8 @@ export class TutorialService {
       orderBy: {
         order: "asc",
       },
+      take: limit,
+      skip: offset,
     });
 
     return tutorials.map((tutorial) => ({
@@ -289,7 +293,7 @@ export class TutorialService {
   /**
    * Search tutorials by title or description
    */
-  static async searchTutorials(query: string): Promise<TutorialWithQuiz[]> {
+  static async searchTutorials(query: string, limit?: number, offset?: number): Promise<TutorialWithQuiz[]> {
     const tutorials = await prisma.tutorial.findMany({
       where: {
         published: true,
@@ -312,6 +316,8 @@ export class TutorialService {
       orderBy: {
         order: "asc",
       },
+      take: limit,
+      skip: offset,
     });
 
     return tutorials.map((tutorial) => ({
@@ -341,5 +347,32 @@ export class TutorialService {
           }
         : undefined,
     }));
+  }
+
+  /**
+   * Get total count of tutorials based on filters
+   */
+  static async getTutorialsCount(filters?: { 
+    category?: string; 
+    search?: string 
+  }): Promise<number> {
+    const where: {
+      published: boolean;
+      category?: string;
+      OR?: Array<{ title?: { contains: string }; description?: { contains: string } }>;
+    } = { published: true };
+    
+    if (filters?.category) {
+      where.category = filters.category;
+    }
+    
+    if (filters?.search) {
+      where.OR = [
+        { title: { contains: filters.search } },
+        { description: { contains: filters.search } },
+      ];
+    }
+    
+    return await prisma.tutorial.count({ where });
   }
 }

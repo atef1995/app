@@ -1,6 +1,6 @@
 "use client";
 
-import { ProjectWithDetails } from "@/lib/projectService";
+import { ProjectWithDetails } from "@/types/project";
 import { useMood } from "@/components/providers/MoodProvider";
 import { 
   Clock, 
@@ -9,7 +9,6 @@ import {
   Code, 
   Link as LinkIcon, 
   FileText,
-  Star,
   CheckCircle,
   AlertCircle,
   BookOpen 

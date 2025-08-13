@@ -7,6 +7,11 @@ export async function GET(request: NextRequest) {
     const id = searchParams.get("id");
     const slug = searchParams.get("slug");
     const search = searchParams.get("search");
+    
+    // Pagination parameters
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "10", 10);
+    const offset = (page - 1) * limit;
 
     // Get specific tutorial by ID
     if (id) {
@@ -40,13 +45,35 @@ export async function GET(request: NextRequest) {
 
     // Search tutorials
     if (search) {
-      const tutorials = await TutorialService.searchTutorials(search);
-      return NextResponse.json({ success: true, data: tutorials });
+      const tutorials = await TutorialService.searchTutorials(search, limit, offset);
+      const totalCount = await TutorialService.getTutorialsCount({ search });
+      return NextResponse.json({
+        success: true,
+        data: tutorials,
+        pagination: {
+          page,
+          limit,
+          totalCount,
+          totalPages: Math.ceil(totalCount / limit),
+          hasMore: offset + limit < totalCount,
+        },
+      });
     }
 
-    // Get all tutorials
-    const tutorials = await TutorialService.getAllTutorials();
-    return NextResponse.json({ success: true, data: tutorials });
+    // Get all tutorials with pagination
+    const tutorials = await TutorialService.getAllTutorials(limit, offset);
+    const totalCount = await TutorialService.getTutorialsCount();
+    return NextResponse.json({
+      success: true,
+      data: tutorials,
+      pagination: {
+        page,
+        limit,
+        totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        hasMore: offset + limit < totalCount,
+      },
+    });
   } catch (error) {
     console.error("Error fetching tutorials:", error);
     return NextResponse.json(

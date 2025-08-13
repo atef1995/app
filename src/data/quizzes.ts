@@ -1,4 +1,3 @@
-import { title } from "process";
 
 // Quiz data for tutorial 1: Variables and Data Types
 export const quiz1 = {

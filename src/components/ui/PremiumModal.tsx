@@ -10,7 +10,7 @@ interface PremiumModalProps {
   isOpen: boolean;
   onClose: () => void;
   requiredPlan?: "VIBED" | "CRACKED";
-  contentType?: "tutorial" | "challenge" | "quiz";
+  contentType?: "tutorial" | "challenge" | "quiz" | "project";
   contentTitle?: string;
 }
 

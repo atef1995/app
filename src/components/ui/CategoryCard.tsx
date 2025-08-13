@@ -3,7 +3,6 @@ import {
   BookOpen, 
   Users, 
   Clock, 
-  TrendingUp,
   ChevronRight,
   Layers,
   Zap,

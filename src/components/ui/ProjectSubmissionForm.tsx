@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { ProjectWithDetails, ProjectSubmissionWithDetails } from "@/lib/projectService";
+import { ProjectWithDetails, ProjectSubmissionWithDetails } from "@/types/project";
 import { useSubmitProject } from "@/hooks/useProjectQueries";
 import { useMood } from "@/components/providers/MoodProvider";
 import { 
@@ -10,7 +10,6 @@ import {
   Send, 
   Code, 
   Link as LinkIcon, 
-  FileText,
   AlertCircle,
   CheckCircle,
   Clock,

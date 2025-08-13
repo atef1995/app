@@ -14,8 +14,6 @@ import {
   ArrowLeft,
   Clock,
   Users,
-  Star,
-  CheckCircle,
   AlertCircle,
   Code,
   Link as LinkIcon,
@@ -66,7 +64,7 @@ export default function ProjectPage() {
               Project Not Found
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              The project you're looking for doesn't exist or has been removed.
+              The project you&apos;re looking for doesn&apos;t exist or has been removed.
             </p>
             <Link
               href="/projects"
