@@ -1,9 +1,13 @@
 # *
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /api
+Disallow: /auth
+Disallow: /payment
 
 # Host
-Host: https://www.vibed-to-cracked.com
+Host: http://localhost:3000
 
 # Sitemaps
-Sitemap: https://www.vibed-to-cracked.com/sitemap.xml
+Sitemap: http://localhost:3000/sitemap.xml
