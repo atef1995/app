@@ -7,6 +7,7 @@ import { useToastContext } from "@/components/providers/ToastProvider";
 import { startTutorialAction } from "@/lib/actions";
 import Link from "next/link";
 import InteractiveCodeBlock from "@/components/InteractiveCodeBlock";
+import { DOMInteractiveBlock } from "@/components/ui/DOMInteractiveBlock";
 import TableOfContents from "@/components/TableOfContents";
 import { MDXRemote } from "next-mdx-remote";
 import { useTutorial, type TutorialData } from "@/hooks/useTutorial";
@@ -296,6 +297,7 @@ export default function TutorialClient({ slug }: TutorialClientProps) {
                   {...tutorial.mdxSource}
                   components={{
                     InteractiveCodeBlock,
+                    DOMInteractiveBlock,
                     // Use custom heading components with anchor IDs
                     h1: createHeadingComponent(1),
                     h2: createHeadingComponent(2),

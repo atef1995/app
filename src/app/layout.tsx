@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { ToastProvider } from "@/components/providers/ToastProvider";
 import { Header } from "@/components/Header";
+import { LiveMoodFeedback } from "@/components/ui/LiveMoodFeedback";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -41,6 +42,7 @@ export default function RootLayout({
                 <ToastProvider>
                   <Header />
                   <main>{children}</main>
+                  <LiveMoodFeedback />
                 </ToastProvider>
               </MoodProvider>
             </AuthProvider>

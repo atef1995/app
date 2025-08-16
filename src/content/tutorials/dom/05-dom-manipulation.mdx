@@ -6,136 +6,163 @@ The **Document Object Model (DOM)** is a programming interface for HTML and XML 
 
 To manipulate anything in the DOM, you first need to select it.
 
-<InteractiveCodeBlock
+<DOMInteractiveBlock
   title="Selecting Elements"
   description="Use `getElementById`, `querySelector`, or `getElementsByClassName` to select elements:"
->
-  {`const title = document.getElementById("main-title");
-  const firstButton = document.querySelector("button");
-  const allItems = document.getElementsByClassName("item");
+  javascript={`const title = document.getElementById("main-title");
+const firstButton = document.querySelector("button");
+const allItems = document.getElementsByClassName("item");
 
-  console.log(title, firstButton, allItems);`}
-</InteractiveCodeBlock>
+console.log(title, firstButton, allItems);
+console.log("Check the browser console to see the selected elements!");`}
+  html={`<h1 id="main-title">Welcome to DOM Manipulation</h1>
+<button>First Button</button>
+<button>Second Button</button>
+<div class="item">Item 1</div>
+<div class="item">Item 2</div>
+<div class="item">Item 3</div>`}
+/>
 
 ## 2. Changing Text Content
 
 Once you have an element, you can change its content using `.textContent` or `.innerHTML`.
 
-<InteractiveCodeBlock
+<DOMInteractiveBlock
   title="Change Text Content"
   description="Set new text using `.textContent`:"
->
-{`const heading = document.querySelector("h1");
-  heading.textContent = "DOM is Powerful!";`}
-</InteractiveCodeBlock>
+  javascript={`const heading = document.querySelector("h1");
+heading.textContent = "DOM is Powerful!";`}
+  html={`<h1>Original Heading</h1>
+<p>This heading will change when you run the code!</p>`}
+/>
 
-<InteractiveCodeBlock
+<DOMInteractiveBlock
   title="Change HTML Content"
   description="Use `.innerHTML` to inject HTML:"
->
-{`
-  const paragraph = document.querySelector("#intro");
-  paragraph.innerHTML = "Updated <strong>HTML</strong> content.";
-`}
-</InteractiveCodeBlock>
+  javascript={`const paragraph = document.querySelector("#intro");
+paragraph.innerHTML = "Updated <strong>HTML</strong> content with <em>formatting</em>!";`}
+  html={`<p id="intro">Original paragraph content.</p>
+<p>Watch the paragraph above change with HTML formatting!</p>`}
+/>
 
 ## 3. Changing Styles Dynamically
 
-Manipulate an element’s style directly using the `.style` property.
+Manipulate an element's style directly using the `.style` property.
 
-<InteractiveCodeBlock
+<DOMInteractiveBlock
   title="Change Style"
   description="Set inline styles dynamically:"
->
-{`
-  const box = document.querySelector(".box");
-  box.style.backgroundColor = "skyblue";
-  box.style.border = "2px solid navy";
-`}
-</InteractiveCodeBlock>
+  javascript={`const box = document.querySelector(".box");
+box.style.backgroundColor = "skyblue";
+box.style.border = "2px solid navy";
+box.style.transform = "rotate(15deg)";
+box.style.transition = "all 0.3s ease";`}
+  html={`<div class="box"></div>
+<p>The blue box above will change style when you run the code!</p>`}
+/>
 
 ## 4. Adding and Removing Classes
 
 Use `classList` to toggle, add, or remove classes without touching raw class strings.
 
-<InteractiveCodeBlock
+<DOMInteractiveBlock
   title="Add/Remove Classes"
   description="Use `classList` to modify CSS classes:"
->
-{`
-  const element = document.querySelector(".message");
-  element.classList.add("visible");
-  element.classList.remove("hidden");
-  element.classList.toggle("highlighted");
-`}
-</InteractiveCodeBlock>
+  javascript={`const element = document.querySelector(".message");
+element.classList.add("visible");
+element.classList.remove("hidden");
+element.classList.toggle("highlighted");`}
+  html={`<div class="message hidden">This message starts hidden</div>
+<p>The message above will become visible and highlighted!</p>`}
+/>
 
 ## 5. Creating and Inserting Elements
 
 JavaScript lets you create new elements and insert them into the DOM.
 
-<InteractiveCodeBlock
+<DOMInteractiveBlock
   title="Create and Append Element"
   description="Use `createElement` and `appendChild`:"
->
-{`
-  const newDiv = document.createElement("div");
-  newDiv.textContent = "I was added with JS!";
-  newDiv.className = "new-box";
+  javascript={`const newDiv = document.createElement("div");
+newDiv.textContent = "I was added with JavaScript!";
+newDiv.className = "new-box";
 
-  const container = document.querySelector("#container");
-  container.appendChild(newDiv);
-`}
-</InteractiveCodeBlock>
+const container = document.querySelector("#container");
+container.appendChild(newDiv);`}
+  html={`<div id="container">
+  <p>Container - new elements will appear below:</p>
+</div>`}
+/>
 
 ## 6. Removing Elements
 
 You can remove any element from the DOM using `.remove()`.
 
-<InteractiveCodeBlock
+<DOMInteractiveBlock
   title="Remove Element"
   description="Call `.remove()` on the element you want to delete:"
->
-{`
-  const unwanted = document.querySelector(".ad-banner");
-  unwanted.remove();
-`}
-</InteractiveCodeBlock>
+  javascript={`const unwanted = document.querySelector(".ad-banner");
+unwanted.remove();`}
+  html={`<div class="ad-banner" style="background: #ffcccc; padding: 12px; margin: 8px 0; border: 1px solid #ff9999;">
+  🚫 Annoying Ad Banner - Click run to remove me!
+</div>
+<p>The ad banner above will disappear when you run the code!</p>`}
+/>
 
 ## 7. Handling Events
 
 Events let you make pages interactive. Attach event listeners using `.addEventListener`.
 
-<InteractiveCodeBlock
+<DOMInteractiveBlock
   title="Add Event Listener"
   description="Listen for a click event on a button:"
->
-{`
-  const button = document.querySelector("#clickMe");
+  javascript={`const button = document.querySelector("#clickMe");
+const counter = document.querySelector("#counter");
+let clicks = 0;
 
-  button.addEventListener("click", function () {
-    alert("Button was clicked!");
-  });
-`}
-</InteractiveCodeBlock>
+button.addEventListener("click", function () {
+  clicks++;
+  counter.textContent = clicks;
+  if (clicks === 1) {
+    button.textContent = "Click me again!";
+  } else {
+    button.textContent = \`Clicked \${clicks} times!\`;
+  }
+});`}
+  html={`<button id="clickMe">Click me!</button>
+<p>Clicks: <span id="counter">0</span></p>`}
+/>
 
 ## 8. Combining All Together
 
 You can combine multiple DOM operations to build dynamic behavior.
 
-<InteractiveCodeBlock
+<DOMInteractiveBlock
   title="Full Example: Toggle Visibility"
   description="Show/hide a box when a button is clicked:"
->
-{`
-  const button = document.querySelector("#toggleBtn");
-  const box = document.querySelector("#box");
+  javascript={`const button = document.querySelector("#toggleBtn");
+const box = document.querySelector("#box");
+const status = document.querySelector("#status");
 
-  button.addEventListener("click", () => {
-    box.classList.toggle("hidden");
-  });
-`}
-</InteractiveCodeBlock>
+button.addEventListener("click", () => {
+  box.classList.toggle("hidden");
+  
+  if (box.classList.contains("hidden")) {
+    button.textContent = "Show Box";
+    status.textContent = "Box is hidden";
+    status.style.color = "#dc2626";
+  } else {
+    button.textContent = "Hide Box";
+    status.textContent = "Box is visible";
+    status.style.color = "#16a34a";
+  }
+});`}
+  html={`<button id="toggleBtn">Hide Box</button>
+<p>Status: <span id="status" style="color: #16a34a;">Box is visible</span></p>
+<div id="box" class="box" style="background: linear-gradient(45deg, #3b82f6, #8b5cf6); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+  Click the button to toggle me!
+</div>`}
+/>
 
 ---
 

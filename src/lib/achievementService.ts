@@ -241,8 +241,8 @@ export class AchievementService {
         where: { userId },
       });
 
-      // Only share if user has social sharing enabled
-      if (userSettings?.shareProgress) {
+      // Only share if user has social sharing enabled (default: enabled)
+      if (!userSettings || userSettings.shareProgress !== false) {
         await prisma.progressShare.create({
           data: {
             userId,

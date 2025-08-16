@@ -2,16 +2,16 @@
 
 import { ProjectWithDetails } from "@/types/project";
 import { useMood } from "@/components/providers/MoodProvider";
-import { 
-  Clock, 
-  Users, 
-  Trophy, 
-  Code, 
-  Link as LinkIcon, 
+import {
+  Clock,
+  Users,
+  Trophy,
+  Code,
+  Link as LinkIcon,
   FileText,
   CheckCircle,
   AlertCircle,
-  BookOpen 
+  BookOpen,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -99,17 +99,17 @@ const getStatusIcon = (status?: string) => {
   }
 };
 
-export default function ProjectCard({ 
-  project, 
-  userProgress, 
+export default function ProjectCard({
+  project,
+  userProgress,
   className = "",
-  showCategory = true 
+  showCategory = true,
 }: ProjectCardProps) {
   const { currentMood } = useMood();
-  
+
   const SubmissionIcon = getSubmissionTypeIcon(project.submissionType);
   const StatusIcon = getStatusIcon(userProgress?.submissionStatus);
-  
+
   const getMoodColors = () => {
     switch (currentMood.id) {
       case "rush":
@@ -120,14 +120,14 @@ export default function ProjectCard({
         };
       case "grind":
         return {
-          border: "border-blue-200 dark:border-blue-800", 
+          border: "border-blue-200 dark:border-blue-800",
           hover: "hover:border-blue-300 dark:hover:border-blue-600",
           accent: "text-blue-600 dark:text-blue-400",
         };
       default:
         return {
           border: "border-purple-200 dark:border-purple-800",
-          hover: "hover:border-purple-300 dark:hover:border-purple-600", 
+          hover: "hover:border-purple-300 dark:hover:border-purple-600",
           accent: "text-purple-600 dark:text-purple-400",
         };
     }
@@ -137,13 +137,15 @@ export default function ProjectCard({
 
   return (
     <Link href={`/projects/${project.slug}`}>
-      <div className={`
+      <div
+        className={`
         bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-xl
         border-2 ${moodColors.border} ${moodColors.hover}
         transition-all duration-300 hover:shadow-xl dark:hover:shadow-2xl
         cursor-pointer h-full flex flex-col
         ${className}
-      `}>
+      `}
+      >
         {/* Header */}
         <div className="p-6 pb-4">
           <div className="flex items-start justify-between mb-4">
@@ -154,7 +156,11 @@ export default function ProjectCard({
                     {project.category}
                   </span>
                 )}
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${getDifficultyColor(project.difficulty)} bg-gray-100 dark:bg-gray-700`}>
+                <span
+                  className={`text-xs px-2 py-1 rounded-full font-medium ${getDifficultyColor(
+                    project.difficulty
+                  )} bg-gray-100 dark:bg-gray-700`}
+                >
                   {getDifficultyLabel(project.difficulty)}
                 </span>
               </div>
@@ -165,14 +171,20 @@ export default function ProjectCard({
                 {project.description}
               </p>
             </div>
-            
+
             {/* Project Status */}
             {userProgress?.hasSubmission && (
               <div className="ml-4 flex flex-col items-end">
                 <div className="flex items-center gap-1 mb-1">
                   <StatusIcon className="w-4 h-4" />
-                  <span className={`text-xs font-medium ${getStatusColor(userProgress.submissionStatus)}`}>
-                    {userProgress.submissionStatus?.replace(/_/g, ' ').toLowerCase()}
+                  <span
+                    className={`text-xs font-medium ${getStatusColor(
+                      userProgress.submissionStatus
+                    )}`}
+                  >
+                    {userProgress.submissionStatus
+                      ?.replace(/_/g, " ")
+                      .toLowerCase()}
                   </span>
                 </div>
                 {userProgress.grade && (
@@ -240,7 +252,7 @@ export default function ProjectCard({
                   {project.requiredPlan}
                 </span>
               )}
-              
+
               {userProgress?.hasSubmission ? (
                 <span className={`text-xs font-medium ${moodColors.accent}`}>
                   View Progress

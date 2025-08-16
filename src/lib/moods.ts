@@ -39,7 +39,7 @@ export const MOODS: Record<string, MoodConfig> = {
     },
     quizSettings: {
       timeLimit: undefined, // no time limit
-      questionsPerTutorial: 3,
+      questionsPerTutorial: 6,
       difficulty: "easy",
     },
     features: {
@@ -62,7 +62,7 @@ export const MOODS: Record<string, MoodConfig> = {
     },
     quizSettings: {
       timeLimit: 30, // 30 seconds per question
-      questionsPerTutorial: 5,
+      questionsPerTutorial: 6,
       difficulty: "medium",
     },
     features: {
@@ -85,7 +85,7 @@ export const MOODS: Record<string, MoodConfig> = {
     },
     quizSettings: {
       timeLimit: 15, // 15 seconds per question
-      questionsPerTutorial: 7,
+      questionsPerTutorial: 9,
       difficulty: "hard",
     },
     features: {

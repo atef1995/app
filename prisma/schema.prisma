@@ -43,6 +43,7 @@ model User {
   email                  String              @unique
   emailVerified          DateTime?
   image                  String?
+  role                   String              @default("USER")
   mood                   String              @default("CHILL")
   subscription           String              @default("FREE")
   subscriptionStatus     String              @default("INACTIVE")
@@ -53,6 +54,7 @@ model User {
   accounts               Account[]
   challengeAttempts      ChallengeAttempt[]
   challengeProgress      ChallengeProgress[]
+  challengeCodeProgress  ChallengeCodeProgress[]
   friendRequestsReceived FriendRequest[]     @relation("FriendRequestReceiver")
   friendRequestsSent     FriendRequest[]     @relation("FriendRequestSender")
   friendships1           Friendship[]        @relation("User1")
@@ -231,6 +233,7 @@ model Challenge {
   attempts          ChallengeAttempt[]
   moodAdaptations   ChallengeMoodAdaptation[]
   challengeProgress ChallengeProgress[]
+  codeProgress      ChallengeCodeProgress[]
   tests             ChallengeTest[]
 
   @@map("challenges")
@@ -272,6 +275,21 @@ model ChallengeAttempt {
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("challenge_attempts")
+}
+
+model ChallengeCodeProgress {
+  id           String   @id @default(cuid())
+  userId       String
+  challengeId  String
+  code         String
+  lastModified DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  challenge    Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, challengeId])
+  @@map("challenge_code_progress")
 }
 
 model Payment {
@@ -321,6 +339,7 @@ model UserSettings {
   allowAnalytics           Boolean  @default(true)
   dailyGoalMinutes         Int      @default(30)
   reminderTime             String   @default("18:00")
+  timezone                 String   @default("UTC")
   difficulty               String   @default("MEDIUM")
   autoSubmit               Boolean  @default(false)
   createdAt                DateTime @default(now())

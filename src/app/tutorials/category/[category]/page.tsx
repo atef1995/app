@@ -93,6 +93,18 @@ const categoryMetadata = {
     badgeColor: "text-red-800 dark:text-red-200",
     dotColor: "bg-red-600",
   },
+  "data-structures": {
+    title: "Data Structures & Algorithms",
+    description: "Master fundamental data structures and algorithms in JavaScript",
+    difficulty: "intermediate" as const,
+    topics: ["Arrays", "Objects", "Sets", "Maps", "Algorithms"],
+    duration: "4-6 hours",
+    iconBg: "bg-indigo-100 dark:bg-indigo-900",
+    iconColor: "text-indigo-600 dark:text-indigo-400",
+    badgeBg: "bg-indigo-100 dark:bg-indigo-900",
+    badgeColor: "text-indigo-800 dark:text-indigo-200",
+    dotColor: "bg-indigo-600",
+  },
 };
 
 export default function CategoryPage() {

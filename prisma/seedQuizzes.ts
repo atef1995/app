@@ -18,7 +18,7 @@ async function main() {
       difficulty: 3,
       order: 5,
       published: true,
-      mdxFile: "05-dom-manipulation",
+      mdxFile: "dom/05-dom-manipulation",
     },
   ];
 

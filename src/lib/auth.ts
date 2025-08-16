@@ -3,6 +3,7 @@ import GitHubProvider from "next-auth/providers/github";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import { generateUniqueUsername } from "@/lib/username";
+import { emailService } from "@/lib/services/emailService";
 import type { NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
@@ -23,13 +24,14 @@ export const authOptions: NextAuthOptions = {
       try {
         if (session?.user && user) {
           session.user.id = user.id;
-          // Add mood to session
+          // Add mood, subscription, and role to session
           const dbUser = await prisma.user.findUnique({
             where: { id: user.id },
-            select: { mood: true, subscription: true, username: true },
+            select: { mood: true, subscription: true, username: true, role: true },
           });
           session.user.mood = dbUser?.mood || "CHILL";
           session.user.subscription = dbUser?.subscription || "FREE";
+          session.user.role = dbUser?.role || "USER";
 
           // Ensure user has a username, generate if missing
           if (!dbUser?.username) {
@@ -83,6 +85,18 @@ export const authOptions: NextAuthOptions = {
           console.log(
             `Generated username "${newUsername}" for new user ${user.email}`
           );
+          
+          // Get the updated user data for welcome email
+          const fullUser = await prisma.user.findUnique({
+            where: { id: user.id },
+          });
+          
+          if (fullUser) {
+            // Send welcome email asynchronously
+            emailService.sendWelcomeEmail(fullUser).catch((error) => {
+              console.error("Failed to send welcome email:", error);
+            });
+          }
         } catch (error) {
           console.error("Failed to generate username for new user:", error);
         }

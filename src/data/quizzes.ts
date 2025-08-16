@@ -1,4 +1,3 @@
-
 // Quiz data for tutorial 1: Variables and Data Types
 export const quiz1 = {
   id: 1,
@@ -248,9 +247,7 @@ export const quiz3 = {
 };
 
 const domManipulationQuiz = {
-  id: 5,
-  tutorialId: 5,
-  title: "DOM Manipulation with JavaScript",
+  title: "DOM Manipulation Quiz",
   questions: [
     {
       id: 1,
@@ -389,6 +386,221 @@ const domManipulationQuiz = {
       explanation:
         "`querySelector()` returns the first element that matches a given CSS selector. `querySelectorAll()` returns a list.",
       difficulty: "medium",
+    },
+    {
+      id: 11,
+      question:
+        "What is the difference between `parentNode` and `parentElement`?",
+      options: [
+        "They are exactly the same",
+        "`parentNode` can return document nodes, `parentElement` only returns element nodes",
+        "`parentElement` can return document nodes, `parentNode` only returns element nodes",
+        "`parentNode` is deprecated, use `parentElement` instead",
+      ],
+      correct: 1,
+      explanation:
+        "`parentNode` can return any type of node (including document nodes), while `parentElement` only returns element nodes or null.",
+      difficulty: "medium",
+    },
+    {
+      id: 12,
+      question:
+        "How do you efficiently add multiple elements to the DOM at once?",
+      options: [
+        "Use multiple `appendChild()` calls",
+        "Use `DocumentFragment` to batch append operations",
+        "Use `innerHTML` with concatenated strings",
+        "Use `insertAdjacentHTML()` multiple times",
+      ],
+      correct: 1,
+      explanation:
+        "`DocumentFragment` allows you to build DOM structure in memory and append it all at once, minimizing reflows and improving performance.",
+      difficulty: "hard",
+    },
+    {
+      id: 13,
+      question: "What does `event.preventDefault()` do in an event handler?",
+      options: [
+        "Stops the event from bubbling up to parent elements",
+        "Cancels the default action associated with the event",
+        "Removes the event listener",
+        "Prevents the event from being triggered again",
+      ],
+      correct: 1,
+      explanation:
+        "`preventDefault()` cancels the default browser behavior for an event (like form submission or link navigation) but doesn't stop event propagation.",
+      difficulty: "medium",
+    },
+    {
+      id: 14,
+      question: "What is event delegation and why is it useful?",
+      options: [
+        "Adding event listeners to each individual element",
+        "Using a single event listener on a parent to handle events from child elements",
+        "Preventing events from bubbling up the DOM tree",
+        "Creating custom events for specific elements",
+      ],
+      correct: 1,
+      explanation:
+        "Event delegation uses event bubbling to handle events from child elements with a single listener on their parent, improving performance and handling dynamic content.",
+      difficulty: "hard",
+    },
+    {
+      id: 15,
+      question:
+        "Which method allows you to insert HTML at a specific position relative to an element?",
+      options: [
+        "insertBefore()",
+        "appendChild()",
+        "insertAdjacentHTML()",
+        "replaceChild()",
+      ],
+      correct: 2,
+      explanation:
+        "`insertAdjacentHTML()` can insert HTML at four positions: 'beforebegin', 'afterbegin', 'beforeend', and 'afterend' relative to the target element.",
+      difficulty: "medium",
+    },
+    {
+      id: 16,
+      question:
+        "What happens if you try to access a DOM element before the page finishes loading?",
+      options: [
+        "The element will always be null or undefined",
+        "JavaScript will throw a syntax error",
+        "The browser will wait automatically",
+        "The element might be null if it hasn't been parsed yet",
+      ],
+      correct: 3,
+      explanation:
+        "If you try to access a DOM element before it's been parsed by the browser, it will be null. This is why we use events like 'DOMContentLoaded' or place scripts at the end of the body.",
+      difficulty: "medium",
+    },
+    {
+      id: 17,
+      question:
+        "Which property gives you the actual visible width of an element including padding but excluding borders?",
+      options: [
+        "offsetWidth",
+        "clientWidth",
+        "scrollWidth",
+        "getBoundingClientRect().width",
+      ],
+      correct: 1,
+      explanation:
+        "`clientWidth` returns the inner width including padding but excluding borders and scrollbars. `offsetWidth` includes borders, `scrollWidth` includes overflow content.",
+      difficulty: "hard",
+    },
+    {
+      id: 18,
+      question: "How do you clone a DOM element and all its children?",
+      options: [
+        "element.clone(true)",
+        "element.cloneNode(true)",
+        "element.copy()",
+        "element.duplicate(true)",
+      ],
+      correct: 1,
+      explanation:
+        "`cloneNode(true)` creates a deep copy of the element including all its children. `cloneNode(false)` or `cloneNode()` only clones the element itself.",
+      difficulty: "medium",
+    },
+    {
+      id: 19,
+      question: "What is the difference between `textContent` and `innerText`?",
+      options: [
+        "They are exactly the same",
+        "`textContent` gets all text including hidden elements, `innerText` respects styling",
+        "`innerText` gets all text including hidden elements, `textContent` respects styling",
+        "`textContent` is faster, `innerText` is more accurate",
+      ],
+      correct: 1,
+      explanation:
+        "`textContent` gets all text content regardless of CSS visibility, while `innerText` respects styling and won't include text from hidden elements.",
+      difficulty: "hard",
+    },
+    {
+      id: 20,
+      question:
+        "Which event fires when the user starts typing in an input field?",
+      options: ["onChange", "onInput", "onKeyPress", "onFocus"],
+      correct: 1,
+      explanation:
+        "The `input` event fires immediately when the input value changes, while `change` only fires when the input loses focus. `input` is better for real-time validation.",
+      difficulty: "medium",
+    },
+    {
+      id: 21,
+      question:
+        "How do you properly remove an event listener that was added with `addEventListener`?",
+      options: [
+        "element.removeEventListener('click')",
+        "element.removeEventListener('click', functionReference)",
+        "element.addEventListener('click', null)",
+        "delete element.onclick",
+      ],
+      correct: 1,
+      explanation:
+        "`removeEventListener()` requires the exact same function reference that was used in `addEventListener()`. Anonymous functions cannot be removed this way.",
+      difficulty: "medium",
+    },
+    {
+      id: 22,
+      question: "What does `document.createDocumentFragment()` create?",
+      options: [
+        "A new HTML document",
+        "A lightweight container for DOM nodes that exists in memory only",
+        "A copy of the current document",
+        "A template for reusable HTML structure",
+      ],
+      correct: 1,
+      explanation:
+        "DocumentFragment is a lightweight container that holds DOM nodes in memory. It's not part of the main DOM tree, making it ideal for building structures before adding them to the document.",
+      difficulty: "hard",
+    },
+    {
+      id: 23,
+      question:
+        "Which method is best for setting multiple CSS properties at once?",
+      options: [
+        "element.style.cssText = 'color: red; font-size: 16px;'",
+        "element.setAttribute('style', 'color: red; font-size: 16px;')",
+        "element.style.setProperty() multiple times",
+        "All of the above work equally well",
+      ],
+      correct: 0,
+      explanation:
+        "`style.cssText` is the most efficient way to set multiple CSS properties at once, as it requires only one DOM operation instead of multiple property assignments.",
+      difficulty: "hard",
+    },
+    {
+      id: 24,
+      question:
+        "What happens when you set `element.innerHTML` to include script tags?",
+      options: [
+        "The scripts will execute immediately",
+        "The scripts will not execute for security reasons",
+        "The scripts will execute only if they're inline",
+        "The scripts will execute only if they're external",
+      ],
+      correct: 1,
+      explanation:
+        "For security reasons, script tags inserted via `innerHTML` will not execute. Use `createElement()` and `appendChild()` if you need to add executable scripts dynamically.",
+      difficulty: "hard",
+    },
+    {
+      id: 25,
+      question:
+        "How do you check if an element has a specific CSS class without using external libraries?",
+      options: [
+        "element.className.includes('className')",
+        "element.classList.contains('className')",
+        "element.hasClass('className')",
+        "element.style.className === 'className'",
+      ],
+      correct: 1,
+      explanation:
+        "`classList.contains()` is the most reliable method to check for a class. Using `className.includes()` can give false positives for partial class name matches.",
+      difficulty: "easy",
     },
   ],
 };

@@ -3,6 +3,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { ProgressService } from "@/lib/progressService";
+import { prisma } from "@/lib/prisma";
 
 interface QuizSubmissionResult {
   success: boolean;
@@ -102,10 +103,29 @@ export async function submitQuizAction(
       };
     }
 
+    // Find the quiz by tutorial ID to get the correct quiz ID
+    const quiz = await prisma.quiz.findFirst({
+      where: { tutorialId },
+      select: { id: true }
+    });
+
+    if (!quiz) {
+      return {
+        success: false,
+        achievements: [],
+        score: 0,
+        passed: false,
+        correctAnswers: 0,
+        totalQuestions: 0,
+        error: "Quiz not found for this tutorial",
+      };
+    }
+
     const result = await ProgressService.submitQuizAttempt(
       session.user.id,
       {
         tutorialId,
+        quizId: quiz.id, // Pass the actual quiz ID
         answers,
         timeSpent: timeSpent || 0,
         ChallengeMoodAdaptation: {

@@ -15,7 +15,7 @@ export async function GET() {
       );
     }
 
-    // Get user basic info
+    // Get user basic info and settings
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
       select: {
@@ -23,6 +23,7 @@ export async function GET() {
         name: true,
         email: true,
         mood: true,
+        userSettings: true,
       },
     });
 
@@ -33,26 +34,26 @@ export async function GET() {
       );
     }
 
-    // For now, return default settings based on user's current mood
-    // TODO: Replace with actual UserSettings table data
+    // Use actual settings from database or defaults
+    const userSettings = user.userSettings;
     const settings = {
       preferredMood: user.mood.toLowerCase(),
       notifications: {
-        email: true,
-        reminders: true,
-        achievements: true,
-        weeklyProgress: false,
+        email: userSettings?.emailNotifications ?? true,
+        reminders: userSettings?.reminderNotifications ?? true,
+        achievements: userSettings?.achievementNotifications ?? true,
+        weeklyProgress: userSettings?.weeklyProgressReports ?? false,
       },
       privacy: {
-        showProfile: true,
-        shareProgress: false,
-        allowAnalytics: true,
+        showProfile: userSettings?.showPublicProfile ?? true,
+        shareProgress: userSettings?.shareProgress ?? true,
+        allowAnalytics: userSettings?.allowAnalytics ?? true,
       },
       learning: {
-        dailyGoal: 30,
-        reminderTime: "18:00",
-        difficulty: "medium",
-        autoSubmit: false,
+        dailyGoal: userSettings?.dailyGoalMinutes ?? 30,
+        reminderTime: userSettings?.reminderTime ?? "18:00",
+        difficulty: userSettings?.difficulty?.toLowerCase() ?? "medium",
+        autoSubmit: userSettings?.autoSubmit ?? false,
       },
     };
 
@@ -82,9 +83,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, preferredMood } = body;
-    // TODO: Extract other settings when UserSettings model is fully integrated
-    // const { notifications, privacy, learning } = body;
+    const { name, preferredMood, notifications, privacy, learning } = body;
 
     // Validate the settings data
     if (!name || typeof name !== "string") {
@@ -94,18 +93,61 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // Get user ID first
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: "User not found" },
+        { status: 404 }
+      );
+    }
+
     // Update user's basic info (name and mood)
     const updatedUser = await prisma.user.update({
       where: { email: session.user.email },
       data: {
         name: name.trim(),
         mood: preferredMood?.toUpperCase() || "CHILL",
-        // TODO: Add other settings to UserSettings table
       },
     });
 
-    // TODO: Store other settings in a separate UserSettings table
-    // For now, we'll just acknowledge the update
+    // Update or create user settings
+    await prisma.userSettings.upsert({
+      where: {
+        userId: user.id,
+      },
+      update: {
+        emailNotifications: notifications?.email ?? true,
+        reminderNotifications: notifications?.reminders ?? true,
+        achievementNotifications: notifications?.achievements ?? true,
+        weeklyProgressReports: notifications?.weeklyProgress ?? false,
+        showPublicProfile: privacy?.showProfile ?? true,
+        shareProgress: privacy?.shareProgress ?? true,
+        allowAnalytics: privacy?.allowAnalytics ?? true,
+        dailyGoalMinutes: learning?.dailyGoal ?? 30,
+        reminderTime: learning?.reminderTime ?? "18:00",
+        difficulty: learning?.difficulty?.toUpperCase() ?? "MEDIUM",
+        autoSubmit: learning?.autoSubmit ?? false,
+      },
+      create: {
+        userId: user.id,
+        emailNotifications: notifications?.email ?? true,
+        reminderNotifications: notifications?.reminders ?? true,
+        achievementNotifications: notifications?.achievements ?? true,
+        weeklyProgressReports: notifications?.weeklyProgress ?? false,
+        showPublicProfile: privacy?.showProfile ?? true,
+        shareProgress: privacy?.shareProgress ?? true,
+        allowAnalytics: privacy?.allowAnalytics ?? true,
+        dailyGoalMinutes: learning?.dailyGoal ?? 30,
+        reminderTime: learning?.reminderTime ?? "18:00",
+        difficulty: learning?.difficulty?.toUpperCase() ?? "MEDIUM",
+        autoSubmit: learning?.autoSubmit ?? false,
+      },
+    });
 
     return NextResponse.json({
       success: true,

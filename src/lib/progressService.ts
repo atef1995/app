@@ -14,6 +14,7 @@ export enum CompletionStatus {
 
 export interface QuizSubmission {
   tutorialId: string;
+  quizId: string;
   answers: number[];
   timeSpent: number;
   ChallengeMoodAdaptation: ChallengeMoodAdaptation;
@@ -29,7 +30,13 @@ export interface ChallengeSubmission {
 
 export interface ProjectSubmission {
   projectId: string;
-  status: "DRAFT" | "SUBMITTED" | "UNDER_REVIEW" | "REVIEWED" | "APPROVED" | "NEEDS_REVISION";
+  status:
+    | "DRAFT"
+    | "SUBMITTED"
+    | "UNDER_REVIEW"
+    | "REVIEWED"
+    | "APPROVED"
+    | "NEEDS_REVISION";
   grade?: number;
   timeSpent: number;
   mood: string;
@@ -91,7 +98,7 @@ export class ProgressService {
     const quizAttempt = await prisma.quizAttempt.create({
       data: {
         userId,
-        quizId: submission.tutorialId, // Use the actual quiz ID (which matches tutorialId)
+        quizId: submission.quizId, // Use the actual quiz ID from submission
         tutorialId: submission.tutorialId,
         answers: submission.answers,
         score,
@@ -171,6 +178,9 @@ export class ProgressService {
           mood: submission.ChallengeMoodAdaptation.mood as MoodId,
         },
       });
+
+      // Share quiz completion to social feed if user has sharing enabled
+      await this.shareQuizCompletion(userId, submission.tutorialId, score, submission.timeSpent, submission.ChallengeMoodAdaptation.mood);
     }
 
     return {
@@ -261,6 +271,9 @@ export class ProgressService {
           mood: submission.ChallengeMoodAdaptation.mood as MoodId,
         },
       });
+
+      // Share challenge completion to social feed if user has sharing enabled
+      await this.shareChallengeCompletion(userId, submission.challengeId, submission.timeSpent, submission.ChallengeMoodAdaptation.mood);
     }
 
     return {
@@ -526,8 +539,8 @@ export class ProgressService {
         },
       },
       update: {
-        status: isCompleted 
-          ? CompletionStatus.COMPLETED 
+        status: isCompleted
+          ? CompletionStatus.COMPLETED
           : CompletionStatus.IN_PROGRESS,
         grade: submission.grade || undefined,
         timeSpent: {
@@ -540,8 +553,8 @@ export class ProgressService {
       create: {
         userId,
         projectId: submission.projectId,
-        status: isCompleted 
-          ? CompletionStatus.COMPLETED 
+        status: isCompleted
+          ? CompletionStatus.COMPLETED
           : CompletionStatus.IN_PROGRESS,
         grade: submission.grade,
         timeSpent: submission.timeSpent,
@@ -631,5 +644,119 @@ export class ProgressService {
         submissionStatus: "DRAFT",
       },
     });
+  }
+
+  /**
+   * Share quiz completion to social feed
+   */
+  private static async shareQuizCompletion(
+    userId: string,
+    tutorialId: string,
+    score: number,
+    timeSpent: number,
+    mood: string
+  ) {
+    try {
+      // Check if user has social sharing enabled
+      const userSettings = await prisma.userSettings.findUnique({
+        where: { userId },
+      });
+
+      if (userSettings && userSettings.shareProgress === false) {
+        return; // User has explicitly disabled progress sharing
+      }
+
+      // Get tutorial information
+      const tutorial = await prisma.tutorial.findUnique({
+        where: { id: tutorialId },
+        select: { title: true, difficulty: true },
+      });
+
+      if (!tutorial) {
+        return;
+      }
+
+      // Create description based on score
+      let description = `Completed ${tutorial.title} quiz`;
+      if (score >= 95) {
+        description = `🔥 Aced ${tutorial.title} quiz with ${score}%!`;
+      } else if (score >= 85) {
+        description = `💪 Crushed ${tutorial.title} quiz with ${score}%`;
+      } else if (score >= 75) {
+        description = `✅ Passed ${tutorial.title} quiz with ${score}%`;
+      } else {
+        description = `📚 Completed ${tutorial.title} quiz (${score}%)`;
+      }
+
+      await prisma.progressShare.create({
+        data: {
+          userId,
+          type: "quiz_completed",
+          title: `🎯 ${tutorial.title} Quiz`,
+          description,
+          data: {
+            score,
+            timeSpent,
+            mood,
+            tutorialId,
+            difficulty: tutorial.difficulty,
+          },
+          visibility: "FRIENDS",
+        },
+      });
+    } catch (error) {
+      console.error("Error sharing quiz completion:", error);
+    }
+  }
+
+  /**
+   * Share challenge completion to social feed
+   */
+  private static async shareChallengeCompletion(
+    userId: string,
+    challengeId: string,
+    timeSpent: number,
+    mood: string
+  ) {
+    try {
+      // Check if user has social sharing enabled
+      const userSettings = await prisma.userSettings.findUnique({
+        where: { userId },
+      });
+
+      if (userSettings && userSettings.shareProgress === false) {
+        return; // User has explicitly disabled progress sharing
+      }
+
+      // Get challenge information
+      const challenge = await prisma.challenge.findUnique({
+        where: { id: challengeId },
+        select: { title: true, difficulty: true },
+      });
+
+      if (!challenge) {
+        return;
+      }
+
+      const description = `💻 Solved the "${challenge.title}" coding challenge`;
+
+      await prisma.progressShare.create({
+        data: {
+          userId,
+          type: "challenge_completed",
+          title: `⚡ ${challenge.title}`,
+          description,
+          data: {
+            timeSpent,
+            mood,
+            challengeId,
+            difficulty: challenge.difficulty,
+          },
+          visibility: "FRIENDS",
+        },
+      });
+    } catch (error) {
+      console.error("Error sharing challenge completion:", error);
+    }
   }
 }

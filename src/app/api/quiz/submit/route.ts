@@ -12,7 +12,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { tutorialId, answers, timeSpent, quizData } = body;
+    const { tutorialId, answers, timeSpent, quizData, quizId } = body;
+    console.log({ body });
 
     if (!tutorialId || !answers || !quizData) {
       return NextResponse.json(
@@ -24,6 +25,7 @@ export async function POST(request: NextRequest) {
     const result = await ProgressService.submitQuizAttempt(
       session.user.id,
       {
+        quizId,
         tutorialId,
         answers,
         timeSpent: timeSpent || 0,

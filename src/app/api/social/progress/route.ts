@@ -115,49 +115,117 @@ export async function GET() {
         {
           id: "progress1",
           type: "achievement",
-          title: "🏆 Quiz Rookie",
-          description: "Completed their first quiz!",
-          data: { points: 10, rarity: "COMMON" },
+          title: "unlocked \"Quiz Master\"!",
+          description: "Complete 10 quizzes with a passing score",
+          data: { points: 50 },
           visibility: "FRIENDS",
-          createdAt: new Date("2025-07-21T10:30:00Z"),
+          createdAt: new Date("2025-08-16T18:30:00Z"),
           user: {
             id: "mock1",
             name: "Alex Johnson",
+            username: "alexj_dev",
             image: null,
             mood: "GRIND",
           },
+          reactions: [
+            {
+              id: "react1",
+              type: "fire",
+              userId: session.user?.id || "current",
+              user: { name: session.user?.name || "You" }
+            }
+          ],
+          _count: { reactions: 1 },
           isOwn: false,
         },
         {
           id: "progress2",
           type: "quiz_completed",
-          title: "🎯 JavaScript Basics Quiz",
-          description: "Scored 95% on JavaScript fundamentals",
-          data: { score: 95, timeSpent: 180 },
+          title: "🎯 DOM Manipulation Quiz",
+          description: "💪 Crushed DOM Manipulation quiz with 88%",
+          data: { score: 88, timeSpent: 240, mood: "CHILL" },
           visibility: "FRIENDS",
-          createdAt: new Date("2025-07-21T09:15:00Z"),
+          createdAt: new Date("2025-08-16T17:15:00Z"),
           user: {
             id: "mock2",
             name: "Sarah Chen",
+            username: "sarahc_codes",
             image: null,
             mood: "CHILL",
           },
+          reactions: [
+            {
+              id: "react2",
+              type: "clap",
+              userId: "mock1",
+              user: { name: "Alex Johnson" }
+            },
+            {
+              id: "react3",
+              type: "like",
+              userId: session.user?.id || "current",
+              user: { name: session.user?.name || "You" }
+            }
+          ],
+          _count: { reactions: 2 },
           isOwn: false,
         },
         {
           id: "progress3",
-          type: "streak",
-          title: "🔥 3-Day Streak",
-          description: "Learning consistently for 3 days!",
-          data: { streakDays: 3 },
+          type: "challenge_completed",
+          title: "⚡ Array Methods Challenge",
+          description: "💻 Solved the \"Array Methods Challenge\" coding challenge",
+          data: { timeSpent: 420, mood: "GRIND" },
           visibility: "FRIENDS",
-          createdAt: new Date("2025-07-21T08:00:00Z"),
+          createdAt: new Date("2025-08-16T16:45:00Z"),
           user: {
-            id: session.user.id || "current",
-            name: session.user.name || "You",
-            image: session.user.image,
-            mood: "CHILL",
+            id: "mock1",
+            name: "Alex Johnson",
+            username: "alexj_dev",
+            image: null,
+            mood: "GRIND",
           },
+          reactions: [
+            {
+              id: "react4",
+              type: "mind_blown",
+              userId: "mock2",
+              user: { name: "Sarah Chen" }
+            }
+          ],
+          _count: { reactions: 1 },
+          isOwn: false,
+        },
+        {
+          id: "progress4",
+          type: "quiz_completed",
+          title: "🎯 Variables and Data Types Quiz",
+          description: "🔥 Aced Variables and Data Types quiz with 100%!",
+          data: { score: 100, timeSpent: 125, mood: "RUSH" },
+          visibility: "FRIENDS",
+          createdAt: new Date("2025-08-16T15:20:00Z"),
+          user: {
+            id: session.user?.id || "current",
+            name: session.user?.name || "You",
+            username: session.user?.username || "you",
+            image: session.user?.image,
+            mood: "RUSH",
+          },
+          reactions: [
+            {
+              id: "react5",
+              type: "fire",
+              userId: "mock1",
+              user: { name: "Alex Johnson" }
+            },
+            {
+              id: "react6",
+              type: "fire",
+              userId: "mock2",
+              user: { name: "Sarah Chen" }
+            }
+          ],
+          _count: { reactions: 2 },
           isOwn: true,
         },
       ];

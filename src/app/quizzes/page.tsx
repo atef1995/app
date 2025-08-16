@@ -366,8 +366,8 @@ export default function QuizzesPage() {
             {paginatedQuizzes.map((quiz: Quiz, index: number) => {
               // Calculate the actual index based on current page
               const actualIndex = (currentPage - 1) * pageSize + index;
-              // The tutorialId in progress matches the quiz ID from the route parameter
-              const quizProgress = tutorialProgress[quiz.id.toString()];
+              // The tutorialId in progress matches the quiz's tutorialId
+              const quizProgress = tutorialProgress[quiz.tutorialId.toString()];
               return (
                 <QuizCard
                   key={quiz.id}

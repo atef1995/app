@@ -11,10 +11,10 @@ import {
 } from "@/hooks/useTutorialQueries";
 import CategoryCard from "@/components/ui/CategoryCard";
 import { PageLayout } from "@/components/ui/PageLayout";
-import { MoodInfoCard } from "@/components/ui/MoodInfoCard";
 import { ContentGrid } from "@/components/ui/ContentGrid";
 import Pagination from "@/components/ui/Pagination";
 import { useMood } from "@/components/providers/MoodProvider";
+import { MoodImpactIndicator, QuickMoodSwitcher } from "@/components/ui/MoodImpactIndicator";
 
 // Category metadata
 const categoryMetadata = {
@@ -52,6 +52,13 @@ const categoryMetadata = {
     topics: ["Closures", "Modules", "Design Patterns", "Performance"],
     duration: "5-8 hours",
   },
+  "data-structures": {
+    description:
+      "Master fundamental data structures and algorithms in JavaScript",
+    difficulty: "intermediate" as const,
+    topics: ["Arrays", "Objects", "Sets", "Maps", "Algorithms"],
+    duration: "4-6 hours",
+  },
 };
 
 export default function TutorialsPage() {
@@ -61,7 +68,6 @@ export default function TutorialsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6);
 
-
   // Fetch data with server-side pagination
   const categoriesQuery = useCategories(currentPage, itemsPerPage);
   const allTutorialsQuery = useTutorials(); // Keep this non-paginated for stats
@@ -69,7 +75,7 @@ export default function TutorialsPage() {
   // Get categories data from paginated response
   const categories = categoriesQuery.data?.data || [];
   const categoryPagination = categoriesQuery.data?.pagination;
-  
+
   // Progress data
   const allTutorials = allTutorialsQuery.data?.data || [];
   const { tutorialsWithProgress } = useTutorialProgress(
@@ -84,9 +90,9 @@ export default function TutorialsPage() {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     // Scroll to categories section
-    const categoriesSection = document.getElementById('categories-section');
+    const categoriesSection = document.getElementById("categories-section");
     if (categoriesSection) {
-      categoriesSection.scrollIntoView({ behavior: 'smooth' });
+      categoriesSection.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -103,8 +109,8 @@ export default function TutorialsPage() {
         total: 0,
         completed: 0,
         duration:
-          categoryMetadata[category as keyof typeof categoryMetadata]?.duration ||
-          "2-3 hours",
+          categoryMetadata[category as keyof typeof categoryMetadata]
+            ?.duration || "2-3 hours",
       };
     }
 
@@ -189,14 +195,24 @@ export default function TutorialsPage() {
     );
   }
 
-
   return (
     <PageLayout
       title="JavaScript Tutorials"
       subtitle={`Interactive lessons tailored to your ${currentMood.name.toLowerCase()} learning style`}
     >
-      {/* Mood Info Card */}
-      <MoodInfoCard className="mb-8" />
+      {/* Mood Impact */}
+      <div className="mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <MoodImpactIndicator context="tutorial" />
+            </div>
+            <div className="ml-6">
+              <QuickMoodSwitcher />
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Categories Grid */}
       <div className="mb-8" id="categories-section">
@@ -298,7 +314,6 @@ export default function TutorialsPage() {
           </button>
         </div>
       </div>
-
     </PageLayout>
   );
 }

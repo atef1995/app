@@ -1,0 +1,824 @@
+---
+title: "Object-Oriented Programming with TypeScript"
+description: "Master advanced OOP concepts using TypeScript's powerful type system, including classes, interfaces, generics, and design patterns"
+difficulty: 3
+estimatedTime: "45 minutes"
+prerequisites: ["constructor-functions-and-prototypes"]
+category: "oop"
+---
+
+# Object-Oriented Programming with TypeScript
+
+TypeScript takes JavaScript's object-oriented capabilities to the next level with static typing, interfaces, and advanced OOP features. In this tutorial, we'll explore how TypeScript enhances OOP development.
+
+## Why TypeScript for OOP?
+
+TypeScript provides several advantages for object-oriented programming:
+
+- **Type Safety**: Catch errors at compile time
+- **Better IntelliSense**: Enhanced IDE support with autocomplete
+- **Interfaces**: Define contracts for objects
+- **Access Modifiers**: Control property and method visibility
+- **Generics**: Write reusable, type-safe code
+- **Decorators**: Add metadata and modify behavior
+
+## Classes in TypeScript
+
+### Basic Class Definition
+
+```typescript
+class Person {
+  // Property declarations with types
+  private name: string;
+  protected age: number;
+  public email: string;
+
+  constructor(name: string, age: number, email: string) {
+    this.name = name;
+    this.age = age;
+    this.email = email;
+  }
+
+  // Method with return type annotation
+  greet(): string {
+    return `Hello, I'm ${this.name}`;
+  }
+
+  // Getter
+  get displayName(): string {
+    return this.name;
+  }
+
+  // Setter with validation
+  set displayName(value: string) {
+    if (value.length < 2) {
+      throw new Error("Name must be at least 2 characters");
+    }
+    this.name = value;
+  }
+}
+```
+
+### Access Modifiers
+
+TypeScript provides three access modifiers:
+
+```typescript
+class BankAccount {
+  private balance: number;      // Only accessible within this class
+  protected accountId: string; // Accessible in this class and subclasses
+  public owner: string;        // Accessible everywhere (default)
+
+  constructor(owner: string, initialBalance: number = 0) {
+    this.owner = owner;
+    this.balance = initialBalance;
+    this.accountId = this.generateAccountId();
+  }
+
+  private generateAccountId(): string {
+    return `ACC${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  protected validateAmount(amount: number): boolean {
+    return amount > 0 && amount <= 10000;
+  }
+
+  public deposit(amount: number): void {
+    if (this.validateAmount(amount)) {
+      this.balance += amount;
+      console.log(`Deposited $${amount}. New balance: $${this.balance}`);
+    } else {
+      throw new Error("Invalid deposit amount");
+    }
+  }
+
+  public getBalance(): number {
+    return this.balance;
+  }
+}
+```
+
+## Interfaces
+
+Interfaces define contracts that classes must implement:
+
+```typescript
+interface Flyable {
+  altitude: number;
+  fly(): void;
+  land(): void;
+}
+
+interface Swimmable {
+  depth: number;
+  swim(): void;
+  surface(): void;
+}
+
+// A class can implement multiple interfaces
+class Duck implements Flyable, Swimmable {
+  altitude: number = 0;
+  depth: number = 0;
+
+  fly(): void {
+    this.altitude = 100;
+    console.log(`Flying at ${this.altitude} feet`);
+  }
+
+  land(): void {
+    this.altitude = 0;
+    console.log("Landed safely");
+  }
+
+  swim(): void {
+    this.depth = 5;
+    console.log(`Swimming at ${this.depth} feet deep`);
+  }
+
+  surface(): void {
+    this.depth = 0;
+    console.log("Surfaced");
+  }
+}
+```
+
+### Interface for Object Shapes
+
+```typescript
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  isActive?: boolean; // Optional property
+  readonly createdAt: Date; // Read-only property
+}
+
+interface UserMethods {
+  updateEmail(newEmail: string): void;
+  deactivate(): void;
+}
+
+// Extending interfaces
+interface AdminUser extends User {
+  permissions: string[];
+  lastLogin?: Date;
+}
+
+class UserAccount implements User, UserMethods {
+  id: number;
+  name: string;
+  email: string;
+  isActive: boolean = true;
+  readonly createdAt: Date;
+
+  constructor(id: number, name: string, email: string) {
+    this.id = id;
+    this.name = name;
+    this.email = email;
+    this.createdAt = new Date();
+  }
+
+  updateEmail(newEmail: string): void {
+    // Email validation logic
+    if (this.isValidEmail(newEmail)) {
+      this.email = newEmail;
+    } else {
+      throw new Error("Invalid email format");
+    }
+  }
+
+  deactivate(): void {
+    this.isActive = false;
+  }
+
+  private isValidEmail(email: string): boolean {
+    return email.includes("@") && email.includes(".");
+  }
+}
+```
+
+## Inheritance in TypeScript
+
+### Class Inheritance
+
+```typescript
+class Animal {
+  protected name: string;
+  protected species: string;
+
+  constructor(name: string, species: string) {
+    this.name = name;
+    this.species = species;
+  }
+
+  makeSound(): string {
+    return "Some generic animal sound";
+  }
+
+  move(): string {
+    return `${this.name} is moving`;
+  }
+
+  // Method that can be overridden
+  describe(): string {
+    return `${this.name} is a ${this.species}`;
+  }
+}
+
+class Dog extends Animal {
+  private breed: string;
+
+  constructor(name: string, breed: string) {
+    super(name, "Canine"); // Call parent constructor
+    this.breed = breed;
+  }
+
+  // Override parent method
+  makeSound(): string {
+    return "Woof! Woof!";
+  }
+
+  // Override with additional functionality
+  describe(): string {
+    return `${super.describe()} and is a ${this.breed}`;
+  }
+
+  // New method specific to Dog
+  fetch(): string {
+    return `${this.name} is fetching the ball!`;
+  }
+}
+
+class Cat extends Animal {
+  private isIndoor: boolean;
+
+  constructor(name: string, isIndoor: boolean = true) {
+    super(name, "Feline");
+    this.isIndoor = isIndoor;
+  }
+
+  makeSound(): string {
+    return "Meow!";
+  }
+
+  climb(): string {
+    return `${this.name} is climbing`;
+  }
+}
+```
+
+## Abstract Classes
+
+Abstract classes cannot be instantiated directly and are meant to be extended:
+
+```typescript
+abstract class Vehicle {
+  protected brand: string;
+  protected year: number;
+
+  constructor(brand: string, year: number) {
+    this.brand = brand;
+    this.year = year;
+  }
+
+  // Concrete method
+  getInfo(): string {
+    return `${this.year} ${this.brand}`;
+  }
+
+  // Abstract method - must be implemented by subclasses
+  abstract start(): string;
+  abstract stop(): string;
+  abstract getMaxSpeed(): number;
+}
+
+class Car extends Vehicle {
+  private engineType: string;
+
+  constructor(brand: string, year: number, engineType: string) {
+    super(brand, year);
+    this.engineType = engineType;
+  }
+
+  start(): string {
+    return `${this.brand} car engine started (${this.engineType})`;
+  }
+
+  stop(): string {
+    return `${this.brand} car engine stopped`;
+  }
+
+  getMaxSpeed(): number {
+    return 180; // km/h
+  }
+}
+
+class Motorcycle extends Vehicle {
+  private engineSize: number;
+
+  constructor(brand: string, year: number, engineSize: number) {
+    super(brand, year);
+    this.engineSize = engineSize;
+  }
+
+  start(): string {
+    return `${this.brand} motorcycle started (${this.engineSize}cc)`;
+  }
+
+  stop(): string {
+    return `${this.brand} motorcycle stopped`;
+  }
+
+  getMaxSpeed(): number {
+    return 250; // km/h
+  }
+}
+```
+
+## Generics in OOP
+
+Generics allow you to create reusable, type-safe classes:
+
+```typescript
+// Generic class
+class Stack<T> {
+  private items: T[] = [];
+
+  push(item: T): void {
+    this.items.push(item);
+  }
+
+  pop(): T | undefined {
+    return this.items.pop();
+  }
+
+  peek(): T | undefined {
+    return this.items[this.items.length - 1];
+  }
+
+  isEmpty(): boolean {
+    return this.items.length === 0;
+  }
+
+  size(): number {
+    return this.items.length;
+  }
+
+  toArray(): T[] {
+    return [...this.items];
+  }
+}
+
+// Usage with different types
+const numberStack = new Stack<number>();
+numberStack.push(1);
+numberStack.push(2);
+console.log(numberStack.pop()); // 2
+
+const stringStack = new Stack<string>();
+stringStack.push("hello");
+stringStack.push("world");
+console.log(stringStack.peek()); // "world"
+
+// Generic interface
+interface Repository<T> {
+  create(item: T): void;
+  findById(id: string): T | undefined;
+  update(id: string, item: T): void;
+  delete(id: string): void;
+  findAll(): T[];
+}
+
+// Implementation with specific type
+class UserRepository implements Repository<User> {
+  private users: Map<string, User> = new Map();
+
+  create(user: User): void {
+    this.users.set(user.id.toString(), user);
+  }
+
+  findById(id: string): User | undefined {
+    return this.users.get(id);
+  }
+
+  update(id: string, user: User): void {
+    if (this.users.has(id)) {
+      this.users.set(id, user);
+    }
+  }
+
+  delete(id: string): void {
+    this.users.delete(id);
+  }
+
+  findAll(): User[] {
+    return Array.from(this.users.values());
+  }
+}
+```
+
+## Design Patterns in TypeScript
+
+### Singleton Pattern
+
+```typescript
+class DatabaseConnection {
+  private static instance: DatabaseConnection;
+  private connectionString: string;
+  private isConnected: boolean = false;
+
+  private constructor() {
+    this.connectionString = "database://localhost:5432/myapp";
+  }
+
+  public static getInstance(): DatabaseConnection {
+    if (!DatabaseConnection.instance) {
+      DatabaseConnection.instance = new DatabaseConnection();
+    }
+    return DatabaseConnection.instance;
+  }
+
+  connect(): void {
+    if (!this.isConnected) {
+      console.log(`Connecting to ${this.connectionString}`);
+      this.isConnected = true;
+    }
+  }
+
+  disconnect(): void {
+    if (this.isConnected) {
+      console.log("Disconnecting from database");
+      this.isConnected = false;
+    }
+  }
+
+  query(sql: string): any[] {
+    if (!this.isConnected) {
+      throw new Error("Not connected to database");
+    }
+    console.log(`Executing query: ${sql}`);
+    return []; // Mock result
+  }
+}
+
+// Usage
+const db1 = DatabaseConnection.getInstance();
+const db2 = DatabaseConnection.getInstance();
+console.log(db1 === db2); // true - same instance
+```
+
+### Factory Pattern
+
+```typescript
+interface Shape {
+  draw(): string;
+  calculateArea(): number;
+}
+
+class Circle implements Shape {
+  constructor(private radius: number) {}
+
+  draw(): string {
+    return `Drawing a circle with radius ${this.radius}`;
+  }
+
+  calculateArea(): number {
+    return Math.PI * this.radius * this.radius;
+  }
+}
+
+class Rectangle implements Shape {
+  constructor(private width: number, private height: number) {}
+
+  draw(): string {
+    return `Drawing a rectangle ${this.width}x${this.height}`;
+  }
+
+  calculateArea(): number {
+    return this.width * this.height;
+  }
+}
+
+class Triangle implements Shape {
+  constructor(private base: number, private height: number) {}
+
+  draw(): string {
+    return `Drawing a triangle with base ${this.base} and height ${this.height}`;
+  }
+
+  calculateArea(): number {
+    return (this.base * this.height) / 2;
+  }
+}
+
+// Factory class
+class ShapeFactory {
+  static createShape(type: string, ...args: number[]): Shape {
+    switch (type.toLowerCase()) {
+      case 'circle':
+        if (args.length !== 1) throw new Error("Circle requires 1 argument: radius");
+        return new Circle(args[0]);
+      
+      case 'rectangle':
+        if (args.length !== 2) throw new Error("Rectangle requires 2 arguments: width, height");
+        return new Rectangle(args[0], args[1]);
+      
+      case 'triangle':
+        if (args.length !== 2) throw new Error("Triangle requires 2 arguments: base, height");
+        return new Triangle(args[0], args[1]);
+      
+      default:
+        throw new Error(`Unknown shape type: ${type}`);
+    }
+  }
+}
+
+// Usage
+const circle = ShapeFactory.createShape('circle', 5);
+const rectangle = ShapeFactory.createShape('rectangle', 10, 20);
+const triangle = ShapeFactory.createShape('triangle', 8, 12);
+
+console.log(circle.draw());
+console.log(`Area: ${circle.calculateArea()}`);
+```
+
+### Observer Pattern
+
+```typescript
+interface Observer {
+  update(data: any): void;
+}
+
+interface Subject {
+  attach(observer: Observer): void;
+  detach(observer: Observer): void;
+  notify(data: any): void;
+}
+
+class NewsPublisher implements Subject {
+  private observers: Observer[] = [];
+  private latestNews: string = "";
+
+  attach(observer: Observer): void {
+    this.observers.push(observer);
+  }
+
+  detach(observer: Observer): void {
+    const index = this.observers.indexOf(observer);
+    if (index > -1) {
+      this.observers.splice(index, 1);
+    }
+  }
+
+  notify(data: any): void {
+    this.observers.forEach(observer => observer.update(data));
+  }
+
+  publishNews(news: string): void {
+    this.latestNews = news;
+    this.notify({
+      type: 'news',
+      content: news,
+      timestamp: new Date()
+    });
+  }
+}
+
+class NewsSubscriber implements Observer {
+  constructor(private name: string) {}
+
+  update(data: any): void {
+    console.log(`${this.name} received news: ${data.content}`);
+  }
+}
+
+// Usage
+const publisher = new NewsPublisher();
+const subscriber1 = new NewsSubscriber("Alice");
+const subscriber2 = new NewsSubscriber("Bob");
+
+publisher.attach(subscriber1);
+publisher.attach(subscriber2);
+
+publisher.publishNews("Breaking: TypeScript 5.0 released!");
+```
+
+## Type Guards and Advanced Types
+
+TypeScript provides powerful type checking capabilities:
+
+```typescript
+// Union types
+type Status = "loading" | "success" | "error";
+
+interface LoadingState {
+  status: "loading";
+}
+
+interface SuccessState {
+  status: "success";
+  data: any;
+}
+
+interface ErrorState {
+  status: "error";
+  message: string;
+}
+
+type AppState = LoadingState | SuccessState | ErrorState;
+
+// Type guard functions
+function isSuccessState(state: AppState): state is SuccessState {
+  return state.status === "success";
+}
+
+function isErrorState(state: AppState): state is ErrorState {
+  return state.status === "error";
+}
+
+// Using type guards
+function handleAppState(state: AppState): string {
+  if (isSuccessState(state)) {
+    return `Data loaded: ${JSON.stringify(state.data)}`;
+  } else if (isErrorState(state)) {
+    return `Error: ${state.message}`;
+  } else {
+    return "Loading...";
+  }
+}
+```
+
+## Practical Exercise
+
+Let's build a complete TypeScript OOP system for a library management system:
+
+```typescript
+// Abstract base class
+abstract class LibraryItem {
+  protected id: string;
+  protected title: string;
+  protected author: string;
+  protected isAvailable: boolean = true;
+
+  constructor(id: string, title: string, author: string) {
+    this.id = id;
+    this.title = title;
+    this.author = author;
+  }
+
+  abstract getItemType(): string;
+  abstract calculateLateFee(daysLate: number): number;
+
+  checkout(): boolean {
+    if (this.isAvailable) {
+      this.isAvailable = false;
+      return true;
+    }
+    return false;
+  }
+
+  returnItem(): void {
+    this.isAvailable = true;
+  }
+
+  getInfo(): string {
+    return `${this.getItemType()}: ${this.title} by ${this.author}`;
+  }
+}
+
+// Concrete implementations
+class Book extends LibraryItem {
+  private genre: string;
+  private pageCount: number;
+
+  constructor(id: string, title: string, author: string, genre: string, pageCount: number) {
+    super(id, title, author);
+    this.genre = genre;
+    this.pageCount = pageCount;
+  }
+
+  getItemType(): string {
+    return "Book";
+  }
+
+  calculateLateFee(daysLate: number): number {
+    return daysLate * 0.50; // $0.50 per day
+  }
+}
+
+class DVD extends LibraryItem {
+  private duration: number; // in minutes
+
+  constructor(id: string, title: string, director: string, duration: number) {
+    super(id, title, director);
+    this.duration = duration;
+  }
+
+  getItemType(): string {
+    return "DVD";
+  }
+
+  calculateLateFee(daysLate: number): number {
+    return daysLate * 1.00; // $1.00 per day
+  }
+}
+
+// Interface for library operations
+interface LibraryOperations {
+  addItem(item: LibraryItem): void;
+  removeItem(id: string): boolean;
+  findItem(id: string): LibraryItem | undefined;
+  checkoutItem(id: string): boolean;
+  returnItem(id: string): boolean;
+}
+
+// Library management system
+class Library implements LibraryOperations {
+  private items: Map<string, LibraryItem> = new Map();
+  private static instance: Library;
+
+  private constructor() {}
+
+  static getInstance(): Library {
+    if (!Library.instance) {
+      Library.instance = new Library();
+    }
+    return Library.instance;
+  }
+
+  addItem(item: LibraryItem): void {
+    this.items.set(item['id'], item);
+    console.log(`Added: ${item.getInfo()}`);
+  }
+
+  removeItem(id: string): boolean {
+    const removed = this.items.delete(id);
+    if (removed) {
+      console.log(`Removed item with ID: ${id}`);
+    }
+    return removed;
+  }
+
+  findItem(id: string): LibraryItem | undefined {
+    return this.items.get(id);
+  }
+
+  checkoutItem(id: string): boolean {
+    const item = this.findItem(id);
+    if (item) {
+      const success = item.checkout();
+      if (success) {
+        console.log(`Checked out: ${item.getInfo()}`);
+      } else {
+        console.log(`Item not available: ${item.getInfo()}`);
+      }
+      return success;
+    }
+    console.log(`Item not found: ${id}`);
+    return false;
+  }
+
+  returnItem(id: string): boolean {
+    const item = this.findItem(id);
+    if (item) {
+      item.returnItem();
+      console.log(`Returned: ${item.getInfo()}`);
+      return true;
+    }
+    console.log(`Item not found: ${id}`);
+    return false;
+  }
+
+  getAllItems(): LibraryItem[] {
+    return Array.from(this.items.values());
+  }
+}
+
+// Usage example
+const library = Library.getInstance();
+
+const book1 = new Book("B001", "The TypeScript Handbook", "Microsoft", "Programming", 300);
+const book2 = new Book("B002", "Clean Code", "Robert Martin", "Programming", 464);
+const dvd1 = new DVD("D001", "The Matrix", "Wachowski Sisters", 136);
+
+library.addItem(book1);
+library.addItem(book2);
+library.addItem(dvd1);
+
+library.checkoutItem("B001");
+library.checkoutItem("B001"); // Should fail - already checked out
+library.returnItem("B001");
+```
+
+## Key Takeaways
+
+1. **Type Safety**: TypeScript's type system catches errors early and improves code reliability
+2. **Better OOP**: Access modifiers, interfaces, and abstract classes provide better structure
+3. **Generics**: Enable type-safe, reusable components
+4. **Design Patterns**: TypeScript makes implementing common patterns more robust
+5. **Interface Segregation**: Use interfaces to define clear contracts
+6. **Inheritance**: Extend functionality while maintaining type safety
+
+TypeScript's OOP features help you build more maintainable, scalable, and bug-free applications. The type system guides development and catches errors before they reach production.
+
+Try implementing your own TypeScript classes with interfaces, generics, and design patterns to master these concepts!

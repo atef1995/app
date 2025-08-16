@@ -13,6 +13,8 @@ import { Challenge } from "@/types/practice";
 import { getChallengeBySlug } from "@/lib/challengeData";
 import PremiumModal from "@/components/ui/PremiumModal";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCodeProgress } from "@/hooks/useCodeProgress";
+import { SaveIndicator } from "@/components/ui/SaveIndicator";
 
 // Define achievement type
 interface UnlockedAchievement {
@@ -40,6 +42,26 @@ export default function ChallengePage({ params }: ChallengePageProps) {
   );
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [userCode, setUserCode] = useState("");
+
+  // Code progress management with auto-save (only when challenge is loaded)
+  const codeProgressResult = useCodeProgress({
+    challengeId: challenge?.id || "",
+    initialCode: challenge?.starter || "",
+    autoSaveDelay: 3000, // 3 seconds
+  });
+
+  // Use code progress result if challenge is loaded, otherwise use local state
+  const {
+    code: progressCode,
+    setCode: setProgressCode,
+    saveStatus,
+    hasUnsavedChanges,
+    hasLoadedProgress,
+    manualSave,
+  } = codeProgressResult;
+
+  const currentCode = challenge ? progressCode : userCode;
+  const setCurrentCode = challenge ? setProgressCode : setUserCode;
   const [testResults, setTestResults] = useState<Array<{
     passed: boolean;
     description: string;
@@ -53,6 +75,8 @@ export default function ChallengePage({ params }: ChallengePageProps) {
   const [challengeStartTime, setChallengeStartTime] = useState<number | null>(
     null
   );
+  const [isTimedOut, setIsTimedOut] = useState(false);
+  const [showTimeoutModal, setShowTimeoutModal] = useState(false);
 
   // Get mood-specific time limit for challenges
   const getMoodTimeLimit = useCallback(() => {
@@ -80,6 +104,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
       }
 
       setChallenge(foundChallenge);
+      // Initialize local code state for initial render
       setUserCode(foundChallenge.starter);
 
       // Check premium access inline (avoiding dependency loop)
@@ -136,6 +161,60 @@ export default function ChallengePage({ params }: ChallengePageProps) {
     }
   }, [challengeStartTime]);
 
+  // Handle timeout - submit failed attempt and show retry option
+  const handleTimeout = useCallback(async () => {
+    if (!challenge || !session?.user?.id) return;
+
+    setIsTimedOut(true);
+    const timeTaken = getMoodTimeLimit() || 300; // Use full time limit
+
+    try {
+      // Submit failed attempt for timeout
+      await submitChallengeAction(
+        challenge.id,
+        currentCode,
+        false, // Not passed
+        timeTaken
+      );
+
+      toast.error(
+        "⏰ Time's Up!",
+        `${currentMood.name} mode time limit reached. Your progress has been saved.`
+      );
+
+      setShowTimeoutModal(true);
+    } catch (error) {
+      console.error("Failed to submit timeout attempt:", error);
+      toast.error("Timeout Error", "Failed to save your timeout attempt");
+    }
+  }, [
+    challenge,
+    session?.user?.id,
+    getMoodTimeLimit,
+    currentCode,
+    currentMood.name,
+    toast,
+  ]);
+
+  // Retry challenge - reset timer and states
+  const handleRetry = useCallback(() => {
+    setIsTimedOut(false);
+    setShowTimeoutModal(false);
+    setTestResults(null);
+
+    // Reset timer
+    const moodTimeLimit = getMoodTimeLimit();
+    if (moodTimeLimit) {
+      setTimeLeft(moodTimeLimit * 60);
+      setChallengeStartTime(Date.now());
+    }
+
+    toast.success(
+      "🔄 Challenge Reset",
+      "Timer restarted. Good luck with your next attempt!"
+    );
+  }, [getMoodTimeLimit, toast]);
+
   const runTests = useCallback(async () => {
     if (!challenge) return;
 
@@ -150,14 +229,14 @@ export default function ChallengePage({ params }: ChallengePageProps) {
 
       try {
         // First try as function expression (arrow function or function assigned to variable)
-        testFunction = new Function("return " + userCode)();
+        testFunction = new Function("return " + currentCode)();
       } catch {
         // If that fails, try evaluating the code directly (for function declarations)
         // Create a sandbox environment to execute the function declaration
         const functionScope: Record<string, unknown> = {};
         new Function(
           "scope",
-          userCode +
+          currentCode +
             "; for(let key in this) { if(typeof this[key] === 'function') scope[key] = this[key]; }"
         ).call(functionScope, functionScope);
 
@@ -211,7 +290,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
         try {
           const result = await submitChallengeAction(
             challenge.id,
-            userCode,
+            currentCode,
             allPassed,
             timeSpent
           );
@@ -238,10 +317,10 @@ export default function ChallengePage({ params }: ChallengePageProps) {
               "Challenge Completed!",
               "Great job! Your solution passed all tests."
             );
-            
+
             // Invalidate challenge progress query to refresh completion status
             queryClient.invalidateQueries({
-              queryKey: ["progress", "challenge", session.user.id]
+              queryKey: ["progress", "challenge", session.user.id],
             });
           }
         } catch (error) {
@@ -271,7 +350,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
             },
             body: JSON.stringify({
               challengeId: challenge.id,
-              code: userCode,
+              code: currentCode,
               passed: false,
               timeSpent,
             }),
@@ -283,20 +362,17 @@ export default function ChallengePage({ params }: ChallengePageProps) {
     }
 
     setIsRunning(false);
-  }, [challenge, userCode, session?.user?.id, toast, queryClient]);
+  }, [challenge, currentCode, session?.user?.id, toast, queryClient]);
 
   // Timer countdown effect
   useEffect(() => {
-    if (timeLeft === null || timeLeft <= 0) return;
+    if (timeLeft === null || timeLeft <= 0 || isTimedOut) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev === null || prev <= 1) {
-          // Time's up! Auto-submit or show timeout message
-          if (currentMood.id === "rush") {
-            // In rush mode, auto-run tests when time runs out
-            runTests();
-          }
+          // Time's up! Handle timeout
+          handleTimeout();
           return 0;
         }
         return prev - 1;
@@ -304,7 +380,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, currentMood.id, runTests]);
+  }, [timeLeft, isTimedOut, handleTimeout]);
 
   // Loading state
   if (!session || !resolvedParams || !challenge) {
@@ -386,30 +462,49 @@ export default function ChallengePage({ params }: ChallengePageProps) {
 
               {/* Timer Display */}
               {timeLeft !== null && (
-                <div className="mt-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border-l-4 border-blue-500 dark:border-blue-400">
+                <div
+                  className={`mt-4 p-3 rounded-lg border-l-4 ${
+                    isTimedOut
+                      ? "bg-red-50 dark:bg-red-900/20 border-red-500 dark:border-red-400"
+                      : "bg-gray-50 dark:bg-gray-700 border-blue-500 dark:border-blue-400"
+                  }`}
+                >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {currentMood.id === "rush"
+                      {isTimedOut
+                        ? "⏰ Timer Expired"
+                        : currentMood.id === "rush"
                         ? "Rush Mode Timer"
                         : "Grind Mode Timer"}
                     </span>
                     <span
                       className={`text-lg font-bold ${
-                        timeLeft <= 60
+                        isTimedOut
+                          ? "text-red-600 dark:text-red-400"
+                          : timeLeft <= 60
                           ? "text-red-600 dark:text-red-400"
                           : currentMood.id === "rush"
                           ? "text-orange-600 dark:text-orange-400"
                           : "text-blue-600 dark:text-blue-400"
                       }`}
                     >
-                      {Math.floor(timeLeft / 60)}:
-                      {(timeLeft % 60).toString().padStart(2, "0")}
+                      {isTimedOut
+                        ? "0:00"
+                        : `${Math.floor(timeLeft / 60)}:${(timeLeft % 60)
+                            .toString()
+                            .padStart(2, "0")}`}
                     </span>
                   </div>
-                  {currentMood.id === "rush" && timeLeft <= 60 && (
+                  {isTimedOut ? (
                     <div className="text-xs text-red-500 dark:text-red-400 mt-1">
-                      ⚡ Auto-submit when timer reaches zero!
+                      🔄 Click &aposTry Again&apos to restart the challenge
                     </div>
+                  ) : (
+                    timeLeft <= 60 && (
+                      <div className="text-xs text-red-500 dark:text-red-400 mt-1">
+                        ⚡ Time running out!
+                      </div>
+                    )
                   )}
                 </div>
               )}
@@ -421,7 +516,11 @@ export default function ChallengePage({ params }: ChallengePageProps) {
                 {currentMood.name} Energy 🎯
               </h2>
               <p className="text-purple-700 dark:text-purple-300">
-                {challenge.moodAdapted[currentMood.id.toLowerCase() as keyof typeof challenge.moodAdapted]}
+                {
+                  challenge.moodAdapted[
+                    currentMood.id.toLowerCase() as keyof typeof challenge.moodAdapted
+                  ]
+                }
               </p>
             </div>
 
@@ -509,29 +608,53 @@ export default function ChallengePage({ params }: ChallengePageProps) {
           <div className="space-y-6">
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                  Your Solution
-                </h2>
+                <div className="flex items-center gap-3">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                    Your Solution
+                  </h2>
+                  {session?.user?.id && hasLoadedProgress && (
+                    <SaveIndicator
+                      saveStatus={saveStatus}
+                      hasUnsavedChanges={hasUnsavedChanges}
+                      onManualSave={manualSave}
+                    />
+                  )}
+                </div>
                 <div className="flex gap-2">
-                  <button
-                    onClick={runTests}
-                    disabled={isRunning}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 ${
-                      currentMood.id === "rush"
-                        ? "bg-orange-600 text-white hover:bg-orange-700 dark:bg-orange-600 dark:hover:bg-orange-700"
+                  {isTimedOut ? (
+                    <button
+                      onClick={handleRetry}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                        currentMood.id === "rush"
+                          ? "bg-orange-600 text-white hover:bg-orange-700 dark:bg-orange-600 dark:hover:bg-orange-700"
+                          : currentMood.id === "grind"
+                          ? "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+                          : "bg-green-600 text-white hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700"
+                      }`}
+                    >
+                      🔄 Try Again
+                    </button>
+                  ) : (
+                    <button
+                      onClick={runTests}
+                      disabled={isRunning || isTimedOut}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 ${
+                        currentMood.id === "rush"
+                          ? "bg-orange-600 text-white hover:bg-orange-700 dark:bg-orange-600 dark:hover:bg-orange-700"
+                          : currentMood.id === "grind"
+                          ? "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+                          : "bg-green-600 text-white hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700"
+                      }`}
+                    >
+                      {isRunning
+                        ? "Running..."
+                        : currentMood.id === "rush"
+                        ? "⚡ Quick Test"
                         : currentMood.id === "grind"
-                        ? "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
-                        : "bg-green-600 text-white hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700"
-                    }`}
-                  >
-                    {isRunning
-                      ? "Running..."
-                      : currentMood.id === "rush"
-                      ? "⚡ Quick Test"
-                      : currentMood.id === "grind"
-                      ? "🔥 Test & Verify"
-                      : "😌 Test Solution"}
-                  </button>
+                        ? "🔥 Test & Verify"
+                        : "😌 Test Solution"}
+                    </button>
+                  )}
                   <button
                     onClick={() => setShowSolution(!showSolution)}
                     className="bg-gray-600 dark:bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
@@ -570,7 +693,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
               </div>
 
               <CodeEditor
-                initialCode={userCode}
+                initialCode={currentCode}
                 height="400px"
                 placeholder={
                   currentMood.id === "rush"
@@ -579,7 +702,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
                     ? "// Grind mode: Think through this step by step..."
                     : "// Chill mode: Take your time and experiment..."
                 }
-                onCodeChange={setUserCode}
+                onCodeChange={setCurrentCode}
               />
 
               {showSolution && (
@@ -628,6 +751,65 @@ export default function ChallengePage({ params }: ChallengePageProps) {
         contentType="challenge"
         contentTitle={challenge?.title}
       />
+
+      {/* Timeout Modal */}
+      {showTimeoutModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+            <div className="text-center">
+              {/* Icon */}
+              <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+                <div className="text-3xl">⏰</div>
+              </div>
+
+              {/* Title */}
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                Time&aposs Up!
+              </h2>
+
+              {/* Message */}
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                The {currentMood.name} mode timer has expired. Don&apost worry -
+                your progress has been saved and you can try again!
+              </p>
+
+              {/* Mode-specific message */}
+              <div className="mb-6 p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  {currentMood.id === "rush" &&
+                    "⚡ Rush mode is all about speed - try to solve it even faster next time!"}
+                  {currentMood.id === "grind" &&
+                    "🔥 Grind mode gives you time to think - use it wisely on your retry!"}
+                  {currentMood.id === "chill" &&
+                    "😌 Even in chill mode, practice makes perfect - give it another go!"}
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowTimeoutModal(false)}
+                  className="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors font-medium"
+                >
+                  Review Code
+                </button>
+                <button
+                  onClick={handleRetry}
+                  className={`flex-1 text-white py-3 rounded-lg font-medium transition-colors ${
+                    currentMood.id === "rush"
+                      ? "bg-orange-600 hover:bg-orange-700"
+                      : currentMood.id === "grind"
+                      ? "bg-blue-600 hover:bg-blue-700"
+                      : "bg-green-600 hover:bg-green-700"
+                  }`}
+                >
+                  🔄 Try Again
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

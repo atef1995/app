@@ -210,8 +210,8 @@ export function MoodCard({
               <span className="opacity-70">Time limit:</span>
               <span className={`font-semibold ${currentClasses.accent}`}>
                 {mood.quizSettings.timeLimit
-                  ? `${mood.quizSettings.timeLimit}s`
-                  : "None"}
+                  ? `${mood.quizSettings.timeLimit}s/question`
+                  : "No limit"}
               </span>
             </div>
 

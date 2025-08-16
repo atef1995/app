@@ -10,6 +10,8 @@ declare module "next-auth" {
       image?: string | null;
       mood?: Mood;
       subscription?: Plan;
+      username: string;
+      role: string;
     };
   }
 

@@ -132,7 +132,7 @@ export default function Card({
 
   const baseCardClasses = `
     relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-xl 
-    transition-all duration-300 border-2 border-transparent flex flex-col
+    transition-all duration-300 border-2 border-transparent flex flex-col h-full min-h-96
     ${
       !disabled && !isPremium
         ? "hover:shadow-xl dark:hover:shadow-2xl hover:border-blue-200 dark:hover:border-blue-600"
@@ -142,7 +142,7 @@ export default function Card({
     ${disabled ? "opacity-50 cursor-not-allowed" : ""}
     ${
       isPremium
-        ? `${moodColors.premiumBg} border-dashed ${moodColors.border}`
+        ? `${moodColors.premiumBg} hover:bg-yellow-500 ${moodColors.border}`
         : ""
     }
     ${className}
@@ -166,7 +166,7 @@ export default function Card({
 
       {/* Premium Lock Overlay */}
       {isPremium && (
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 flex items-center justify-center backdrop-blur-sm z-20">
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 flex items-center justify-center backdrop-blur-sm z-20 h-full min-h-max">
           <div className="text-center p-6">
             {/* Lock Icon */}
             <div
