@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Eye, EyeOff, RotateCcw } from "lucide-react";
 
 interface HTMLPreviewWindowProps {
@@ -23,17 +23,22 @@ export function HTMLPreviewWindow({
   const [isVisible, setIsVisible] = useState(true);
   const [srcDoc, setSrcDoc] = useState("");
   const [forceUpdate, setForceUpdate] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Handle client-side mounting
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     // Update force update counter when trigger changes
     setForceUpdate(forceUpdateTrigger);
   }, [forceUpdateTrigger]);
 
-  useEffect(() => {
-    // Create the full HTML document with a unique timestamp to force updates
+  const generateHTML = useCallback((includeJS: boolean = true) => {
     const timestamp = Date.now();
-    const fullHTML = `
-<!DOCTYPE html>
+    return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -125,7 +130,7 @@ export function HTMLPreviewWindow({
 </head>
 <body>
     ${html}
-    
+    ${includeJS ? `
     <script>
         // Timestamp: ${timestamp} - Force update: ${forceUpdate}
         try {
@@ -133,111 +138,37 @@ export function HTMLPreviewWindow({
         } catch (error) {
             console.error('Preview Error:', error);
         }
-    </script>
+    </script>` : ''}
 </body>
 </html>`;
+  }, [css, html, javascript, forceUpdate]);
 
+  useEffect(() => {
+    // Only update srcDoc on client side to prevent hydration issues
+    if (!isMounted) return;
+    
+    const fullHTML = generateHTML(true);
     setSrcDoc(fullHTML);
-  }, [html, css, javascript, forceUpdate]);
+    
+    // Force iframe refresh by setting srcDoc twice with slight delay
+    setTimeout(() => {
+      if (iframeRef.current) {
+        iframeRef.current.srcDoc = fullHTML;
+      }
+    }, 50);
+  }, [generateHTML, isMounted]);
 
   const resetPreview = () => {
-    // Force re-render of the iframe by creating a new srcDoc
-    const fullHTML = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preview</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 16px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            line-height: 1.5;
-            background: #f8fafc;
-        }
-        
-        .box {
-            width: 100px;
-            height: 100px;
-            background: #3b82f6;
-            margin: 10px;
-            display: inline-block;
-            border-radius: 8px;
-        }
-        
-        .message {
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 6px;
-            background: #f3f4f6;
-            border: 1px solid #d1d5db;
-        }
-        
-        .visible {
-            opacity: 1;
-            transition: opacity 0.3s ease;
-        }
-        
-        .hidden {
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .highlighted {
-            background: #fef3c7;
-            border-color: #f59e0b;
-        }
-        
-        .new-box {
-            padding: 12px;
-            margin: 8px 0;
-            background: #dcfce7;
-            border: 2px solid #16a34a;
-            border-radius: 6px;
-            color: #166534;
-        }
-        
-        button {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin: 4px;
-            font-size: 14px;
-        }
-        
-        button:hover {
-            background: #2563eb;
-        }
-        
-        input {
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            margin: 4px;
-        }
-        
-        .item {
-            padding: 8px;
-            margin: 4px 0;
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 4px;
-        }
-        
-        ${css}
-    </style>
-</head>
-<body>
-    ${html}
-</body>
-</html>`;
-
+    // Force re-render of the iframe by creating fresh HTML without JavaScript
+    const fullHTML = generateHTML(false);
     setSrcDoc(fullHTML);
+    
+    // Force iframe refresh
+    setTimeout(() => {
+      if (iframeRef.current) {
+        iframeRef.current.srcDoc = fullHTML;
+      }
+    }, 100);
   };
 
   return (
@@ -276,13 +207,24 @@ export function HTMLPreviewWindow({
       {/* Preview Content */}
       {isVisible && (
         <div className="relative">
-          <iframe
-            className="w-full border-none"
-            style={{ height: `${height}px` }}
-            title="HTML Preview"
-            sandbox="allow-scripts"
-            srcDoc={srcDoc}
-          />
+          {isMounted ? (
+            <iframe
+              ref={iframeRef}
+              className="w-full border-none"
+              style={{ height: `${height}px` }}
+              title="HTML Preview"
+              sandbox="allow-scripts"
+              srcDoc={srcDoc}
+              key={`iframe-${forceUpdate}-${Date.now()}`}
+            />
+          ) : (
+            <div 
+              className="w-full flex items-center justify-center bg-gray-50 dark:bg-gray-700"
+              style={{ height: `${height}px` }}
+            >
+              <div className="text-gray-500 dark:text-gray-400">Loading preview...</div>
+            </div>
+          )}
         </div>
       )}
     </div>

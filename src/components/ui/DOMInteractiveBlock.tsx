@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Play, Code, Eye } from "lucide-react";
 import { HTMLPreviewWindow } from "./HTMLPreviewWindow";
 
@@ -25,12 +25,31 @@ export function DOMInteractiveBlock({
   const [currentCode, setCurrentCode] = useState(javascript);
   const [executed, setExecuted] = useState(false);
   const [executeCount, setExecuteCount] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Handle client-side mounting to prevent hydration issues
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Reset code when javascript prop changes
+  useEffect(() => {
+    setCurrentCode(javascript);
+    setExecuted(false);
+    setExecuteCount(0);
+  }, [javascript]);
 
   const executeCode = () => {
+    if (!isMounted) return;
+    
     setExecuted(true);
     setExecuteCount((prev) => prev + 1);
+    
+    // Switch to preview tab with a slight delay to ensure state updates
     if (activeTab === "code") {
-      setActiveTab("preview");
+      setTimeout(() => {
+        setActiveTab("preview");
+      }, 100);
     }
   };
 
@@ -100,10 +119,10 @@ export function DOMInteractiveBlock({
           </div>
         )}
 
-        {activeTab === "preview" && (
+        {activeTab === "preview" && isMounted && (
           <div className="p-4">
             <HTMLPreviewWindow
-              key={`${executed}-${executeCount}-${currentCode.length}`}
+              key={`dom-preview-${executeCount}-${currentCode.length}-${Date.now()}`}
               html={html}
               css={css}
               javascript={executed ? currentCode : ""}
