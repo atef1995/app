@@ -117,8 +117,8 @@ export default {
     // Challenges
     const challengesData = await safeFetch(`${baseUrl}/api/challenges`);
     if (challengesData?.challenges) {
-      const challengePaths = challengesData.challenges.map(slug => ({
-        loc: `/practice/${slug}`,
+      const challengePaths = challengesData.challenges.map(challenge => ({
+        loc: `/practice/${challenge.slug}`,
         changefreq: "weekly",
         priority: 0.7,
         lastmod: new Date().toISOString(),
