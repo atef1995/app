@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useMood } from "@/components/providers/MoodProvider";
 import { useSession } from "next-auth/react";
 import { useToastContext } from "@/components/providers/ToastProvider";
@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import SyntaxHighlighter from "@/components/SyntaxHighlighter";
 import { HTMLPreviewWindow } from "@/components/ui/HTMLPreviewWindow";
+import { HTMLEditorPreview } from "@/components/ui/HTMLEditorPreview";
 
 interface UnlockedAchievement {
   achievement: {
@@ -34,13 +35,18 @@ interface UnlockedAchievement {
 }
 
 interface TutorialClientProps {
+  category: string;
   slug: string;
 }
 
-export default function TutorialClient({ slug }: TutorialClientProps) {
+export default function TutorialClient({
+  category,
+  slug,
+}: TutorialClientProps) {
   const { currentMood } = useMood();
   const { data: session } = useSession();
   const toast = useToastContext();
+  const [contentLoaded, setContentLoaded] = useState(false);
 
   // Use TanStack Query hook for tutorial data
   const { data: tutorial, isLoading, error, isError } = useTutorial(slug);
@@ -74,6 +80,17 @@ export default function TutorialClient({ slug }: TutorialClientProps) {
         });
     }
   }, [tutorial, session?.user?.id, toast]);
+
+  // Progressive content loading
+  useEffect(() => {
+    if (tutorial?.mdxSource) {
+      // Simulate progressive loading for better UX
+      const timer = setTimeout(() => {
+        setContentLoaded(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [tutorial?.mdxSource]);
 
   const getMoodColors = () => {
     switch (currentMood.id) {
@@ -226,12 +243,65 @@ export default function TutorialClient({ slug }: TutorialClientProps) {
     return (
       <div className={`min-h-screen bg-gradient-to-br ${moodColors.gradient}`}>
         <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-400">
-                Loading tutorial...
-              </p>
+          <div className="max-w-4xl mx-auto">
+            {/* Tutorial Header Skeleton */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl mb-8 animate-pulse">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+                <div className="flex-1">
+                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-2"></div>
+                  <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-96 mb-2"></div>
+                  <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-64"></div>
+                  <div className="flex items-center gap-4 mt-2">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tutorial Content Skeleton */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl mb-8 animate-pulse">
+              <div className="space-y-4">
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-4/5"></div>
+
+                <div className="my-6 h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+
+                <div className="my-6 h-20 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+              </div>
+            </div>
+
+            {/* Quiz Section Skeleton */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl animate-pulse">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2"></div>
+                  <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-96"></div>
+                </div>
+                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+              </div>
+              <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded-lg mb-6"></div>
+              <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg w-32"></div>
+            </div>
+
+            {/* Navigation Skeleton */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl mt-8 animate-pulse">
+              <div className="flex justify-between items-center">
+                <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+                <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-28"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -249,10 +319,16 @@ export default function TutorialClient({ slug }: TutorialClientProps) {
                 Error: {error?.message || "Tutorial not found"}
               </p>
               <Link
-                href="/tutorials"
-                className="bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800"
+                href={`/tutorials/category/${category}`}
+                className="bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 mr-2"
               >
-                Back to Tutorials
+                Back to {category}
+              </Link>
+              <Link
+                href="/tutorials"
+                className="bg-gray-600 dark:bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-800"
+              >
+                All Tutorials
               </Link>
             </div>
           </div>
@@ -271,6 +347,11 @@ export default function TutorialClient({ slug }: TutorialClientProps) {
             <div className="flex items-center gap-4 mb-4">
               <div className="flex-shrink-0">{getTutorialIcon(tutorial)}</div>
               <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm text-blue-600 dark:text-blue-400 font-medium capitalize">
+                    {category} Tutorial
+                  </span>
+                </div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                   {tutorial.meta.title || tutorial.title}
                 </h1>
@@ -318,9 +399,21 @@ export default function TutorialClient({ slug }: TutorialClientProps) {
           {/* Tutorial Content */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl mb-8 relative">
             {/* Add Table of Contents */}
-            {tutorial.content && <TableOfContents content={tutorial.content} />}
+            {tutorial.content && contentLoaded && (
+              <TableOfContents content={tutorial.content} />
+            )}
 
-            {tutorial.mdxSource ? (
+            {!contentLoaded ? (
+              <div className="animate-pulse space-y-4">
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-4/5"></div>
+                <div className="my-6 h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+              </div>
+            ) : tutorial.mdxSource ? (
               <article className="prose prose-lg dark:prose-invert max-w-none">
                 <MDXRemote
                   {...tutorial.mdxSource}
@@ -328,6 +421,7 @@ export default function TutorialClient({ slug }: TutorialClientProps) {
                     InteractiveCodeBlock,
                     DOMInteractiveBlock,
                     HTMLPreviewWindow,
+                    HTMLEditorPreview,
                     // Use custom heading components with anchor IDs
                     h1: createHeadingComponent(1),
                     h2: createHeadingComponent(2),
@@ -442,48 +536,71 @@ export default function TutorialClient({ slug }: TutorialClientProps) {
           {/* Quiz Section */}
           {(tutorial.meta.quizQuestions > 0 || tutorial.quiz) && (
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                    Ready for the Quiz?
-                  </h2>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    Test your knowledge with{" "}
-                    {tutorial.meta.quizQuestions ||
-                      tutorial.quiz?.questions.length ||
-                      0}{" "}
-                    questions. You need 70% or higher to complete this tutorial.
-                  </p>
+              {!contentLoaded ? (
+                <div className="animate-pulse">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2"></div>
+                      <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-96"></div>
+                    </div>
+                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+                  </div>
+                  <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded-lg mb-6"></div>
+                  <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg w-32"></div>
                 </div>
-                <Brain className="w-12 h-12 text-blue-600 dark:text-blue-400" />
-              </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                        Ready for the Quiz?
+                      </h2>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        Test your knowledge with{" "}
+                        {tutorial.meta.quizQuestions ||
+                          tutorial.quiz?.questions.length ||
+                          0}{" "}
+                        questions. You need 70% or higher to complete this
+                        tutorial.
+                      </p>
+                    </div>
+                    <Brain className="w-12 h-12 text-blue-600 dark:text-blue-400" />
+                  </div>
 
-              <div
-                className={`p-4 rounded-lg ${moodColors.bg} border-2 ${moodColors.border} mb-6`}
-              >
-                <h3 className={`font-bold mb-2 ${moodColors.text}`}>
-                  {currentMood.name} Mode Quiz Settings
-                </h3>
-                <ul className={`text-sm ${moodColors.text} space-y-1`}>
-                  <li>• Difficulty: {currentMood.quizSettings.difficulty}</li>
-                  <li>
-                    • Questions: {currentMood.quizSettings.questionsPerTutorial}
-                  </li>
-                  {currentMood.quizSettings.timeLimit && (
-                    <li>
-                      • Time Limit: {currentMood.quizSettings.timeLimit} seconds
-                    </li>
-                  )}
-                  <li>• Passing Score: 70%</li>
-                </ul>
-              </div>
+                  <div
+                    className={`p-4 rounded-lg ${moodColors.bg} border-2 ${moodColors.border} mb-6`}
+                  >
+                    <h3 className={`font-bold mb-2 ${moodColors.text}`}>
+                      {currentMood.name} Mode Quiz Settings
+                    </h3>
+                    <ul className={`text-sm ${moodColors.text} space-y-1`}>
+                      <li>
+                        • Difficulty: {currentMood.quizSettings.difficulty}
+                      </li>
+                      <li>
+                        • Questions:{" "}
+                        {currentMood.quizSettings.questionsPerTutorial}
+                      </li>
+                      {currentMood.quizSettings.timeLimit && (
+                        <li>
+                          • Time Limit: {currentMood.quizSettings.timeLimit}{" "}
+                          seconds
+                        </li>
+                      )}
+                      <li>• Passing Score: 70%</li>
+                    </ul>
+                  </div>
 
-              <Link
-                href={tutorial.quiz?.slug ? `/quiz/${tutorial.quiz.slug}` : "#"}
-                className={`inline-flex items-center gap-2 ${moodColors.accent} text-white py-3 px-8 rounded-lg font-semibold hover:opacity-90 transition-opacity`}
-              >
-                Start Quiz <ChevronRight className="w-5 h-5" />
-              </Link>
+                  <Link
+                    href={
+                      tutorial.quiz?.slug ? `/quiz/${tutorial.quiz.slug}` : "#"
+                    }
+                    className={`inline-flex items-center gap-2 ${moodColors.accent} text-white py-3 px-8 rounded-lg font-semibold hover:opacity-90 transition-opacity`}
+                  >
+                    Start Quiz <ChevronRight className="w-5 h-5" />
+                  </Link>
+                </>
+              )}
             </div>
           )}
 
@@ -491,15 +608,15 @@ export default function TutorialClient({ slug }: TutorialClientProps) {
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl mt-8">
             <div className="flex justify-between items-center">
               <Link
-                href="/tutorials"
+                href={`/tutorials/category/${category}`}
                 className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
-                <span className="text-sm">Back to Tutorials</span>
+                <span className="text-sm">Back to {category}</span>
               </Link>
 
               <div className="text-sm text-gray-500 dark:text-gray-400">
-                {tutorial.slug}
+                {category} / {tutorial.slug}
               </div>
 
               <Link

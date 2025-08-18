@@ -36,9 +36,10 @@ export function HTMLPreviewWindow({
     setForceUpdate(forceUpdateTrigger);
   }, [forceUpdateTrigger]);
 
-  const generateHTML = useCallback((includeJS: boolean = true) => {
-    const timestamp = Date.now();
-    return `<!DOCTYPE html>
+  const generateHTML = useCallback(
+    (includeJS: boolean = true) => {
+      const timestamp = Date.now();
+      return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -130,7 +131,9 @@ export function HTMLPreviewWindow({
 </head>
 <body>
     ${html}
-    ${includeJS ? `
+    ${
+      includeJS
+        ? `
     <script>
         // Timestamp: ${timestamp} - Force update: ${forceUpdate}
         try {
@@ -138,22 +141,26 @@ export function HTMLPreviewWindow({
         } catch (error) {
             console.error('Preview Error:', error);
         }
-    </script>` : ''}
+    </script>`
+        : ""
+    }
 </body>
 </html>`;
-  }, [css, html, javascript, forceUpdate]);
+    },
+    [css, html, javascript, forceUpdate]
+  );
 
   useEffect(() => {
     // Only update srcDoc on client side to prevent hydration issues
     if (!isMounted) return;
-    
+
     const fullHTML = generateHTML(true);
     setSrcDoc(fullHTML);
-    
+
     // Force iframe refresh by setting srcDoc twice with slight delay
     setTimeout(() => {
       if (iframeRef.current) {
-        iframeRef.current.srcDoc = fullHTML;
+        iframeRef.current.srcdoc = fullHTML;
       }
     }, 50);
   }, [generateHTML, isMounted]);
@@ -162,11 +169,11 @@ export function HTMLPreviewWindow({
     // Force re-render of the iframe by creating fresh HTML without JavaScript
     const fullHTML = generateHTML(false);
     setSrcDoc(fullHTML);
-    
+
     // Force iframe refresh
     setTimeout(() => {
       if (iframeRef.current) {
-        iframeRef.current.srcDoc = fullHTML;
+        iframeRef.current.srcdoc = fullHTML;
       }
     }, 100);
   };
@@ -185,7 +192,7 @@ export function HTMLPreviewWindow({
             {title}
           </span>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <button
             onClick={resetPreview}
@@ -199,7 +206,11 @@ export function HTMLPreviewWindow({
             className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-600 dark:text-gray-400"
             title={isVisible ? "Hide Preview" : "Show Preview"}
           >
-            {isVisible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            {isVisible ? (
+              <EyeOff className="w-4 h-4" />
+            ) : (
+              <Eye className="w-4 h-4" />
+            )}
           </button>
         </div>
       </div>
@@ -218,11 +229,13 @@ export function HTMLPreviewWindow({
               key={`iframe-${forceUpdate}-${Date.now()}`}
             />
           ) : (
-            <div 
+            <div
               className="w-full flex items-center justify-center bg-gray-50 dark:bg-gray-700"
               style={{ height: `${height}px` }}
             >
-              <div className="text-gray-500 dark:text-gray-400">Loading preview...</div>
+              <div className="text-gray-500 dark:text-gray-400">
+                Loading preview...
+              </div>
             </div>
           )}
         </div>

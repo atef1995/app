@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       success: true,
-      categories: paginatedCategories,
+      data: paginatedCategories,
       pagination: {
         page,
         limit,

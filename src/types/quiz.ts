@@ -38,9 +38,9 @@ export interface UnlockedAchievement {
 }
 
 export interface TutorialNavigation {
-  current: { id: string; slug: string; title: string; order: number };
-  prev: { id: string; slug: string; title: string; order: number } | null;
-  next: { id: string; slug: string; title: string; order: number } | null;
+  current: { id: string; slug: string; title: string; order: number; category: string };
+  prev: { id: string; slug: string; title: string; order: number; category: string } | null;
+  next: { id: string; slug: string; title: string; order: number; category: string } | null;
 }
 
 export interface QuizSubmissionResult {

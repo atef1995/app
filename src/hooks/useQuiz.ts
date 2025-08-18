@@ -3,7 +3,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { useToastContext } from "@/components/providers/ToastProvider";
 import { submitQuizAction } from "@/lib/actions";
-import { Quiz, QuizState, UnlockedAchievement, TutorialNavigation, Question } from "@/types/quiz";
+import {
+  Quiz,
+  QuizState,
+  UnlockedAchievement,
+  TutorialNavigation,
+  Question,
+} from "@/types/quiz";
 import { MOODS } from "@/lib/moods";
 
 // Fisher-Yates shuffle algorithm for randomizing array order
@@ -25,7 +31,8 @@ export function useQuiz({ slug, currentMoodId }: UseQuizProps) {
   const toast = useToastContext();
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [loadingQuiz, setLoadingQuiz] = useState(true);
-  const [tutorialNavigation, setTutorialNavigation] = useState<TutorialNavigation | null>(null);
+  const [tutorialNavigation, setTutorialNavigation] =
+    useState<TutorialNavigation | null>(null);
   const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
   const [quizState, setQuizState] = useState<QuizState>({
     currentQuestion: 0,
@@ -74,7 +81,7 @@ export function useQuiz({ slug, currentMoodId }: UseQuizProps) {
     const filteredQuestions = quiz.questions.filter((q) => {
       // If questions don't have difficulty property, include all questions
       if (!q.difficulty) return true;
-      
+
       if (currentMoodConfig.quizSettings.difficulty === "easy") {
         return q.difficulty === "easy";
       } else if (currentMoodConfig.quizSettings.difficulty === "medium") {
@@ -82,15 +89,15 @@ export function useQuiz({ slug, currentMoodId }: UseQuizProps) {
       }
       return true;
     });
-    
+
     const shuffled = shuffleArray(filteredQuestions);
     const questionsToShow = shuffled.slice(
       0,
       currentMoodConfig.quizSettings.questionsPerTutorial
     );
-    
+
     setShuffledQuestions(questionsToShow);
-    
+
     // Reset quiz state when questions change
     setQuizState({
       currentQuestion: 0,
@@ -105,7 +112,10 @@ export function useQuiz({ slug, currentMoodId }: UseQuizProps) {
 
     let correct = 0;
     quizState.answers.forEach((answer, index) => {
-      if (shuffledQuestions[index] && answer === shuffledQuestions[index].correct) {
+      if (
+        shuffledQuestions[index] &&
+        answer === shuffledQuestions[index].correct
+      ) {
         correct++;
       }
     });
@@ -137,7 +147,7 @@ export function useQuiz({ slug, currentMoodId }: UseQuizProps) {
 
         toast.success(
           "Quiz submitted successfully!",
-          `Score: ${result.score}% - ${
+          `Score: ${result.score.toPrecision(4)}% - ${
             result.passed ? "Passed!" : "Try again for 70%+"
           }`
         );
@@ -183,13 +193,23 @@ export function useQuiz({ slug, currentMoodId }: UseQuizProps) {
         showResults: true,
       }));
     }
-  }, [quiz, shuffledQuestions, quizState.startTime, quizState.answers, toast, submitError]);
+  }, [
+    quiz,
+    shuffledQuestions,
+    quizState.startTime,
+    quizState.answers,
+    toast,
+    submitError,
+  ]);
 
-  const handleAnswerSelect = useCallback((answerIndex: number) => {
-    const newAnswers = [...quizState.answers];
-    newAnswers[quizState.currentQuestion] = answerIndex;
-    setQuizState((prev) => ({ ...prev, answers: newAnswers }));
-  }, [quizState.answers, quizState.currentQuestion]);
+  const handleAnswerSelect = useCallback(
+    (answerIndex: number) => {
+      const newAnswers = [...quizState.answers];
+      newAnswers[quizState.currentQuestion] = answerIndex;
+      setQuizState((prev) => ({ ...prev, answers: newAnswers }));
+    },
+    [quizState.answers, quizState.currentQuestion]
+  );
 
   const handleNextQuestion = useCallback(() => {
     if (quizState.currentQuestion < shuffledQuestions.length - 1) {

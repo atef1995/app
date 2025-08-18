@@ -7,12 +7,16 @@ import {
   Layers,
   Zap,
   Globe,
-  Cpu
+  Cpu,
+  Code,
+  Palette,
+  Database
 } from "lucide-react";
 import { useMood } from "@/components/providers/MoodProvider";
 
 interface CategoryCardProps {
   category: string;
+  title?: string;
   tutorialCount: number;
   completedCount?: number;
   totalDuration?: string;
@@ -25,9 +29,12 @@ interface CategoryCardProps {
 
 const categoryIcons = {
   fundamentals: <Layers className="w-8 h-8" />,
+  html: <Code className="w-8 h-8" />,
+  css: <Palette className="w-8 h-8" />,
+  dom: <Globe className="w-8 h-8" />,
   oop: <Users className="w-8 h-8" />,
   async: <Zap className="w-8 h-8" />,
-  dom: <Globe className="w-8 h-8" />,
+  "data-structures": <Database className="w-8 h-8" />,
   advanced: <Cpu className="w-8 h-8" />,
 } as const;
 
@@ -57,6 +64,7 @@ const difficultyStyles = {
 
 export default function CategoryCard({
   category,
+  title,
   tutorialCount,
   completedCount = 0,
   totalDuration,
@@ -103,8 +111,8 @@ export default function CategoryCard({
               {categoryIcon}
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 capitalize">
-                {category.replace(/([A-Z])/g, ' $1').trim()}
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                {title || category.replace(/([A-Z])/g, ' $1').trim()}
               </h3>
               <p className={`text-sm font-medium capitalize ${styles.text}`}>
                 {difficulty} Level

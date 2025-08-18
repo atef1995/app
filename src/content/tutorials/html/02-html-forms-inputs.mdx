@@ -1,0 +1,721 @@
+---
+title: "HTML Forms and Input Elements: Building Interactive Web Pages"
+description: "Master HTML forms, input types, validation, and user interaction to create dynamic web experiences"
+level: "beginner"
+estimatedTime: "60 minutes"
+topics: ["Forms", "Input Types", "Validation", "User Interaction", "Accessibility"]
+quizQuestions: 15
+order: 2
+---
+
+# HTML Forms and Input Elements: Building Interactive Web Pages
+
+Welcome back! 📝 Now that you understand basic HTML structure, let's dive into one of the most powerful features of HTML: **forms**. Forms are how users interact with web pages, send data, and communicate with websites.
+
+## What are HTML Forms?
+
+HTML forms are containers that collect user input and send it to a server for processing. They're essential for:
+- **User registration and login**
+- **Contact forms and feedback**
+- **Search functionality**
+- **E-commerce and shopping carts**
+- **Surveys and data collection**
+
+> **💡 Real-World Impact** Every time you log into a website, search on Google, or fill out an online form, you're using HTML forms. They're the backbone of web interactivity!
+
+## Basic Form Structure
+
+Every form starts with the `<form>` element:
+
+<HTMLEditorPreview
+  title="Basic Form Structure"
+  initialHtml={`<form action="/submit" method="post" style="max-width: 400px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
+    <div style="margin-bottom: 16px;">
+        <label for="username" style="display: block; margin-bottom: 4px; font-weight: bold;">Username:</label>
+        <input type="text" id="username" name="username" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+    
+    <div style="margin-bottom: 16px;">
+        <label for="password" style="display: block; margin-bottom: 4px; font-weight: bold;">Password:</label>
+        <input type="password" id="password" name="password" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+    
+    <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-weight: bold;">Login</button>
+</form>`}
+  height={200}
+/>
+
+### Form Attributes
+
+**Key `<form>` attributes:**
+- `action` - Where to send form data (URL)
+- `method` - How to send data (`GET` or `POST`)
+- `enctype` - Encoding type for file uploads
+- `target` - Where to display the response
+
+## Input Types: The Building Blocks
+
+HTML5 introduced many input types that provide better user experience and built-in validation.
+
+### Text Inputs
+
+<HTMLEditorPreview
+  title="Text Input Types"
+  initialHtml={`<div style="max-width: 500px; padding: 20px;">
+    <!-- Basic text input -->
+    <div style="margin-bottom: 16px;">
+        <label for="name" style="display: block; margin-bottom: 4px; font-weight: bold;">Full Name:</label>
+        <input type="text" id="name" name="name" placeholder="Enter your full name" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+
+    <!-- Email input with validation -->
+    <div style="margin-bottom: 16px;">
+        <label for="email" style="display: block; margin-bottom: 4px; font-weight: bold;">Email Address:</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+
+    <!-- Password input (hidden text) -->
+    <div style="margin-bottom: 16px;">
+        <label for="password" style="display: block; margin-bottom: 4px; font-weight: bold;">Password:</label>
+        <input type="password" id="password" name="password" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+
+    <!-- Phone number input -->
+    <div style="margin-bottom: 16px;">
+        <label for="phone" style="display: block; margin-bottom: 4px; font-weight: bold;">Phone Number:</label>
+        <input type="tel" id="phone" name="phone" placeholder="(555) 123-4567" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+
+    <!-- URL input -->
+    <div style="margin-bottom: 16px;">
+        <label for="website" style="display: block; margin-bottom: 4px; font-weight: bold;">Website:</label>
+        <input type="url" id="website" name="website" placeholder="https://example.com" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+
+    <!-- Search input -->
+    <div style="margin-bottom: 16px;">
+        <label for="search" style="display: block; margin-bottom: 4px; font-weight: bold;">Search:</label>
+        <input type="search" id="search" name="search" placeholder="Search products..." style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+</div>`}
+  height={400}
+/>
+
+### Number and Date Inputs
+
+<HTMLEditorPreview
+  title="Number and Date Inputs"
+  initialHtml={`<div style="max-width: 500px; padding: 20px;">
+    <!-- Number input with min/max -->
+    <div style="margin-bottom: 16px;">
+        <label for="age" style="display: block; margin-bottom: 4px; font-weight: bold;">Age:</label>
+        <input type="number" id="age" name="age" min="13" max="120" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+
+    <!-- Range slider -->
+    <div style="margin-bottom: 16px;">
+        <label for="volume" style="display: block; margin-bottom: 4px; font-weight: bold;">Volume: <span id="volume-display">50</span></label>
+        <input type="range" id="volume" name="volume" min="0" max="100" value="50" style="width: 100%;" oninput="document.getElementById('volume-display').textContent = this.value">
+    </div>
+
+    <!-- Date input -->
+    <div style="margin-bottom: 16px;">
+        <label for="birthday" style="display: block; margin-bottom: 4px; font-weight: bold;">Birthday:</label>
+        <input type="date" id="birthday" name="birthday" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+
+    <!-- Time input -->
+    <div style="margin-bottom: 16px;">
+        <label for="appointment" style="display: block; margin-bottom: 4px; font-weight: bold;">Appointment Time:</label>
+        <input type="time" id="appointment" name="appointment" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+
+    <!-- Date and time combined -->
+    <div style="margin-bottom: 16px;">
+        <label for="meeting" style="display: block; margin-bottom: 4px; font-weight: bold;">Meeting Date & Time:</label>
+        <input type="datetime-local" id="meeting" name="meeting" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+
+    <!-- Month picker -->
+    <div style="margin-bottom: 16px;">
+        <label for="graduation" style="display: block; margin-bottom: 4px; font-weight: bold;">Graduation Month:</label>
+        <input type="month" id="graduation" name="graduation" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+
+    <!-- Week picker -->
+    <div style="margin-bottom: 16px;">
+        <label for="vacation" style="display: block; margin-bottom: 4px; font-weight: bold;">Vacation Week:</label>
+        <input type="week" id="vacation" name="vacation" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+</div>`}
+  height={450}
+/>
+
+### Choice Inputs
+
+<HTMLEditorPreview
+  title="Radio Buttons and Checkboxes"
+  initialHtml={`<div style="max-width: 500px; padding: 20px;">
+    <!-- Radio buttons (single choice) -->
+    <fieldset style="margin-bottom: 24px; padding: 16px; border: 2px solid #e5e7eb; border-radius: 8px; background: #f9fafb;">
+        <legend style="font-weight: bold; font-size: 16px; color: #374151; padding: 0 8px;">Choose your preferred contact method:</legend>
+        
+        <div style="margin: 12px 0; display: flex; align-items: center;">
+            <input type="radio" id="contact-email" name="contact" value="email" style="margin-right: 8px; transform: scale(1.2);">
+            <label for="contact-email" style="font-weight: 500; cursor: pointer;">Email</label>
+        </div>
+        
+        <div style="margin: 12px 0; display: flex; align-items: center;">
+            <input type="radio" id="contact-phone" name="contact" value="phone" style="margin-right: 8px; transform: scale(1.2);">
+            <label for="contact-phone" style="font-weight: 500; cursor: pointer;">Phone</label>
+        </div>
+        
+        <div style="margin: 12px 0; display: flex; align-items: center;">
+            <input type="radio" id="contact-text" name="contact" value="text" style="margin-right: 8px; transform: scale(1.2);">
+            <label for="contact-text" style="font-weight: 500; cursor: pointer;">Text Message</label>
+        </div>
+    </fieldset>
+
+    <!-- Checkboxes (multiple choices) -->
+    <fieldset style="padding: 16px; border: 2px solid #e5e7eb; border-radius: 8px; background: #f9fafb;">
+        <legend style="font-weight: bold; font-size: 16px; color: #374151; padding: 0 8px;">Select your interests:</legend>
+        
+        <div style="margin: 12px 0; display: flex; align-items: center;">
+            <input type="checkbox" id="interest-web" name="interests" value="web-development" style="margin-right: 8px; transform: scale(1.2);">
+            <label for="interest-web" style="font-weight: 500; cursor: pointer;">Web Development</label>
+        </div>
+        
+        <div style="margin: 12px 0; display: flex; align-items: center;">
+            <input type="checkbox" id="interest-design" name="interests" value="design" style="margin-right: 8px; transform: scale(1.2);">
+            <label for="interest-design" style="font-weight: 500; cursor: pointer;">Design</label>
+        </div>
+        
+        <div style="margin: 12px 0; display: flex; align-items: center;">
+            <input type="checkbox" id="interest-data" name="interests" value="data-science" style="margin-right: 8px; transform: scale(1.2);">
+            <label for="interest-data" style="font-weight: 500; cursor: pointer;">Data Science</label>
+        </div>
+    </fieldset>
+</div>`}
+  height={280}
+/>
+
+### Dropdown Selections
+
+<HTMLEditorPreview
+  title="Select Dropdowns"
+  initialHtml={`<div style="max-width: 500px; padding: 20px;">
+    <!-- Simple dropdown -->
+    <div style="margin-bottom: 20px;">
+        <label for="country" style="display: block; margin-bottom: 6px; font-weight: bold; color: #374151;">Country:</label>
+        <select id="country" name="country" style="width: 100%; padding: 10px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px; background: white;">
+            <option value="">Choose a country</option>
+            <option value="us">United States</option>
+            <option value="ca">Canada</option>
+            <option value="uk">United Kingdom</option>
+            <option value="au">Australia</option>
+        </select>
+    </div>
+
+    <!-- Multiple selection dropdown -->
+    <div style="margin-bottom: 20px;">
+        <label for="skills" style="display: block; margin-bottom: 6px; font-weight: bold; color: #374151;">Programming Skills:</label>
+        <select id="skills" name="skills" multiple style="width: 100%; padding: 10px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px; background: white; height: 120px;">
+            <option value="html">HTML</option>
+            <option value="css">CSS</option>
+            <option value="javascript">JavaScript</option>
+            <option value="python">Python</option>
+            <option value="java">Java</option>
+        </select>
+        <small style="color: #6b7280; font-style: italic;">Hold Ctrl (Cmd on Mac) to select multiple options</small>
+    </div>
+
+    <!-- Grouped options -->
+    <div style="margin-bottom: 20px;">
+        <label for="subject" style="display: block; margin-bottom: 6px; font-weight: bold; color: #374151;">Subject:</label>
+        <select id="subject" name="subject" style="width: 100%; padding: 10px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px; background: white;">
+            <optgroup label="Web Development" style="font-weight: bold; color: #3b82f6;">
+                <option value="html">HTML</option>
+                <option value="css">CSS</option>
+                <option value="javascript">JavaScript</option>
+            </optgroup>
+            <optgroup label="Programming" style="font-weight: bold; color: #10b981;">
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+            </optgroup>
+        </select>
+    </div>
+</div>`}
+  height={320}
+/>
+
+## Text Areas and File Uploads
+
+<HTMLEditorPreview
+  title="Text Areas and File Inputs"
+  initialHtml={`<div style="max-width: 500px; padding: 20px;">
+    <!-- Multi-line text input -->
+    <div style="margin-bottom: 20px;">
+        <label for="message" style="display: block; margin-bottom: 6px; font-weight: bold; color: #374151;">Your Message:</label>
+        <textarea id="message" name="message" rows="5" placeholder="Tell us about yourself..." style="width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px; font-family: inherit; resize: vertical;"></textarea>
+    </div>
+
+    <!-- File upload -->
+    <div style="margin-bottom: 20px;">
+        <label for="resume" style="display: block; margin-bottom: 6px; font-weight: bold; color: #374151;">Upload Resume:</label>
+        <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" style="width: 100%; padding: 8px; border: 2px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer;">
+        <small style="color: #6b7280; font-style: italic;">Accepted formats: PDF, DOC, DOCX</small>
+    </div>
+
+    <!-- Multiple file upload -->
+    <div style="margin-bottom: 20px;">
+        <label for="photos" style="display: block; margin-bottom: 6px; font-weight: bold; color: #374151;">Upload Photos:</label>
+        <input type="file" id="photos" name="photos" multiple accept="image/*" style="width: 100%; padding: 8px; border: 2px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer;">
+        <small style="color: #6b7280; font-style: italic;">Select multiple image files</small>
+    </div>
+
+    <!-- Hidden input explanation -->
+    <div style="padding: 12px; background: #f3f4f6; border-radius: 6px; border-left: 4px solid #6b7280;">
+        <strong style="color: #374151;">Hidden Input:</strong>
+        <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 14px;">Hidden inputs store data not visible to users (like user IDs):</p>
+        <code style="background: #e5e7eb; padding: 2px 4px; border-radius: 3px; font-size: 13px;">&lt;input type="hidden" name="user_id" value="12345"&gt;</code>
+    </div>
+</div>`}
+  height={350}
+/>
+
+## Form Validation
+
+HTML5 provides built-in validation that works without JavaScript:
+
+<HTMLEditorPreview
+  title="HTML5 Validation"
+  initialHtml={`<form onsubmit="event.preventDefault(); alert('Form is valid! In a real app, this would submit to the server.');" style="max-width: 500px; padding: 20px; border: 2px solid #e5e7eb; border-radius: 8px; background: #f9fafb;">
+    <!-- Required field -->
+    <div style="margin-bottom: 16px;">
+        <label for="username" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Username (required):</label>
+        <input type="text" id="username" name="username" required style="width: 100%; padding: 10px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+    </div>
+    
+    <!-- Minimum length requirement -->
+    <div style="margin-bottom: 16px;">
+        <label for="password" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Password (min 8 characters):</label>
+        <input type="password" id="password" name="password" minlength="8" required style="width: 100%; padding: 10px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+    </div>
+    
+    <!-- Pattern validation (regex) -->
+    <div style="margin-bottom: 16px;">
+        <label for="phone" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Phone (format: 123-456-7890):</label>
+        <input type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="123-456-7890" style="width: 100%; padding: 10px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+    </div>
+    
+    <!-- Number range validation -->
+    <div style="margin-bottom: 16px;">
+        <label for="age" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Age (13-120):</label>
+        <input type="number" id="age" name="age" min="13" max="120" required style="width: 100%; padding: 10px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+    </div>
+    
+    <!-- Custom validation message -->
+    <div style="margin-bottom: 20px;">
+        <label for="confirm-password" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Confirm Password:</label>
+        <input type="password" id="confirm-password" name="confirm-password" required style="width: 100%; padding: 10px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+    </div>
+    
+    <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; transition: background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">Register</button>
+    
+    <div style="margin-top: 16px; padding: 12px; background: #dbeafe; border-radius: 6px; border-left: 4px solid #3b82f6;">
+        <strong style="color: #1e40af;">Try it:</strong>
+        <p style="margin: 4px 0 0 0; color: #1e40af; font-size: 14px;">Leave fields empty or enter invalid data to see validation messages!</p>
+    </div>
+</form>`}
+  height={450}
+/>
+
+### Validation Attributes
+
+**Common validation attributes:**
+- `required` - Field must be filled out
+- `minlength` / `maxlength` - Text length limits
+- `min` / `max` - Number range limits
+- `pattern` - Regular expression pattern
+- `step` - Increment for number inputs
+
+## Form Accessibility
+
+Making forms accessible ensures everyone can use your website:
+
+<HTMLEditorPreview
+  title="Accessible Form Design"
+  initialHtml={`<form style="max-width: 500px; padding: 20px;">
+    <!-- Always associate labels with inputs -->
+    <div style="margin-bottom: 20px;">
+        <label for="email" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Email Address:</label>
+        <input type="email" id="email" name="email" required aria-describedby="email-help" style="width: 100%; padding: 10px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+        <div id="email-help" style="margin-top: 4px; font-size: 14px; color: #6b7280; padding: 8px; background: #f3f4f6; border-radius: 4px;">We'll never share your email with anyone.</div>
+    </div>
+    
+    <!-- Use fieldset and legend for grouped inputs -->
+    <fieldset style="margin-bottom: 20px; padding: 16px; border: 2px solid #e5e7eb; border-radius: 8px; background: #f9fafb;">
+        <legend style="font-weight: bold; font-size: 16px; color: #374151; padding: 0 8px;">Shipping Address</legend>
+        
+        <div style="margin-bottom: 12px;">
+            <label for="address" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Street Address:</label>
+            <input type="text" id="address" name="address" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+        </div>
+        
+        <div style="margin-bottom: 12px;">
+            <label for="city" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">City:</label>
+            <input type="text" id="city" name="city" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+        </div>
+        
+        <div style="margin-bottom: 12px;">
+            <label for="zip" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">ZIP Code:</label>
+            <input type="text" id="zip" name="zip" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+        </div>
+    </fieldset>
+    
+    <!-- Provide clear error messages -->
+    <div style="margin-bottom: 20px;">
+        <label for="age" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Age:</label>
+        <input type="number" id="age" name="age" min="13" max="120" required aria-describedby="age-error" style="width: 100%; padding: 10px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+        <div id="age-error" role="alert" style="color: #dc2626; background: #fef2f2; padding: 8px; border-radius: 4px; margin-top: 4px; border-left: 4px solid #dc2626; font-size: 14px;">
+            Please enter an age between 13 and 120.
+        </div>
+    </div>
+    
+    <div style="padding: 16px; background: #dbeafe; border-radius: 6px; border-left: 4px solid #3b82f6;">
+        <strong style="color: #1e40af;">Accessibility Features:</strong>
+        <ul style="margin: 8px 0 0 20px; color: #1e40af; font-size: 14px;">
+            <li>Labels properly associated with inputs</li>
+            <li>Helpful descriptions linked with aria-describedby</li>
+            <li>Fieldset groups related fields</li>
+            <li>Error messages have alert role</li>
+        </ul>
+    </div>
+</form>`}
+  height={500}
+/>
+
+## Advanced Form Elements
+
+### Datalist for Autocomplete
+
+<HTMLEditorPreview
+  title="Datalist Autocomplete"
+  initialHtml={`<div style="max-width: 500px; padding: 20px;">
+    <div style="margin-bottom: 20px;">
+        <label for="browser" style="display: block; margin-bottom: 6px; font-weight: bold; color: #374151;">Choose your browser:</label>
+        <input list="browsers" id="browser" name="browser" placeholder="Start typing browser name..." style="width: 100%; padding: 10px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+        
+        <datalist id="browsers">
+            <option value="Chrome">
+            <option value="Firefox">
+            <option value="Safari">
+            <option value="Edge">
+            <option value="Opera">
+        </datalist>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <label for="language" style="display: block; margin-bottom: 6px; font-weight: bold; color: #374151;">Programming Language:</label>
+        <input list="languages" id="language" name="language" placeholder="Start typing language name..." style="width: 100%; padding: 10px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+        
+        <datalist id="languages">
+            <option value="JavaScript">
+            <option value="Python">
+            <option value="Java">
+            <option value="C++">
+            <option value="Ruby">
+        </datalist>
+    </div>
+    
+    <div style="padding: 16px; background: #ecfdf5; border-radius: 6px; border-left: 4px solid #10b981;">
+        <strong style="color: #047857;">Try it:</strong>
+        <p style="margin: 4px 0 0 0; color: #047857; font-size: 14px;">Start typing in the fields above to see autocomplete suggestions appear!</p>
+    </div>
+</div>`}
+  height={220}
+/>
+
+### Output Element
+
+<HTMLEditorPreview
+  title="Output Element"
+  initialHtml={`<form oninput="result.value=parseInt(a.value)+parseInt(b.value)" style="max-width: 400px; padding: 20px; border: 2px solid #e5e7eb; border-radius: 8px; background: #f9fafb;">
+    <div style="margin-bottom: 16px;">
+        <label for="a" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">First Number:</label>
+        <input type="number" id="a" name="a" value="0" style="width: 100%; padding: 10px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+    </div>
+    
+    <div style="margin-bottom: 16px;">
+        <label for="b" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Second Number:</label>
+        <input type="number" id="b" name="b" value="0" style="width: 100%; padding: 10px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+    </div>
+    
+    <div style="margin-bottom: 20px;">
+        <label for="result" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Sum:</label>
+        <output id="result" name="result" for="a b" style="display: block; padding: 10px; background: #dbeafe; border: 2px solid #3b82f6; border-radius: 6px; font-size: 18px; font-weight: bold; color: #1e40af;">0</output>
+    </div>
+    
+    <div style="padding: 12px; background: #ecfdf5; border-radius: 6px; border-left: 4px solid #10b981;">
+        <strong style="color: #047857;">Interactive:</strong>
+        <p style="margin: 4px 0 0 0; color: #047857; font-size: 14px;">Change the numbers above to see the sum update automatically!</p>
+    </div>
+</form>`}
+  height={280}
+/>
+
+## Complete Registration Form Example
+
+Let's put it all together with a comprehensive registration form:
+
+<HTMLEditorPreview
+  title="Complete Registration Form"
+  initialHtml={`<form action="/register" method="post" enctype="multipart/form-data" style="max-width: 600px; padding: 20px; background: #f9fafb; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <h2 style="text-align: center; color: #1f2937; margin-bottom: 24px; font-size: 24px;">Create Your Account</h2>
+    
+    <!-- Personal Information -->
+    <fieldset style="margin-bottom: 24px; padding: 20px; border: 2px solid #e5e7eb; border-radius: 8px; background: white;">
+        <legend style="font-weight: bold; font-size: 18px; color: #374151; padding: 0 12px;">Personal Information</legend>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+                <label for="first-name" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">First Name:</label>
+                <input type="text" id="first-name" name="firstName" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+            </div>
+            <div>
+                <label for="last-name" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Last Name:</label>
+                <input type="text" id="last-name" name="lastName" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+            <label for="email" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Email Address:</label>
+            <input type="email" id="email" name="email" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div>
+                <label for="phone" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="123-456-7890" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+            </div>
+            <div>
+                <label for="birthday" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Date of Birth:</label>
+                <input type="date" id="birthday" name="birthday" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+            </div>
+        </div>
+    </fieldset>
+    
+    <!-- Account Details -->
+    <fieldset style="margin-bottom: 24px; padding: 20px; border: 2px solid #e5e7eb; border-radius: 8px; background: white;">
+        <legend style="font-weight: bold; font-size: 18px; color: #374151; padding: 0 12px;">Account Details</legend>
+        
+        <div style="margin-bottom: 16px;">
+            <label for="username" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Username:</label>
+            <input type="text" id="username" name="username" minlength="3" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+                <label for="password" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Password:</label>
+                <input type="password" id="password" name="password" minlength="8" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+            </div>
+            <div>
+                <label for="confirm-password" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Confirm Password:</label>
+                <input type="password" id="confirm-password" name="confirmPassword" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+            </div>
+        </div>
+        
+        <div>
+            <label for="profile-pic" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Profile Picture:</label>
+            <input type="file" id="profile-pic" name="profilePic" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; background: white;">
+        </div>
+    </fieldset>
+    
+    <!-- Preferences -->
+    <fieldset style="margin-bottom: 24px; padding: 20px; border: 2px solid #e5e7eb; border-radius: 8px; background: white;">
+        <legend style="font-weight: bold; font-size: 18px; color: #374151; padding: 0 12px;">Preferences</legend>
+        
+        <div style="margin-bottom: 16px;">
+            <label for="country" style="display: block; margin-bottom: 4px; font-weight: bold; color: #374151;">Country:</label>
+            <select id="country" name="country" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; background: white;">
+                <option value="">Select a country</option>
+                <option value="us">United States</option>
+                <option value="ca">Canada</option>
+                <option value="uk">United Kingdom</option>
+            </select>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+            <strong style="display: block; margin-bottom: 8px; color: #374151;">Preferred Contact Method:</strong>
+            <div style="display: flex; gap: 20px;">
+                <label style="display: flex; align-items: center; cursor: pointer;"><input type="radio" id="contact-email" name="contactMethod" value="email" checked style="margin-right: 6px;"> Email</label>
+                <label style="display: flex; align-items: center; cursor: pointer;"><input type="radio" id="contact-phone" name="contactMethod" value="phone" style="margin-right: 6px;"> Phone</label>
+            </div>
+        </div>
+        
+        <div>
+            <strong style="display: block; margin-bottom: 8px; color: #374151;">Interests (select all that apply):</strong>
+            <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+                <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox" id="interest-tech" name="interests" value="technology" style="margin-right: 6px;"> Technology</label>
+                <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox" id="interest-sports" name="interests" value="sports" style="margin-right: 6px;"> Sports</label>
+                <label style="display: flex; align-items: center; cursor: pointer;"><input type="checkbox" id="interest-music" name="interests" value="music" style="margin-right: 6px;"> Music</label>
+            </div>
+        </div>
+    </fieldset>
+    
+    <!-- Terms and Submit -->
+    <fieldset style="margin-bottom: 24px; padding: 20px; border: 2px solid #e5e7eb; border-radius: 8px; background: white;">
+        <div style="margin-bottom: 12px;">
+            <label style="display: flex; align-items: start; cursor: pointer;"><input type="checkbox" id="terms" name="agreeToTerms" required style="margin-right: 8px; margin-top: 2px;"> I agree to the Terms of Service and Privacy Policy</label>
+        </div>
+        
+        <div>
+            <label style="display: flex; align-items: start; cursor: pointer;"><input type="checkbox" id="newsletter" name="newsletter" style="margin-right: 8px; margin-top: 2px;"> Subscribe to our newsletter (optional)</label>
+        </div>
+    </fieldset>
+    
+    <div style="display: flex; gap: 12px; justify-content: center;">
+        <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 12px 32px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px;">Create Account</button>
+        <button type="reset" style="background: #6b7280; color: white; border: none; padding: 12px 32px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px;">Clear Form</button>
+    </div>
+</form>`}
+  height={800}
+/>
+
+## Form Styling with CSS
+
+While this tutorial focuses on HTML, here's a quick example of how forms can be styled:
+
+<HTMLEditorPreview
+  title="Basic Form Styling"
+  initialHtml={`<div style="max-width: 600px; margin: 0 auto;">
+    <!-- CSS Preview -->
+    <div style="background: #1f2937; color: #e5e7eb; padding: 16px; border-radius: 8px; margin-bottom: 20px; font-family: 'Courier New', monospace; font-size: 14px; overflow-x: auto;">
+        <div style="color: #fbbf24; margin-bottom: 8px;">/* CSS Styles Applied Below */</div>
+        <div><span style="color: #34d399;">form</span> { <span style="color: #60a5fa;">max-width:</span> 600px; <span style="color: #60a5fa;">padding:</span> 20px; <span style="color: #60a5fa;">background:</span> #f9f9f9; }</div>
+        <div><span style="color: #34d399;">label</span> { <span style="color: #60a5fa;">font-weight:</span> bold; <span style="color: #60a5fa;">margin-bottom:</span> 5px; }</div>
+        <div><span style="color: #34d399;">input</span> { <span style="color: #60a5fa;">padding:</span> 8px; <span style="color: #60a5fa;">border:</span> 1px solid #ccc; <span style="color: #60a5fa;">border-radius:</span> 4px; }</div>
+        <div><span style="color: #34d399;">button</span> { <span style="color: #60a5fa;">background:</span> #007bff; <span style="color: #60a5fa;">color:</span> white; <span style="color: #60a5fa;">padding:</span> 10px 20px; }</div>
+    </div>
+    
+    <!-- Styled Form Example -->
+    <form style="max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="margin-bottom: 16px;">
+            <label for="styled-name" style="display: block; margin-bottom: 5px; font-weight: bold; color: #374151;">Your Name:</label>
+            <input type="text" id="styled-name" name="name" required style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px;">
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label for="styled-email" style="display: block; margin-bottom: 5px; font-weight: bold; color: #374151;">Email:</label>
+            <input type="email" id="styled-email" name="email" required style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px;">
+        </div>
+        
+        <button type="submit" style="background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; transition: background 0.2s;" onmouseover="this.style.background='#0056b3'" onmouseout="this.style.background='#007bff'">Submit</button>
+        
+        <div style="margin-top: 16px; padding: 12px; background: #dbeafe; border-radius: 6px; border-left: 4px solid #3b82f6;">
+            <strong style="color: #1e40af;">CSS Styling:</strong>
+            <p style="margin: 4px 0 0 0; color: #1e40af; font-size: 14px;">This form demonstrates professional styling with proper spacing, colors, and hover effects!</p>
+        </div>
+    </form>
+</div>`}
+  height={400}
+/>
+
+## Best Practices for HTML Forms
+
+### 1. Always Use Labels
+```html
+<!-- ❌ Bad -->
+<input type="text" placeholder="Name">
+
+<!-- ✅ Good -->
+<label for="name">Name:</label>
+<input type="text" id="name" name="name" placeholder="Enter your full name">
+```
+
+### 2. Use Appropriate Input Types
+```html
+<!-- ❌ Bad -->
+<input type="text" placeholder="Email">
+
+<!-- ✅ Good -->
+<input type="email" placeholder="Email" required>
+```
+
+### 3. Group Related Fields
+```html
+<!-- ✅ Good -->
+<fieldset>
+    <legend>Shipping Address</legend>
+    <!-- address fields here -->
+</fieldset>
+```
+
+### 4. Provide Clear Instructions
+```html
+<label for="password">Password:</label>
+<input type="password" id="password" name="password" 
+       aria-describedby="password-help" required>
+<div id="password-help">Must be at least 8 characters long</div>
+```
+
+### 5. Use Validation Wisely
+```html
+<!-- Provide helpful patterns and messages -->
+<input type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" 
+       placeholder="123-456-7890" title="Please use the format: 123-456-7890">
+```
+
+## Common Form Mistakes to Avoid
+
+### 1. Missing Name Attributes
+Forms won't submit data without `name` attributes on inputs.
+
+### 2. Poor Label Association
+Always use `for` attribute on labels that matches the `id` of the input.
+
+### 3. Inaccessible Forms
+Missing labels, poor color contrast, or no keyboard navigation support.
+
+### 4. Over-Validation
+Don't make forms too restrictive - be user-friendly while maintaining security.
+
+### 5. No Feedback
+Users need to know if form submission succeeded or failed.
+
+## Your Turn! 💪
+
+Create a contact form that includes:
+
+1. **Personal info**: Name, email, phone
+2. **Message type**: Dropdown with options (General, Support, Sales)
+3. **Priority level**: Radio buttons (Low, Medium, High)
+4. **Message**: Textarea for the actual message
+5. **File attachment**: File input for optional attachments
+6. **Newsletter signup**: Checkbox for newsletter subscription
+7. **Submit and reset buttons**
+
+Make sure to:
+- Use proper labels and accessibility
+- Add appropriate validation
+- Group related fields with fieldsets
+- Use semantic input types
+
+## What's Next?
+
+Great job! 🎉 You've learned how to create interactive forms that can collect user data. Next up:
+
+- **HTML Multimedia** - Adding images, videos, and audio to your pages
+- **CSS Styling** - Making your forms (and everything else) look amazing
+- **JavaScript Validation** - Adding dynamic validation and interactivity
+- **Form Handling** - Server-side processing of form data
+
+Forms are the gateway to user interaction on the web. Master them, and you'll be able to build truly interactive websites! 🚀
+
+## Resources for Further Learning
+
+- [MDN Forms Guide](https://developer.mozilla.org/en-US/docs/Learn/Forms)
+- [HTML5 Input Types](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input)
+- [Web Accessibility Guidelines for Forms](https://www.w3.org/WAI/tutorials/forms/)
+- [Form Validation Best Practices](https://web.dev/learn/forms/validation/)

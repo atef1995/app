@@ -74,6 +74,7 @@ model User {
   projectReviews         ProjectReview[]
   projectReviewAssignments ProjectReviewAssignment[]
   projectProgress        ProjectProgress[]
+  studyProgress          UserStudyProgress[]
 
   @@map("users")
 }
@@ -87,6 +88,28 @@ model VerificationToken {
   @@map("verificationtokens")
 }
 
+model Category {
+  id           String    @id @default(cuid())
+  slug         String    @unique
+  title        String
+  description  String
+  difficulty   String    @default("beginner") // "beginner", "intermediate", "advanced"
+  topics       String[]  // Array of topic strings
+  duration     String    // e.g., "4-6 hours"
+  iconBg       String    @default("bg-blue-100 dark:bg-blue-900")
+  iconColor    String    @default("text-blue-600 dark:text-blue-400")
+  badgeBg      String    @default("bg-blue-100 dark:bg-blue-900")
+  badgeColor   String    @default("text-blue-800 dark:text-blue-200")
+  dotColor     String    @default("bg-blue-600")
+  order        Int       @default(0)
+  published    Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  tutorials    Tutorial[]
+
+  @@map("categories")
+}
+
 model Tutorial {
   id               String             @id @default(cuid())
   slug             String             @unique
@@ -94,14 +117,16 @@ model Tutorial {
   description      String?
   content          String?
   mdxFile          String?
-  category         String             @default("fundamentals")
+  categoryId       String
   difficulty       Int                @default(1)
+  estimatedTime    Float              @default(60.0)
   order            Int
   published        Boolean            @default(false)
   isPremium        Boolean            @default(false)
   requiredPlan     String             @default("FREE")
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
+  category         Category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   progress         Progress[]
   quizzes          Quiz[]
   tutorialProgress TutorialProgress[]
@@ -566,4 +591,25 @@ model ProjectProgress {
 
   @@unique([userId, projectId])
   @@map("project_progress")
+}
+
+model UserStudyProgress {
+  id                       String   @id @default(cuid())
+  userId                   String
+  studyPlanId              String
+  currentPhaseId           String
+  currentStepId            String
+  completedSteps           String[]
+  completedPhases          String[]
+  totalProgressPercentage  Int      @default(0)
+  hoursSpent               Float    @default(0)
+  startedAt                DateTime @default(now())
+  estimatedCompletionDate  DateTime
+  lastActivityAt           DateTime @default(now())
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  user                     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, studyPlanId])
+  @@map("user_study_progress")
 }

@@ -15,6 +15,7 @@ import {
   Trophy,
   Users,
   Building,
+  Map,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -66,6 +67,17 @@ export function Header() {
           "text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20",
         mobile:
           "text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20",
+      },
+    },
+    {
+      href: "/study-plan",
+      label: "Study Plan",
+      icon: Map,
+      colors: {
+        desktop:
+          "text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20",
+        mobile:
+          "text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20",
       },
     },
     {

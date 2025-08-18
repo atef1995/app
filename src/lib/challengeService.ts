@@ -1,92 +1,60 @@
 import { prisma } from "./prisma";
-import type { Challenge } from "@/types/practice";
 import {
-  Challenge as PrismaChallenge,
+  Challenge,
   ChallengeTest,
   ChallengeMoodAdaptation,
 } from "@prisma/client";
 
-type DbChallenge = PrismaChallenge & {
+// Prisma types for challenges with relationships
+export type ChallengeWithTests = Challenge & {
   tests: ChallengeTest[];
   moodAdaptations: ChallengeMoodAdaptation[];
 };
 
-// Convert database challenge to frontend Challenge type
-function convertDbChallengeToFrontend(dbChallenge: DbChallenge): Challenge {
-  // Create mood adaptations map
-  const moodAdaptations = dbChallenge.moodAdaptations.reduce(
-    (acc, adaptation) => {
-      acc[adaptation.mood.toLowerCase() as "chill" | "rush" | "grind"] =
-        adaptation.content;
-      return acc;
-    },
-    {} as { chill: string; rush: string; grind: string }
-  );
-
-  return {
-    id: dbChallenge.id,
-    slug: dbChallenge.slug,
-    title: dbChallenge.title,
-    description: dbChallenge.description,
-    difficulty: dbChallenge.difficulty.toLowerCase() as
-      | "easy"
-      | "medium"
-      | "hard",
-    type: dbChallenge.type.toLowerCase() as
-      | "algorithm"
-      | "function"
-      | "array"
-      | "object"
-      | "logic",
-    estimatedTime: dbChallenge.estimatedTime,
-    isPremium: dbChallenge.isPremium,
-    requiredPlan: (dbChallenge.requiredPlan || "FREE") as
-      | "FREE"
-      | "VIBED"
-      | "CRACKED",
-    moodAdapted: moodAdaptations,
-    starter: dbChallenge.starter,
-    solution: dbChallenge.solution,
-    tests: dbChallenge.tests.map((test) => ({
-      input: test.input as unknown,
-      expected: test.expected as unknown,
-      description: test.description,
-    })),
-  };
-}
-
-export async function getAllChallenges(): Promise<Challenge[]> {
+export async function getAllChallenges(): Promise<ChallengeWithTests[]> {
   try {
-    const dbChallenges = await prisma.challenge.findMany({
+    const challenges = await prisma.challenge.findMany({
+      where: {
+        published: true,
+      },
       include: {
-        tests: true,
+        tests: {
+          orderBy: {
+            order: "asc",
+          },
+        },
         moodAdaptations: true,
       },
-      orderBy: [{ difficulty: "asc" }, { createdAt: "asc" }],
+      orderBy: [{ order: "asc" }, { createdAt: "asc" }],
     });
 
-    return dbChallenges.map(convertDbChallengeToFrontend);
+    return challenges;
   } catch (error) {
     console.error("Error fetching challenges:", error);
-    return [];
+    throw new Error("Failed to fetch challenges");
   }
 }
 
-export async function getChallengeById(id: string): Promise<Challenge | null> {
+export async function getChallengeById(
+  id: string
+): Promise<ChallengeWithTests | null> {
   try {
-    const dbChallenge = await prisma.challenge.findUnique({
-      where: { id },
+    const challenge = await prisma.challenge.findUnique({
+      where: {
+        id,
+        published: true,
+      },
       include: {
-        tests: true,
+        tests: {
+          orderBy: {
+            order: "asc",
+          },
+        },
         moodAdaptations: true,
       },
     });
 
-    if (!dbChallenge) {
-      return null;
-    }
-
-    return convertDbChallengeToFrontend(dbChallenge);
+    return challenge;
   } catch (error) {
     console.error("Error fetching challenge by ID:", error);
     return null;
@@ -95,21 +63,24 @@ export async function getChallengeById(id: string): Promise<Challenge | null> {
 
 export async function getChallengeBySlug(
   slug: string
-): Promise<Challenge | null> {
+): Promise<ChallengeWithTests | null> {
   try {
-    const dbChallenge = await prisma.challenge.findUnique({
-      where: { slug },
+    const challenge = await prisma.challenge.findUnique({
+      where: {
+        slug,
+        published: true,
+      },
       include: {
-        tests: true,
+        tests: {
+          orderBy: {
+            order: "asc",
+          },
+        },
         moodAdaptations: true,
       },
     });
 
-    if (!dbChallenge) {
-      return null;
-    }
-
-    return convertDbChallengeToFrontend(dbChallenge);
+    return challenge;
   } catch (error) {
     console.error("Error fetching challenge by slug:", error);
     return null;
@@ -119,9 +90,15 @@ export async function getChallengeBySlug(
 export async function getFilteredChallenges(filters: {
   type?: string;
   difficulty?: string;
-}): Promise<Challenge[]> {
+}): Promise<ChallengeWithTests[]> {
   try {
-    const where: { type?: string; difficulty?: string } = {};
+    const where: {
+      published: boolean;
+      type?: string;
+      difficulty?: string;
+    } = {
+      published: true,
+    };
 
     if (filters.type && filters.type !== "all") {
       where.type = filters.type.toUpperCase();
@@ -131,47 +108,57 @@ export async function getFilteredChallenges(filters: {
       where.difficulty = filters.difficulty.toUpperCase();
     }
 
-    const dbChallenges = await prisma.challenge.findMany({
+    const challenges = await prisma.challenge.findMany({
       where,
       include: {
-        tests: true,
+        tests: {
+          orderBy: {
+            order: "asc",
+          },
+        },
         moodAdaptations: true,
       },
-      orderBy: [{ difficulty: "asc" }, { createdAt: "asc" }],
+      orderBy: [{ order: "asc" }, { createdAt: "asc" }],
     });
 
-    return dbChallenges.map(convertDbChallengeToFrontend);
+    return challenges;
   } catch (error) {
     console.error("Error fetching filtered challenges:", error);
-    return [];
+    throw new Error("Failed to fetch filtered challenges");
   }
 }
 
 export async function getChallengeTypes(): Promise<string[]> {
   try {
     const types = await prisma.challenge.findMany({
+      where: {
+        published: true,
+      },
       select: { type: true },
       distinct: ["type"],
     });
 
-    return types.map((t) => t.type.toLowerCase());
+    return types.map((t) => t.type);
   } catch (error) {
     console.error("Error fetching challenge types:", error);
-    return [];
+    throw new Error("Failed to fetch challenge types");
   }
 }
 
 export async function getChallengeDifficulties(): Promise<string[]> {
   try {
     const difficulties = await prisma.challenge.findMany({
+      where: {
+        published: true,
+      },
       select: { difficulty: true },
       distinct: ["difficulty"],
     });
 
-    return difficulties.map((d) => d.difficulty.toLowerCase());
+    return difficulties.map((d) => d.difficulty);
   } catch (error) {
     console.error("Error fetching challenge difficulties:", error);
-    return [];
+    throw new Error("Failed to fetch challenge difficulties");
   }
 }
 

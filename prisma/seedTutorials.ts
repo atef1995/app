@@ -1372,6 +1372,178 @@ const TUTORIALS = [
     },
   },
 
+  // HTML CATEGORY
+  {
+    slug: "html-basics",
+    title: "HTML Fundamentals: Building Your First Web Page",
+    description:
+      "Learn the essential HTML elements and structure to create your first web page",
+    mdxFile: "html/01-html-basics",
+    category: "html",
+    difficulty: 1,
+    order: 1,
+    published: true,
+    isPremium: false,
+    requiredPlan: "FREE",
+    quiz: {
+      title: "HTML Fundamentals Quiz",
+      isPremium: false,
+      requiredPlan: "FREE",
+      questions: [
+        {
+          question: "What does HTML stand for?",
+          options: [
+            "Hyper Text Markup Language",
+            "High Tech Modern Language",
+            "Home Tool Markup Language",
+            "Hyperlink and Text Markup Language"
+          ],
+          correct: 0,
+          explanation:
+            "HTML stands for HyperText Markup Language, the standard markup language for creating web pages."
+        },
+        {
+          question: "Which tag is used to create the largest heading?",
+          options: ["<h6>", "<h1>", "<header>", "<heading>"],
+          correct: 1,
+          explanation:
+            "The <h1> tag creates the largest heading in HTML, representing the most important heading level."
+        },
+        {
+          question: "What is the correct way to create a link to another website?",
+          options: [
+            "<link href='https://example.com'>Example</link>",
+            "<a href='https://example.com'>Example</a>",
+            "<url>https://example.com</url>",
+            "<website url='https://example.com'>Example</website>"
+          ],
+          correct: 1,
+          explanation:
+            "The <a> tag with the href attribute is used to create hyperlinks to other web pages."
+        },
+        {
+          question: "Which attribute is required for the <img> tag for accessibility?",
+          options: ["src", "alt", "title", "width"],
+          correct: 1,
+          explanation:
+            "The alt attribute provides alternative text for images, which is essential for screen readers and accessibility."
+        },
+        {
+          question: "What is the purpose of the <!DOCTYPE html> declaration?",
+          options: [
+            "To include CSS styles",
+            "To tell the browser this is an HTML5 document",
+            "To create a comment",
+            "To import JavaScript"
+          ],
+          correct: 1,
+          explanation:
+            "The <!DOCTYPE html> declaration tells the browser that this is an HTML5 document and should be rendered accordingly."
+        },
+        {
+          question: "Which tag is used to create an unordered list?",
+          options: ["<ol>", "<ul>", "<list>", "<ulist>"],
+          correct: 1,
+          explanation:
+            "The <ul> tag creates an unordered (bulleted) list, while <ol> creates an ordered (numbered) list."
+        },
+        {
+          question: "What is semantic HTML?",
+          options: [
+            "HTML that looks good",
+            "HTML that uses meaningful elements that describe their content",
+            "HTML with CSS styling",
+            "HTML with JavaScript functionality"
+          ],
+          correct: 1,
+          explanation:
+            "Semantic HTML uses elements that clearly describe their meaning and content, improving accessibility and SEO."
+        },
+        {
+          question: "Which tag should contain the main content of a web page?",
+          options: ["<content>", "<body>", "<main>", "<section>"],
+          correct: 2,
+          explanation:
+            "The <main> element contains the main content of the document, excluding headers, footers, and navigation."
+        },
+        {
+          question: "What is the difference between <strong> and <b>?",
+          options: [
+            "No difference",
+            "<strong> has semantic meaning (importance), <b> is just visual styling",
+            "<b> is better for accessibility",
+            "<strong> is deprecated"
+          ],
+          correct: 1,
+          explanation:
+            "<strong> indicates importance semantically, while <b> is purely presentational. <strong> is better for accessibility."
+        },
+        {
+          question: "Which input type is used for email addresses in forms?",
+          options: [
+            "<input type='text'>",
+            "<input type='email'>",
+            "<input type='mail'>",
+            "<input type='address'>"
+          ],
+          correct: 1,
+          explanation:
+            "The input type='email' provides built-in email validation and appropriate mobile keyboards."
+        },
+        {
+          question: "What does the 'required' attribute do in form inputs?",
+          options: [
+            "Makes the input larger",
+            "Changes the input color",
+            "Makes the field mandatory to fill before submission",
+            "Adds a tooltip"
+          ],
+          correct: 2,
+          explanation:
+            "The required attribute makes form fields mandatory - the form cannot be submitted without filling them."
+        },
+        {
+          question: "Which tag is used to group related form elements?",
+          options: ["<group>", "<fieldset>", "<formgroup>", "<section>"],
+          correct: 1,
+          explanation:
+            "The <fieldset> tag groups related form controls and is often used with <legend> to provide a caption."
+        },
+        {
+          question: "What is the purpose of the <head> section?",
+          options: [
+            "Contains visible page content",
+            "Contains metadata about the document",
+            "Contains the page header",
+            "Contains navigation links"
+          ],
+          correct: 1,
+          explanation:
+            "The <head> contains metadata like title, character encoding, viewport settings, and links to CSS/JavaScript files."
+        },
+        {
+          question: "Which tag creates a line break?",
+          options: ["<break>", "<br>", "<lb>", "<newline>"],
+          correct: 1,
+          explanation:
+            "The <br> tag creates a line break and is one of the few self-closing tags in HTML."
+        },
+        {
+          question: "How do you add a comment in HTML?",
+          options: [
+            "// This is a comment",
+            "/* This is a comment */",
+            "<!-- This is a comment -->",
+            "# This is a comment"
+          ],
+          correct: 2,
+          explanation:
+            "HTML comments are written using <!-- comment text --> and are not visible on the rendered page."
+        }
+      ],
+    },
+  },
+
   // DATA STRUCTURES CATEGORY
   {
     slug: "introduction-to-arrays",
@@ -1495,23 +1667,35 @@ async function seedTutorials() {
     console.log("🌱 Starting tutorial seeding...");
 
     for (const tutorialData of TUTORIALS) {
-      const { quiz, ...tutorial } = tutorialData;
+      const { quiz, category, ...tutorial } = tutorialData;
+
+      // Find the category by slug to get the categoryId
+      const categoryRecord = await prisma.category.findUnique({
+        where: { slug: category },
+      });
+
+      if (!categoryRecord) {
+        console.error(`❌ Category not found: ${category}`);
+        continue;
+      }
 
       // Create or update tutorial
       const createdTutorial = await prisma.tutorial.upsert({
         where: { slug: tutorial.slug },
         update: {
           ...tutorial,
+          categoryId: categoryRecord.id,
           published: true, // Ensure all tutorials are published
         },
         create: {
           ...tutorial,
+          categoryId: categoryRecord.id,
           published: true,
         },
       });
 
       console.log(
-        `✅ Tutorial created/updated: ${createdTutorial.title} (Category: ${createdTutorial.category})`
+        `✅ Tutorial created/updated: ${createdTutorial.title} (Category: ${categoryRecord.title})`
       );
 
       if (quiz) {
@@ -1568,6 +1752,9 @@ async function seedTutorials() {
       `   - Data Structures: ${
         TUTORIALS.filter((t) => t.category === "data-structures").length
       }`
+    );
+    console.log(
+      `   - HTML: ${TUTORIALS.filter((t) => t.category === "html").length}`
     );
     console.log(
       `   - Free tutorials: ${TUTORIALS.filter((t) => !t.isPremium).length}`

@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import {
   useTutorialsByCategory,
   useTutorialProgress,
+  useCategoryBySlug,
   type TutorialWithProgress,
 } from "@/hooks/useTutorialQueries";
 import Card, { CardAction } from "@/components/ui/Card";
@@ -25,87 +26,9 @@ import {
   List,
   BookOpen,
   Clock,
+  Loader2,
 } from "lucide-react";
 
-// Category metadata
-const categoryMetadata = {
-  fundamentals: {
-    title: "Fundamentals",
-    description:
-      "Master the essential building blocks of JavaScript programming",
-    difficulty: "beginner" as const,
-    topics: ["Variables", "Functions", "Arrays", "Objects"],
-    duration: "4-6 hours",
-    iconBg: "bg-blue-100 dark:bg-blue-900",
-    iconColor: "text-blue-600 dark:text-blue-400",
-    badgeBg: "bg-blue-100 dark:bg-blue-900",
-    badgeColor: "text-blue-800 dark:text-blue-200",
-    dotColor: "bg-blue-600",
-  },
-  oop: {
-    title: "Object-Oriented Programming",
-    description:
-      "Learn object-oriented programming concepts and patterns in JavaScript",
-    difficulty: "intermediate" as const,
-    topics: ["Objects", "Prototypes", "Classes", "Inheritance"],
-    duration: "3-4 hours",
-    iconBg: "bg-green-100 dark:bg-green-900",
-    iconColor: "text-green-600 dark:text-green-400",
-    badgeBg: "bg-green-100 dark:bg-green-900",
-    badgeColor: "text-green-800 dark:text-green-200",
-    dotColor: "bg-green-600",
-  },
-  async: {
-    title: "Asynchronous JavaScript",
-    description:
-      "Handle asynchronous operations with promises, async/await, and more",
-    difficulty: "intermediate" as const,
-    topics: ["Promises", "Async/Await", "Fetch API", "Error Handling"],
-    duration: "2-3 hours",
-    iconBg: "bg-purple-100 dark:bg-purple-900",
-    iconColor: "text-purple-600 dark:text-purple-400",
-    badgeBg: "bg-purple-100 dark:bg-purple-900",
-    badgeColor: "text-purple-800 dark:text-purple-200",
-    dotColor: "bg-purple-600",
-  },
-  dom: {
-    title: "DOM Manipulation",
-    description:
-      "Manipulate web pages dynamically using the Document Object Model",
-    difficulty: "intermediate" as const,
-    topics: ["DOM Selection", "Event Handling", "Element Creation", "Styling"],
-    duration: "2-3 hours",
-    iconBg: "bg-orange-100 dark:bg-orange-900",
-    iconColor: "text-orange-600 dark:text-orange-400",
-    badgeBg: "bg-orange-100 dark:bg-orange-900",
-    badgeColor: "text-orange-800 dark:text-orange-200",
-    dotColor: "bg-orange-600",
-  },
-  advanced: {
-    title: "Advanced JavaScript",
-    description: "Explore advanced JavaScript concepts and modern patterns",
-    difficulty: "advanced" as const,
-    topics: ["Closures", "Modules", "Design Patterns", "Performance"],
-    duration: "5-8 hours",
-    iconBg: "bg-red-100 dark:bg-red-900",
-    iconColor: "text-red-600 dark:text-red-400",
-    badgeBg: "bg-red-100 dark:bg-red-900",
-    badgeColor: "text-red-800 dark:text-red-200",
-    dotColor: "bg-red-600",
-  },
-  "data-structures": {
-    title: "Data Structures & Algorithms",
-    description: "Master fundamental data structures and algorithms in JavaScript",
-    difficulty: "intermediate" as const,
-    topics: ["Arrays", "Objects", "Sets", "Maps", "Algorithms"],
-    duration: "4-6 hours",
-    iconBg: "bg-indigo-100 dark:bg-indigo-900",
-    iconColor: "text-indigo-600 dark:text-indigo-400",
-    badgeBg: "bg-indigo-100 dark:bg-indigo-900",
-    badgeColor: "text-indigo-800 dark:text-indigo-200",
-    dotColor: "bg-indigo-600",
-  },
-};
 
 export default function CategoryPage() {
   const params = useParams();
@@ -115,6 +38,7 @@ export default function CategoryPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [navigatingToTutorial, setNavigatingToTutorial] = useState<string | null>(null);
 
   const {
     handlePremiumContent,
@@ -129,15 +53,15 @@ export default function CategoryPage() {
   const tutorialsData = categoryTutorialsQuery.data?.data || [];
   const pagination = categoryTutorialsQuery.data?.pagination;
 
+  // Fetch category metadata from database
+  const categoryQuery = useCategoryBySlug(category);
+  const categoryMeta = categoryQuery.data;
+
   // Progress data
   const { tutorialsWithProgress } = useTutorialProgress(
     tutorialsData,
     session?.user?.id
   );
-
-  // Get category metadata
-  const categoryMeta =
-    categoryMetadata[category as keyof typeof categoryMetadata];
 
   // Use server-side pagination data instead of client-side calculations
   const totalItems = pagination?.totalCount || 0;
@@ -175,7 +99,9 @@ export default function CategoryPage() {
         type: "tutorial",
       },
       () => {
-        window.location.href = `/tutorials/${tutorial.slug}`;
+        setNavigatingToTutorial(tutorial.slug);
+        // Use Next.js router for better navigation
+        window.location.href = `/tutorials/category/${category}/${tutorial.slug}`;
       }
     );
   };
@@ -203,7 +129,7 @@ export default function CategoryPage() {
     );
   }
 
-  if (categoryTutorialsQuery.isLoading) {
+  if (categoryTutorialsQuery.isLoading || categoryQuery.isLoading) {
     return (
       <PageLayout
         title={categoryMeta?.title || category}
@@ -221,7 +147,7 @@ export default function CategoryPage() {
     );
   }
 
-  if (categoryTutorialsQuery.error) {
+  if (categoryTutorialsQuery.error || categoryQuery.error) {
     return (
       <PageLayout
         title={categoryMeta?.title || category}
@@ -420,13 +346,23 @@ export default function CategoryPage() {
                     />
                     <CardAction.Primary
                       onClick={() => handleTutorialClick(tutorial)}
+                      disabled={navigatingToTutorial === tutorial.slug}
                     >
-                      {isLocked
-                        ? "Unlock"
-                        : tutorial.progress?.quizPassed
-                        ? "Review"
-                        : "Start"}{" "}
-                      Tutorial
+                      {navigatingToTutorial === tutorial.slug ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          {isLocked
+                            ? "Unlock"
+                            : tutorial.progress?.quizPassed
+                            ? "Review"
+                            : "Start"}{" "}
+                          Tutorial
+                        </>
+                      )}
                     </CardAction.Primary>
                   </div>
                 }

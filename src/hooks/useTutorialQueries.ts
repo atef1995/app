@@ -1,5 +1,6 @@
 import { useQuery, useQueries } from "@tanstack/react-query";
-import { TutorialWithQuiz } from "@/lib/tutorialService";
+import { TutorialWithAll } from "@/lib/tutorialService";
+import { Category } from "@prisma/client";
 
 // Types
 interface TutorialProgress {
@@ -11,14 +12,12 @@ interface TutorialProgress {
   completedAt: Date | null;
 }
 
-interface TutorialWithProgress extends TutorialWithQuiz {
+interface TutorialWithProgress extends Omit<TutorialWithAll, "estimatedTime"> {
   progress?: TutorialProgress | null;
   level?: string;
   lessons?: number;
-  estimatedTime?: string;
+  estimatedTime?: string; // Override to be string instead of number
   topics?: string[];
-  isPremium: boolean;
-  requiredPlan: "FREE" | "VIBED" | "CRACKED";
 }
 
 // Constants
@@ -35,7 +34,7 @@ const getDifficultyLevel = (difficulty: number): string => {
   return "advanced";
 };
 
-const validateTutorial = (tutorial: unknown): tutorial is TutorialWithQuiz => {
+const validateTutorial = (tutorial: unknown): tutorial is TutorialWithAll => {
   const t = tutorial as Record<string, unknown>;
   return (
     typeof t.id === "string" &&
@@ -46,7 +45,7 @@ const validateTutorial = (tutorial: unknown): tutorial is TutorialWithQuiz => {
 };
 
 const mapTutorialWithDefaults = async (
-  tutorial: TutorialWithQuiz
+  tutorial: TutorialWithAll
 ): Promise<TutorialWithProgress> => {
   let estimatedTime: string = TUTORIAL_DEFAULTS.ESTIMATED_TIME;
   let topics: string[] = [...TUTORIAL_DEFAULTS.DEFAULT_TOPICS];
@@ -101,8 +100,16 @@ interface PaginatedResponse<T> {
 }
 
 // Fetch functions
-const fetchTutorials = async (page = 1, limit = 10): Promise<PaginatedResponse<TutorialWithProgress>> => {
-  const response = await fetch(`/api/tutorials?page=${page}&limit=${limit}`);
+const fetchTutorials = async (
+  page = 1,
+  limit = 10,
+  all = false
+): Promise<PaginatedResponse<TutorialWithProgress>> => {
+  const url = all
+    ? `/api/tutorials?page=1&limit=1000` // Get all tutorials for stats
+    : `/api/tutorials?page=${page}&limit=${limit}`;
+
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error("Failed to fetch tutorials");
   }
@@ -145,8 +152,13 @@ const fetchTutorialProgress = async (
   return progressData.data;
 };
 
-const fetchCategories = async (page = 1, limit = 10): Promise<PaginatedResponse<string>> => {
-  const response = await fetch(`/api/tutorials/categories?page=${page}&limit=${limit}`);
+const fetchCategories = async (
+  page = 1,
+  limit = 10
+): Promise<PaginatedResponse<Category>> => {
+  const response = await fetch(
+    `/api/tutorials/categories?page=${page}&limit=${limit}`
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch categories");
   }
@@ -158,9 +170,28 @@ const fetchCategories = async (page = 1, limit = 10): Promise<PaginatedResponse<
 
   return {
     success: true,
-    data: data.categories,
+    data: data.data,
     pagination: data.pagination,
   };
+};
+
+const fetchCategoryBySlug = async (slug: string): Promise<Category | null> => {
+  const response = await fetch(
+    `/api/tutorials/categories/${encodeURIComponent(slug)}`
+  );
+  if (!response.ok) {
+    if (response.status === 404) {
+      return null;
+    }
+    throw new Error("Failed to fetch category");
+  }
+
+  const data = await response.json();
+  if (!data.success) {
+    throw new Error(data.error || "Failed to fetch category");
+  }
+
+  return data.data;
 };
 
 const fetchTutorialsByCategory = async (
@@ -169,7 +200,9 @@ const fetchTutorialsByCategory = async (
   limit = 10
 ): Promise<PaginatedResponse<TutorialWithProgress>> => {
   const response = await fetch(
-    `/api/tutorials/category/${encodeURIComponent(category)}?page=${page}&limit=${limit}`
+    `/api/tutorials/category/${encodeURIComponent(
+      category
+    )}?page=${page}&limit=${limit}`
   );
   if (!response.ok) {
     throw new Error(`Failed to fetch tutorials for category: ${category}`);
@@ -181,7 +214,7 @@ const fetchTutorialsByCategory = async (
   }
 
   // Validate and map tutorials
-  const validTutorials = data.tutorials.filter(validateTutorial);
+  const validTutorials = data.data.filter(validateTutorial);
   const mappedTutorials = await Promise.all(
     validTutorials.map(mapTutorialWithDefaults)
   );
@@ -194,10 +227,10 @@ const fetchTutorialsByCategory = async (
 };
 
 // Custom hooks
-export const useTutorials = (page = 1, limit = 10) => {
+export const useTutorials = (page = 1, limit = 10, all = false) => {
   return useQuery({
-    queryKey: ["tutorials", page, limit],
-    queryFn: () => fetchTutorials(page, limit),
+    queryKey: all ? ["tutorials", "all"] : ["tutorials", page, limit],
+    queryFn: () => fetchTutorials(page, limit, all),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
@@ -246,13 +279,27 @@ export const useCategories = (page = 1, limit = 10) => {
   });
 };
 
-export const useTutorialsByCategory = (category: string, page = 1, limit = 12) => {
+export const useTutorialsByCategory = (
+  category: string,
+  page = 1,
+  limit = 12
+) => {
   return useQuery({
     queryKey: ["tutorials-by-category", category, page, limit],
     queryFn: () => fetchTutorialsByCategory(category, page, limit),
     enabled: Boolean(category),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+};
+
+export const useCategoryBySlug = (slug: string) => {
+  return useQuery({
+    queryKey: ["category-by-slug", slug],
+    queryFn: () => fetchCategoryBySlug(slug),
+    enabled: Boolean(slug),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
   });
 };
 

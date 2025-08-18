@@ -1,0 +1,672 @@
+---
+title: "HTML Fundamentals: Building Your First Web Page"
+description: "Learn the essential HTML elements and structure to create your first web page"
+level: "beginner"
+estimatedTime: "45 minutes"
+topics: ["HTML", "Elements", "Tags", "Structure", "Semantic HTML"]
+quizQuestions: 15
+order: 1
+---
+
+# HTML Fundamentals: Building Your First Web Page
+
+Welcome to HTML! 🌐 HTML (HyperText Markup Language) is the foundation of every web page. It's the skeleton that gives structure to web content.
+
+## What is HTML?
+
+HTML stands for **HyperText Markup Language**. It's not a programming language, but a **markup language** that uses tags to define the structure and content of web pages.
+
+> **💡 Markup vs Programming** HTML is a markup language, not a programming language. It describes content structure rather than logic or behavior. Think of it as the blueprint for a house - it shows where walls, doors, and windows go, but doesn't control electricity or plumbing.
+
+<HTMLEditorPreview
+  title="Your First HTML Document - Try Editing!"
+  initialHtml={`<h1>Welcome to My Website!</h1>
+<p>This is my first HTML page.</p>`}
+  height={200}
+/>
+
+### 🎯 Exercise 1: Edit Your First HTML
+
+**Step 1:** Click the **code icon (`< >`) button** in the preview window above to show the HTML editor with syntax highlighting.
+
+**Step 2:** Change "Welcome to My Website!" to your own website name. For example: "Welcome to Sarah's Blog!"
+
+**Step 3:** Edit the paragraph text to describe your page. Try: "This is where I share my coding journey."
+
+**Step 4:** Click the **Play button (▶)** to see your changes in the preview.
+
+**Step 5:** Try adding a new paragraph below. Add: `<p>I'm excited to learn HTML!</p>`
+
+> **💡 Tip:** If you make a mistake, click the **Reset button (↻)** to go back to the original code.
+
+**Complete HTML structure:**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My First Web Page</title>
+</head>
+<body>
+    <h1>Welcome to My Website!</h1>
+    <p>This is my first HTML page.</p>
+</body>
+</html>
+```
+
+## HTML Document Structure
+
+Every HTML document follows the same basic structure:
+
+### 1. Document Type Declaration
+
+```html
+<!DOCTYPE html>
+```
+
+The `<!DOCTYPE html>` declaration tells the browser this is an HTML5 document. Always put this at the very top of your HTML files.
+
+### 2. The HTML Root Element
+
+```html
+<html lang="en">
+```
+
+The `<html>` element is the root of every HTML page. The `lang="en"` attribute tells browsers and screen readers the page language.
+
+### 3. The Head Section
+
+```html
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Title</title>
+    <meta name="description" content="Page description for search engines">
+</head>
+```
+
+**Head elements include:**
+- `<meta charset="UTF-8">` - Character encoding for international text
+- `<meta name="viewport">` - Mobile responsiveness settings
+- `<title>` - Page title shown in browser tabs
+- `<meta name="description">` - Page description for search engines
+
+### 4. The Body Section
+
+The `<body>` contains all visible content on your web page.
+
+## Essential HTML Elements
+
+### Headings (h1-h6)
+
+HTML has six heading levels, from `<h1>` (most important) to `<h6>` (least important).
+
+<HTMLEditorPreview
+  title="Heading Hierarchy - Try Different Headings!"
+  initialHtml={`<h1>Main Title</h1>
+<h2>Chapter Title</h2>
+<h3>Section Title</h3>
+<h4>Subsection Title</h4>
+<h5>Minor Heading</h5>
+<h6>Smallest Heading</h6>`}
+  height={250}
+/>
+
+### 🎯 Exercise 2: Create Your Blog Structure
+
+**Step 1:** Click the **`< >` button** to open the editor above.
+
+**Step 2:** Change the `<h1>` to your blog title: "My Learning Journey" 
+
+**Step 3:** Replace `<h2>Chapter Title</h2>` with `<h2>Week 1: HTML Basics</h2>`
+
+**Step 4:** Change the `<h3>` to a specific topic: `<h3>Understanding Tags</h3>`
+
+**Step 5:** Add a new `<h3>` below it: `<h3>Building My First Page</h3>`
+
+**Step 6:** Click **▶** to run your code and see the heading structure!
+
+> **💡 SEO and Accessibility** Search engines and screen readers use headings to understand page structure. Use them hierarchically - don't skip levels (h1 → h3) without h2.
+
+### Paragraphs and Text
+
+<HTMLEditorPreview
+  title="Text Elements - Try Editing the Text!"
+  initialHtml={`<p>This is a paragraph. It represents a block of text.</p>
+
+<p>You can make text <strong>bold</strong> or <em>italic</em>.</p>
+
+<p>There's also <b>bold</b> and <i>italic</i>, but strong and em are better for accessibility.</p>
+
+<p>Line breaks<br>can be added with the br tag.</p>`}
+  height={200}
+/>
+
+### 🎯 Exercise 3: Style Your Text
+
+**Step 1:** Click **`< >`** to show the editor.
+
+**Step 2:** In the first paragraph, make "paragraph" **bold** by wrapping it: `<strong>paragraph</strong>`
+
+**Step 3:** In the second paragraph, make "bold" even more emphasized by changing `<strong>bold</strong>` to `<strong><em>bold</em></strong>`
+
+**Step 4:** Add a new paragraph: `<p>I'm learning HTML and it's <em>amazing</em>!</p>`
+
+**Step 5:** Try adding a line break in your new paragraph: `I'm learning HTML<br>and it's <em>amazing</em>!`
+
+**Step 6:** Hit **▶** to see your formatted text!
+
+> **💡 Pro Tip:** Notice the colorful syntax highlighting in the editor? You can toggle it on/off using the `< >` button in the editor toolbar!
+
+**Text elements:**
+- `<p>` - Paragraphs
+- `<strong>` - Important text (bold)
+- `<em>` - Emphasized text (italic)
+- `<br>` - Line break
+- `<hr>` - Horizontal rule (divider line)
+
+### Lists
+
+<HTMLEditorPreview
+  title="HTML Lists - Try Adding More Items!"
+  initialHtml={`<!-- Unordered List -->
+<ul>
+    <li>First item</li>
+    <li>Second item</li>
+    <li>Third item</li>
+</ul>
+
+<!-- Ordered List -->
+<ol>
+    <li>Step one</li>
+    <li>Step two</li>
+    <li>Step three</li>
+</ol>`}
+  height={220}
+/>
+
+### 🎯 Exercise 4: Build Your To-Do Lists
+
+**Step 1:** Click **`< >`** to open the editor.
+
+**Step 2:** In the unordered list (`<ul>`), change the items to your favorite hobbies:
+   - Change "First item" to "Reading books"
+   - Change "Second item" to "Playing guitar" 
+   - Change "Third item" to "Coding websites"
+
+**Step 3:** Add a fourth hobby: `<li>Learning new languages</li>`
+
+**Step 4:** In the ordered list (`<ol>`), create your learning plan:
+   - Change "Step one" to "Learn HTML basics"
+   - Change "Step two" to "Practice with CSS"
+   - Change "Step three" to "Add JavaScript"
+
+**Step 5:** Add a fourth step: `<li>Build amazing projects</li>`
+
+**Step 6:** Click **▶** to see your personalized lists!
+
+> **🎨 Challenge:** Try nesting a list inside a list item! Add `<ul><li>Sub-item</li></ul>` inside one of your `<li>` elements.
+
+### Links and Images
+
+<HTMLPreviewWindow
+  title="Links and Images"
+  html={`<!-- External Link -->
+<a href="https://example.com">Visit Example.com</a>
+
+<!-- Internal Link -->
+<a href="#section1">Go to Section 1</a>
+
+<!-- Email Link -->
+<a href="mailto:hello@example.com">Send Email</a>
+
+<!-- Image placeholder (image won't load in preview) -->
+<div style="width: 300px; height: 200px; background: #f0f0f0; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #666;">
+  Image placeholder (image.jpg)
+</div>`}
+  height={280}
+/>
+
+> **💡 Alt Text for Accessibility** Always include descriptive `alt` text for images. Screen readers use this to describe images to visually impaired users. If an image is decorative, use empty alt text: `alt=""`.
+
+## Semantic HTML Elements
+
+Semantic HTML uses elements that describe their meaning, not just appearance. This improves accessibility and SEO.
+
+<HTMLPreviewWindow
+  title="Semantic Structure"
+  html={`<header style="border: 2px solid #3b82f6; padding: 16px; margin: 8px 0; background: #eff6ff;">
+    <nav>
+        <ul style="display: flex; list-style: none; gap: 16px; margin: 0; padding: 0;">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main style="border: 2px solid #16a34a; padding: 16px; margin: 8px 0; background: #f0fdf4;">
+    <section style="margin: 16px 0;">
+        <h2>About Us</h2>
+        <p>We are a company dedicated to web development.</p>
+    </section>
+    
+    <article style="margin: 16px 0;">
+        <h2>Latest News</h2>
+        <p>Here's what's happening in our company.</p>
+    </article>
+    
+    <aside style="border: 1px solid #f59e0b; padding: 12px; background: #fefbf3; margin: 16px 0;">
+        <h3>Related Links</h3>
+        <ul>
+            <li><a href="#link1">Resource 1</a></li>
+            <li><a href="#link2">Resource 2</a></li>
+        </ul>
+    </aside>
+</main>
+
+<footer style="border: 2px solid #6b7280; padding: 16px; margin: 8px 0; background: #f9fafb;">
+    <p>&copy; 2024 My Company. All rights reserved.</p>
+</footer>`}
+  height={400}
+/>
+
+**Semantic elements:**
+- `<header>` - Page or section header
+- `<nav>` - Navigation links
+- `<main>` - Main content area
+- `<section>` - Thematic grouping of content
+- `<article>` - Independent content
+- `<aside>` - Sidebar content
+- `<footer>` - Page or section footer
+
+## HTML Attributes
+
+Attributes provide additional information about elements. They're written inside the opening tag.
+
+<HTMLPreviewWindow
+  title="Common Attributes"
+  html={`<!-- Class and ID for CSS styling -->
+<div class="container" id="main-content" style="border: 1px solid #e5e7eb; padding: 16px; margin: 8px 0;">
+    <p class="highlight" style="background: #fef3c7; padding: 8px;">This paragraph has a class.</p>
+</div>
+
+<!-- Data attributes for JavaScript -->
+<button data-action="save" data-id="123" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Save</button>
+
+<!-- Title for tooltips (hover over the HTML text below) -->
+<p><abbr title="HyperText Markup Language" style="border-bottom: 1px dotted; cursor: help;">HTML</abbr> stands for HyperText Markup Language</p>`}
+  height={150}
+/>
+
+**Common attributes:**
+- `class` - CSS styling identifier (can be reused)
+- `id` - Unique identifier (should be unique per page)
+- `title` - Tooltip text
+- `data-*` - Custom data attributes for JavaScript
+
+## Forms and Input
+
+Forms collect user input and send it to servers.
+
+<HTMLEditorPreview
+  title="Basic Form - Try Adding More Fields!"
+  initialHtml={`<form action="/submit" method="post" style="max-width: 400px;">
+    <div style="margin: 12px 0;">
+        <label for="name" style="display: block; margin-bottom: 4px; font-weight: bold;">Name:</label>
+        <input type="text" id="name" name="name" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+    
+    <div style="margin: 12px 0;">
+        <label for="email" style="display: block; margin-bottom: 4px; font-weight: bold;">Email:</label>
+        <input type="email" id="email" name="email" required style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    </div>
+    
+    <div style="margin: 12px 0;">
+        <label for="message" style="display: block; margin-bottom: 4px; font-weight: bold;">Message:</label>
+        <textarea id="message" name="message" rows="4" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; resize: vertical;"></textarea>
+    </div>
+    
+    <div style="margin: 12px 0;">
+        <label for="newsletter" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="newsletter" name="newsletter">
+            Subscribe to newsletter
+        </label>
+    </div>
+    
+    <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px;">Send Message</button>
+</form>`}
+  height={350}
+/>
+
+### 🎯 Exercise 5: Customize Your Contact Form
+
+**Step 1:** Click **`< >`** to open the form editor.
+
+**Step 2:** Add a phone number field. After the email field, add:
+```html
+<div style="margin: 12px 0;">
+    <label for="phone" style="display: block; margin-bottom: 4px; font-weight: bold;">Phone:</label>
+    <input type="tel" id="phone" name="phone" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+</div>
+```
+
+**Step 3:** Change the button text from "Send Message" to "Contact Me Now!"
+
+**Step 4:** Add a dropdown for subject. Before the message field, add:
+```html
+<div style="margin: 12px 0;">
+    <label for="subject" style="display: block; margin-bottom: 4px; font-weight: bold;">Subject:</label>
+    <select id="subject" name="subject" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+        <option value="general">General Inquiry</option>
+        <option value="project">Project Discussion</option>
+        <option value="job">Job Opportunity</option>
+    </select>
+</div>
+```
+
+**Step 5:** Click **▶** to test your enhanced contact form!
+
+**Form elements:**
+- `<form>` - Form container
+- `<label>` - Input labels (important for accessibility)
+- `<input>` - Various input types (text, email, password, etc.)
+- `<textarea>` - Multi-line text input
+- `<button>` - Form buttons
+
+## Best Practices
+
+### 1. Use Semantic HTML
+
+Choose elements based on meaning, not appearance. CSS handles styling.
+
+```html
+<!-- ❌ Bad -->
+<div class="heading">Page Title</div>
+
+<!-- ✅ Good -->
+<h1>Page Title</h1>
+```
+
+### 2. Write Valid HTML
+
+Use proper nesting, close all tags, and include required attributes.
+
+```html
+<!-- ❌ Bad -->
+<p>Paragraph <strong>bold text</p></strong>
+
+<!-- ✅ Good -->
+<p>Paragraph <strong>bold text</strong></p>
+```
+
+### 3. Use Meaningful Alt Text
+
+Describe what images show, not just "image" or "photo."
+
+```html
+<!-- ❌ Bad -->
+<img src="dog.jpg" alt="image">
+
+<!-- ✅ Good -->
+<img src="dog.jpg" alt="Golden retriever playing fetch in the park">
+```
+
+### 4. Structure with Headings
+
+Use headings to create a logical document outline.
+
+```html
+<!-- ✅ Good heading structure -->
+<h1>Website Title</h1>
+  <h2>Main Section</h2>
+    <h3>Subsection</h3>
+    <h3>Another Subsection</h3>
+  <h2>Another Main Section</h2>
+```
+
+## Building Your First Page
+
+Let's create a complete personal webpage:
+
+<HTMLPreviewWindow
+  title="Complete Personal Website Example"
+  html={`<header style="background: #f8fafc; padding: 20px; border-bottom: 1px solid #e2e8f0;">
+    <h1 style="margin: 0 0 16px 0; color: #1f2937;">John Doe</h1>
+    <nav>
+        <ul style="display: flex; list-style: none; gap: 24px; margin: 0; padding: 0;">
+            <li><a href="#about" style="color: #3b82f6; text-decoration: none;">About</a></li>
+            <li><a href="#projects" style="color: #3b82f6; text-decoration: none;">Projects</a></li>
+            <li><a href="#contact" style="color: #3b82f6; text-decoration: none;">Contact</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main style="padding: 20px; max-width: 800px;">
+    <section id="about" style="margin-bottom: 32px;">
+        <h2 style="color: #1f2937; border-bottom: 2px solid #3b82f6; padding-bottom: 8px;">About Me</h2>
+        <p style="line-height: 1.6; margin: 16px 0;">I'm a <strong>passionate web developer</strong> with 3 years of experience creating beautiful and functional websites.</p>
+        <div style="width: 200px; height: 150px; background: #f0f0f0; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #666; margin: 16px 0;">
+            Profile Image
+        </div>
+    </section>
+    
+    <section id="projects" style="margin-bottom: 32px;">
+        <h2 style="color: #1f2937; border-bottom: 2px solid #3b82f6; padding-bottom: 8px;">My Projects</h2>
+        <article style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 16px 0;">
+            <h3 style="margin: 0 0 12px 0; color: #374151;">E-commerce Website</h3>
+            <p style="line-height: 1.6; margin: 0 0 12px 0;">Built a full-stack e-commerce solution using modern web technologies.</p>
+            <a href="https://example-store.com" style="color: #3b82f6; text-decoration: none; font-weight: 500;">View Project →</a>
+        </article>
+    </section>
+    
+    <section id="contact">
+        <h2 style="color: #1f2937; border-bottom: 2px solid #3b82f6; padding-bottom: 8px;">Get In Touch</h2>
+        <form action="/contact" method="post" style="margin-top: 16px;">
+            <div style="margin: 16px 0;">
+                <label for="name" style="display: block; margin-bottom: 8px; font-weight: 500;">Name:</label>
+                <input type="text" id="name" name="name" required style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+            </div>
+            
+            <div style="margin: 16px 0;">
+                <label for="email" style="display: block; margin-bottom: 8px; font-weight: 500;">Email:</label>
+                <input type="email" id="email" name="email" required style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px;">
+            </div>
+            
+            <div style="margin: 16px 0;">
+                <label for="message" style="display: block; margin-bottom: 8px; font-weight: 500;">Message:</label>
+                <textarea id="message" name="message" required style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px; resize: vertical; min-height: 100px;"></textarea>
+            </div>
+            
+            <button type="submit" style="background: #3b82f6; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 500;">Send Message</button>
+        </form>
+    </section>
+</main>
+
+<footer style="background: #f8fafc; padding: 20px; border-top: 1px solid #e2e8f0; text-align: center; margin-top: 40px;">
+    <p style="margin: 0; color: #6b7280;">&copy; 2024 John Doe. Built with HTML.</p>
+</footer>`}
+  height={600}
+/>
+
+## Common Mistakes to Avoid
+
+### 1. Missing DOCTYPE
+
+Always include `<!DOCTYPE html>` at the top of your documents.
+
+### 2. Unclosed Tags
+
+HTML requires properly closed tags (except self-closing tags like `<img>` and `<br>`).
+
+### 3. Missing Alt Attributes
+
+Images should always have alt text for accessibility.
+
+### 4. Improper Heading Hierarchy
+
+Don't skip heading levels - use h1, then h2, then h3, etc.
+
+## Your Turn! 💪
+
+Create your own HTML page:
+
+1. Start with the basic HTML structure
+2. Add a header with your name and navigation
+3. Create sections for about, skills, and contact
+4. Include at least one image with proper alt text
+5. Add a form with name, email, and message fields
+
+### HTML Playground
+
+Try building your own webpage in this interactive editor:
+
+### 🎯 Final Challenge: Build Your Personal Website
+
+This is your chance to create a complete webpage! Follow these steps:
+
+<HTMLEditorPreview
+  title="HTML Playground - Build Your Own Page!"
+  initialHtml={`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My First Website</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px;
+            background: #f8fafc;
+        }
+        header { 
+            background: #3b82f6; 
+            color: white; 
+            padding: 1rem; 
+            border-radius: 8px; 
+        }
+        nav ul { 
+            list-style: none; 
+            padding: 0; 
+            display: flex; 
+            gap: 1rem; 
+        }
+        nav a { 
+            color: white; 
+            text-decoration: none; 
+        }
+        main { 
+            margin: 2rem 0; 
+        }
+        section { 
+            margin: 2rem 0; 
+            padding: 1rem; 
+            background: white; 
+            border-radius: 8px; 
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Your Name Here</h1>
+        <nav>
+            <ul>
+                <li><a href="#about">About</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="about">
+            <h2>About Me</h2>
+            <p>Write something about yourself here!</p>
+        </section>
+        
+        <section id="projects">
+            <h2>My Projects</h2>
+            <ul>
+                <li>Project 1</li>
+                <li>Project 2</li>
+                <li>Project 3</li>
+            </ul>
+        </section>
+        
+        <section id="contact">
+            <h2>Contact Me</h2>
+            <form>
+                <p>
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name">
+                </p>
+                <p>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email">
+                </p>
+                <p>
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" rows="4"></textarea>
+                </p>
+                <button type="submit">Send Message</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>`}
+  height={500}
+/>
+
+**🎯 Your Mission (click `< >` to start editing):**
+
+**Phase 1: Personalize the Header**
+1. Change "Your Name Here" in the `<h1>` to your actual name
+2. Update the navigation links if you want different sections
+
+**Phase 2: Fill Out the About Section**
+3. Replace "Write something about yourself here!" with a real description
+4. Try adding more paragraphs about your interests
+
+**Phase 3: Add Your Projects**
+5. Replace "Project 1", "Project 2", etc. with real or imagined projects
+6. **Bonus:** Change the `<ul>` to `<ol>` to make it a numbered list
+
+**Phase 4: Enhance the Contact Form**
+7. Add a phone number input (use `type="tel"`)
+8. Add a dropdown for inquiry type using `<select>` and `<option>`
+9. Change the submit button text to something personal
+
+**Phase 5: Advanced Touches**
+10. Add a `<footer>` section with your copyright
+11. Try adding some `<strong>` or `<em>` tags to emphasize text
+12. Add an `<hr>` tag between sections to create visual separation
+
+**Phase 6: Test Everything**
+- Click **▶** after each change to see it live
+- Use **↻** if you want to start over
+- Use **📋** to copy your final code!
+
+> **🏆 Expert Challenge:** Try adding a `<table>` with your skills and experience levels, or create nested lists for detailed project descriptions!
+
+## Quiz Time! 🧠
+
+Ready to test your HTML knowledge? The quiz will cover all the essential concepts we've learned!
+
+## What's Next?
+
+Excellent work! 🎉 You've learned the fundamentals of HTML. Next steps:
+
+- **CSS Fundamentals** - Style your HTML with colors, fonts, and layouts
+- **JavaScript Basics** - Add interactivity to your web pages
+- **Responsive Design** - Make your sites work on all devices
+- **Accessibility** - Ensure your sites work for everyone
+
+Remember: HTML is the foundation of the web. Master these basics, and you'll be ready to build amazing web experiences! 🚀
+
+## Resources for Further Learning
+
+- [MDN HTML Reference](https://developer.mozilla.org/en-US/docs/Web/HTML)
+- [HTML Validator](https://validator.w3.org/)
+- [Web Accessibility Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)

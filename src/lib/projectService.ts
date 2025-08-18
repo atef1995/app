@@ -1,24 +1,68 @@
 import { prisma } from "@/lib/prisma";
 import { ProgressService } from "./progressService";
 import {
-  ProjectWithDetails,
-  ProjectSubmissionWithDetails,
-  ProjectReviewAssignmentWithDetails,
-  ProjectRequirement,
-  ProjectResource,
-  ProjectRubricCriteria,
-  CreateProjectSubmissionRequest,
-  ProjectReviewRequest,
-  ProjectStats,
-} from "@/types/project";
-import {
-  SubscriptionPlan,
-  ProjectSubmissionType,
-  ProjectReviewType,
-  ProjectReviewStatus,
-  ProjectSubmissionStatus,
-  ReviewAssignmentStatus,
-} from "@/types/common";
+  Project,
+  ProjectSubmission,
+  ProjectReview,
+  ProjectReviewAssignment,
+  User,
+  Prisma,
+} from "@prisma/client";
+
+// Prisma types for projects with relationships
+export type ProjectWithCount = Project & {
+  _count: {
+    submissions: number;
+  };
+};
+
+export type ProjectSubmissionWithDetails = ProjectSubmission & {
+  user: Pick<User, "id" | "name" | "username" | "image">;
+  project: Pick<Project, "id" | "title" | "category" | "difficulty">;
+  reviews: (ProjectReview & {
+    reviewer: Pick<User, "id" | "name" | "username" | "image">;
+  })[];
+  _count: {
+    reviews: number;
+  };
+};
+
+export type ProjectReviewAssignmentWithDetails = ProjectReviewAssignment & {
+  reviewer: Pick<User, "id" | "name" | "username" | "image">;
+  submission: {
+    id: string;
+    title: string | null;
+    project: Pick<Project, "id" | "title">;
+    user: Pick<User, "id" | "name" | "username">;
+  };
+};
+
+export interface CreateProjectSubmissionRequest {
+  title?: string;
+  description?: string;
+  submissionUrl?: string;
+  submissionFiles?: Prisma.InputJsonValue;
+  sourceCode?: string;
+  notes?: string;
+  status: string;
+}
+
+export interface ProjectReviewRequest {
+  overallScore?: number;
+  criteriaScores?: Record<string, number>;
+  strengths?: string;
+  improvements?: string;
+  suggestions?: string;
+  timeSpent?: number;
+}
+
+export interface ProjectStats {
+  completed: number;
+  inProgress: number;
+  notStarted: number;
+  total: number;
+  recentActivity: ProjectSubmissionWithDetails[];
+}
 
 /**
  * Service for handling project operations
@@ -27,7 +71,7 @@ export class ProjectService {
   /**
    * Get all published projects
    */
-  static async getAllProjects(): Promise<ProjectWithDetails[]> {
+  static async getAllProjects(): Promise<ProjectWithCount[]> {
     try {
       const projects = await prisma.project.findMany({
         where: {
@@ -43,16 +87,7 @@ export class ProjectService {
         orderBy: [{ category: "asc" }, { order: "asc" }],
       });
 
-      return projects.map((project) => ({
-        ...project,
-        requirements:
-          (project.requirements as unknown as ProjectRequirement[]) || [],
-        resources: (project.resources as unknown as ProjectResource[]) || [],
-        rubric: (project.rubric as unknown as ProjectRubricCriteria[]) || [],
-        requiredPlan: project.requiredPlan as SubscriptionPlan,
-        submissionType: project.submissionType as ProjectSubmissionType,
-        reviewType: project.reviewType as ProjectReviewType,
-      }));
+      return projects;
     } catch (error) {
       console.error("Error in getAllProjects:", error);
       throw new Error("Failed to fetch projects from database");
@@ -64,7 +99,7 @@ export class ProjectService {
    */
   static async getProjectsByCategory(
     category: string
-  ): Promise<ProjectWithDetails[]> {
+  ): Promise<ProjectWithCount[]> {
     try {
       const projects = await prisma.project.findMany({
         where: {
@@ -83,16 +118,7 @@ export class ProjectService {
         },
       });
 
-      return projects.map((project) => ({
-        ...project,
-        requirements:
-          (project.requirements as unknown as ProjectRequirement[]) || [],
-        resources: (project.resources as unknown as ProjectResource[]) || [],
-        rubric: (project.rubric as unknown as ProjectRubricCriteria[]) || [],
-        requiredPlan: project.requiredPlan as SubscriptionPlan,
-        submissionType: project.submissionType as ProjectSubmissionType,
-        reviewType: project.reviewType as ProjectReviewType,
-      }));
+      return projects;
     } catch (error) {
       console.error("Error in getProjectsByCategory:", error);
       throw new Error("Failed to fetch projects for category");
@@ -105,7 +131,7 @@ export class ProjectService {
   static async getProjectBySlug(
     slug: string,
     userId?: string
-  ): Promise<ProjectWithDetails | null> {
+  ): Promise<ProjectWithCount | null> {
     try {
       const project = await prisma.project.findUnique({
         where: {
@@ -128,16 +154,7 @@ export class ProjectService {
         await ProgressService.markProjectStarted(userId, project.id);
       }
 
-      return {
-        ...project,
-        requirements:
-          (project.requirements as unknown as ProjectRequirement[]) || [],
-        resources: (project.resources as unknown as ProjectResource[]) || [],
-        rubric: (project.rubric as unknown as ProjectRubricCriteria[]) || [],
-        requiredPlan: project.requiredPlan as SubscriptionPlan,
-        submissionType: project.submissionType as ProjectSubmissionType,
-        reviewType: project.reviewType as ProjectReviewType,
-      };
+      return project;
     } catch (error) {
       console.error("Error in getProjectBySlug:", error);
       throw new Error("Failed to fetch project");
@@ -201,17 +218,7 @@ export class ProjectService {
 
       if (!submission) return null;
 
-      return {
-        ...submission,
-        status: submission.status as ProjectSubmissionStatus,
-        reviews: submission.reviews.map((review) => ({
-          ...review,
-          type: review.type as ProjectReviewType,
-          status: review.status as ProjectReviewStatus,
-          criteriaScores:
-            (review.criteriaScores as Record<string, number>) || {},
-        })),
-      };
+      return submission;
     } catch (error) {
       console.error("Error in getUserSubmission:", error);
       throw new Error("Failed to fetch user submission");
@@ -274,6 +281,11 @@ export class ProjectService {
               },
             },
           },
+          _count: {
+            select: {
+              reviews: true,
+            },
+          },
         },
       });
 
@@ -291,17 +303,7 @@ export class ProjectService {
         });
       }
 
-      return {
-        ...submission,
-        status: submission.status as ProjectSubmissionStatus,
-        reviews: submission.reviews.map((review) => ({
-          ...review,
-          type: review.type as ProjectReviewType,
-          status: review.status as ProjectReviewStatus,
-          criteriaScores:
-            (review.criteriaScores as Record<string, number>) || {},
-        })),
-      };
+      return submission;
     } catch (error) {
       console.error("Error in upsertSubmission:", error);
       throw new Error("Failed to save submission");
@@ -353,10 +355,7 @@ export class ProjectService {
         orderBy: [{ priority: "desc" }, { createdAt: "asc" }],
       });
 
-      return assignments.map(assignment => ({
-        ...assignment,
-        status: assignment.status as ReviewAssignmentStatus,
-      }));
+      return assignments;
     } catch (error) {
       console.error("Error in getReviewAssignments:", error);
       throw new Error("Failed to fetch review assignments");
@@ -730,17 +729,7 @@ export class ProjectService {
         inProgress: inProgressProjects,
         notStarted: notStartedProjects,
         total: totalProjects,
-        recentActivity: recentActivity.map(submission => ({
-          ...submission,
-          status: submission.status as ProjectSubmissionStatus,
-          reviews: submission.reviews.map((review) => ({
-            ...review,
-            type: review.type as ProjectReviewType,
-            status: review.status as ProjectReviewStatus,
-            criteriaScores:
-              (review.criteriaScores as Record<string, number>) || {},
-          })),
-        })),
+        recentActivity: recentActivity,
       };
     } catch (error) {
       console.error("Error in getUserProjectStats:", error);
@@ -813,17 +802,7 @@ export class ProjectService {
         take: limit,
       });
 
-      return submissions.map((submission) => ({
-        ...submission,
-        status: submission.status as ProjectSubmissionStatus,
-        reviews: submission.reviews.map((review) => ({
-          ...review,
-          type: review.type as ProjectReviewType,
-          status: review.status as ProjectReviewStatus,
-          criteriaScores:
-            (review.criteriaScores as Record<string, number>) || {},
-        })),
-      }));
+      return submissions;
     } catch (error) {
       console.error("Error in getPublicSubmissions:", error);
       throw new Error("Failed to fetch public submissions");

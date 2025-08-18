@@ -171,7 +171,7 @@ export function QuizResults({
                 <Link
                   href={
                     tutorialNavigation?.current?.slug
-                      ? `/tutorials/${tutorialNavigation.current.slug}`
+                      ? `/tutorials/category/${tutorialNavigation.current.category}/${tutorialNavigation.current.slug}`
                       : `/tutorials`
                   }
                   className="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 py-2 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
@@ -181,7 +181,7 @@ export function QuizResults({
 
                 {percentage >= 70 && tutorialNavigation?.next && (
                   <Link
-                    href={`/tutorials/${tutorialNavigation.next.slug}`}
+                    href={`/tutorials/category/${tutorialNavigation.next.category}/${tutorialNavigation.next.slug}`}
                     className="bg-blue-600 dark:bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
                   >
                     Next Tutorial

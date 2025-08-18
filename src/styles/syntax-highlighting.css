@@ -1,0 +1,61 @@
+/* HTML Syntax Highlighting Styles */
+.syntax-html-editor .token.tag {
+  color: #569cd6 !important;
+  font-weight: normal;
+}
+
+.syntax-html-editor .token.attr-name {
+  color: #9cdcfe !important;
+}
+
+.syntax-html-editor .token.attr-value {
+  color: #ce9178 !important;
+}
+
+.syntax-html-editor .token.punctuation {
+  color: #d4d4d4 !important;
+}
+
+.syntax-html-editor .token.doctype {
+  color: #569cd6 !important;
+  font-weight: bold;
+}
+
+.syntax-html-editor .token.comment {
+  color: #6a9955 !important;
+  font-style: italic;
+}
+
+.syntax-html-editor .token.string {
+  color: #ce9178 !important;
+}
+
+.syntax-html-editor .token.entity {
+  color: #dcdcaa !important;
+}
+
+.syntax-html-editor .token.cdata {
+  color: #808080 !important;
+}
+
+.syntax-html-editor .token.prolog {
+  color: #569cd6 !important;
+}
+
+/* Style the editor container */
+.syntax-html-editor {
+  font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Segoe UI Mono', monospace !important;
+}
+
+.syntax-html-editor pre {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+}
+
+.syntax-html-editor code {
+  font-family: inherit !important;
+  background: transparent !important;
+  color: inherit !important;
+}

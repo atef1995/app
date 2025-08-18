@@ -1,5 +1,22 @@
 import { prisma } from "@/lib/prisma";
+import { Tutorial, Category, Quiz, Prisma } from "@prisma/client";
 
+// Prisma types for tutorials with relationships
+export type TutorialWithCategory = Tutorial & {
+  category: Category;
+};
+
+export type TutorialWithQuiz = Tutorial & {
+  category: Category;
+  quizzes: Quiz[];
+};
+
+export type TutorialWithAll = Tutorial & {
+  category: Category;
+  quizzes: Quiz[];
+};
+
+// Legacy interface for backward compatibility only
 export interface QuizQuestion {
   question: string;
   options: string[];
@@ -7,39 +24,17 @@ export interface QuizQuestion {
   explanation: string;
 }
 
-export interface TutorialWithQuiz {
-  id: string;
-  slug: string;
-  title: string;
-  description: string | null;
-  content: string | null; // Allow null content for MDX-based tutorials
-  mdxFile: string | null; // MDX file reference
-  category: string; // Will use fallback if missing from DB
-  difficulty: number;
-  order: number;
-  published: boolean;
-  isPremium: boolean;
-  requiredPlan: "FREE" | "VIBED" | "CRACKED";
-  createdAt: Date;
-  updatedAt: Date;
-  quiz?: {
-    id: string;
-    title: string;
-    slug: string;
-    questions: QuizQuestion[];
-    isPremium: boolean;
-    requiredPlan: string;
-  };
-}
-
 /**
- * Service for handling tutorial operations
+ * Service for handling tutorial operations using pure Prisma types
  */
 export class TutorialService {
   /**
-   * Get all published tutorials with their quizzes
+   * Get all published tutorials with their categories and quizzes
    */
-  static async getAllTutorials(limit?: number, offset?: number): Promise<TutorialWithQuiz[]> {
+  static async getAllTutorials(
+    limit?: number,
+    offset?: number
+  ): Promise<TutorialWithAll[]> {
     try {
       const tutorials = await prisma.tutorial.findMany({
         where: {
@@ -47,6 +42,7 @@ export class TutorialService {
         },
         include: {
           quizzes: true,
+          category: true,
         },
         orderBy: {
           order: "asc",
@@ -55,33 +51,7 @@ export class TutorialService {
         skip: offset,
       });
 
-    return tutorials.map((tutorial) => ({
-      id: tutorial.id,
-      slug: tutorial.slug,
-      title: tutorial.title,
-      description: tutorial.description,
-      content: tutorial.content,
-      mdxFile: tutorial.mdxFile,
-      category: tutorial.category || "fundamentals", // Fallback for missing category
-      difficulty: tutorial.difficulty,
-      order: tutorial.order,
-      published: tutorial.published,
-      isPremium: tutorial.isPremium,
-      requiredPlan: tutorial.requiredPlan as "FREE" | "VIBED" | "CRACKED",
-      createdAt: tutorial.createdAt,
-      updatedAt: tutorial.updatedAt,
-      quiz: tutorial.quizzes[0]
-        ? {
-            id: tutorial.quizzes[0].id,
-            title: tutorial.quizzes[0].title,
-            slug: tutorial.quizzes[0].slug,
-            questions: tutorial.quizzes[0]
-              .questions as unknown as QuizQuestion[],
-            isPremium: tutorial.quizzes[0].isPremium,
-            requiredPlan: tutorial.quizzes[0].requiredPlan,
-          }
-        : undefined,
-    }));
+      return tutorials.filter(t => t.category !== null) as TutorialWithAll[];
     } catch (error) {
       console.error("Error in getAllTutorials:", error);
       throw new Error("Failed to fetch tutorials from database");
@@ -89,95 +59,51 @@ export class TutorialService {
   }
 
   /**
-   * Get a specific tutorial by ID with its quiz
+   * Get a specific tutorial by ID with its quiz and category
    */
-  static async getTutorialById(id: string): Promise<TutorialWithQuiz | null> {
-    const tutorial = await prisma.tutorial.findUnique({
-      where: {
-        id,
-        published: true,
-      },
-      include: {
-        quizzes: true,
-      },
-    });
+  static async getTutorialById(id: string): Promise<TutorialWithAll | null> {
+    try {
+      const tutorial = await prisma.tutorial.findUnique({
+        where: {
+          id,
+          published: true,
+        },
+        include: {
+          quizzes: true,
+          category: true,
+        },
+      });
 
-    if (!tutorial) return null;
-
-    return {
-      id: tutorial.id,
-      slug: tutorial.slug,
-      title: tutorial.title,
-      description: tutorial.description,
-      content: tutorial.content,
-      mdxFile: tutorial.mdxFile,
-      category: tutorial.category || "fundamentals", // Fallback for missing category
-      difficulty: tutorial.difficulty,
-      order: tutorial.order,
-      published: tutorial.published,
-      isPremium: tutorial.isPremium,
-      requiredPlan: tutorial.requiredPlan as "FREE" | "VIBED" | "CRACKED",
-      createdAt: tutorial.createdAt,
-      updatedAt: tutorial.updatedAt,
-      quiz: tutorial.quizzes[0]
-        ? {
-            id: tutorial.quizzes[0].id,
-            title: tutorial.quizzes[0].title,
-            slug: tutorial.quizzes[0].slug,
-            questions: tutorial.quizzes[0]
-              .questions as unknown as QuizQuestion[],
-            isPremium: tutorial.quizzes[0].isPremium,
-            requiredPlan: tutorial.quizzes[0].requiredPlan,
-          }
-        : undefined,
-    };
+      if (!tutorial || !tutorial.category) return null;
+      return tutorial as TutorialWithAll;
+    } catch (error) {
+      console.error("Error in getTutorialById:", error);
+      return null;
+    }
   }
 
   /**
-   * Get a tutorial by slug with its quiz
+   * Get a tutorial by slug with its quiz and category
    */
-  static async getTutorialBySlug(
-    slug: string
-  ): Promise<TutorialWithQuiz | null> {
-    const tutorial = await prisma.tutorial.findUnique({
-      where: {
-        slug,
-        published: true,
-      },
-      include: {
-        quizzes: true,
-      },
-    });
+  static async getTutorialBySlug(slug: string): Promise<TutorialWithAll | null> {
+    try {
+      const tutorial = await prisma.tutorial.findUnique({
+        where: {
+          slug,
+          published: true,
+        },
+        include: {
+          quizzes: true,
+          category: true,
+        },
+      });
 
-    if (!tutorial) return null;
-
-    return {
-      id: tutorial.id,
-      slug: tutorial.slug,
-      title: tutorial.title,
-      description: tutorial.description,
-      content: tutorial.content,
-      mdxFile: tutorial.mdxFile,
-      category: tutorial.category || "fundamentals", // Fallback for missing category
-      difficulty: tutorial.difficulty,
-      order: tutorial.order,
-      published: tutorial.published,
-      isPremium: tutorial.isPremium,
-      requiredPlan: tutorial.requiredPlan as "FREE" | "VIBED" | "CRACKED",
-      createdAt: tutorial.createdAt,
-      updatedAt: tutorial.updatedAt,
-      quiz: tutorial.quizzes[0]
-        ? {
-            id: tutorial.quizzes[0].id,
-            title: tutorial.quizzes[0].title,
-            slug: tutorial.quizzes[0].slug,
-            questions: tutorial.quizzes[0]
-              .questions as unknown as QuizQuestion[],
-            isPremium: tutorial.quizzes[0].isPremium,
-            requiredPlan: tutorial.quizzes[0].requiredPlan,
-          }
-        : undefined,
-    };
+      if (!tutorial || !tutorial.category) return null;
+      return tutorial as TutorialWithAll;
+    } catch (error) {
+      console.error("Error in getTutorialBySlug:", error);
+      return null;
+    }
   }
 
   /**
@@ -206,173 +132,173 @@ export class TutorialService {
   /**
    * Get tutorials by category
    */
-  static async getTutorialsByCategory(category: string, limit?: number, offset?: number): Promise<TutorialWithQuiz[]> {
-    const tutorials = await prisma.tutorial.findMany({
-      where: {
-        published: true,
-        category: category,
-      },
-      include: {
-        quizzes: true,
-      },
-      orderBy: {
-        order: "asc",
-      },
-      take: limit,
-      skip: offset,
-    });
+  static async getTutorialsByCategory(
+    categorySlug: string,
+    limit?: number,
+    offset?: number
+  ): Promise<TutorialWithAll[]> {
+    try {
+      const tutorials = await prisma.tutorial.findMany({
+        where: {
+          published: true,
+          category: {
+            slug: categorySlug,
+          },
+        },
+        include: {
+          quizzes: true,
+          category: true,
+        },
+        orderBy: {
+          order: "asc",
+        },
+        take: limit,
+        skip: offset,
+      });
 
-    return tutorials.map((tutorial) => ({
-      id: tutorial.id,
-      slug: tutorial.slug,
-      title: tutorial.title,
-      description: tutorial.description,
-      content: tutorial.content,
-      mdxFile: tutorial.mdxFile,
-      category: tutorial.category || "fundamentals", // Fallback for missing category
-      difficulty: tutorial.difficulty,
-      order: tutorial.order,
-      published: tutorial.published,
-      isPremium: tutorial.isPremium,
-      requiredPlan: tutorial.requiredPlan as "FREE" | "VIBED" | "CRACKED",
-      createdAt: tutorial.createdAt,
-      updatedAt: tutorial.updatedAt,
-      quiz: tutorial.quizzes[0]
-        ? {
-            id: tutorial.quizzes[0].id,
-            title: tutorial.quizzes[0].title,
-            slug: tutorial.quizzes[0].slug,
-            questions: tutorial.quizzes[0]
-              .questions as unknown as QuizQuestion[],
-            isPremium: tutorial.quizzes[0].isPremium,
-            requiredPlan: tutorial.quizzes[0].requiredPlan,
-          }
-        : undefined,
-    }));
+      return tutorials.filter(t => t.category !== null) as TutorialWithAll[];
+    } catch (error) {
+      console.error("Error in getTutorialsByCategory:", error);
+      throw new Error("Failed to fetch tutorials by category");
+    }
   }
 
   /**
    * Get all available tutorial categories
    */
-  static async getCategories(): Promise<string[]> {
+  static async getCategories(): Promise<Category[]> {
     try {
-      const categories = await prisma.tutorial.findMany({
+      return await prisma.category.findMany({
         where: {
           published: true,
         },
-        select: {
-          category: true,
+        orderBy: {
+          order: "asc",
         },
-        distinct: ['category'],
       });
-
-      return categories.map(c => c.category || "fundamentals").filter(Boolean).sort();
     } catch (error) {
       console.error("Error fetching categories:", error);
-      // Return default categories if DB query fails
-      return ["fundamentals", "oop", "async", "dom", "advanced"];
+      throw new Error("Failed to fetch categories");
+    }
+  }
+
+  /**
+   * Get a specific category by slug
+   */
+  static async getCategoryBySlug(slug: string): Promise<Category | null> {
+    try {
+      return await prisma.category.findUnique({
+        where: {
+          slug,
+          published: true,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching category by slug:", error);
+      return null;
     }
   }
 
   /**
    * Get tutorials grouped by category
    */
-  static async getTutorialsGroupedByCategory(): Promise<Record<string, TutorialWithQuiz[]>> {
+  static async getTutorialsGroupedByCategory(): Promise<Record<string, TutorialWithAll[]>> {
     const tutorials = await this.getAllTutorials();
-    
+
     return tutorials.reduce((groups, tutorial) => {
-      const category = tutorial.category;
-      if (!groups[category]) {
-        groups[category] = [];
+      const categorySlug = tutorial.category.slug;
+      if (!groups[categorySlug]) {
+        groups[categorySlug] = [];
       }
-      groups[category].push(tutorial);
+      groups[categorySlug].push(tutorial);
       return groups;
-    }, {} as Record<string, TutorialWithQuiz[]>);
+    }, {} as Record<string, TutorialWithAll[]>);
   }
 
   /**
    * Search tutorials by title or description
    */
-  static async searchTutorials(query: string, limit?: number, offset?: number): Promise<TutorialWithQuiz[]> {
-    const tutorials = await prisma.tutorial.findMany({
-      where: {
-        published: true,
-        OR: [
-          {
-            title: {
-              contains: query,
+  static async searchTutorials(
+    query: string,
+    limit?: number,
+    offset?: number
+  ): Promise<TutorialWithAll[]> {
+    try {
+      const tutorials = await prisma.tutorial.findMany({
+        where: {
+          published: true,
+          OR: [
+            {
+              title: {
+                contains: query,
+                mode: "insensitive",
+              },
             },
-          },
-          {
-            description: {
-              contains: query,
+            {
+              description: {
+                contains: query,
+                mode: "insensitive",
+              },
             },
-          },
-        ],
-      },
-      include: {
-        quizzes: true,
-      },
-      orderBy: {
-        order: "asc",
-      },
-      take: limit,
-      skip: offset,
-    });
+          ],
+        },
+        include: {
+          quizzes: true,
+          category: true,
+        },
+        orderBy: {
+          order: "asc",
+        },
+        take: limit,
+        skip: offset,
+      });
 
-    return tutorials.map((tutorial) => ({
-      id: tutorial.id,
-      slug: tutorial.slug,
-      title: tutorial.title,
-      description: tutorial.description,
-      content: tutorial.content,
-      mdxFile: tutorial.mdxFile,
-      category: tutorial.category || "fundamentals", // Fallback for missing category
-      difficulty: tutorial.difficulty,
-      order: tutorial.order,
-      published: tutorial.published,
-      isPremium: tutorial.isPremium,
-      requiredPlan: tutorial.requiredPlan as "FREE" | "VIBED" | "CRACKED",
-      createdAt: tutorial.createdAt,
-      updatedAt: tutorial.updatedAt,
-      quiz: tutorial.quizzes[0]
-        ? {
-            id: tutorial.quizzes[0].id,
-            title: tutorial.quizzes[0].title,
-            slug: tutorial.quizzes[0].slug,
-            questions: tutorial.quizzes[0]
-              .questions as unknown as QuizQuestion[],
-            isPremium: tutorial.quizzes[0].isPremium,
-            requiredPlan: tutorial.quizzes[0].requiredPlan,
-          }
-        : undefined,
-    }));
+      return tutorials.filter(t => t.category !== null) as TutorialWithAll[];
+    } catch (error) {
+      console.error("Error in searchTutorials:", error);
+      throw new Error("Failed to search tutorials");
+    }
   }
 
   /**
    * Get total count of tutorials based on filters
    */
-  static async getTutorialsCount(filters?: { 
-    category?: string; 
-    search?: string 
+  static async getTutorialsCount(filters?: {
+    category?: string;
+    search?: string;
   }): Promise<number> {
-    const where: {
-      published: boolean;
-      category?: string;
-      OR?: Array<{ title?: { contains: string }; description?: { contains: string } }>;
-    } = { published: true };
-    
-    if (filters?.category) {
-      where.category = filters.category;
+    try {
+      const where: Prisma.TutorialWhereInput = {
+        published: true,
+      };
+
+      if (filters?.category) {
+        where.category = {
+          slug: filters.category,
+        };
+      }
+
+      if (filters?.search) {
+        where.OR = [
+          {
+            title: {
+              contains: filters.search,
+              mode: "insensitive",
+            },
+          },
+          {
+            description: {
+              contains: filters.search,
+              mode: "insensitive",
+            },
+          },
+        ];
+      }
+
+      return await prisma.tutorial.count({ where });
+    } catch (error) {
+      console.error("Error in getTutorialsCount:", error);
+      throw new Error("Failed to count tutorials");
     }
-    
-    if (filters?.search) {
-      where.OR = [
-        { title: { contains: filters.search } },
-        { description: { contains: filters.search } },
-      ];
-    }
-    
-    return await prisma.tutorial.count({ where });
   }
 }

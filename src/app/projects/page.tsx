@@ -168,8 +168,8 @@ export default function ProjectsPage() {
           >
             <option value="">All Categories</option>
             {categories.map((category) => (
-              <option key={category} value={category}>
-                {category.charAt(0).toUpperCase() + category.slice(1)}
+              <option key={category.slug} value={category.slug}>
+                {category.title}
               </option>
             ))}
           </select>

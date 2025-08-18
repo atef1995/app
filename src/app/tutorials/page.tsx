@@ -16,50 +16,6 @@ import Pagination from "@/components/ui/Pagination";
 import { useMood } from "@/components/providers/MoodProvider";
 import { MoodImpactIndicator, QuickMoodSwitcher } from "@/components/ui/MoodImpactIndicator";
 
-// Category metadata
-const categoryMetadata = {
-  fundamentals: {
-    description:
-      "Master the essential building blocks of JavaScript programming",
-    difficulty: "beginner" as const,
-    topics: ["Variables", "Functions", "Arrays", "Objects"],
-    duration: "4-6 hours",
-  },
-  oop: {
-    description:
-      "Learn object-oriented programming concepts and patterns in JavaScript",
-    difficulty: "intermediate" as const,
-    topics: ["Objects", "Prototypes", "Classes", "Inheritance"],
-    duration: "3-4 hours",
-  },
-  async: {
-    description:
-      "Handle asynchronous operations with promises, async/await, and more",
-    difficulty: "intermediate" as const,
-    topics: ["Promises", "Async/Await", "Fetch API", "Error Handling"],
-    duration: "2-3 hours",
-  },
-  dom: {
-    description:
-      "Manipulate web pages dynamically using the Document Object Model",
-    difficulty: "intermediate" as const,
-    topics: ["DOM Selection", "Event Handling", "Element Creation", "Styling"],
-    duration: "2-3 hours",
-  },
-  advanced: {
-    description: "Explore advanced JavaScript concepts and modern patterns",
-    difficulty: "advanced" as const,
-    topics: ["Closures", "Modules", "Design Patterns", "Performance"],
-    duration: "5-8 hours",
-  },
-  "data-structures": {
-    description:
-      "Master fundamental data structures and algorithms in JavaScript",
-    difficulty: "intermediate" as const,
-    topics: ["Arrays", "Objects", "Sets", "Maps", "Algorithms"],
-    duration: "4-6 hours",
-  },
-};
 
 export default function TutorialsPage() {
   const { data: session } = useSession();
@@ -70,7 +26,7 @@ export default function TutorialsPage() {
 
   // Fetch data with server-side pagination
   const categoriesQuery = useCategories(currentPage, itemsPerPage);
-  const allTutorialsQuery = useTutorials(); // Keep this non-paginated for stats
+  const allTutorialsQuery = useTutorials(1, 10, true); // Get all tutorials for stats
 
   // Get categories data from paginated response
   const categories = categoriesQuery.data?.data || [];
@@ -101,20 +57,17 @@ export default function TutorialsPage() {
     setCurrentPage(1); // Reset to first page when changing items per page
   };
 
-  // Calculate category stats (fallback to default values if allTutorials is not available)
-  const getCategoryStats = (category: string) => {
+  // Calculate category stats based on tutorials
+  const getCategoryStats = (categorySlug: string) => {
     if (!allTutorials.length) {
       // Fallback when tutorials are not loaded yet
       return {
         total: 0,
         completed: 0,
-        duration:
-          categoryMetadata[category as keyof typeof categoryMetadata]
-            ?.duration || "2-3 hours",
       };
     }
 
-    const categoryTuts = allTutorials.filter((t) => t.category === category);
+    const categoryTuts = allTutorials.filter((t) => t.category.slug === categorySlug);
     const completed = categoryTuts.filter((t) => {
       const progress = tutorialsWithProgress.find(
         (tp) => tp.id === t.id
@@ -125,9 +78,6 @@ export default function TutorialsPage() {
     return {
       total: categoryTuts.length,
       completed,
-      duration:
-        categoryMetadata[category as keyof typeof categoryMetadata]?.duration ||
-        "2-3 hours",
     };
   };
 
@@ -221,23 +171,20 @@ export default function TutorialsPage() {
         </h2>
         <ContentGrid>
           {categories.map((category) => {
-            const metadata =
-              categoryMetadata[category as keyof typeof categoryMetadata];
-            const stats = getCategoryStats(category);
+            const stats = getCategoryStats(category.slug);
 
             return (
               <CategoryCard
-                key={category}
-                category={category}
+                key={category.id}
+                category={category.slug}
+                title={category.title}
                 tutorialCount={stats.total}
                 completedCount={stats.completed}
-                totalDuration={stats.duration}
-                difficulty={metadata?.difficulty || "beginner"}
-                description={
-                  metadata?.description || "Learn JavaScript concepts"
-                }
-                topics={metadata?.topics || []}
-                onClick={() => router.push(`/tutorials/category/${category}`)}
+                totalDuration={category.duration}
+                difficulty={category.difficulty as "beginner" | "intermediate" | "advanced"}
+                description={category.description}
+                topics={category.topics}
+                onClick={() => router.push(`/tutorials/category/${category.slug}`)}
               />
             );
           })}
