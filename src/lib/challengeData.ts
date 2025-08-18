@@ -5,13 +5,13 @@ import {
   getFilteredChallenges as dbGetFilteredChallenges,
   getChallengeTypes as dbGetChallengeTypes,
   getChallengeDifficulties as dbGetChallengeDifficulties,
+  ChallengeWithTests,
 } from "./challengeService";
-import type { Challenge } from "@/types/practice";
 
 // For client-side usage, we'll fetch from API
 // For server-side usage, we'll use the database service directly
 
-export async function getAllChallenges(): Promise<Challenge[]> {
+export async function getAllChallenges(): Promise<ChallengeWithTests[]> {
   if (typeof window === "undefined") {
     // Server-side: use database service directly
     return await dbGetAllChallenges();
@@ -28,7 +28,7 @@ export async function getAllChallenges(): Promise<Challenge[]> {
   }
 }
 
-export async function getChallengeById(id: string): Promise<Challenge | null> {
+export async function getChallengeById(id: string): Promise<ChallengeWithTests | null> {
   if (typeof window === "undefined") {
     // Server-side: use database service directly
     return await dbGetChallengeById(id);
@@ -48,7 +48,7 @@ export async function getChallengeById(id: string): Promise<Challenge | null> {
   }
 }
 
-export async function getChallengeBySlug(slug: string): Promise<Challenge | null> {
+export async function getChallengeBySlug(slug: string): Promise<ChallengeWithTests | null> {
   if (typeof window === "undefined") {
     // Server-side: use database service directly
     return await dbGetChallengeBySlug(slug);
@@ -71,7 +71,7 @@ export async function getChallengeBySlug(slug: string): Promise<Challenge | null
 export async function getFilteredChallenges(filters: {
   type?: string;
   difficulty?: string;
-}): Promise<Challenge[]> {
+}): Promise<ChallengeWithTests[]> {
   if (typeof window === "undefined") {
     // Server-side: use database service directly
     return await dbGetFilteredChallenges(filters);
