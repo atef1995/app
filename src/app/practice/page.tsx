@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
 import { useState } from "react";
-import { Challenge } from "@/types/practice";
+import { ChallengeWithTests } from "@/lib/challengeService";
 import Card, { CardAction } from "@/components/ui/Card";
 import { PageLayout } from "@/components/ui/PageLayout";
 import { MoodInfoCard } from "@/components/ui/MoodInfoCard";
@@ -62,7 +62,7 @@ export default function PracticePage() {
   };
 
   // Handle premium challenge click
-  const handleChallengeClick = (challenge: Challenge) => {
+  const handleChallengeClick = (challenge: ChallengeWithTests) => {
     handlePremiumContent(
       {
         title: challenge.title,
@@ -308,9 +308,9 @@ export default function PracticePage() {
                 <div className={`${moodColors.bg} rounded-lg p-3`}>
                   <p className={`${moodColors.text} text-xs leading-relaxed`}>
                     {
-                      challenge.moodAdapted[
-                        currentMood.id.toLowerCase() as keyof typeof challenge.moodAdapted
-                      ]
+                      challenge.moodAdaptations.find(
+                        adaptation => adaptation.mood.toLowerCase() === currentMood.id.toLowerCase()
+                      )?.content || "Get ready to tackle this challenge!"
                     }
                   </p>
                 </div>

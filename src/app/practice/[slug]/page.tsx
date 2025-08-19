@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { notFound } from "next/navigation";
 import CodeEditor from "@/components/CodeEditor";
-import { Challenge } from "@/types/practice";
+import { ChallengeWithTests } from "@/lib/challengeService";
 import { getChallengeBySlug } from "@/lib/challengeData";
 import PremiumModal from "@/components/ui/PremiumModal";
 import { useQueryClient } from "@tanstack/react-query";
@@ -40,7 +40,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
   const [resolvedParams, setResolvedParams] = useState<{ slug: string } | null>(
     null
   );
-  const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [challenge, setChallenge] = useState<ChallengeWithTests | null>(null);
   const [userCode, setUserCode] = useState("");
 
   // Code progress management with auto-save (only when challenge is loaded)
@@ -517,9 +517,9 @@ export default function ChallengePage({ params }: ChallengePageProps) {
               </h2>
               <p className="text-purple-700 dark:text-purple-300">
                 {
-                  challenge.moodAdapted[
-                    currentMood.id.toLowerCase() as keyof typeof challenge.moodAdapted
-                  ]
+                  challenge.moodAdaptations.find(
+                    adaptation => adaptation.mood.toLowerCase() === currentMood.id.toLowerCase()
+                  )?.content || "Get ready to tackle this challenge!"
                 }
               </p>
             </div>
