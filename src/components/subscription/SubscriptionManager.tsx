@@ -269,10 +269,10 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
           </p>
           {access.recommendations && (
             <button
-              onClick={() => handleUpgrade(access.recommendations.suggestedPlan as Plan)}
+              onClick={() => handleUpgrade(access.recommendations!.suggestedPlan as Plan)}
               className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             >
-              Upgrade to {access.recommendations.suggestedPlan} - {formatPrice(access.recommendations.price)}/month
+              Upgrade to {access.recommendations!.suggestedPlan} - {formatPrice(access.recommendations!.price)}/month
             </button>
           )}
         </div>
@@ -287,16 +287,16 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
             </div>
             <div>
               <h4 className="font-semibold text-gray-900 dark:text-gray-100">
-                Unlock More with {access.recommendations.suggestedPlan}
+                Unlock More with {access.recommendations!.suggestedPlan}
               </h4>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {formatPrice(access.recommendations.price)}/month
+                {formatPrice(access.recommendations!.price)}/month
               </p>
             </div>
           </div>
           
           <ul className="space-y-2 mb-4">
-            {access.recommendations.benefits.map((benefit: string, index: number) => (
+            {access.recommendations!.benefits.map((benefit: string, index: number) => (
               <li key={index} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                 <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
                 {benefit}
@@ -305,7 +305,7 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
           </ul>
           
           <button
-            onClick={() => handleUpgrade(access.recommendations.suggestedPlan as Plan)}
+            onClick={() => handleUpgrade(access.recommendations!.suggestedPlan as Plan)}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
           >
             Upgrade Now

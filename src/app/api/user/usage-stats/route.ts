@@ -25,11 +25,10 @@ export async function GET() {
       select: {
         completedAt: true,
         timeSpent: true,
-        isCompleted: true,
       },
     });
 
-    const completedTutorials = tutorialProgress.filter(p => p.isCompleted);
+    const completedTutorials = tutorialProgress.filter(p => p.completedAt);
     const tutorialThisWeek = completedTutorials.filter(p => 
       p.completedAt && p.completedAt >= oneWeekAgo
     ).length;
@@ -64,40 +63,47 @@ export async function GET() {
     const challengeAttempts = await prisma.challengeAttempt.findMany({
       where: { userId },
       select: {
-        isCorrect: true,
-        submittedAt: true,
+        passed: true,
+        createdAt: true,
         challengeId: true,
       },
     });
 
     const uniqueChallengesSolved = new Set(
-      challengeAttempts.filter(a => a.isCorrect).map(a => a.challengeId)
+      challengeAttempts.filter(a => a.passed).map(a => a.challengeId)
     ).size;
 
     const challengeSuccessRate = challengeAttempts.length > 0 
-      ? (challengeAttempts.filter(a => a.isCorrect).length / challengeAttempts.length) * 100 
+      ? (challengeAttempts.filter(a => a.passed).length / challengeAttempts.length) * 100 
       : 0;
 
-    // Fetch quiz statistics
+    // Fetch quiz statistics  
     const quizAttempts = await prisma.quizAttempt.findMany({
       where: { userId },
       select: {
         score: true,
-        totalQuestions: true,
-        submittedAt: true,
+        answers: true,
+        createdAt: true,
+        quiz: {
+          select: {
+            questions: true,
+          },
+        },
       },
     });
 
     const completedQuizzes = quizAttempts.length;
     const averageQuizScore = quizAttempts.length > 0 
-      ? (quizAttempts.reduce((sum, attempt) => 
-          sum + (attempt.score / attempt.totalQuestions) * 100, 0
-        ) / quizAttempts.length) 
+      ? (quizAttempts.reduce((sum, attempt) => {
+          const totalQuestions = Array.isArray(attempt.quiz.questions) ? attempt.quiz.questions.length : 0;
+          return sum + (totalQuestions > 0 ? (attempt.score / totalQuestions) * 100 : 0);
+        }, 0) / quizAttempts.length) 
       : 0;
 
-    const perfectQuizScores = quizAttempts.filter(attempt => 
-      attempt.score === attempt.totalQuestions
-    ).length;
+    const perfectQuizScores = quizAttempts.filter(attempt => {
+      const totalQuestions = Array.isArray(attempt.quiz.questions) ? attempt.quiz.questions.length : 0;
+      return attempt.score === totalQuestions;
+    }).length;
 
     // Fetch project statistics (mock data since project model might not exist yet)
     const projectsCompleted = 0;
