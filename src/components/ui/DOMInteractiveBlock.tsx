@@ -41,10 +41,10 @@ export function DOMInteractiveBlock({
 
   const executeCode = () => {
     if (!isMounted) return;
-    
+
     setExecuted(true);
     setExecuteCount((prev) => prev + 1);
-    
+
     // Switch to preview tab with a slight delay to ensure state updates
     if (activeTab === "code") {
       setTimeout(() => {
@@ -115,12 +115,14 @@ export function DOMInteractiveBlock({
                 <Play className="w-4 h-4" />
                 Run Code & See Result
               </button>
-              
+
               {/* Console Tip */}
               <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-lg border border-blue-200 dark:border-blue-800">
                 <span className="font-mono">💡</span>
                 <span>
-                  <strong>Tip:</strong> Open your browser's Developer Tools (F12) and check the Console tab to see any logging output from your code!
+                  <strong>Tip:</strong> Open your browser&apos;s Developer Tools
+                  (F12) and check the Console tab to see any logging output from
+                  your code!
                 </span>
               </div>
             </div>
@@ -130,7 +132,9 @@ export function DOMInteractiveBlock({
         {activeTab === "preview" && isMounted && (
           <div className="p-4">
             <HTMLPreviewWindow
-              key={`dom-preview-${executeCount}-${currentCode.length}-${Date.now()}`}
+              key={`dom-preview-${executeCount}-${
+                currentCode.length
+              }-${Date.now()}`}
               html={html}
               css={css}
               javascript={executed ? currentCode : ""}
