@@ -1,8 +1,9 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import TutorialClient from "./TutorialClient";
+import ErrorBoundary, { TutorialErrorFallback } from "@/components/ErrorBoundary";
 
 interface TutorialPageProps {
   params: Promise<{ category: string; slug: string }>;
@@ -19,5 +20,9 @@ export default async function TutorialPage({ params }: TutorialPageProps) {
   // Resolve params on server side
   const { category, slug } = await params;
 
-  return <TutorialClient category={category} slug={slug} />;
+  return (
+    <ErrorBoundary fallback={TutorialErrorFallback}>
+      <TutorialClient category={category} slug={slug} />
+    </ErrorBoundary>
+  );
 }

@@ -24,6 +24,7 @@ import {
 import SyntaxHighlighter from "@/components/SyntaxHighlighter";
 import { HTMLPreviewWindow } from "@/components/ui/HTMLPreviewWindow";
 import { HTMLEditorPreview } from "@/components/ui/HTMLEditorPreview";
+import { SeparatedEditorPreview } from "@/components/ui/SeparatedEditorPreview";
 
 interface UnlockedAchievement {
   achievement: {
@@ -422,6 +423,7 @@ export default function TutorialClient({
                     DOMInteractiveBlock,
                     HTMLPreviewWindow,
                     HTMLEditorPreview,
+                    SeparatedEditorPreview,
                     // Use custom heading components with anchor IDs
                     h1: createHeadingComponent(1),
                     h2: createHeadingComponent(2),

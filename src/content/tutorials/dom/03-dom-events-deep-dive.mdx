@@ -1,0 +1,886 @@
+---
+title: "DOM Events Deep Dive: Interactive Web Magic"
+description: "Master event handling, event delegation, custom events, and advanced interaction patterns for dynamic web applications."
+difficulty: 3
+estimatedTime: 60
+order: 3
+isPremium: true
+requiredPlan: "PRO"
+topics: ["DOM", "Events", "Event Delegation", "Custom Events", "Interaction"]
+quizQuestions: 16
+---
+
+import { DOMInteractiveBlock } from "@/components/ui/DOMInteractiveBlock";
+import { InteractiveCodeBlock } from "@/components/InteractiveCodeBlock";
+
+# DOM Events Deep Dive: Interactive Web Magic
+
+Events are what make web pages come alive! In this advanced tutorial, you'll master event handling patterns, delegation techniques, and custom event systems that power modern web applications.
+
+## 🎯 What You'll Master
+
+By the end of this tutorial, you'll be able to:
+- Handle complex event scenarios with confidence
+- Implement event delegation for dynamic content
+- Create and dispatch custom events
+- Optimize event performance
+- Build advanced interaction patterns
+- Debug event-related issues effectively
+
+## Event Fundamentals Refresher
+
+Before diving deep, let's quickly review the event basics and then explore advanced concepts.
+
+<DOMInteractiveBlock
+  title="Event Basics Review"
+  description="Understanding the event object and basic handling:"
+  javascript={`const button = document.querySelector('#demo-button');
+const output = document.querySelector('#output');
+
+button.addEventListener('click', function(event) {
+  // Event object properties
+  console.log('Event type:', event.type);
+  console.log('Target element:', event.target.tagName);
+  console.log('Current target:', event.currentTarget.tagName);
+  console.log('Mouse position:', event.clientX, event.clientY);
+  console.log('Timestamp:', event.timeStamp);
+  
+  output.innerHTML = \`
+    <strong>Event Details:</strong><br>
+    Type: \${event.type}<br>
+    Target: \${event.target.tagName}<br>
+    Position: (\${event.clientX}, \${event.clientY})<br>
+    Timestamp: \${Math.round(event.timeStamp)}ms
+  \`;
+});`}
+  html={`<button id="demo-button">Click me for event details!</button>
+<div id="output">Click the button to see event information</div>`}
+/>
+
+## Event Propagation and Control
+
+Understanding event bubbling and capturing is crucial for advanced event handling.
+
+### Event Phases
+
+<DOMInteractiveBlock
+  title="Event Bubbling and Capturing"
+  description="Watch how events travel through the DOM tree:"
+  javascript={`const outer = document.querySelector('.outer-box');
+const middle = document.querySelector('.middle-box');
+const inner = document.querySelector('.inner-box');
+const log = document.querySelector('#event-log');
+
+function logEvent(phase, element) {
+  return function(event) {
+    const entry = document.createElement('div');
+    entry.textContent = \`\${phase}: \${element} clicked\`;
+    entry.style.margin = '2px 0';
+    entry.style.padding = '4px';
+    entry.style.backgroundColor = phase === 'CAPTURE' ? '#fef3c7' : '#e0f2fe';
+    log.appendChild(entry);
+    log.scrollTop = log.scrollHeight;
+  };
+}
+
+// Add capture phase listeners
+outer.addEventListener('click', logEvent('CAPTURE', 'Outer'), true);
+middle.addEventListener('click', logEvent('CAPTURE', 'Middle'), true);
+inner.addEventListener('click', logEvent('CAPTURE', 'Inner'), true);
+
+// Add bubble phase listeners
+outer.addEventListener('click', logEvent('BUBBLE', 'Outer'), false);
+middle.addEventListener('click', logEvent('BUBBLE', 'Middle'), false);
+inner.addEventListener('click', logEvent('BUBBLE', 'Inner'), false);
+
+// Clear log button
+document.querySelector('#clear-log').addEventListener('click', () => {
+  log.innerHTML = '<strong>Event Log:</strong>';
+});`}
+  html={`<div class="outer-box" style="padding: 20px; border: 3px solid #3b82f6; background: #dbeafe; cursor: pointer;">
+  Outer Box
+  <div class="middle-box" style="padding: 15px; margin: 10px; border: 3px solid #10b981; background: #d1fae5; cursor: pointer;">
+    Middle Box
+    <div class="inner-box" style="padding: 10px; margin: 10px; border: 3px solid #f59e0b; background: #fef3c7; cursor: pointer;">
+      Inner Box - Click me!
+    </div>
+  </div>
+</div>
+
+<button id="clear-log">Clear Log</button>
+<div id="event-log" style="height: 150px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-top: 10px; background: #f9fafb;">
+  <strong>Event Log:</strong>
+</div>`}
+/>
+
+### Stopping Propagation
+
+<DOMInteractiveBlock
+  title="Controlling Event Propagation"
+  description="Use stopPropagation() and preventDefault() strategically:"
+  javascript={`const container = document.querySelector('#propagation-container');
+const button1 = document.querySelector('#stop-propagation');
+const button2 = document.querySelector('#prevent-default');
+const link = document.querySelector('#demo-link');
+const form = document.querySelector('#demo-form');
+
+// Container listener
+container.addEventListener('click', () => {
+  console.log('Container clicked - this should not always fire');
+  container.style.backgroundColor = '#fecaca';
+  setTimeout(() => container.style.backgroundColor = '#f3f4f6', 500);
+});
+
+// Stop propagation example
+button1.addEventListener('click', (event) => {
+  event.stopPropagation();
+  console.log('Propagation stopped - container listener won\\'t fire');
+  button1.textContent = 'Propagation Stopped!';
+  setTimeout(() => button1.textContent = 'Stop Propagation', 1000);
+});
+
+// Prevent default example
+link.addEventListener('click', (event) => {
+  event.preventDefault();
+  console.log('Default navigation prevented');
+  link.textContent = 'Navigation prevented!';
+  link.style.color = '#dc2626';
+  setTimeout(() => {
+    link.textContent = 'Try to navigate';
+    link.style.color = '#2563eb';
+  }, 2000);
+});
+
+// Form submission prevention
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+  console.log('Form submission prevented');
+  const status = document.querySelector('#form-status');
+  status.textContent = 'Form submission prevented!';
+  status.style.color = '#dc2626';
+});`}
+  html={`<div id="propagation-container" style="padding: 20px; background: #f3f4f6; border: 2px solid #d1d5db; margin-bottom: 10px;">
+  <p>Container (click anywhere to see background flash)</p>
+  <button id="stop-propagation">Stop Propagation</button>
+  <a href="https://example.com" id="demo-link" style="color: #2563eb; margin-left: 10px;">Try to navigate</a>
+</div>
+
+<form id="demo-form">
+  <input type="text" placeholder="Enter something" required>
+  <button id="prevent-default" type="submit">Submit Form</button>
+</form>
+<div id="form-status"></div>`}
+/>
+
+## Event Delegation
+
+Event delegation is a powerful pattern for handling events on dynamic content efficiently.
+
+<DOMInteractiveBlock
+  title="Event Delegation Pattern"
+  description="Handle events for dynamically added elements:"
+  javascript={`const todoContainer = document.querySelector('#todo-container');
+const addBtn = document.querySelector('#add-todo');
+const todoInput = document.querySelector('#todo-input');
+
+let todoCount = 0;
+
+// Event delegation - single listener handles all todos
+todoContainer.addEventListener('click', (event) => {
+  const target = event.target;
+  
+  if (target.classList.contains('delete-btn')) {
+    // Handle delete
+    const todoItem = target.closest('.todo-item');
+    todoItem.remove();
+    console.log('Todo deleted');
+    
+  } else if (target.classList.contains('toggle-btn')) {
+    // Handle toggle
+    const todoItem = target.closest('.todo-item');
+    todoItem.classList.toggle('completed');
+    target.textContent = todoItem.classList.contains('completed') ? '↶' : '✓';
+    console.log('Todo toggled');
+    
+  } else if (target.classList.contains('edit-btn')) {
+    // Handle edit
+    const todoText = target.closest('.todo-item').querySelector('.todo-text');
+    const currentText = todoText.textContent;
+    const newText = prompt('Edit todo:', currentText);
+    if (newText && newText.trim()) {
+      todoText.textContent = newText.trim();
+      console.log('Todo edited');
+    }
+  }
+});
+
+// Add new todos
+function addTodo() {
+  const text = todoInput.value.trim();
+  if (!text) return;
+  
+  todoCount++;
+  const todoItem = document.createElement('div');
+  todoItem.className = 'todo-item';
+  todoItem.innerHTML = \`
+    <span class="todo-text">\${text}</span>
+    <button class="toggle-btn">✓</button>
+    <button class="edit-btn">✏️</button>
+    <button class="delete-btn">🗑️</button>
+  \`;
+  
+  todoContainer.appendChild(todoItem);
+  todoInput.value = '';
+  console.log('Todo added:', text);
+}
+
+addBtn.addEventListener('click', addTodo);
+todoInput.addEventListener('keypress', (event) => {
+  if (event.key === 'Enter') {
+    addTodo();
+  }
+});
+
+// Add some initial todos
+setTimeout(() => {
+  todoInput.value = 'Learn event delegation';
+  addTodo();
+  todoInput.value = 'Practice DOM manipulation';
+  addTodo();
+}, 100);`}
+  html={`<div style="margin-bottom: 10px;">
+  <input type="text" id="todo-input" placeholder="Enter a new todo..." style="padding: 8px; width: 200px;">
+  <button id="add-todo" style="padding: 8px 12px; margin-left: 5px;">Add Todo</button>
+</div>
+
+<div id="todo-container" style="border: 1px solid #d1d5db; border-radius: 8px; padding: 10px; min-height: 100px; background: #f9fafb;">
+  <!-- Todos will be added here dynamically -->
+</div>
+
+<style>
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  margin: 5px 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+}
+
+.todo-text {
+  flex: 1;
+}
+
+.todo-item.completed .todo-text {
+  text-decoration: line-through;
+  color: #6b7280;
+}
+
+.todo-item button {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.toggle-btn { background: #10b981; color: white; }
+.edit-btn { background: #f59e0b; color: white; }
+.delete-btn { background: #ef4444; color: white; }
+</style>`}
+/>
+
+## Custom Events
+
+Create your own events to build loosely coupled, modular applications.
+
+<DOMInteractiveBlock
+  title="Custom Events System"
+  description="Create and dispatch custom events for better application architecture:"
+  javascript={`// Custom event system for a shopping cart
+class ShoppingCart {
+  constructor() {
+    this.items = [];
+    this.total = 0;
+  }
+  
+  addItem(product, price) {
+    this.items.push({ product, price, id: Date.now() });
+    this.updateTotal();
+    
+    // Dispatch custom event
+    const event = new CustomEvent('itemAdded', {
+      detail: { product, price, total: this.total, itemCount: this.items.length }
+    });
+    document.dispatchEvent(event);
+  }
+  
+  removeItem(id) {
+    const item = this.items.find(item => item.id === id);
+    this.items = this.items.filter(item => item.id !== id);
+    this.updateTotal();
+    
+    const event = new CustomEvent('itemRemoved', {
+      detail: { item, total: this.total, itemCount: this.items.length }
+    });
+    document.dispatchEvent(event);
+  }
+  
+  updateTotal() {
+    this.total = this.items.reduce((sum, item) => sum + item.price, 0);
+  }
+}
+
+const cart = new ShoppingCart();
+
+// Listen for custom events
+document.addEventListener('itemAdded', (event) => {
+  const { product, price, total, itemCount } = event.detail;
+  console.log(\`Item added: \${product} ($\${price})\`);
+  
+  const cartDisplay = document.querySelector('#cart-display');
+  cartDisplay.innerHTML = \`
+    <strong>Cart (\${itemCount} items): $\${total.toFixed(2)}</strong>
+    <div>Last added: \${product}</div>
+  \`;
+  
+  // Visual feedback
+  cartDisplay.style.backgroundColor = '#dcfce7';
+  setTimeout(() => cartDisplay.style.backgroundColor = 'transparent', 500);
+});
+
+document.addEventListener('itemRemoved', (event) => {
+  const { item, total, itemCount } = event.detail;
+  console.log(\`Item removed: \${item.product}\`);
+  
+  const cartDisplay = document.querySelector('#cart-display');
+  cartDisplay.innerHTML = \`
+    <strong>Cart (\${itemCount} items): $\${total.toFixed(2)}</strong>
+    <div>Removed: \${item.product}</div>
+  \`;
+  
+  cartDisplay.style.backgroundColor = '#fecaca';
+  setTimeout(() => cartDisplay.style.backgroundColor = 'transparent', 500);
+});
+
+// Product buttons
+document.querySelector('#add-laptop').addEventListener('click', () => {
+  cart.addItem('Laptop', 999.99);
+});
+
+document.querySelector('#add-mouse').addEventListener('click', () => {
+  cart.addItem('Mouse', 29.99);
+});
+
+document.querySelector('#add-keyboard').addEventListener('click', () => {
+  cart.addItem('Keyboard', 79.99);
+});
+
+// Simulate removing last item
+document.querySelector('#remove-last').addEventListener('click', () => {
+  if (cart.items.length > 0) {
+    const lastItem = cart.items[cart.items.length - 1];
+    cart.removeItem(lastItem.id);
+  }
+});`}
+  html={`<div style="margin-bottom: 15px;">
+  <h4>Product Catalog:</h4>
+  <button id="add-laptop">Add Laptop ($999.99)</button>
+  <button id="add-mouse" style="margin-left: 10px;">Add Mouse ($29.99)</button>
+  <button id="add-keyboard" style="margin-left: 10px;">Add Keyboard ($79.99)</button>
+</div>
+
+<div id="cart-display" style="padding: 15px; border: 2px solid #d1d5db; border-radius: 8px; background: #f9fafb; margin-bottom: 10px;">
+  <strong>Cart (0 items): $0.00</strong>
+</div>
+
+<button id="remove-last" style="background: #ef4444; color: white; padding: 8px 12px; border: none; border-radius: 4px;">Remove Last Item</button>`}
+/>
+
+## Advanced Event Patterns
+
+### Debouncing and Throttling
+
+<DOMInteractiveBlock
+  title="Debouncing and Throttling Events"
+  description="Control event frequency for better performance:"
+  javascript={`// Utility functions
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+function throttle(func, limit) {
+  let inThrottle;
+  return function(...args) {
+    if (!inThrottle) {
+      func.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+}
+
+// Counters for demonstration
+let normalCount = 0;
+let debouncedCount = 0;
+let throttledCount = 0;
+
+const normalCounter = document.querySelector('#normal-count');
+const debouncedCounter = document.querySelector('#debounced-count');
+const throttledCounter = document.querySelector('#throttled-count');
+const input = document.querySelector('#demo-input');
+
+// Normal event handler
+function normalHandler() {
+  normalCount++;
+  normalCounter.textContent = normalCount;
+}
+
+// Debounced handler (waits 500ms after last event)
+const debouncedHandler = debounce(() => {
+  debouncedCount++;
+  debouncedCounter.textContent = debouncedCount;
+}, 500);
+
+// Throttled handler (max once per 500ms)
+const throttledHandler = throttle(() => {
+  throttledCount++;
+  throttledCounter.textContent = throttledCount;
+}, 500);
+
+// Attach all handlers to input
+input.addEventListener('input', normalHandler);
+input.addEventListener('input', debouncedHandler);
+input.addEventListener('input', throttledHandler);
+
+// Reset counters
+document.querySelector('#reset-counters').addEventListener('click', () => {
+  normalCount = debouncedCount = throttledCount = 0;
+  normalCounter.textContent = '0';
+  debouncedCounter.textContent = '0';
+  throttledCounter.textContent = '0';
+});`}
+  html={`<div style="margin-bottom: 15px;">
+  <label for="demo-input">Type rapidly to see the difference:</label><br>
+  <input type="text" id="demo-input" placeholder="Type here..." style="padding: 8px; width: 300px; margin-top: 5px;">
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+  <div style="text-align: center; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px;">
+    <strong>Normal</strong><br>
+    <span id="normal-count" style="font-size: 24px; color: #ef4444;">0</span><br>
+    <small>Every keystroke</small>
+  </div>
+  
+  <div style="text-align: center; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px;">
+    <strong>Debounced</strong><br>
+    <span id="debounced-count" style="font-size: 24px; color: #f59e0b;">0</span><br>
+    <small>500ms after stopping</small>
+  </div>
+  
+  <div style="text-align: center; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px;">
+    <strong>Throttled</strong><br>
+    <span id="throttled-count" style="font-size: 24px; color: #10b981;">0</span><br>
+    <small>Max once per 500ms</small>
+  </div>
+</div>
+
+<button id="reset-counters">Reset Counters</button>`}
+/>
+
+### Event Composition
+
+<DOMInteractiveBlock
+  title="Complex Event Combinations"
+  description="Handle multiple event types together for rich interactions:"
+  javascript={`const canvas = document.querySelector('#interaction-canvas');
+const status = document.querySelector('#interaction-status');
+const coords = document.querySelector('#coordinates');
+
+let isMouseDown = false;
+let startTime = 0;
+let startPos = { x: 0, y: 0 };
+
+// Mouse events
+canvas.addEventListener('mousedown', (event) => {
+  isMouseDown = true;
+  startTime = Date.now();
+  startPos = { x: event.offsetX, y: event.offsetY };
+  
+  status.textContent = 'Mouse pressed';
+  canvas.style.backgroundColor = '#fef3c7';
+});
+
+canvas.addEventListener('mousemove', (event) => {
+  coords.textContent = \`Position: (\${event.offsetX}, \${event.offsetY})\`;
+  
+  if (isMouseDown) {
+    const distance = Math.sqrt(
+      Math.pow(event.offsetX - startPos.x, 2) + 
+      Math.pow(event.offsetY - startPos.y, 2)
+    );
+    status.textContent = \`Dragging - Distance: \${Math.round(distance)}px\`;
+    canvas.style.backgroundColor = '#e0f2fe';
+  }
+});
+
+canvas.addEventListener('mouseup', (event) => {
+  const duration = Date.now() - startTime;
+  const distance = Math.sqrt(
+    Math.pow(event.offsetX - startPos.x, 2) + 
+    Math.pow(event.offsetY - startPos.y, 2)
+  );
+  
+  let action = 'Click';
+  if (distance > 10) action = 'Drag';
+  if (duration > 500) action = 'Long ' + action.toLowerCase();
+  
+  status.textContent = \`\${action} completed (\${duration}ms, \${Math.round(distance)}px)\`;
+  canvas.style.backgroundColor = '#f3f4f6';
+  
+  isMouseDown = false;
+});
+
+canvas.addEventListener('mouseleave', () => {
+  if (isMouseDown) {
+    status.textContent = 'Drag cancelled (mouse left area)';
+    canvas.style.backgroundColor = '#fecaca';
+    isMouseDown = false;
+  }
+});
+
+// Keyboard combinations
+document.addEventListener('keydown', (event) => {
+  if (event.target === canvas) {
+    let modifiers = [];
+    if (event.ctrlKey) modifiers.push('Ctrl');
+    if (event.altKey) modifiers.push('Alt');
+    if (event.shiftKey) modifiers.push('Shift');
+    
+    const keyCombo = modifiers.length > 0 ? 
+      \`\${modifiers.join('+')}+\${event.key}\` : event.key;
+    
+    status.textContent = \`Key pressed: \${keyCombo}\`;
+    
+    // Special combinations
+    if (event.ctrlKey && event.key === 'c') {
+      event.preventDefault();
+      status.textContent = 'Copy action prevented!';
+      canvas.style.backgroundColor = '#dcfce7';
+      setTimeout(() => canvas.style.backgroundColor = '#f3f4f6', 500);
+    }
+  }
+});`}
+  html={`<div id="interaction-canvas" 
+     tabindex="0" 
+     style="width: 100%; height: 200px; background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 8px; cursor: crosshair; outline: none; display: flex; align-items: center; justify-content: center; color: #6b7280;">
+  Click, drag, and try keyboard combinations here<br>
+  <small>(Click to focus, then try Ctrl+C)</small>
+</div>
+
+<div style="margin-top: 10px; display: flex; gap: 20px;">
+  <div id="interaction-status" style="font-weight: bold;">Ready</div>
+  <div id="coordinates">Position: (0, 0)</div>
+</div>`}
+/>
+
+## Event Performance Optimization
+
+<InteractiveCodeBlock
+  title="Event Performance Best Practices"
+  description="Optimize event handling for better performance:"
+>
+{`// ❌ Bad: Adding listeners to many elements
+function badApproach() {
+  const items = document.querySelectorAll('.item');
+  items.forEach(item => {
+    item.addEventListener('click', handleClick);
+  });
+}
+
+// ✅ Good: Use event delegation
+function goodApproach() {
+  document.querySelector('.container').addEventListener('click', (event) => {
+    if (event.target.classList.contains('item')) {
+      handleClick(event);
+    }
+  });
+}
+
+// ✅ Better: Passive listeners for scroll events
+function optimizedScrollHandler() {
+  window.addEventListener('scroll', handleScroll, { passive: true });
+}
+
+// ✅ Best: AbortController for cleanup
+function modernEventHandling() {
+  const controller = new AbortController();
+  
+  element.addEventListener('click', handleClick, {
+    signal: controller.signal
+  });
+  
+  // Later: remove all listeners at once
+  // controller.abort();
+}
+
+// Event pooling for high-frequency events
+class EventPool {
+  constructor() {
+    this.handlers = new Map();
+    this.throttledHandlers = new Map();
+  }
+  
+  addThrottledHandler(element, event, handler, delay = 16) {
+    const key = \`\${element}_\${event}\`;
+    
+    if (this.throttledHandlers.has(key)) {
+      return;
+    }
+    
+    const throttledHandler = this.throttle(handler, delay);
+    this.throttledHandlers.set(key, throttledHandler);
+    element.addEventListener(event, throttledHandler);
+  }
+  
+  throttle(func, limit) {
+    let inThrottle;
+    return function(...args) {
+      if (!inThrottle) {
+        func.apply(this, args);
+        inThrottle = true;
+        setTimeout(() => inThrottle = false, limit);
+      }
+    };
+  }
+}`}
+</InteractiveCodeBlock>
+
+## Debugging Events
+
+<InteractiveCodeBlock
+  title="Event Debugging Techniques"
+  description="Tools and techniques for debugging event issues:"
+>
+{`// Event debugging utilities
+class EventDebugger {
+  static logAllEvents(element, events = ['click', 'mousedown', 'mouseup', 'mousemove']) {
+    events.forEach(eventType => {
+      element.addEventListener(eventType, (event) => {
+        console.group(\`🎯 \${eventType.toUpperCase()} Event\`);
+        console.log('Target:', event.target);
+        console.log('CurrentTarget:', event.currentTarget);
+        console.log('EventPhase:', this.getPhaseString(event.eventPhase));
+        console.log('Bubbles:', event.bubbles);
+        console.log('Cancelable:', event.cancelable);
+        console.log('TimeStamp:', event.timeStamp);
+        console.groupEnd();
+      }, true); // Capture phase
+    });
+  }
+  
+  static getPhaseString(phase) {
+    const phases = {
+      1: 'CAPTURING_PHASE',
+      2: 'AT_TARGET', 
+      3: 'BUBBLING_PHASE'
+    };
+    return phases[phase] || 'UNKNOWN';
+  }
+  
+  static trackEventPath(event) {
+    const path = event.composedPath();
+    console.log('Event path:', path.map(el => el.tagName || el.toString()));
+  }
+  
+  static monitorPerformance(element, eventType) {
+    let eventCount = 0;
+    const startTime = performance.now();
+    
+    element.addEventListener(eventType, () => {
+      eventCount++;
+      const currentTime = performance.now();
+      const rate = eventCount / ((currentTime - startTime) / 1000);
+      console.log(\`\${eventType} rate: \${rate.toFixed(2)} events/second\`);
+    });
+  }
+}
+
+// Usage examples:
+// EventDebugger.logAllEvents(document.querySelector('#debug-element'));
+// EventDebugger.monitorPerformance(window, 'scroll');`}
+</InteractiveCodeBlock>
+
+## Real-World Example: Advanced Image Gallery
+
+<DOMInteractiveBlock
+  title="Advanced Image Gallery with Events"
+  description="A complete gallery with keyboard navigation, gestures, and custom events:"
+  javascript={`class ImageGallery {
+  constructor(container) {
+    this.container = container;
+    this.images = container.querySelectorAll('.gallery-image');
+    this.currentIndex = 0;
+    this.isFullscreen = false;
+    
+    this.init();
+  }
+  
+  init() {
+    this.setupEventListeners();
+    this.updateDisplay();
+  }
+  
+  setupEventListeners() {
+    // Image clicks
+    this.container.addEventListener('click', (event) => {
+      if (event.target.classList.contains('gallery-image')) {
+        const index = Array.from(this.images).indexOf(event.target);
+        this.goToImage(index);
+      }
+      
+      if (event.target.classList.contains('prev-btn')) {
+        this.previousImage();
+      }
+      
+      if (event.target.classList.contains('next-btn')) {
+        this.nextImage();
+      }
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', (event) => {
+      if (!this.isFullscreen) return;
+      
+      switch(event.key) {
+        case 'ArrowLeft':
+          event.preventDefault();
+          this.previousImage();
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          this.nextImage();
+          break;
+        case 'Escape':
+          this.exitFullscreen();
+          break;
+      }
+    });
+    
+    // Touch/swipe support
+    let startX = 0;
+    let startY = 0;
+    
+    this.container.addEventListener('touchstart', (event) => {
+      startX = event.touches[0].clientX;
+      startY = event.touches[0].clientY;
+    }, { passive: true });
+    
+    this.container.addEventListener('touchend', (event) => {
+      const endX = event.changedTouches[0].clientX;
+      const endY = event.changedTouches[0].clientY;
+      const diffX = startX - endX;
+      const diffY = startY - endY;
+      
+      // Only handle horizontal swipes
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+        if (diffX > 0) {
+          this.nextImage();
+        } else {
+          this.previousImage();
+        }
+      }
+    }, { passive: true });
+  }
+  
+  goToImage(index) {
+    if (index < 0 || index >= this.images.length) return;
+    
+    this.currentIndex = index;
+    this.updateDisplay();
+    this.dispatchCustomEvent('imageChanged', { index });
+  }
+  
+  nextImage() {
+    this.goToImage((this.currentIndex + 1) % this.images.length);
+  }
+  
+  previousImage() {
+    this.goToImage((this.currentIndex - 1 + this.images.length) % this.images.length);
+  }
+  
+  updateDisplay() {
+    const indicator = this.container.querySelector('.current-indicator');
+    indicator.textContent = \`\${this.currentIndex + 1} / \${this.images.length}\`;
+    
+    // Highlight current image
+    this.images.forEach((img, index) => {
+      img.style.opacity = index === this.currentIndex ? '1' : '0.6';
+      img.style.transform = index === this.currentIndex ? 'scale(1.05)' : 'scale(1)';
+    });
+  }
+  
+  dispatchCustomEvent(type, detail) {
+    const event = new CustomEvent(type, { detail });
+    this.container.dispatchEvent(event);
+  }
+}
+
+// Initialize gallery
+const gallery = new ImageGallery(document.querySelector('#image-gallery'));
+
+// Listen for custom events
+document.querySelector('#image-gallery').addEventListener('imageChanged', (event) => {
+  console.log('Image changed to index:', event.detail.index);
+});`}
+  html={`<div id="image-gallery" style="border: 2px solid #d1d5db; border-radius: 12px; padding: 20px; background: #f9fafb;">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+    <button class="prev-btn" style="padding: 8px 12px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;">← Previous</button>
+    <div class="current-indicator" style="font-weight: bold; font-size: 18px;">1 / 4</div>
+    <button class="next-btn" style="padding: 8px 12px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;">Next →</button>
+  </div>
+  
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+    <div class="gallery-image" style="aspect-ratio: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; transition: all 0.3s ease;">
+      Image 1
+    </div>
+    <div class="gallery-image" style="aspect-ratio: 1; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; transition: all 0.3s ease; opacity: 0.6;">
+      Image 2
+    </div>
+    <div class="gallery-image" style="aspect-ratio: 1; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; transition: all 0.3s ease; opacity: 0.6;">
+      Image 3
+    </div>
+    <div class="gallery-image" style="aspect-ratio: 1; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; transition: all 0.3s ease; opacity: 0.6;">
+      Image 4
+    </div>
+  </div>
+  
+  <div style="margin-top: 15px; text-align: center; color: #6b7280; font-size: 14px;">
+    💡 Click images, use arrow keys, or swipe on mobile
+  </div>
+</div>`}
+/>
+
+## Quiz Time! 🧠
+
+Ready to test your advanced event handling skills? The quiz will adapt to your current mood setting - whether you're in chill, rush, or grind mode!
+
+## What's Next?
+
+Outstanding work mastering advanced DOM events! Next up:
+- **Form Handling & Validation** - Advanced form interactions
+- **Browser Object Model (BOM)** - Window, location, and navigation APIs
+- **Web APIs Integration** - Fetch, Storage, and modern browser features
+- **Performance Optimization** - Advanced DOM performance techniques
+
+You're now equipped to handle the most complex event scenarios! 🚀

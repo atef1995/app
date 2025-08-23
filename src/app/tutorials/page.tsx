@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -14,8 +14,87 @@ import { PageLayout } from "@/components/ui/PageLayout";
 import { ContentGrid } from "@/components/ui/ContentGrid";
 import Pagination from "@/components/ui/Pagination";
 import { useMood } from "@/components/providers/MoodProvider";
-import { MoodImpactIndicator, QuickMoodSwitcher } from "@/components/ui/MoodImpactIndicator";
+import {
+  MoodImpactIndicator,
+  QuickMoodSwitcher,
+} from "@/components/ui/MoodImpactIndicator";
+import ErrorBoundary, {
+  ComponentErrorFallback,
+} from "@/components/ErrorBoundary";
 
+// Skeleton Components for Suspense fallbacks
+function MoodImpactSkeleton() {
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 animate-pulse">
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3 w-1/3"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+        </div>
+        <div className="ml-6 flex space-x-2">
+          <div className="h-10 w-16 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+          <div className="h-10 w-16 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+          <div className="h-10 w-16 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CategoryCardSkeleton() {
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg animate-pulse">
+      <div className="mb-4">
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-lg w-3/4"></div>
+      </div>
+      <div className="mb-4">
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-2"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+      </div>
+      <div className="flex flex-wrap gap-2 mb-4">
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-16"></div>
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-20"></div>
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-18"></div>
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+        </div>
+        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-lg w-24"></div>
+      </div>
+    </div>
+  );
+}
+
+function CategoriesGridSkeleton() {
+  return (
+    <ContentGrid>
+      {[1, 2, 3, 4, 5, 6].map((i) => (
+        <CategoryCardSkeleton key={i} />
+      ))}
+    </ContentGrid>
+  );
+}
+
+function StatsCardSkeleton() {
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg animate-pulse">
+      <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4 w-1/2"></div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="text-center">
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2 w-12 mx-auto"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mx-auto"></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function TutorialsPage() {
   const { data: session } = useSession();
@@ -67,7 +146,9 @@ export default function TutorialsPage() {
       };
     }
 
-    const categoryTuts = allTutorials.filter((t) => t.category.slug === categorySlug);
+    const categoryTuts = allTutorials.filter(
+      (t) => t.category.slug === categorySlug
+    );
     const completed = categoryTuts.filter((t) => {
       const progress = tutorialsWithProgress.find(
         (tp) => tp.id === t.id
@@ -84,7 +165,7 @@ export default function TutorialsPage() {
   if (!session) {
     return (
       <PageLayout
-        title="JavaScript Tutorials"
+        title="Programming Tutorials"
         subtitle="Interactive lessons tailored to your learning style"
       >
         <div className="flex items-center justify-center h-64">
@@ -104,23 +185,7 @@ export default function TutorialsPage() {
     );
   }
 
-  if (categoriesQuery.isLoading || allTutorialsQuery.isLoading) {
-    return (
-      <PageLayout
-        title="JavaScript Tutorials"
-        subtitle="Interactive lessons tailored to your learning style"
-      >
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">
-              Loading tutorials...
-            </p>
-          </div>
-        </div>
-      </PageLayout>
-    );
-  }
+  // Remove the loading state since it's handled by loading.tsx
 
   if (categoriesQuery.error || allTutorialsQuery.error) {
     return (
@@ -152,16 +217,18 @@ export default function TutorialsPage() {
     >
       {/* Mood Impact */}
       <div className="mb-8">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <MoodImpactIndicator context="tutorial" />
-            </div>
-            <div className="ml-6">
-              <QuickMoodSwitcher />
+        <Suspense fallback={<MoodImpactSkeleton />}>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <MoodImpactIndicator context="tutorial" />
+              </div>
+              <div className="ml-6">
+                <QuickMoodSwitcher />
+              </div>
             </div>
           </div>
-        </div>
+        </Suspense>
       </div>
 
       {/* Categories Grid */}
@@ -169,26 +236,35 @@ export default function TutorialsPage() {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
           Choose a Learning Path
         </h2>
-        <ContentGrid>
-          {categories.map((category) => {
-            const stats = getCategoryStats(category.slug);
+        <Suspense fallback={<CategoriesGridSkeleton />}>
+          <ContentGrid>
+            {categories.map((category) => {
+              const stats = getCategoryStats(category.slug);
 
-            return (
-              <CategoryCard
-                key={category.id}
-                category={category.slug}
-                title={category.title}
-                tutorialCount={stats.total}
-                completedCount={stats.completed}
-                totalDuration={category.duration}
-                difficulty={category.difficulty as "beginner" | "intermediate" | "advanced"}
-                description={category.description}
-                topics={category.topics}
-                onClick={() => router.push(`/tutorials/category/${category.slug}`)}
-              />
-            );
-          })}
-        </ContentGrid>
+              return (
+                <CategoryCard
+                  key={category.id}
+                  category={category.slug}
+                  title={category.title}
+                  tutorialCount={stats.total}
+                  completedCount={stats.completed}
+                  totalDuration={category.duration}
+                  difficulty={
+                    category.difficulty as
+                      | "beginner"
+                      | "intermediate"
+                      | "advanced"
+                  }
+                  description={category.description}
+                  topics={category.topics}
+                  onClick={() =>
+                    router.push(`/tutorials/category/${category.slug}`)
+                  }
+                />
+              );
+            })}
+          </ContentGrid>
+        </Suspense>
 
         {/* Categories Pagination */}
         {totalPages > 1 && (
@@ -211,39 +287,43 @@ export default function TutorialsPage() {
       </div>
 
       {/* Quick Stats */}
-      <div className="mb-8 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-          Your Learning Progress
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {allTutorials.length}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Total Tutorials
+      <div className="mb-8">
+        <Suspense fallback={<StatsCardSkeleton />}>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              Your Learning Progress
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {allTutorials.length}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  Total Tutorials
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {
+                    tutorialsWithProgress.filter((t) => t.progress?.quizPassed)
+                      .length
+                  }
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  Completed
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                  {categories.length}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  Categories
+                </div>
+              </div>
             </div>
           </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-              {
-                tutorialsWithProgress.filter((t) => t.progress?.quizPassed)
-                  .length
-              }
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Completed
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-              {categories.length}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Categories
-            </div>
-          </div>
-        </div>
+        </Suspense>
       </div>
 
       {/* Coming Soon */}

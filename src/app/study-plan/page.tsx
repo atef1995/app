@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useStudyPlan } from "@/hooks/useStudyPlan";
@@ -119,8 +119,6 @@ export default function StudyPlanPage() {
   const { status } = useSession();
   const router = useRouter();
   const [navigatingStepId, setNavigatingStepId] = useState<string | null>(null);
-  const [overviewLoaded, setOverviewLoaded] = useState(false);
-  const [roadmapLoaded, setRoadmapLoaded] = useState(false);
 
   // TanStack Query hooks
   const { data, isLoading, error, refetch } = useStudyPlan();
@@ -129,16 +127,6 @@ export default function StudyPlanPage() {
   if (status === "unauthenticated") {
     router.push("/auth/signin");
     return null;
-  }
-
-  // Progressive content loading effect
-  if (data && !overviewLoaded) {
-    requestAnimationFrame(() => {
-      setOverviewLoaded(true);
-      setTimeout(() => {
-        setRoadmapLoaded(true);
-      }, 150);
-    });
   }
 
   const handleStartStep = (stepId: string) => {
@@ -256,7 +244,7 @@ export default function StudyPlanPage() {
           </TabsList>
 
           <TabsContent value="overview">
-            {overviewLoaded ? (
+            <Suspense fallback={<StudyPlanSkeleton />}>
               <StudyPlanOverview
                 studyPlan={studyPlan}
                 completedSteps={userProgress.completedSteps}
@@ -264,13 +252,11 @@ export default function StudyPlanPage() {
                 onStartStep={handleStartStep}
                 navigatingStepId={navigatingStepId}
               />
-            ) : (
-              <StudyPlanSkeleton />
-            )}
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="roadmap">
-            {roadmapLoaded ? (
+            <Suspense fallback={<RoadmapSkeleton />}>
               <StudyPlanRoadmap
                 studyPlan={studyPlan}
                 completedSteps={userProgress.completedSteps}
@@ -279,9 +265,7 @@ export default function StudyPlanPage() {
                 onViewStep={handleViewStep}
                 navigatingStepId={navigatingStepId}
               />
-            ) : (
-              <RoadmapSkeleton />
-            )}
+            </Suspense>
           </TabsContent>
         </Tabs>
       </div>

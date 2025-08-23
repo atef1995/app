@@ -1,0 +1,1207 @@
+---
+title: "Browser Object Model (BOM): Mastering the Browser Environment"
+description: "Explore the Browser Object Model to control navigation, manage browser history, handle storage, and interact with the browser environment."
+difficulty: 3
+estimatedTime: 50
+order: 5
+isPremium: true
+requiredPlan: "PRO"
+topics: ["BOM", "Window", "Navigation", "History", "Storage", "Location"]
+quizQuestions: 13
+---
+
+import { DOMInteractiveBlock } from "@/components/ui/DOMInteractiveBlock";
+import { InteractiveCodeBlock } from "@/components/InteractiveCodeBlock";
+
+# Browser Object Model (BOM): Mastering the Browser Environment
+
+The Browser Object Model provides JavaScript with access to browser functionality beyond the DOM. Master window management, navigation control, storage APIs, and browser-specific features.
+
+## 🎯 What You'll Master
+
+By the end of this tutorial, you'll be able to:
+- Control browser windows and tabs
+- Manage navigation and browser history
+- Use local and session storage effectively
+- Handle browser events and notifications
+- Work with timers and intervals
+- Detect browser capabilities and features
+
+## Window Object Fundamentals
+
+The `window` object is the global object in browsers and provides access to browser functionality.
+
+<DOMInteractiveBlock
+  title="Window Object Exploration"
+  description="Explore window properties and methods:"
+  javascript={`// Window dimensions and position
+const windowInfo = {
+  innerWidth: window.innerWidth,
+  innerHeight: window.innerHeight,
+  outerWidth: window.outerWidth,
+  outerHeight: window.outerHeight,
+  screenX: window.screenX,
+  screenY: window.screenY
+};
+
+console.log('Window Info:', windowInfo);
+
+// Screen information
+const screenInfo = {
+  width: screen.width,
+  height: screen.height,
+  availWidth: screen.availWidth,
+  availHeight: screen.availHeight,
+  colorDepth: screen.colorDepth,
+  pixelDepth: screen.pixelDepth
+};
+
+console.log('Screen Info:', screenInfo);
+
+// Display information
+const displayDiv = document.querySelector('#window-display');
+displayDiv.innerHTML = \`
+  <h4>🖥️ Window Information</h4>
+  <div class="info-grid">
+    <div><strong>Inner Size:</strong> \${window.innerWidth} × \${window.innerHeight}</div>
+    <div><strong>Outer Size:</strong> \${window.outerWidth} × \${window.outerHeight}</div>
+    <div><strong>Position:</strong> (\${window.screenX}, \${window.screenY})</div>
+    <div><strong>Screen:</strong> \${screen.width} × \${screen.height}</div>
+    <div><strong>Available:</strong> \${screen.availWidth} × \${screen.availHeight}</div>
+    <div><strong>Color Depth:</strong> \${screen.colorDepth} bits</div>
+  </div>
+\`;
+
+// Window resize listener
+function updateWindowInfo() {
+  const sizeDisplay = document.querySelector('#size-display');
+  if (sizeDisplay) {
+    sizeDisplay.textContent = \`Current: \${window.innerWidth} × \${window.innerHeight}\`;
+  }
+}
+
+window.addEventListener('resize', updateWindowInfo);
+updateWindowInfo();
+
+// Scroll information
+function updateScrollInfo() {
+  const scrollDisplay = document.querySelector('#scroll-display');
+  if (scrollDisplay) {
+    scrollDisplay.textContent = \`Scroll: (\${window.scrollX}, \${window.scrollY})\`;
+  }
+}
+
+window.addEventListener('scroll', updateScrollInfo);
+updateScrollInfo();`}
+  html={`<div id="window-display" style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+  Loading window information...
+</div>
+
+<div style="display: flex; gap: 15px; margin-bottom: 15px;">
+  <div id="size-display" style="padding: 8px; background: #dbeafe; border-radius: 4px; font-family: monospace;"></div>
+  <div id="scroll-display" style="padding: 8px; background: #dcfce7; border-radius: 4px; font-family: monospace;"></div>
+</div>
+
+<div style="height: 100px; overflow-y: auto; border: 1px solid #d1d5db; padding: 10px; background: #f9fafb;">
+  <p>Try resizing your browser window and scrolling this content area to see updates.</p>
+  <p>Line 2 of scrollable content...</p>
+  <p>Line 3 of scrollable content...</p>
+  <p>Line 4 of scrollable content...</p>
+  <p>Line 5 of scrollable content...</p>
+  <p>Line 6 of scrollable content...</p>
+  <p>Bottom of scrollable content.</p>
+</div>
+
+<style>
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.info-grid > div {
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  font-size: 14px;
+}
+</style>`}
+/>
+
+## Location and Navigation
+
+The `location` object provides information about the current URL and methods for navigation.
+
+<DOMInteractiveBlock
+  title="Location Object and URL Manipulation"
+  description="Work with URLs, query parameters, and navigation:"
+  javascript={`// Current location information
+const locationInfo = {
+  href: window.location.href,
+  protocol: window.location.protocol,
+  host: window.location.host,
+  hostname: window.location.hostname,
+  port: window.location.port,
+  pathname: window.location.pathname,
+  search: window.location.search,
+  hash: window.location.hash,
+  origin: window.location.origin
+};
+
+console.log('Location Info:', locationInfo);
+
+// URL manipulation utilities
+class URLUtils {
+  static getQueryParams() {
+    return new URLSearchParams(window.location.search);
+  }
+  
+  static setQueryParam(key, value) {
+    const params = new URLSearchParams(window.location.search);
+    params.set(key, value);
+    const newURL = \`\${window.location.pathname}?\${params.toString()}\${window.location.hash}\`;
+    window.history.replaceState({}, '', newURL);
+  }
+  
+  static removeQueryParam(key) {
+    const params = new URLSearchParams(window.location.search);
+    params.delete(key);
+    const newURL = \`\${window.location.pathname}?\${params.toString()}\${window.location.hash}\`;
+    window.history.replaceState({}, '', newURL);
+  }
+  
+  static parseURL(url) {
+    try {
+      const parsed = new URL(url);
+      return {
+        protocol: parsed.protocol,
+        host: parsed.host,
+        pathname: parsed.pathname,
+        search: parsed.search,
+        hash: parsed.hash,
+        searchParams: Object.fromEntries(parsed.searchParams)
+      };
+    } catch (error) {
+      return { error: 'Invalid URL' };
+    }
+  }
+}
+
+// Display current location
+const locationDisplay = document.querySelector('#location-display');
+locationDisplay.innerHTML = \`
+  <h4>📍 Current Location</h4>
+  <div class="location-info">
+    <div><strong>Full URL:</strong> \${locationInfo.href}</div>
+    <div><strong>Protocol:</strong> \${locationInfo.protocol}</div>
+    <div><strong>Host:</strong> \${locationInfo.host}</div>
+    <div><strong>Path:</strong> \${locationInfo.pathname}</div>
+    <div><strong>Query:</strong> \${locationInfo.search || '(none)'}</div>
+    <div><strong>Hash:</strong> \${locationInfo.hash || '(none)'}</div>
+  </div>
+\`;
+
+// URL parser functionality
+document.querySelector('#parse-url').addEventListener('click', () => {
+  const urlInput = document.querySelector('#url-input');
+  const result = URLUtils.parseURL(urlInput.value);
+  
+  const resultDisplay = document.querySelector('#parse-result');
+  resultDisplay.innerHTML = \`
+    <strong>Parsed URL:</strong>
+    <pre style="background: white; padding: 10px; border-radius: 4px; margin-top: 5px; font-size: 12px;">\${JSON.stringify(result, null, 2)}</pre>
+  \`;
+});
+
+// Query parameter management
+document.querySelector('#add-param').addEventListener('click', () => {
+  const key = document.querySelector('#param-key').value;
+  const value = document.querySelector('#param-value').value;
+  
+  if (key && value) {
+    URLUtils.setQueryParam(key, value);
+    updateParamDisplay();
+    document.querySelector('#param-key').value = '';
+    document.querySelector('#param-value').value = '';
+  }
+});
+
+document.querySelector('#clear-params').addEventListener('click', () => {
+  window.history.replaceState({}, '', window.location.pathname);
+  updateParamDisplay();
+});
+
+function updateParamDisplay() {
+  const params = URLUtils.getQueryParams();
+  const paramDisplay = document.querySelector('#param-display');
+  
+  if (params.toString()) {
+    const paramList = Array.from(params.entries()).map(([key, value]) => 
+      \`<span class="param-item">\${key}=\${value}</span>\`
+    ).join(' ');
+    paramDisplay.innerHTML = \`<strong>Current params:</strong> \${paramList}\`;
+  } else {
+    paramDisplay.innerHTML = '<em>No query parameters</em>';
+  }
+}
+
+updateParamDisplay();`}
+  html={`<div id="location-display" style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+  Loading location information...
+</div>
+
+<div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #d1d5db; margin-bottom: 15px;">
+  <h4>🔗 URL Parser</h4>
+  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+    <input type="url" id="url-input" placeholder="https://example.com/path?param=value#section" 
+           style="flex: 1; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    <button id="parse-url" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Parse URL
+    </button>
+  </div>
+  <div id="parse-result" style="color: #374151;">
+    Enter a URL above and click Parse URL to see its components
+  </div>
+</div>
+
+<div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #d1d5db;">
+  <h4>⚙️ Query Parameter Manager</h4>
+  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+    <input type="text" id="param-key" placeholder="Parameter name" 
+           style="padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    <input type="text" id="param-value" placeholder="Parameter value" 
+           style="padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+    <button id="add-param" style="padding: 8px 16px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Add Param
+    </button>
+    <button id="clear-params" style="padding: 8px 16px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Clear All
+    </button>
+  </div>
+  <div id="param-display" style="padding: 10px; background: #f3f4f6; border-radius: 4px; font-family: monospace; font-size: 14px;">
+    No query parameters
+  </div>
+</div>
+
+<style>
+.location-info {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.location-info > div {
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.param-item {
+  display: inline-block;
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 12px;
+  margin-right: 5px;
+}
+</style>`}
+/>
+
+## Browser History Management
+
+The `history` object allows you to manage the browser's session history.
+
+<DOMInteractiveBlock
+  title="History API and Navigation"
+  description="Manage browser history programmatically:"
+  javascript={`// History management system
+class HistoryManager {
+  constructor() {
+    this.currentPage = 1;
+    this.pages = {
+      1: { title: 'Home', content: 'Welcome to the home page!' },
+      2: { title: 'About', content: 'Learn more about our company.' },
+      3: { title: 'Services', content: 'Our services and offerings.' },
+      4: { title: 'Contact', content: 'Get in touch with us.' }
+    };
+    
+    this.init();
+  }
+  
+  init() {
+    // Listen for popstate events (back/forward buttons)
+    window.addEventListener('popstate', (event) => {
+      console.log('Popstate event:', event.state);
+      if (event.state && event.state.page) {
+        this.displayPage(event.state.page, false); // Don't push to history
+      }
+    });
+    
+    this.displayPage(1, true); // Initial page
+  }
+  
+  navigateTo(pageNum, pushToHistory = true) {
+    if (this.pages[pageNum]) {
+      this.displayPage(pageNum, pushToHistory);
+    }
+  }
+  
+  displayPage(pageNum, pushToHistory = true) {
+    const page = this.pages[pageNum];
+    this.currentPage = pageNum;
+    
+    // Update content
+    const contentDiv = document.querySelector('#page-content');
+    contentDiv.innerHTML = \`
+      <h3>\${page.title}</h3>
+      <p>\${page.content}</p>
+      <div class="page-meta">
+        Current page: \${pageNum} | History length: \${history.length}
+      </div>
+    \`;
+    
+    // Update navigation
+    this.updateNavigation();
+    
+    // Update browser history
+    if (pushToHistory) {
+      const state = { page: pageNum, timestamp: Date.now() };
+      const url = \`#page-\${pageNum}\`;
+      history.pushState(state, page.title, url);
+      console.log('Pushed to history:', state);
+    }
+    
+    // Update history display
+    this.updateHistoryDisplay();
+  }
+  
+  updateNavigation() {
+    // Update active nav item
+    document.querySelectorAll('.nav-item').forEach((item, index) => {
+      if (index + 1 === this.currentPage) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+  }
+  
+  updateHistoryDisplay() {
+    const historyInfo = document.querySelector('#history-info');
+    historyInfo.innerHTML = \`
+      <div><strong>History Length:</strong> \${history.length}</div>
+      <div><strong>Current State:</strong> \${JSON.stringify(history.state)}</div>
+      <div><strong>Can Go Back:</strong> \${history.length > 1 ? 'Yes' : 'No'}</div>
+    \`;
+  }
+  
+  goBack() {
+    if (history.length > 1) {
+      history.back();
+    } else {
+      console.log('Cannot go back - at beginning of history');
+    }
+  }
+  
+  goForward() {
+    history.forward();
+  }
+  
+  replaceCurrentPage(newContent) {
+    const state = { page: this.currentPage, timestamp: Date.now(), replaced: true };
+    history.replaceState(state, \`Modified \${this.pages[this.currentPage].title}\`, \`#page-\${this.currentPage}-modified\`);
+    
+    const contentDiv = document.querySelector('#page-content');
+    contentDiv.innerHTML += \`
+      <div style="background: #fef3c7; padding: 10px; border-radius: 4px; margin-top: 10px; border: 1px solid #f59e0b;">
+        <strong>Replaced content:</strong> \${newContent}
+      </div>
+    \`;
+    
+    this.updateHistoryDisplay();
+  }
+}
+
+// Initialize history manager
+const historyManager = new HistoryManager();
+
+// Navigation event listeners
+document.querySelectorAll('.nav-item').forEach((item, index) => {
+  item.addEventListener('click', (e) => {
+    e.preventDefault();
+    historyManager.navigateTo(index + 1);
+  });
+});
+
+// History control buttons
+document.querySelector('#back-btn').addEventListener('click', () => {
+  historyManager.goBack();
+});
+
+document.querySelector('#forward-btn').addEventListener('click', () => {
+  historyManager.goForward();
+});
+
+document.querySelector('#replace-btn').addEventListener('click', () => {
+  const newContent = prompt('Enter replacement content:');
+  if (newContent) {
+    historyManager.replaceCurrentPage(newContent);
+  }
+});
+
+// Display browser history capabilities
+const historyCapabilities = document.querySelector('#history-capabilities');
+historyCapabilities.innerHTML = \`
+  <h4>🔍 History API Capabilities</h4>
+  <div class="capabilities-grid">
+    <div><strong>pushState:</strong> \${'pushState' in history ? '✅' : '❌'}</div>
+    <div><strong>replaceState:</strong> \${'replaceState' in history ? '✅' : '❌'}</div>
+    <div><strong>state:</strong> \${history.state ? '✅' : '❌'}</div>
+    <div><strong>length:</strong> \${history.length}</div>
+  </div>
+\`;`}
+  html={`<div id="history-capabilities" style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+  Loading history capabilities...
+</div>
+
+<nav style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #d1d5db; margin-bottom: 15px;">
+  <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+    <a href="#" class="nav-item active">Home</a>
+    <a href="#" class="nav-item">About</a>
+    <a href="#" class="nav-item">Services</a>
+    <a href="#" class="nav-item">Contact</a>
+  </div>
+  
+  <div style="display: flex; gap: 10px;">
+    <button id="back-btn" style="padding: 6px 12px; background: #6b7280; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      ← Back
+    </button>
+    <button id="forward-btn" style="padding: 6px 12px; background: #6b7280; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Forward →
+    </button>
+    <button id="replace-btn" style="padding: 6px 12px; background: #f59e0b; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Replace Current
+    </button>
+  </div>
+</nav>
+
+<div id="page-content" style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #d1d5db; margin-bottom: 15px; min-height: 120px;">
+  Loading page content...
+</div>
+
+<div id="history-info" style="background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+  Loading history information...
+</div>
+
+<style>
+.nav-item {
+  color: #6b7280;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.nav-item:hover {
+  color: #374151;
+  background: #f3f4f6;
+}
+
+.nav-item.active {
+  color: #3b82f6;
+  background: #dbeafe;
+  border-color: #3b82f6;
+}
+
+.page-meta {
+  margin-top: 15px;
+  padding: 10px;
+  background: #f3f4f6;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.capabilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.capabilities-grid > div {
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  font-size: 14px;
+}
+</style>`}
+/>
+
+## Web Storage APIs
+
+Local storage and session storage provide client-side data persistence.
+
+<DOMInteractiveBlock
+  title="Local and Session Storage Management"
+  description="Store and retrieve data in the browser:"
+  javascript={`// Storage management utility
+class StorageManager {
+  static setItem(storage, key, value) {
+    try {
+      if (typeof value === 'object') {
+        storage.setItem(key, JSON.stringify(value));
+      } else {
+        storage.setItem(key, value);
+      }
+      return true;
+    } catch (error) {
+      console.error('Storage error:', error);
+      return false;
+    }
+  }
+  
+  static getItem(storage, key) {
+    try {
+      const value = storage.getItem(key);
+      if (value === null) return null;
+      
+      // Try to parse as JSON
+      try {
+        return JSON.parse(value);
+      } catch {
+        return value;
+      }
+    } catch (error) {
+      console.error('Storage retrieval error:', error);
+      return null;
+    }
+  }
+  
+  static removeItem(storage, key) {
+    try {
+      storage.removeItem(key);
+      return true;
+    } catch (error) {
+      console.error('Storage removal error:', error);
+      return false;
+    }
+  }
+  
+  static clear(storage) {
+    try {
+      storage.clear();
+      return true;
+    } catch (error) {
+      console.error('Storage clear error:', error);
+      return false;
+    }
+  }
+  
+  static getStorageInfo(storage) {
+    const items = {};
+    let totalSize = 0;
+    
+    for (let i = 0; i < storage.length; i++) {
+      const key = storage.key(i);
+      const value = storage.getItem(key);
+      items[key] = value;
+      totalSize += key.length + (value ? value.length : 0);
+    }
+    
+    return {
+      count: storage.length,
+      items,
+      approximateSize: totalSize,
+      sizeFormatted: this.formatBytes(totalSize)
+    };
+  }
+  
+  static formatBytes(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+}
+
+// Storage testing functions
+function saveToLocal() {
+  const key = document.querySelector('#local-key').value;
+  const value = document.querySelector('#local-value').value;
+  
+  if (key && value) {
+    const success = StorageManager.setItem(localStorage, key, value);
+    if (success) {
+      console.log('Saved to localStorage:', key, value);
+      updateLocalStorageDisplay();
+      document.querySelector('#local-key').value = '';
+      document.querySelector('#local-value').value = '';
+    }
+  }
+}
+
+function saveToSession() {
+  const key = document.querySelector('#session-key').value;
+  const value = document.querySelector('#session-value').value;
+  
+  if (key && value) {
+    const success = StorageManager.setItem(sessionStorage, key, value);
+    if (success) {
+      console.log('Saved to sessionStorage:', key, value);
+      updateSessionStorageDisplay();
+      document.querySelector('#session-key').value = '';
+      document.querySelector('#session-value').value = '';
+    }
+  }
+}
+
+function saveComplexData() {
+  const userData = {
+    id: Date.now(),
+    name: 'John Doe',
+    preferences: {
+      theme: 'dark',
+      language: 'en',
+      notifications: true
+    },
+    lastLogin: new Date().toISOString(),
+    scores: [85, 92, 78, 95]
+  };
+  
+  StorageManager.setItem(localStorage, 'complex_user_data', userData);
+  console.log('Saved complex data:', userData);
+  updateLocalStorageDisplay();
+}
+
+function clearLocalStorage() {
+  StorageManager.clear(localStorage);
+  updateLocalStorageDisplay();
+}
+
+function clearSessionStorage() {
+  StorageManager.clear(sessionStorage);
+  updateSessionStorageDisplay();
+}
+
+function updateLocalStorageDisplay() {
+  const info = StorageManager.getStorageInfo(localStorage);
+  const display = document.querySelector('#local-storage-info');
+  
+  display.innerHTML = \`
+    <h4>💾 Local Storage (\${info.count} items, \${info.sizeFormatted})</h4>
+    \${Object.keys(info.items).length > 0 ? 
+      Object.entries(info.items).map(([key, value]) => 
+        \`<div class="storage-item">
+          <strong>\${key}:</strong> 
+          <span class="storage-value">\${value.length > 50 ? value.substring(0, 50) + '...' : value}</span>
+          <button onclick="StorageManager.removeItem(localStorage, '\${key}'); updateLocalStorageDisplay();" class="remove-btn">×</button>
+        </div>\`
+      ).join('') :
+      '<div style="color: #6b7280; font-style: italic;">No items in localStorage</div>'
+    }
+  \`;
+}
+
+function updateSessionStorageDisplay() {
+  const info = StorageManager.getStorageInfo(sessionStorage);
+  const display = document.querySelector('#session-storage-info');
+  
+  display.innerHTML = \`
+    <h4>🔒 Session Storage (\${info.count} items, \${info.sizeFormatted})</h4>
+    \${Object.keys(info.items).length > 0 ? 
+      Object.entries(info.items).map(([key, value]) => 
+        \`<div class="storage-item">
+          <strong>\${key}:</strong> 
+          <span class="storage-value">\${value.length > 50 ? value.substring(0, 50) + '...' : value}</span>
+          <button onclick="StorageManager.removeItem(sessionStorage, '\${key}'); updateSessionStorageDisplay();" class="remove-btn">×</button>
+        </div>\`
+      ).join('') :
+      '<div style="color: #6b7280; font-style: italic;">No items in sessionStorage</div>'
+    }
+  \`;
+}
+
+// Event listeners
+document.querySelector('#save-local').addEventListener('click', saveToLocal);
+document.querySelector('#save-session').addEventListener('click', saveToSession);
+document.querySelector('#save-complex').addEventListener('click', saveComplexData);
+document.querySelector('#clear-local').addEventListener('click', clearLocalStorage);
+document.querySelector('#clear-session').addEventListener('click', clearSessionStorage);
+
+// Initial display update
+updateLocalStorageDisplay();
+updateSessionStorageDisplay();
+
+// Listen for storage events (from other tabs)
+window.addEventListener('storage', (event) => {
+  console.log('Storage event from another tab:', event);
+  if (event.storageArea === localStorage) {
+    updateLocalStorageDisplay();
+  }
+});
+
+// Storage capability check
+const storageCapabilities = document.querySelector('#storage-capabilities');
+storageCapabilities.innerHTML = \`
+  <h4>🔧 Storage Capabilities</h4>
+  <div class="capabilities-grid">
+    <div><strong>localStorage:</strong> \${'localStorage' in window ? '✅' : '❌'}</div>
+    <div><strong>sessionStorage:</strong> \${'sessionStorage' in window ? '✅' : '❌'}</div>
+    <div><strong>Storage Events:</strong> \${'StorageEvent' in window ? '✅' : '❌'}</div>
+    <div><strong>Max Size (approx):</strong> ~5-10MB</div>
+  </div>
+\`;`}
+  html={`<div id="storage-capabilities" style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+  Loading storage capabilities...
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+  <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #d1d5db;">
+    <h4>💾 Local Storage</h4>
+    <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+      <input type="text" id="local-key" placeholder="Key" style="flex: 1; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px;">
+      <input type="text" id="local-value" placeholder="Value" style="flex: 2; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px;">
+      <button id="save-local" style="padding: 6px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">Save</button>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button id="save-complex" style="padding: 6px 12px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Save Complex Data</button>
+      <button id="clear-local" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Clear All</button>
+    </div>
+  </div>
+  
+  <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #d1d5db;">
+    <h4>🔒 Session Storage</h4>
+    <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+      <input type="text" id="session-key" placeholder="Key" style="flex: 1; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px;">
+      <input type="text" id="session-value" placeholder="Value" style="flex: 2; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px;">
+      <button id="save-session" style="padding: 6px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">Save</button>
+    </div>
+    <div>
+      <button id="clear-session" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Clear All</button>
+    </div>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+  <div id="local-storage-info" style="background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+    Loading localStorage info...
+  </div>
+  
+  <div id="session-storage-info" style="background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+    Loading sessionStorage info...
+  </div>
+</div>
+
+<style>
+.storage-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  margin: 5px 0;
+  border: 1px solid #e5e7eb;
+}
+
+.storage-value {
+  flex: 1;
+  font-family: monospace;
+  font-size: 12px;
+  color: #374151;
+  word-break: break-all;
+}
+
+.remove-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>`}
+/>
+
+## Timers and Intervals
+
+JavaScript provides timer functions for delayed and repeated execution.
+
+<DOMInteractiveBlock
+  title="Timers, Intervals, and Animation"
+  description="Manage time-based operations and animations:"
+  javascript={`// Timer management system
+class TimerManager {
+  constructor() {
+    this.timers = new Map();
+    this.nextId = 1;
+  }
+  
+  createTimeout(callback, delay, name = null) {
+    const id = this.nextId++;
+    const timerId = setTimeout(() => {
+      callback();
+      this.timers.delete(id);
+      this.updateTimerDisplay();
+    }, delay);
+    
+    this.timers.set(id, {
+      type: 'timeout',
+      timerId,
+      name: name || \`Timeout-\${id}\`,
+      delay,
+      startTime: Date.now(),
+      callback: callback.toString().slice(0, 100) + '...'
+    });
+    
+    this.updateTimerDisplay();
+    return id;
+  }
+  
+  createInterval(callback, delay, name = null) {
+    const id = this.nextId++;
+    const timerId = setInterval(callback, delay);
+    
+    this.timers.set(id, {
+      type: 'interval',
+      timerId,
+      name: name || \`Interval-\${id}\`,
+      delay,
+      startTime: Date.now(),
+      executions: 0,
+      callback: callback.toString().slice(0, 100) + '...'
+    });
+    
+    this.updateTimerDisplay();
+    return id;
+  }
+  
+  clearTimer(id) {
+    const timer = this.timers.get(id);
+    if (timer) {
+      if (timer.type === 'timeout') {
+        clearTimeout(timer.timerId);
+      } else {
+        clearInterval(timer.timerId);
+      }
+      this.timers.delete(id);
+      this.updateTimerDisplay();
+      return true;
+    }
+    return false;
+  }
+  
+  clearAllTimers() {
+    for (let [id, timer] of this.timers) {
+      if (timer.type === 'timeout') {
+        clearTimeout(timer.timerId);
+      } else {
+        clearInterval(timer.timerId);
+      }
+    }
+    this.timers.clear();
+    this.updateTimerDisplay();
+  }
+  
+  updateTimerDisplay() {
+    const display = document.querySelector('#timers-display');
+    
+    if (this.timers.size === 0) {
+      display.innerHTML = '<div style="color: #6b7280; font-style: italic;">No active timers</div>';
+      return;
+    }
+    
+    const timerList = Array.from(this.timers.entries()).map(([id, timer]) => {
+      const elapsed = ((Date.now() - timer.startTime) / 1000).toFixed(1);
+      return \`
+        <div class="timer-item">
+          <div class="timer-info">
+            <strong>\${timer.name}</strong> (\${timer.type})
+            <div class="timer-details">
+              Delay: \${timer.delay}ms | Elapsed: \${elapsed}s
+              \${timer.executions !== undefined ? \` | Executions: \${timer.executions}\` : ''}
+            </div>
+          </div>
+          <button onclick="timerManager.clearTimer(\${id})" class="clear-timer-btn">Stop</button>
+        </div>
+      \`;
+    }).join('');
+    
+    display.innerHTML = timerList;
+  }
+}
+
+// Initialize timer manager
+const timerManager = new TimerManager();
+
+// Animation system
+class AnimationController {
+  constructor() {
+    this.isRunning = false;
+    this.animationId = null;
+    this.startTime = null;
+    this.progress = 0;
+  }
+  
+  start() {
+    if (this.isRunning) return;
+    
+    this.isRunning = true;
+    this.startTime = performance.now();
+    this.animate();
+  }
+  
+  stop() {
+    this.isRunning = false;
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+  }
+  
+  animate() {
+    if (!this.isRunning) return;
+    
+    const currentTime = performance.now();
+    const elapsed = currentTime - this.startTime;
+    const duration = 3000; // 3 seconds
+    
+    this.progress = Math.min(elapsed / duration, 1);
+    
+    // Update progress bar
+    const progressBar = document.querySelector('#progress-bar');
+    const progressText = document.querySelector('#progress-text');
+    
+    if (progressBar && progressText) {
+      progressBar.style.width = \`\${this.progress * 100}%\`;
+      progressText.textContent = \`\${Math.round(this.progress * 100)}%\`;
+      
+      // Animate box position
+      const animatedBox = document.querySelector('#animated-box');
+      if (animatedBox) {
+        const x = this.progress * 200; // Move 200px
+        const scale = 1 + Math.sin(this.progress * Math.PI * 4) * 0.2; // Pulsing effect
+        animatedBox.style.transform = \`translateX(\${x}px) scale(\${scale})\`;
+      }
+    }
+    
+    if (this.progress < 1) {
+      this.animationId = requestAnimationFrame(() => this.animate());
+    } else {
+      this.isRunning = false;
+      this.progress = 0;
+      console.log('Animation completed!');
+    }
+  }
+}
+
+const animationController = new AnimationController();
+
+// Timer examples
+document.querySelector('#create-timeout').addEventListener('click', () => {
+  const delay = parseInt(document.querySelector('#timeout-delay').value) || 3000;
+  timerManager.createTimeout(() => {
+    alert('Timeout executed!');
+    console.log('Timeout callback executed');
+  }, delay, \`Custom timeout (\${delay}ms)\`);
+});
+
+document.querySelector('#create-interval').addEventListener('click', () => {
+  const delay = parseInt(document.querySelector('#interval-delay').value) || 1000;
+  let count = 0;
+  
+  timerManager.createInterval(() => {
+    count++;
+    console.log(\`Interval execution #\${count}\`);
+    
+    // Update counter display
+    const counterDisplay = document.querySelector('#interval-counter');
+    if (counterDisplay) {
+      counterDisplay.textContent = \`Interval executed \${count} times\`;
+    }
+    
+    // Update executions in timer manager
+    for (let [id, timer] of timerManager.timers) {
+      if (timer.type === 'interval' && timer.delay === delay) {
+        timer.executions = count;
+        break;
+      }
+    }
+    timerManager.updateTimerDisplay();
+  }, delay, \`Custom interval (\${delay}ms)\`);
+});
+
+document.querySelector('#clear-all-timers').addEventListener('click', () => {
+  timerManager.clearAllTimers();
+  document.querySelector('#interval-counter').textContent = 'No active intervals';
+});
+
+// Animation controls
+document.querySelector('#start-animation').addEventListener('click', () => {
+  animationController.start();
+});
+
+document.querySelector('#stop-animation').addEventListener('click', () => {
+  animationController.stop();
+});
+
+// Performance timing example
+document.querySelector('#measure-performance').addEventListener('click', () => {
+  const startTime = performance.now();
+  
+  // Simulate some work
+  let result = 0;
+  for (let i = 0; i < 1000000; i++) {
+    result += Math.random();
+  }
+  
+  const endTime = performance.now();
+  const duration = endTime - startTime;
+  
+  const perfDisplay = document.querySelector('#performance-result');
+  perfDisplay.innerHTML = \`
+    <div style="background: #dcfce7; border: 1px solid #16a34a; padding: 10px; border-radius: 4px;">
+      <strong>Performance Measurement:</strong><br>
+      Duration: \${duration.toFixed(2)}ms<br>
+      Operations: 1,000,000<br>
+      Rate: \${(1000000 / duration * 1000).toLocaleString()} ops/second<br>
+      Result: \${result.toFixed(2)}
+    </div>
+  \`;
+});
+
+// Initialize displays
+timerManager.updateTimerDisplay();`}
+  html={`<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+  <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #d1d5db;">
+    <h4>⏰ Timeout Controls</h4>
+    <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+      <input type="number" id="timeout-delay" value="3000" min="100" placeholder="Delay (ms)" 
+             style="flex: 1; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px;">
+      <button id="create-timeout" style="padding: 6px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        Create Timeout
+      </button>
+    </div>
+  </div>
+  
+  <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #d1d5db;">
+    <h4>🔄 Interval Controls</h4>
+    <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+      <input type="number" id="interval-delay" value="1000" min="100" placeholder="Delay (ms)" 
+             style="flex: 1; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px;">
+      <button id="create-interval" style="padding: 6px 12px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        Create Interval
+      </button>
+    </div>
+    <div id="interval-counter" style="font-size: 12px; color: #6b7280;">No active intervals</div>
+  </div>
+</div>
+
+<div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #d1d5db; margin-bottom: 15px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <h4>🎬 Animation Controls</h4>
+    <div style="display: flex; gap: 8px;">
+      <button id="start-animation" style="padding: 6px 12px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">Start</button>
+      <button id="stop-animation" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">Stop</button>
+    </div>
+  </div>
+  
+  <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <span>Progress:</span>
+      <span id="progress-text">0%</span>
+    </div>
+    <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+      <div id="progress-bar" style="height: 100%; background: #3b82f6; width: 0%; transition: none;"></div>
+    </div>
+  </div>
+  
+  <div style="height: 60px; background: #f3f4f6; border-radius: 8px; padding: 10px; position: relative; overflow: hidden;">
+    <div id="animated-box" style="width: 40px; height: 40px; background: #f59e0b; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; transform: translateX(0); transition: none;">
+      📦
+    </div>
+  </div>
+</div>
+
+<div style="display: flex; gap: 15px; margin-bottom: 15px;">
+  <div style="flex: 2; background: white; padding: 15px; border-radius: 8px; border: 1px solid #d1d5db;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <h4>🕐 Active Timers</h4>
+      <button id="clear-all-timers" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+        Clear All
+      </button>
+    </div>
+    <div id="timers-display">
+      No active timers
+    </div>
+  </div>
+  
+  <div style="flex: 1; background: white; padding: 15px; border-radius: 8px; border: 1px solid #d1d5db;">
+    <h4>⚡ Performance</h4>
+    <button id="measure-performance" style="padding: 8px 16px; background: #8b5cf6; color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%; margin-bottom: 10px;">
+      Measure Performance
+    </button>
+    <div id="performance-result" style="font-size: 12px;">
+      Click to measure performance
+    </div>
+  </div>
+</div>
+
+<style>
+.timer-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #f9fafb;
+  border-radius: 4px;
+  margin: 5px 0;
+  border: 1px solid #e5e7eb;
+}
+
+.timer-info {
+  flex: 1;
+}
+
+.timer-details {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.clear-timer-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+</style>`}
+/>
+
+## Quiz Time! 🧠
+
+Ready to test your BOM mastery? The quiz will adapt to your current mood setting - whether you're in chill, rush, or grind mode!
+
+## What's Next?
+
+Excellent work mastering the Browser Object Model! Next up:
+- **Web APIs Integration** - Fetch, Geolocation, and modern browser APIs
+- **Performance Optimization** - Advanced DOM and BOM performance techniques
+- **Security Considerations** - Safe browser API usage and best practices
+- **Progressive Web Apps** - Using BOM APIs for app-like experiences
+
+You now have complete control over the browser environment! 🌐

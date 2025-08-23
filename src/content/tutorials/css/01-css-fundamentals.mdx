@@ -1,0 +1,741 @@
+---
+title: "CSS Fundamentals: Styling Your Web Pages"
+description: "Learn the basics of CSS including selectors, properties, and styling techniques to make your web pages look amazing."
+difficulty: 1
+estimatedTime: 60
+order: 1
+isPremium: false
+requiredPlan: "FREE"
+topics: ["CSS", "Styling", "Selectors", "Properties"]
+quizQuestions: 15
+---
+
+import { HTMLEditorPreview } from "@/components/ui/HTMLEditorPreview";
+import { InteractiveCodeBlock } from "@/components/InteractiveCodeBlock";
+import { SeparatedEditorPreview } from "@/components/ui/SeparatedEditorPreview";
+
+# CSS Fundamentals: Styling Your Web Pages
+
+Welcome to the world of CSS! CSS (Cascading Style Sheets) is what makes web pages beautiful and visually appealing. In this tutorial, you'll learn the fundamentals of CSS and how to style your HTML elements through hands-on practice.
+
+## 🎯 What You'll Learn
+
+By the end of this tutorial, you'll be able to:
+- Write CSS syntax correctly
+- Use different types of CSS selectors
+- Apply colors, fonts, and spacing to elements
+- Understand the CSS box model
+- Create your first styled webpage
+
+Let's get started with some interactive learning!
+
+## What is CSS?
+
+CSS stands for **Cascading Style Sheets**. It's a stylesheet language used to describe the presentation of HTML documents. While HTML provides the structure, CSS provides the styling.
+
+## Basic CSS Syntax
+
+CSS follows a simple syntax pattern:
+
+```css
+selector {
+  property: value;
+  property: value;
+}
+```
+
+Let's break this down:
+- **Selector**: Targets the HTML element(s) you want to style
+- **Property**: The style attribute you want to change (e.g., color, font-size)
+- **Value**: The specific setting for that property
+
+### 🎮 Try It Yourself: Your First CSS Rule
+
+Let's start with something fun! This editor separates HTML and CSS just like real development:
+
+<SeparatedEditorPreview
+  initialHtml={`<h1>Hello World!</h1>
+<p>This is my first CSS styling attempt.</p>
+<p>Try editing the CSS to change how this looks!</p>`}
+  initialCss={`/* Welcome to CSS! Edit these styles and see what happens */
+h1 {
+  color: blue;
+  font-size: 24px;
+}
+
+p {
+  color: gray;
+  font-size: 16px;
+}`}
+  title="✨ Your First CSS Styling"
+  mission="Change the colors and sizes to your liking! Try making the h1 red and paragraphs green."
+  instructions="Click the CSS tab to edit styles, then click Preview to see your changes. This is how real web development works!"
+  height={300}
+/>
+
+**🔥 Challenge Ideas:**
+- Make the h1 red and larger (`font-size: 36px`)
+- Make paragraphs green with a different font size
+- Add `text-align: center` to center the text
+- Try different colors like `purple`, `orange`, or hex codes like `#ff6b6b`
+
+**💡 Real-World Note:** In professional development, HTML and CSS are always in separate files. This editor simulates that workflow!
+
+## CSS Selectors
+
+CSS selectors are like targeting systems that tell your styles exactly which elements to affect. Let's explore the three main types with hands-on practice!
+
+### Element Selector
+Targets all elements of a specific type:
+
+```css
+p {
+  color: blue;
+  font-size: 16px;
+}
+```
+
+### Class Selector
+Targets elements with a specific class attribute:
+
+```css
+.highlight {
+  background-color: yellow;
+  font-weight: bold;
+}
+```
+
+### ID Selector
+Targets an element with a specific ID:
+
+```css
+#header {
+  background-color: navy;
+  color: white;
+  padding: 20px;
+}
+```
+
+### 🎮 Interactive Challenge: Selector Master
+
+Now it's your turn! Can you style the different elements using the correct selectors? 
+
+<SeparatedEditorPreview
+  initialHtml={`<div id="main-header">Website Header</div>
+<p>This is a regular paragraph.</p>
+<p class="special">This paragraph has a special class!</p>
+<p class="special">This one too!</p>
+<h2>A Subheading</h2>
+<div class="box">A div with box class</div>
+<div class="box">Another box</div>`}
+  initialCss={`/* Your challenge: Style these elements! */
+
+/* 1. Make the #main-header have a dark background and white text */
+#main-header {
+  /* Add your styles here */
+}
+
+/* 2. Make all paragraphs (p) have blue text */
+p {
+  /* Add your styles here */
+}
+
+/* 3. Make elements with class 'special' have yellow background */
+.special {
+  /* Add your styles here */
+}
+
+/* 4. Make all h2 elements red and centered */
+h2 {
+  /* Add your styles here */
+}
+
+/* 5. Give the .box class a border and padding */
+.box {
+  /* Add your styles here */
+}`}
+  title="🎯 Selector Challenge - Master CSS Selectors!"
+  mission="Complete all 5 styling challenges by editing the CSS"
+  instructions="Work in the CSS tab to add the missing styles. Click Preview to see your results!"
+  height={400}
+/>
+
+**🏆 Your Mission:**
+1. Make the header have a dark background (#333) and white text
+2. Make all paragraphs blue
+3. Give the 'special' class elements a yellow background
+4. Make the h2 red and center-aligned
+5. Add a border and padding to the box
+
+**💡 Hint:** Use `background-color`, `color`, `text-align`, `border: 1px solid black`, and `padding: 10px`
+
+## Common CSS Properties
+
+### Colors
+```css
+.text-styles {
+  color: red;           /* Text color */
+  background-color: #f0f0f0;  /* Background color */
+}
+```
+
+### Typography
+```css
+.typography {
+  font-family: Arial, sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.5;
+}
+```
+
+### Spacing
+```css
+.spacing {
+  margin: 20px;         /* Space outside the element */
+  padding: 15px;        /* Space inside the element */
+}
+```
+
+### Box Model
+Every HTML element is essentially a rectangular box. The CSS box model consists of:
+- **Content**: The actual content of the element
+- **Padding**: Space between content and border
+- **Border**: A line around the padding
+- **Margin**: Space outside the border
+
+### 🎮 Interactive Box Model Explorer
+
+Play with the box model properties and see how they affect the layout:
+
+<HTMLEditorPreview
+  initialHtml={`<div class="demo-box">
+  Content Area
+  <br>
+  Adjust the values below!
+</div>
+<div class="second-box">
+  Second Box
+</div>`}
+  css={`/* Try changing these values to see the box model in action! */
+.demo-box {
+  width: 150px;
+  height: 80px;
+  padding: 20px;
+  border: 3px solid #3498db;
+  margin: 15px;
+  background-color: #e8f6ff;
+  color: #2c3e50;
+  text-align: center;
+  font-weight: bold;
+}
+
+.second-box {
+  width: 100px;
+  height: 50px;
+  padding: 10px;
+  border: 2px solid #e74c3c;
+  margin: 10px;
+  background-color: #ffeaa7;
+  text-align: center;
+  color: #2d3436;
+}
+
+/* Pro tip: Uncomment the line below to see the difference! */
+/* * { box-sizing: border-box; } */`}
+  title="📦 Box Model Interactive Demo"
+  height={300}
+/>
+
+**🔥 Experiment Time:**
+1. Change the `padding` values - see how it affects the space inside the boxes
+2. Modify the `margin` values - watch how the spacing between elements changes
+3. Adjust the `border` thickness and color
+4. Uncomment the `box-sizing: border-box;` line to see how it changes the layout!
+
+**💡 Box Model Math:**
+- **Total width** = width + padding-left + padding-right + border-left + border-right + margin-left + margin-right
+- **Total height** = height + padding-top + padding-bottom + border-top + border-bottom + margin-top + margin-bottom
+
+## Adding CSS to HTML: Best Practices & Real-World Workflow
+
+There are three ways to add CSS to HTML. Let's explore each one and understand when to use them:
+
+### 1. Inline CSS (Emergency Use Only!)
+
+<SeparatedEditorPreview
+  initialHtml={`<p style="color: red; font-size: 20px; background: yellow; padding: 10px;">This is inline CSS</p>
+<p>This is normal text without inline styles</p>`}
+  initialCss={`/* Notice: The first paragraph can't be styled here because it uses inline CSS! */
+p {
+  color: blue;
+  font-size: 16px;
+  /* This only affects paragraphs WITHOUT inline styles */
+}`}
+  title="⚠️ Inline CSS Example"
+  mission="Try changing the CSS - notice it only affects the second paragraph!"
+  instructions="Inline styles override CSS classes. This is why we avoid them in professional development."
+  showHtmlEditor={true}
+  height={300}
+/>
+
+**When to use inline CSS:**
+- ✅ Quick testing/debugging
+- ✅ One-time overrides for specific elements
+- ✅ Dynamic styles generated by JavaScript
+- ❌ **Never for regular styling in production**
+
+**Why avoid inline CSS?**
+- Hard to maintain (styles scattered in HTML)
+- Can't be reused across elements
+- Makes HTML messy and harder to read
+- Difficult to change site-wide styles
+
+### 2. Internal CSS (Good for Single Pages)
+
+<SeparatedEditorPreview
+  initialHtml={`<!-- This simulates what would be in your HTML file -->
+<div class="header">Website Header</div>
+<p class="intro">This is an introduction paragraph.</p>
+<p class="highlight">This paragraph stands out!</p>`}
+  initialCss={`/* This CSS would normally be inside <style> tags in your HTML head */
+.header {
+  background-color: #2c3e50;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  font-size: 24px;
+}
+
+.intro {
+  font-size: 18px;
+  color: #555;
+  margin: 20px 0;
+}
+
+.highlight {
+  background-color: #f39c12;
+  color: white;
+  padding: 15px;
+  border-radius: 5px;
+  font-weight: bold;
+}`}
+  title="📄 Internal CSS Example"
+  mission="Add a new CSS rule for a .footer class with dark background and centered text"
+  instructions="Internal CSS goes in <style> tags in the HTML head. Good for single-page projects."
+  height={350}
+/>
+
+**When to use internal CSS:**
+- ✅ Single-page websites
+- ✅ Prototyping and testing
+- ✅ Page-specific styles that won't be reused
+- ❌ Multi-page websites (causes repetition)
+
+### 3. External CSS (Professional Standard!)
+
+This is how professionals do it! Here's the real-world workflow:
+
+<SeparatedEditorPreview
+  initialHtml={`<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- This links to an external CSS file -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">My Website</div>
+    <ul class="nav-links">
+      <li><a href="#">Home</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </nav>
+  
+  <main class="content">
+    <h1>Welcome to My Site</h1>
+    <p>This is styled with external CSS!</p>
+  </main>
+</body>
+</html>`}
+  initialCss={`/* styles.css - This would be a separate file */
+
+/* Navigation Styles */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #2c3e50;
+  padding: 1rem 2rem;
+}
+
+.logo {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: #3498db;
+}
+
+/* Content Styles */
+.content {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.content h1 {
+  color: #2c3e50;
+  border-bottom: 3px solid #3498db;
+  padding-bottom: 0.5rem;
+}
+
+.content p {
+  line-height: 1.6;
+  color: #555;
+  font-size: 1.1rem;
+}`}
+  title="🏆 External CSS - Professional Approach"
+  mission="Add styles for a footer section with dark background and centered text"
+  instructions="This simulates separate HTML and CSS files - the professional standard!"
+  showHtmlEditor={true}
+  height={400}
+/>
+
+**Why external CSS is the best:**
+- ✅ **Separation of concerns**: HTML for structure, CSS for styling
+- ✅ **Reusable**: One CSS file can style multiple HTML pages
+- ✅ **Maintainable**: Easy to update styles across entire website
+- ✅ **Performance**: CSS files are cached by browsers
+- ✅ **Team-friendly**: Designers can work on CSS while developers work on HTML
+- ✅ **Organization**: Keeps files clean and focused
+
+**Real-World File Structure:**
+```
+my-website/
+├── index.html
+├── about.html
+├── contact.html
+├── css/
+│   ├── styles.css
+│   ├── layout.css
+│   └── components.css
+└── images/
+    ├── logo.png
+    └── hero.jpg
+```
+
+**🎯 Professional Tip:** Most websites use build tools that combine multiple CSS files into one optimized file for production!
+
+## Practical Example
+
+Let's create a simple styled webpage:
+
+**HTML:**
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Styled Page</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header id="main-header">
+    <h1>Welcome to My Website</h1>
+  </header>
+  
+  <main>
+    <p class="intro">This is an introduction paragraph.</p>
+    <p class="highlight">This paragraph is highlighted.</p>
+  </main>
+  
+  <footer>
+    <p>&copy; 2024 My Website</p>
+  </footer>
+</body>
+</html>
+```
+
+**CSS (styles.css):**
+```css
+/* Reset some default styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+}
+
+#main-header {
+  background-color: #2c3e50;
+  color: white;
+  padding: 2rem;
+  text-align: center;
+}
+
+main {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.intro {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.highlight {
+  background-color: #f39c12;
+  color: white;
+  padding: 1rem;
+  border-radius: 5px;
+  margin: 1rem 0;
+}
+
+footer {
+  background-color: #34495e;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  margin-top: 2rem;
+}
+```
+
+## CSS Units
+
+### Absolute Units
+- **px**: Pixels (most common)
+- **pt**: Points
+- **cm**: Centimeters
+
+### Relative Units
+- **%**: Percentage of parent element
+- **em**: Relative to current font size
+- **rem**: Relative to root font size
+- **vh/vw**: Viewport height/width
+
+```css
+.units-example {
+  width: 50%;           /* 50% of parent width */
+  font-size: 1.5rem;    /* 1.5 times the root font size */
+  margin: 2em;          /* 2 times the current font size */
+  height: 50vh;         /* 50% of viewport height */
+}
+```
+
+## Display Property
+
+Controls how an element is displayed:
+
+```css
+.block {
+  display: block;       /* Takes full width, stacks vertically */
+}
+
+.inline {
+  display: inline;      /* Takes only needed width, flows horizontally */
+}
+
+.inline-block {
+  display: inline-block; /* Hybrid of inline and block */
+}
+
+.none {
+  display: none;        /* Element is hidden */
+}
+```
+
+## CSS Cascade and Specificity
+
+CSS follows these rules when multiple styles conflict:
+
+1. **Inline styles** (highest priority)
+2. **IDs** (#header)
+3. **Classes** (.highlight)
+4. **Elements** (p, div)
+
+```css
+/* This will be overridden */
+p {
+  color: blue;
+}
+
+/* This has higher specificity */
+.special-text {
+  color: red;
+}
+
+/* This has even higher specificity */
+#unique-paragraph {
+  color: green;
+}
+```
+
+## Best Practices
+
+1. **Use external stylesheets** for better maintainability
+2. **Use classes** instead of IDs for styling (IDs should be unique)
+3. **Keep specificity low** to make styles easier to override
+4. **Use meaningful class names** (.nav-button instead of .red-button)
+5. **Group related styles** together
+6. **Comment your CSS** for complex sections
+
+```css
+/* Navigation Styles */
+.nav {
+  background-color: #333;
+  padding: 1rem;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  margin-right: 1rem;
+}
+
+.nav-link:hover {
+  color: #f39c12;
+}
+```
+
+## Next Steps
+
+Now that you understand CSS fundamentals, you're ready to:
+- Learn about CSS Flexbox and Grid for layout
+- Explore CSS animations and transitions
+- Master responsive design with media queries
+- Dive into CSS preprocessors like Sass
+
+## 🎯 Final Challenge: Build Your Profile Card
+
+Put everything you've learned together! Create a stylish profile card using all the CSS concepts from this tutorial. This is your chance to shine!
+
+<SeparatedEditorPreview
+  initialHtml={`<div class="profile-card">
+  <div class="profile-header">
+    <h2 class="profile-name">Your Name Here</h2>
+    <p class="profile-title">Web Developer in Training</p>
+  </div>
+  
+  <div class="profile-content">
+    <p class="profile-bio">
+      I'm learning CSS and loving every minute of it! Building beautiful websites is my passion, and I'm excited to share my journey with the world.
+    </p>
+    
+    <div class="skills">
+      <span class="skill">HTML</span>
+      <span class="skill">CSS</span>
+      <span class="skill">JavaScript</span>
+      <span class="skill">Learning</span>
+    </div>
+  </div>
+  
+  <div class="profile-footer">
+    <p>Let's connect and build amazing things together! 🚀</p>
+  </div>
+</div>`}
+  initialCss={`/* Your mission: Style this profile card to perfection! */
+
+.profile-card {
+  /* Container styling - try: width: 350px, background: white, etc. */
+}
+
+.profile-header {
+  /* Header styling - try: gradient background, padding, text-align: center */
+}
+
+.profile-name {
+  /* Name styling - try: larger font-size, margin: 0, color: white */
+}
+
+.profile-title {
+  /* Title styling - try: font-style: italic, opacity: 0.9 */
+}
+
+.profile-content {
+  /* Content area - try: padding: 20px */
+}
+
+.profile-bio {
+  /* Bio text - try: line-height: 1.6, color: #555, margin-bottom: 20px */
+}
+
+.skills {
+  /* Skills container - try: display: flex, gap: 10px, flex-wrap: wrap */
+}
+
+.skill {
+  /* Individual skills - try: background: #e3f2fd, padding, border-radius */
+}
+
+.profile-footer {
+  /* Footer styling - try: background: #f5f5f5, padding, text-align: center */
+}
+
+/* Bonus: Add hover effects and box-shadow! */`}
+  title="🏆 Final Challenge: Your Professional Profile Card"
+  mission="Transform this basic HTML into a stunning profile card using only CSS!"
+  instructions="Work in the CSS tab to style each section. Make it look professional and reflect your personality!"
+  showHtmlEditor={true}
+  height={500}
+/>
+
+**🎯 Your Mission:**
+1. **Profile Card**: Give it a width (300px), white background, subtle border, and rounded corners
+2. **Header Section**: Add a gradient background (#667eea to #764ba2), white text, and center alignment
+3. **Name**: Make it larger (24px), bold, with no margin
+4. **Title**: Make it italic and slightly transparent
+5. **Content**: Add padding for breathing room
+6. **Bio**: Use a readable color and comfortable line-height (1.6)
+7. **Skills**: Display as flex with gap, each skill with background color and padding
+8. **Footer**: Dark background with light text
+
+**💡 Bonus Points:**
+- Add a subtle box-shadow: `0 4px 6px rgba(0,0,0,0.1)`
+- Use hover effects on the skills: `.skill:hover { transform: scale(1.05); }`
+- Experiment with different color combinations!
+
+**🔥 Pro Tip:** Copy your final code and save it - you've just created your first CSS component!
+
+## Quiz Time! 🧠
+
+Ready to test your CSS knowledge? The quiz will adapt to your current mood setting - whether you're in chill, rush, or grind mode!
+
+## Summary
+
+In this tutorial, you learned:
+- ✅ What CSS is and its basic syntax
+- ✅ Different types of CSS selectors
+- ✅ Common CSS properties for colors, typography, and spacing
+- ✅ The CSS box model
+- ✅ How to add CSS to HTML documents
+- ✅ CSS units and the display property
+- ✅ CSS cascade and specificity rules
+- ✅ Best practices for writing maintainable CSS
+
+CSS is a powerful tool that allows you to transform plain HTML into beautiful, engaging web pages. Keep practicing and experimenting with different styles to become proficient in CSS!

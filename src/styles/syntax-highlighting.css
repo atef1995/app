@@ -1,61 +1,219 @@
-/* HTML Syntax Highlighting Styles */
-.syntax-html-editor .token.tag {
-  color: #569cd6 !important;
-  font-weight: normal;
-}
-
-.syntax-html-editor .token.attr-name {
-  color: #9cdcfe !important;
-}
-
-.syntax-html-editor .token.attr-value {
-  color: #ce9178 !important;
-}
-
-.syntax-html-editor .token.punctuation {
-  color: #d4d4d4 !important;
-}
-
-.syntax-html-editor .token.doctype {
-  color: #569cd6 !important;
-  font-weight: bold;
-}
-
-.syntax-html-editor .token.comment {
-  color: #6a9955 !important;
-  font-style: italic;
-}
-
-.syntax-html-editor .token.string {
-  color: #ce9178 !important;
-}
-
-.syntax-html-editor .token.entity {
-  color: #dcdcaa !important;
-}
-
-.syntax-html-editor .token.cdata {
-  color: #808080 !important;
-}
-
-.syntax-html-editor .token.prolog {
-  color: #569cd6 !important;
-}
-
-/* Style the editor container */
-.syntax-html-editor {
+/* Base editor styles */
+.syntax-html-editor,
+.syntax-css-editor {
   font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Segoe UI Mono', monospace !important;
 }
 
-.syntax-html-editor pre {
+.syntax-html-editor pre,
+.syntax-css-editor pre {
   margin: 0 !important;
   padding: 0 !important;
   background: transparent !important;
   overflow: visible !important;
 }
 
-.syntax-html-editor code {
+.syntax-html-editor code,
+.syntax-css-editor code {
   font-family: inherit !important;
   background: transparent !important;
   color: inherit !important;
+}
+
+/* HTML Syntax Highlighting Styles - Light Mode */
+.syntax-html-editor .token.tag {
+  color: #0969da !important;
+  font-weight: normal;
+}
+
+.syntax-html-editor .token.attr-name {
+  color: #8250df !important;
+}
+
+.syntax-html-editor .token.attr-value {
+  color: #0a3069 !important;
+}
+
+.syntax-html-editor .token.punctuation {
+  color: #24292f !important;
+}
+
+.syntax-html-editor .token.doctype {
+  color: #0969da !important;
+  font-weight: bold;
+}
+
+.syntax-html-editor .token.comment {
+  color: #6e7781 !important;
+  font-style: italic;
+}
+
+.syntax-html-editor .token.string {
+  color: #0a3069 !important;
+}
+
+.syntax-html-editor .token.entity {
+  color: #953800 !important;
+}
+
+.syntax-html-editor .token.cdata {
+  color: #6e7781 !important;
+}
+
+.syntax-html-editor .token.prolog {
+  color: #0969da !important;
+}
+
+/* CSS Syntax Highlighting Styles - Light Mode */
+.syntax-css-editor .token.property {
+  color: #0969da !important;
+}
+
+.syntax-css-editor .token.selector {
+  color: #8250df !important;
+  font-weight: 600;
+}
+
+.syntax-css-editor .token.string,
+.syntax-css-editor .token.url {
+  color: #0a3069 !important;
+}
+
+.syntax-css-editor .token.punctuation {
+  color: #24292f !important;
+}
+
+.syntax-css-editor .token.comment {
+  color: #6e7781 !important;
+  font-style: italic;
+}
+
+.syntax-css-editor .token.function {
+  color: #953800 !important;
+}
+
+.syntax-css-editor .token.number {
+  color: #0550ae !important;
+}
+
+.syntax-css-editor .token.important {
+  color: #cf222e !important;
+  font-weight: bold;
+}
+
+.syntax-css-editor .token.atrule {
+  color: #8250df !important;
+}
+
+.syntax-css-editor .token.keyword {
+  color: #cf222e !important;
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+  /* HTML Dark Mode */
+  .dark .syntax-html-editor .token.tag {
+    color: #79c0ff !important;
+  }
+
+  .dark .syntax-html-editor .token.attr-name {
+    color: #ffa657 !important;
+  }
+
+  .dark .syntax-html-editor .token.attr-value {
+    color: #a5d6ff !important;
+  }
+
+  .dark .syntax-html-editor .token.punctuation {
+    color: #e6edf3 !important;
+  }
+
+  .dark .syntax-html-editor .token.doctype {
+    color: #79c0ff !important;
+  }
+
+  .dark .syntax-html-editor .token.comment {
+    color: #8b949e !important;
+  }
+
+  .dark .syntax-html-editor .token.string {
+    color: #a5d6ff !important;
+  }
+
+  .dark .syntax-html-editor .token.entity {
+    color: #ffa657 !important;
+  }
+
+  .dark .syntax-html-editor .token.cdata {
+    color: #8b949e !important;
+  }
+
+  .dark .syntax-html-editor .token.prolog {
+    color: #79c0ff !important;
+  }
+
+  /* CSS Dark Mode */
+  .dark .syntax-css-editor .token.property {
+    color: #79c0ff !important;
+  }
+
+  .dark .syntax-css-editor .token.selector {
+    color: #ffa657 !important;
+  }
+
+  .dark .syntax-css-editor .token.string,
+  .dark .syntax-css-editor .token.url {
+    color: #a5d6ff !important;
+  }
+
+  .dark .syntax-css-editor .token.punctuation {
+    color: #e6edf3 !important;
+  }
+
+  .dark .syntax-css-editor .token.comment {
+    color: #8b949e !important;
+  }
+
+  .dark .syntax-css-editor .token.function {
+    color: #d2a8ff !important;
+  }
+
+  .dark .syntax-css-editor .token.number {
+    color: #a5d6ff !important;
+  }
+
+  .dark .syntax-css-editor .token.important {
+    color: #f85149 !important;
+  }
+
+  .dark .syntax-css-editor .token.atrule {
+    color: #ffa657 !important;
+  }
+
+  .dark .syntax-css-editor .token.keyword {
+    color: #f85149 !important;
+  }
+}
+
+/* Let the editor handle text color naturally */
+.syntax-html-editor textarea,
+.syntax-css-editor textarea {
+  color: inherit !important;
+  background: transparent !important;
+}
+
+/* Ensure the editor container has proper text color */
+.syntax-html-editor {
+  color: #24292f;
+}
+
+.dark .syntax-html-editor {
+  color: #e6edf3;
+}
+
+.syntax-css-editor {
+  color: #24292f;
+}
+
+.dark .syntax-css-editor {
+  color: #e6edf3;
 }

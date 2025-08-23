@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { seedCategories } from "./seedCategories";
 import { seedTutorials } from "./seedTutorials";
+import seedHtmlTutorials from "./seedHtmlTutorials";
+import seedCssTutorials from "./seedCssTutorials";
 
 const prisma = new PrismaClient();
 
@@ -13,6 +15,12 @@ async function seedAll() {
     
     // Then seed tutorials (which depend on categories)
     await seedTutorials();
+    
+    // Seed HTML tutorials
+    await seedHtmlTutorials();
+    
+    // Seed CSS tutorials
+    await seedCssTutorials();
     
     console.log("🎉 Complete seeding finished successfully!");
   } catch (error) {

@@ -1,0 +1,1019 @@
+---
+title: "Form Handling & Validation: User Input Mastery"
+description: "Master form interactions, validation patterns, data collection, and user experience best practices for web forms."
+difficulty: 3
+estimatedTime: 55
+order: 4
+isPremium: true
+requiredPlan: "PRO"
+topics: ["Forms", "Validation", "User Input", "UX", "DOM"]
+quizQuestions: 15
+---
+
+import { DOMInteractiveBlock } from "@/components/ui/DOMInteractiveBlock";
+import { InteractiveCodeBlock } from "@/components/InteractiveCodeBlock";
+
+# Form Handling & Validation: User Input Mastery
+
+Forms are the bridge between users and your application. In this tutorial, you'll learn to create robust, user-friendly forms with real-time validation, accessibility features, and smooth user experiences.
+
+## 🎯 What You'll Master
+
+By the end of this tutorial, you'll be able to:
+- Build dynamic form validation systems
+- Handle form data collection and processing
+- Create accessible form experiences
+- Implement real-time feedback and validation
+- Handle complex form scenarios and edge cases
+- Optimize form performance and user experience
+
+## Form Basics and Event Handling
+
+Let's start with fundamental form events and data access patterns.
+
+<DOMInteractiveBlock
+  title="Form Events and Data Access"
+  description="Understanding form events and accessing form data:"
+  javascript={`const form = document.querySelector('#demo-form');
+const output = document.querySelector('#form-output');
+
+// Form submission event
+form.addEventListener('submit', (event) => {
+  event.preventDefault(); // Prevent page reload
+  
+  // Method 1: FormData API (modern approach)
+  const formData = new FormData(form);
+  const data1 = Object.fromEntries(formData.entries());
+  
+  // Method 2: Direct element access
+  const data2 = {
+    name: form.name.value,
+    email: form.email.value,
+    age: form.age.value,
+    subscribe: form.subscribe.checked,
+    plan: form.plan.value
+  };
+  
+  console.log('FormData approach:', data1);
+  console.log('Direct access approach:', data2);
+  
+  output.innerHTML = \`
+    <h4>Form Submitted!</h4>
+    <pre>\${JSON.stringify(data1, null, 2)}</pre>
+  \`;
+});
+
+// Input events for real-time feedback
+form.addEventListener('input', (event) => {
+  const target = event.target;
+  console.log(\`Field changed: \${target.name} = \${target.value}\`);
+});
+
+// Focus events
+form.addEventListener('focusin', (event) => {
+  event.target.style.backgroundColor = '#f0f9ff';
+});
+
+form.addEventListener('focusout', (event) => {
+  event.target.style.backgroundColor = '';
+});
+
+// Change event (different from input)
+form.addEventListener('change', (event) => {
+  console.log(\`Field committed: \${event.target.name}\`);
+});`}
+  html={`<form id="demo-form">
+  <div style="margin-bottom: 15px;">
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name" required style="padding: 8px; width: 250px;">
+  </div>
+  
+  <div style="margin-bottom: 15px;">
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" required style="padding: 8px; width: 250px;">
+  </div>
+  
+  <div style="margin-bottom: 15px;">
+    <label for="age">Age:</label><br>
+    <input type="number" id="age" name="age" min="18" max="100" style="padding: 8px; width: 100px;">
+  </div>
+  
+  <div style="margin-bottom: 15px;">
+    <label>
+      <input type="checkbox" name="subscribe" value="yes">
+      Subscribe to newsletter
+    </label>
+  </div>
+  
+  <div style="margin-bottom: 15px;">
+    <label for="plan">Plan:</label><br>
+    <select id="plan" name="plan" style="padding: 8px; width: 150px;">
+      <option value="free">Free</option>
+      <option value="pro">Pro</option>
+      <option value="enterprise">Enterprise</option>
+    </select>
+  </div>
+  
+  <button type="submit">Submit Form</button>
+</form>
+
+<div id="form-output" style="margin-top: 20px; padding: 15px; background: #f9fafb; border-radius: 8px; border: 1px solid #d1d5db;">
+  Fill out and submit the form to see the data
+</div>`}
+/>
+
+## Real-time Validation System
+
+Build a comprehensive validation system with immediate feedback.
+
+<DOMInteractiveBlock
+  title="Advanced Real-time Validation"
+  description="Create a validation system with custom rules and feedback:"
+  javascript={`class FormValidator {
+  constructor(form) {
+    this.form = form;
+    this.rules = {};
+    this.errors = {};
+    this.init();
+  }
+  
+  init() {
+    this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+    this.form.addEventListener('input', (e) => this.handleInput(e));
+    this.form.addEventListener('blur', (e) => this.handleBlur(e), true);
+  }
+  
+  addRule(fieldName, validator, message) {
+    if (!this.rules[fieldName]) {
+      this.rules[fieldName] = [];
+    }
+    this.rules[fieldName].push({ validator, message });
+    return this;
+  }
+  
+  validateField(fieldName, value) {
+    const rules = this.rules[fieldName] || [];
+    const errors = [];
+    
+    for (let rule of rules) {
+      if (!rule.validator(value, this.form)) {
+        errors.push(rule.message);
+      }
+    }
+    
+    return errors;
+  }
+  
+  showFieldError(fieldName, errors) {
+    const field = this.form[fieldName];
+    let errorContainer = field.nextElementSibling;
+    
+    // Remove existing error container
+    if (errorContainer && errorContainer.classList.contains('error-message')) {
+      errorContainer.remove();
+    }
+    
+    if (errors.length > 0) {
+      // Create error container
+      errorContainer = document.createElement('div');
+      errorContainer.className = 'error-message';
+      errorContainer.style.cssText = 'color: #dc2626; font-size: 12px; margin-top: 4px;';
+      errorContainer.textContent = errors[0]; // Show first error
+      
+      field.parentNode.insertBefore(errorContainer, field.nextSibling);
+      field.style.borderColor = '#dc2626';
+      field.setAttribute('aria-invalid', 'true');
+    } else {
+      field.style.borderColor = '#10b981';
+      field.setAttribute('aria-invalid', 'false');
+    }
+    
+    this.errors[fieldName] = errors;
+  }
+  
+  handleInput(event) {
+    const field = event.target;
+    if (field.name) {
+      const errors = this.validateField(field.name, field.value);
+      this.showFieldError(field.name, errors);
+    }
+  }
+  
+  handleBlur(event) {
+    this.handleInput(event);
+  }
+  
+  handleSubmit(event) {
+    event.preventDefault();
+    
+    // Validate all fields
+    let hasErrors = false;
+    for (let fieldName in this.rules) {
+      const field = this.form[fieldName];
+      if (field) {
+        const value = field.type === 'checkbox' ? field.checked : field.value;
+        const errors = this.validateField(fieldName, value);
+        this.showFieldError(fieldName, errors);
+        if (errors.length > 0) hasErrors = true;
+      }
+    }
+    
+    if (!hasErrors) {
+      this.onValidSubmit();
+    } else {
+      console.log('Form has errors:', this.errors);
+    }
+  }
+  
+  onValidSubmit() {
+    const formData = new FormData(this.form);
+    const data = Object.fromEntries(formData.entries());
+    
+    document.querySelector('#validation-output').innerHTML = \`
+      <div style="background: #dcfce7; border: 1px solid #16a34a; color: #166534; padding: 15px; border-radius: 8px;">
+        <strong>✅ Form submitted successfully!</strong>
+        <pre style="margin-top: 10px;">\${JSON.stringify(data, null, 2)}</pre>
+      </div>
+    \`;
+  }
+}
+
+// Initialize validator
+const validator = new FormValidator(document.querySelector('#validation-form'));
+
+// Add validation rules
+validator
+  .addRule('username', (value) => value.length >= 3, 'Username must be at least 3 characters')
+  .addRule('username', (value) => /^[a-zA-Z0-9_]+$/.test(value), 'Username can only contain letters, numbers, and underscores')
+  .addRule('email', (value) => /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value), 'Please enter a valid email address')
+  .addRule('password', (value) => value.length >= 8, 'Password must be at least 8 characters')
+  .addRule('password', (value) => /(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)/.test(value), 'Password must contain uppercase, lowercase, and number')
+  .addRule('confirmPassword', (value, form) => value === form.password.value, 'Passwords do not match')
+  .addRule('phone', (value) => /^\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}$/.test(value), 'Please enter a valid phone number');`}
+  html={`<form id="validation-form" style="max-width: 400px;">
+  <div style="margin-bottom: 15px;">
+    <label for="username">Username *</label><br>
+    <input type="text" id="username" name="username" required 
+           style="padding: 8px; width: 100%; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 4px;">
+  </div>
+  
+  <div style="margin-bottom: 15px;">
+    <label for="email-val">Email *</label><br>
+    <input type="email" id="email-val" name="email" required 
+           style="padding: 8px; width: 100%; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 4px;">
+  </div>
+  
+  <div style="margin-bottom: 15px;">
+    <label for="password">Password *</label><br>
+    <input type="password" id="password" name="password" required 
+           style="padding: 8px; width: 100%; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 4px;">
+  </div>
+  
+  <div style="margin-bottom: 15px;">
+    <label for="confirm-password">Confirm Password *</label><br>
+    <input type="password" id="confirm-password" name="confirmPassword" required 
+           style="padding: 8px; width: 100%; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 4px;">
+  </div>
+  
+  <div style="margin-bottom: 15px;">
+    <label for="phone-val">Phone</label><br>
+    <input type="tel" id="phone-val" name="phone" placeholder="(123) 456-7890"
+           style="padding: 8px; width: 100%; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 4px;">
+  </div>
+  
+  <button type="submit" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">
+    Create Account
+  </button>
+</form>
+
+<div id="validation-output" style="margin-top: 20px;">
+  Start typing to see real-time validation feedback
+</div>`}
+/>
+
+## Dynamic Form Generation
+
+Create forms dynamically based on data structures.
+
+<DOMInteractiveBlock
+  title="Dynamic Form Builder"
+  description="Build forms from configuration objects:"
+  javascript={`class DynamicFormBuilder {
+  constructor(container) {
+    this.container = container;
+  }
+  
+  buildForm(config) {
+    const form = document.createElement('form');
+    form.className = 'dynamic-form';
+    
+    // Build form fields
+    config.fields.forEach(field => {
+      const fieldContainer = this.createField(field);
+      form.appendChild(fieldContainer);
+    });
+    
+    // Add submit button
+    const submitBtn = document.createElement('button');
+    submitBtn.type = 'submit';
+    submitBtn.textContent = config.submitText || 'Submit';
+    submitBtn.style.cssText = 'margin-top: 15px; padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;';
+    form.appendChild(submitBtn);
+    
+    // Handle submission
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.handleSubmit(form, config.onSubmit);
+    });
+    
+    this.container.innerHTML = '';
+    this.container.appendChild(form);
+  }
+  
+  createField(field) {
+    const container = document.createElement('div');
+    container.style.marginBottom = '15px';
+    
+    // Label
+    if (field.label) {
+      const label = document.createElement('label');
+      label.textContent = field.label + (field.required ? ' *' : '');
+      label.style.cssText = 'display: block; margin-bottom: 5px; font-weight: 500;';
+      container.appendChild(label);
+    }
+    
+    // Input element
+    let input;
+    switch (field.type) {
+      case 'select':
+        input = this.createSelect(field);
+        break;
+      case 'textarea':
+        input = this.createTextarea(field);
+        break;
+      case 'radio':
+        return this.createRadioGroup(field);
+      case 'checkbox':
+        return this.createCheckboxGroup(field);
+      default:
+        input = this.createInput(field);
+    }
+    
+    // Common input styling
+    if (input.tagName !== 'DIV') {
+      input.style.cssText = 'padding: 8px; width: 100%; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 4px;';
+    }
+    
+    container.appendChild(input);
+    
+    // Help text
+    if (field.help) {
+      const help = document.createElement('small');
+      help.textContent = field.help;
+      help.style.cssText = 'color: #6b7280; font-size: 12px;';
+      container.appendChild(help);
+    }
+    
+    return container;
+  }
+  
+  createInput(field) {
+    const input = document.createElement('input');
+    input.type = field.type || 'text';
+    input.name = field.name;
+    input.placeholder = field.placeholder || '';
+    if (field.required) input.required = true;
+    if (field.value !== undefined) input.value = field.value;
+    return input;
+  }
+  
+  createSelect(field) {
+    const select = document.createElement('select');
+    select.name = field.name;
+    if (field.required) select.required = true;
+    
+    field.options.forEach(option => {
+      const optionEl = document.createElement('option');
+      optionEl.value = option.value;
+      optionEl.textContent = option.text;
+      if (option.selected) optionEl.selected = true;
+      select.appendChild(optionEl);
+    });
+    
+    return select;
+  }
+  
+  createTextarea(field) {
+    const textarea = document.createElement('textarea');
+    textarea.name = field.name;
+    textarea.placeholder = field.placeholder || '';
+    textarea.rows = field.rows || 4;
+    if (field.required) textarea.required = true;
+    if (field.value) textarea.value = field.value;
+    return textarea;
+  }
+  
+  createRadioGroup(field) {
+    const container = document.createElement('div');
+    container.style.marginBottom = '15px';
+    
+    if (field.label) {
+      const legend = document.createElement('div');
+      legend.textContent = field.label + (field.required ? ' *' : '');
+      legend.style.cssText = 'font-weight: 500; margin-bottom: 8px;';
+      container.appendChild(legend);
+    }
+    
+    field.options.forEach(option => {
+      const radioContainer = document.createElement('label');
+      radioContainer.style.cssText = 'display: flex; align-items: center; margin-bottom: 5px; cursor: pointer;';
+      
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = field.name;
+      radio.value = option.value;
+      radio.style.marginRight = '8px';
+      if (option.checked) radio.checked = true;
+      
+      const span = document.createElement('span');
+      span.textContent = option.text;
+      
+      radioContainer.appendChild(radio);
+      radioContainer.appendChild(span);
+      container.appendChild(radioContainer);
+    });
+    
+    return container;
+  }
+  
+  createCheckboxGroup(field) {
+    const container = document.createElement('div');
+    container.style.marginBottom = '15px';
+    
+    if (field.label) {
+      const legend = document.createElement('div');
+      legend.textContent = field.label;
+      legend.style.cssText = 'font-weight: 500; margin-bottom: 8px;';
+      container.appendChild(legend);
+    }
+    
+    field.options.forEach(option => {
+      const checkboxContainer = document.createElement('label');
+      checkboxContainer.style.cssText = 'display: flex; align-items: center; margin-bottom: 5px; cursor: pointer;';
+      
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.name = field.name + '[]';
+      checkbox.value = option.value;
+      checkbox.style.marginRight = '8px';
+      if (option.checked) checkbox.checked = true;
+      
+      const span = document.createElement('span');
+      span.textContent = option.text;
+      
+      checkboxContainer.appendChild(checkbox);
+      checkboxContainer.appendChild(span);
+      container.appendChild(checkboxContainer);
+    });
+    
+    return container;
+  }
+  
+  handleSubmit(form, callback) {
+    const formData = new FormData(form);
+    const data = {};
+    
+    // Handle regular fields
+    for (let [key, value] of formData.entries()) {
+      if (key.endsWith('[]')) {
+        const cleanKey = key.slice(0, -2);
+        if (!data[cleanKey]) data[cleanKey] = [];
+        data[cleanKey].push(value);
+      } else {
+        data[key] = value;
+      }
+    }
+    
+    if (callback) {
+      callback(data);
+    } else {
+      console.log('Form submitted:', data);
+    }
+  }
+}
+
+// Initialize form builder
+const formBuilder = new DynamicFormBuilder(document.querySelector('#dynamic-form-container'));
+
+// Configuration objects
+const userProfileConfig = {
+  fields: [
+    {
+      type: 'text',
+      name: 'firstName',
+      label: 'First Name',
+      required: true,
+      placeholder: 'Enter your first name'
+    },
+    {
+      type: 'email',
+      name: 'email',
+      label: 'Email Address',
+      required: true,
+      placeholder: 'your@email.com'
+    },
+    {
+      type: 'select',
+      name: 'country',
+      label: 'Country',
+      required: true,
+      options: [
+        { value: '', text: 'Select a country' },
+        { value: 'us', text: 'United States' },
+        { value: 'ca', text: 'Canada' },
+        { value: 'uk', text: 'United Kingdom' }
+      ]
+    },
+    {
+      type: 'radio',
+      name: 'experience',
+      label: 'Programming Experience',
+      options: [
+        { value: 'beginner', text: 'Beginner (0-1 years)' },
+        { value: 'intermediate', text: 'Intermediate (2-5 years)' },
+        { value: 'advanced', text: 'Advanced (5+ years)' }
+      ]
+    },
+    {
+      type: 'checkbox',
+      name: 'interests',
+      label: 'Interests',
+      options: [
+        { value: 'web', text: 'Web Development' },
+        { value: 'mobile', text: 'Mobile Development' },
+        { value: 'data', text: 'Data Science' },
+        { value: 'ai', text: 'Artificial Intelligence' }
+      ]
+    },
+    {
+      type: 'textarea',
+      name: 'bio',
+      label: 'Bio',
+      placeholder: 'Tell us about yourself...',
+      rows: 4
+    }
+  ],
+  submitText: 'Save Profile',
+  onSubmit: (data) => {
+    document.querySelector('#form-result').innerHTML = \`
+      <div style="background: #dcfce7; border: 1px solid #16a34a; color: #166534; padding: 15px; border-radius: 8px; margin-top: 15px;">
+        <strong>Profile saved successfully!</strong>
+        <pre style="margin-top: 10px; font-size: 12px;">\${JSON.stringify(data, null, 2)}</pre>
+      </div>
+    \`;
+  }
+};
+
+const surveyConfig = {
+  fields: [
+    {
+      type: 'radio',
+      name: 'satisfaction',
+      label: 'How satisfied are you with our service?',
+      required: true,
+      options: [
+        { value: '5', text: 'Very Satisfied' },
+        { value: '4', text: 'Satisfied' },
+        { value: '3', text: 'Neutral' },
+        { value: '2', text: 'Dissatisfied' },
+        { value: '1', text: 'Very Dissatisfied' }
+      ]
+    },
+    {
+      type: 'checkbox',
+      name: 'features',
+      label: 'Which features do you use most?',
+      options: [
+        { value: 'dashboard', text: 'Dashboard' },
+        { value: 'reports', text: 'Reports' },
+        { value: 'analytics', text: 'Analytics' },
+        { value: 'integrations', text: 'Integrations' }
+      ]
+    },
+    {
+      type: 'textarea',
+      name: 'feedback',
+      label: 'Additional Feedback',
+      placeholder: 'Your feedback helps us improve...',
+      rows: 3
+    }
+  ],
+  submitText: 'Submit Survey',
+  onSubmit: (data) => {
+    document.querySelector('#form-result').innerHTML = \`
+      <div style="background: #dbeafe; border: 1px solid #3b82f6; color: #1e40af; padding: 15px; border-radius: 8px; margin-top: 15px;">
+        <strong>Thank you for your feedback!</strong>
+        <pre style="margin-top: 10px; font-size: 12px;">\${JSON.stringify(data, null, 2)}</pre>
+      </div>
+    \`;
+  }
+};
+
+// Form switcher
+document.querySelector('#load-profile').addEventListener('click', () => {
+  formBuilder.buildForm(userProfileConfig);
+});
+
+document.querySelector('#load-survey').addEventListener('click', () => {
+  formBuilder.buildForm(surveyConfig);
+});
+
+// Load default form
+formBuilder.buildForm(userProfileConfig);`}
+  html={`<div style="margin-bottom: 15px;">
+  <button id="load-profile" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 4px; margin-right: 10px; cursor: pointer;">
+    Load Profile Form
+  </button>
+  <button id="load-survey" style="padding: 8px 16px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">
+    Load Survey Form
+  </button>
+</div>
+
+<div id="dynamic-form-container" style="border: 1px solid #d1d5db; padding: 20px; border-radius: 8px; background: #f9fafb;">
+  <!-- Dynamic form will be generated here -->
+</div>
+
+<div id="form-result">
+  <!-- Form submission results will appear here -->
+</div>`}
+/>
+
+## Advanced Form Patterns
+
+### Multi-step Forms
+
+<DOMInteractiveBlock
+  title="Multi-step Form Wizard"
+  description="Create a wizard-style form with progress indication:"
+  javascript={`class FormWizard {
+  constructor(container, config) {
+    this.container = container;
+    this.config = config;
+    this.currentStep = 0;
+    this.data = {};
+    this.init();
+  }
+  
+  init() {
+    this.render();
+  }
+  
+  render() {
+    this.container.innerHTML = \`
+      <div class="wizard-header">
+        <div class="progress-bar">
+          \${this.renderProgressBar()}
+        </div>
+        <h3>\${this.config.steps[this.currentStep].title}</h3>
+      </div>
+      
+      <form class="wizard-form">
+        \${this.renderCurrentStep()}
+        
+        <div class="wizard-controls">
+          \${this.currentStep > 0 ? '<button type="button" class="prev-btn">← Previous</button>' : ''}
+          \${this.currentStep < this.config.steps.length - 1 ? 
+            '<button type="button" class="next-btn">Next →</button>' : 
+            '<button type="submit" class="submit-btn">Complete</button>'
+          }
+        </div>
+      </form>
+    \`;
+    
+    this.attachEventListeners();
+  }
+  
+  renderProgressBar() {
+    const steps = this.config.steps;
+    return steps.map((step, index) => {
+      const isActive = index === this.currentStep;
+      const isCompleted = index < this.currentStep;
+      const className = isActive ? 'active' : (isCompleted ? 'completed' : '');
+      
+      return \`
+        <div class="progress-step \${className}">
+          <div class="step-number">\${isCompleted ? '✓' : index + 1}</div>
+          <div class="step-label">\${step.title}</div>
+        </div>
+      \`;
+    }).join('');
+  }
+  
+  renderCurrentStep() {
+    const step = this.config.steps[this.currentStep];
+    return step.fields.map(field => {
+      const value = this.data[field.name] || '';
+      return \`
+        <div class="form-field">
+          <label>\${field.label}\${field.required ? ' *' : ''}</label>
+          \${this.renderField(field, value)}
+        </div>
+      \`;
+    }).join('');
+  }
+  
+  renderField(field, value) {
+    switch (field.type) {
+      case 'select':
+        return \`
+          <select name="\${field.name}" \${field.required ? 'required' : ''}>
+            \${field.options.map(opt => 
+              \`<option value="\${opt.value}" \${opt.value === value ? 'selected' : ''}>\${opt.text}</option>\`
+            ).join('')}
+          </select>
+        \`;
+      case 'textarea':
+        return \`<textarea name="\${field.name}" placeholder="\${field.placeholder || ''}" \${field.required ? 'required' : ''}>\${value}</textarea>\`;
+      default:
+        return \`<input type="\${field.type || 'text'}" name="\${field.name}" value="\${value}" placeholder="\${field.placeholder || ''}" \${field.required ? 'required' : ''}>\`;
+    }
+  }
+  
+  attachEventListeners() {
+    const form = this.container.querySelector('.wizard-form');
+    
+    // Next button
+    const nextBtn = this.container.querySelector('.next-btn');
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => this.nextStep());
+    }
+    
+    // Previous button
+    const prevBtn = this.container.querySelector('.prev-btn');
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => this.previousStep());
+    }
+    
+    // Form submission
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.handleSubmit();
+    });
+  }
+  
+  nextStep() {
+    if (this.validateCurrentStep()) {
+      this.saveCurrentStepData();
+      this.currentStep++;
+      this.render();
+    }
+  }
+  
+  previousStep() {
+    this.saveCurrentStepData();
+    this.currentStep--;
+    this.render();
+  }
+  
+  validateCurrentStep() {
+    const form = this.container.querySelector('.wizard-form');
+    return form.checkValidity();
+  }
+  
+  saveCurrentStepData() {
+    const form = this.container.querySelector('.wizard-form');
+    const formData = new FormData(form);
+    
+    for (let [key, value] of formData.entries()) {
+      this.data[key] = value;
+    }
+  }
+  
+  handleSubmit() {
+    if (this.validateCurrentStep()) {
+      this.saveCurrentStepData();
+      
+      const result = document.querySelector('#wizard-result');
+      result.innerHTML = \`
+        <div style="background: #dcfce7; border: 1px solid #16a34a; color: #166534; padding: 20px; border-radius: 8px;">
+          <h3>🎉 Registration Complete!</h3>
+          <p>Thank you for completing the registration process.</p>
+          <details style="margin-top: 10px;">
+            <summary>View submitted data</summary>
+            <pre style="margin-top: 10px; font-size: 12px; background: white; padding: 10px; border-radius: 4px;">\${JSON.stringify(this.data, null, 2)}</pre>
+          </details>
+        </div>
+      \`;
+    }
+  }
+}
+
+// Wizard configuration
+const wizardConfig = {
+  steps: [
+    {
+      title: 'Personal Information',
+      fields: [
+        { type: 'text', name: 'firstName', label: 'First Name', required: true, placeholder: 'John' },
+        { type: 'text', name: 'lastName', label: 'Last Name', required: true, placeholder: 'Doe' },
+        { type: 'email', name: 'email', label: 'Email', required: true, placeholder: 'john@example.com' },
+        { type: 'tel', name: 'phone', label: 'Phone Number', placeholder: '(555) 123-4567' }
+      ]
+    },
+    {
+      title: 'Account Details',
+      fields: [
+        { type: 'text', name: 'username', label: 'Username', required: true, placeholder: 'johndoe' },
+        { type: 'password', name: 'password', label: 'Password', required: true },
+        { 
+          type: 'select', 
+          name: 'plan', 
+          label: 'Plan', 
+          required: true,
+          options: [
+            { value: '', text: 'Choose a plan' },
+            { value: 'free', text: 'Free Plan' },
+            { value: 'pro', text: 'Pro Plan ($19/month)' },
+            { value: 'enterprise', text: 'Enterprise Plan ($49/month)' }
+          ]
+        }
+      ]
+    },
+    {
+      title: 'Preferences',
+      fields: [
+        { 
+          type: 'select', 
+          name: 'language', 
+          label: 'Preferred Language',
+          options: [
+            { value: 'en', text: 'English' },
+            { value: 'es', text: 'Spanish' },
+            { value: 'fr', text: 'French' },
+            { value: 'de', text: 'German' }
+          ]
+        },
+        { 
+          type: 'select', 
+          name: 'timezone', 
+          label: 'Timezone',
+          options: [
+            { value: 'UTC', text: 'UTC' },
+            { value: 'EST', text: 'Eastern Time' },
+            { value: 'PST', text: 'Pacific Time' },
+            { value: 'CET', text: 'Central European Time' }
+          ]
+        },
+        { type: 'textarea', name: 'bio', label: 'Bio (Optional)', placeholder: 'Tell us about yourself...' }
+      ]
+    }
+  ]
+};
+
+// Initialize wizard
+const wizard = new FormWizard(document.querySelector('#wizard-container'), wizardConfig);`}
+  html={`<style>
+.wizard-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.progress-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 0 20px;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.progress-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: #e5e7eb;
+  z-index: -1;
+}
+
+.progress-step.completed:not(:last-child)::after {
+  background: #10b981;
+}
+
+.step-number {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.progress-step.active .step-number {
+  background: #3b82f6;
+  color: white;
+}
+
+.progress-step.completed .step-number {
+  background: #10b981;
+  color: white;
+}
+
+.step-label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.progress-step.active .step-label {
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.form-field {
+  margin-bottom: 20px;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.wizard-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+.prev-btn,
+.next-btn,
+.submit-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.prev-btn {
+  background: #6b7280;
+  color: white;
+}
+
+.next-btn {
+  background: #3b82f6;
+  color: white;
+  margin-left: auto;
+}
+
+.submit-btn {
+  background: #10b981;
+  color: white;
+  margin-left: auto;
+}
+</style>
+
+<div id="wizard-container" style="max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #d1d5db; border-radius: 12px; background: white;">
+  <!-- Wizard will be rendered here -->
+</div>
+
+<div id="wizard-result" style="margin-top: 20px;">
+  <!-- Results will appear here -->
+</div>`}
+/>
+
+## Quiz Time! 🧠
+
+Ready to test your form handling expertise? The quiz will adapt to your current mood setting - whether you're in chill, rush, or grind mode!
+
+## What's Next?
+
+Fantastic work mastering form handling and validation! Next up:
+- **Browser Object Model (BOM)** - Window, location, and navigation APIs
+- **Web Storage & APIs** - Local storage, session storage, and modern web APIs
+- **Performance Optimization** - Advanced DOM performance techniques
+- **Accessibility** - Making forms accessible to all users
+
+You now have the skills to build professional-grade form experiences! 🚀

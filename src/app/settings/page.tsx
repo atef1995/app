@@ -24,8 +24,11 @@ import {
   RefreshCw,
   CheckCircle,
   AlertTriangle,
+  CreditCard,
 } from "lucide-react";
 import Link from "next/link";
+import { SubscriptionManager } from "@/components/subscription/SubscriptionManager";
+import { UsageStatistics } from "@/components/subscription/UsageStatistics";
 
 interface UserSettings {
   name: string;
@@ -325,6 +328,7 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: "profile", label: "Profile", icon: User },
+    { id: "subscription", label: "Subscription", icon: CreditCard },
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "learning", label: "Learning", icon: Brain },
     { id: "privacy", label: "Privacy", icon: Shield },
@@ -580,6 +584,31 @@ export default function SettingsPage() {
                         </div>
                       </div>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {/* Subscription Tab */}
+              {activeTab === "subscription" && (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                      Subscription Management
+                    </h2>
+                  </div>
+
+                  <SubscriptionManager 
+                    onUpgrade={(plan) => {
+                      // Handle upgrade - redirect to pricing with selected plan
+                      window.open(`/pricing?plan=${plan.toLowerCase()}`, '_blank');
+                    }} 
+                  />
+
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                      Usage Statistics
+                    </h3>
+                    <UsageStatistics />
                   </div>
                 </div>
               )}
