@@ -14,7 +14,15 @@ import {
   Target,
   ChevronDown,
   ChevronRight,
-  Loader2
+  Loader2,
+  Globe,
+  Palette,
+  Sprout,
+  MousePointer,
+  Building,
+  Zap,
+  Flame,
+  Database
 } from "lucide-react";
 
 interface StudyPlanRoadmapProps {
@@ -25,6 +33,23 @@ interface StudyPlanRoadmapProps {
   onViewStep?: (stepId: string) => void;
   navigatingStepId?: string | null;
 }
+
+// Map icon names to Lucide components
+const getPhaseIcon = (iconName: string) => {
+  const iconMap = {
+    'Globe': Globe,
+    'Palette': Palette,
+    'Sprout': Sprout,
+    'MousePointer': MousePointer,
+    'Building': Building,
+    'Zap': Zap,
+    'Flame': Flame,
+    'Database': Database,
+  };
+  
+  const IconComponent = iconMap[iconName as keyof typeof iconMap] || Circle;
+  return <IconComponent className="w-6 h-6" />;
+};
 
 export function StudyPlanRoadmap({ 
   studyPlan, 
@@ -144,8 +169,8 @@ export function StudyPlanRoadmap({
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${phase.color} flex items-center justify-center text-white text-xl`}>
-                      {phase.icon}
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${phase.color} flex items-center justify-center text-white`}>
+                      {getPhaseIcon(phase.icon)}
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">

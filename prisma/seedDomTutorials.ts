@@ -32,83 +32,60 @@ async function seedDomTutorials() {
         slug: "dom-manipulation",
         description:
           "Learn to interact with and manipulate HTML elements using JavaScript DOM methods for dynamic web experiences.",
-        content: "dom/01-dom-manipulation.mdx",
+        content: "dom/01-dom-manipulation",
         difficulty: 2,
         estimatedTime: 45,
         order: 1,
         isPremium: false,
         requiredPlan: "FREE",
-        topics: ["DOM", "JavaScript", "HTML", "Events", "Elements"],
-        quizQuestions: 12,
       },
       {
         title: "DOM Selectors & Traversal: Finding Elements Like a Pro",
         slug: "dom-selectors-traversal",
         description:
           "Master advanced DOM selection techniques, CSS selectors, and tree traversal methods to efficiently navigate HTML structures.",
-        content: "dom/02-dom-selectors-traversal.mdx",
+        content: "dom/02-dom-selectors-traversal",
         difficulty: 2,
         estimatedTime: 50,
         order: 2,
         isPremium: false,
         requiredPlan: "FREE",
-        topics: ["DOM", "Selectors", "CSS", "Traversal", "Elements"],
-        quizQuestions: 14,
       },
       {
         title: "DOM Events Deep Dive: Interactive Web Magic",
         slug: "dom-events-deep-dive",
         description:
           "Master event handling, event delegation, custom events, and advanced interaction patterns for dynamic web applications.",
-        content: "dom/03-dom-events-deep-dive.mdx",
+        content: "dom/03-dom-events-deep-dive",
         difficulty: 3,
         estimatedTime: 60,
         order: 3,
         isPremium: true,
         requiredPlan: "PRO",
-        topics: [
-          "DOM",
-          "Events",
-          "Event Delegation",
-          "Custom Events",
-          "Interaction",
-        ],
-        quizQuestions: 16,
       },
       {
         title: "Form Handling & Validation: User Input Mastery",
         slug: "form-handling-validation",
         description:
           "Master form interactions, validation patterns, data collection, and user experience best practices for web forms.",
-        content: "dom/04-form-handling-validation.mdx",
+        content: "dom/04-form-handling-validation",
         difficulty: 3,
         estimatedTime: 55,
         order: 4,
         isPremium: true,
         requiredPlan: "PRO",
-        topics: ["Forms", "Validation", "User Input", "UX", "DOM"],
-        quizQuestions: 15,
       },
       {
         title: "Browser Object Model (BOM): Mastering the Browser Environment",
         slug: "browser-object-model",
         description:
           "Explore the Browser Object Model to control navigation, manage browser history, handle storage, and interact with the browser environment.",
-        content: "dom/05-browser-object-model.mdx",
+        content: "dom/05-browser-object-model",
         difficulty: 3,
         estimatedTime: 50,
         order: 5,
         isPremium: true,
         requiredPlan: "PRO",
-        topics: [
-          "BOM",
-          "Window",
-          "Navigation",
-          "History",
-          "Storage",
-          "Location",
-        ],
-        quizQuestions: 13,
       },
     ];
 
@@ -116,35 +93,31 @@ async function seedDomTutorials() {
     for (const tutorialData of domTutorials) {
       const tutorial = await prisma.tutorial.upsert({
         where: {
-          categoryId_slug: {
-            categoryId: domCategory.id,
-            slug: tutorialData.slug,
-          },
+          slug: tutorialData.slug,
         },
         update: {
           title: tutorialData.title,
           description: tutorialData.description,
-          content: tutorialData.content,
+          mdxFile: tutorialData.content,
           difficulty: tutorialData.difficulty,
           estimatedTime: tutorialData.estimatedTime,
           order: tutorialData.order,
           isPremium: tutorialData.isPremium,
           requiredPlan: tutorialData.requiredPlan,
-          topics: tutorialData.topics,
-          quizQuestions: tutorialData.quizQuestions,
+          published: true,
+          categoryId: domCategory.id,
         },
         create: {
           title: tutorialData.title,
           slug: tutorialData.slug,
           description: tutorialData.description,
-          content: tutorialData.content,
+          mdxFile: tutorialData.content,
           difficulty: tutorialData.difficulty,
           estimatedTime: tutorialData.estimatedTime,
           order: tutorialData.order,
           isPremium: tutorialData.isPremium,
           requiredPlan: tutorialData.requiredPlan,
-          topics: tutorialData.topics,
-          quizQuestions: tutorialData.quizQuestions,
+          published: true,
           categoryId: domCategory.id,
         },
       });
@@ -152,170 +125,79 @@ async function seedDomTutorials() {
       console.log(`✅ Tutorial created/updated: ${tutorial.title}`);
     }
 
-    // Create sample quiz questions for DOM Manipulation tutorial
-    const domManipulationTutorial = await prisma.tutorial.findFirst({
-      where: {
-        categoryId: domCategory.id,
-        slug: "dom-manipulation",
-      },
-    });
-
-    if (domManipulationTutorial) {
-      // Sample quiz questions for DOM Manipulation
-      const quizQuestions = [
-        {
-          question: "Which method is used to select an element by its ID?",
-          options: [
-            "document.querySelector('#id')",
-            "document.getElementById('id')",
-            "document.getElementByClass('id')",
-            "document.selectById('id')",
-          ],
-          correctAnswer: 1,
-          explanation:
-            "document.getElementById() is the most direct and fastest way to select an element by its ID. It returns the element directly or null if not found.",
-          difficulty: 1,
-          order: 1,
-        },
-        {
-          question: "What is the difference between textContent and innerHTML?",
-          options: [
-            "They are exactly the same",
-            "textContent sets/gets plain text, innerHTML sets/gets HTML content",
-            "innerHTML is faster than textContent",
-            "textContent only works with div elements",
-          ],
-          correctAnswer: 1,
-          explanation:
-            "textContent sets or gets the plain text content of an element, while innerHTML sets or gets the HTML content including tags. innerHTML can parse HTML, textContent treats everything as plain text.",
-          difficulty: 2,
-          order: 2,
-        },
-        {
-          question:
-            "Which method adds a CSS class to an element without removing existing classes?",
-          options: [
-            "element.className = 'newClass'",
-            "element.classList.add('newClass')",
-            "element.addClass('newClass')",
-            "element.style.class = 'newClass'",
-          ],
-          correctAnswer: 1,
-          explanation:
-            "classList.add() adds a class to an element's class list without affecting existing classes. It's safer than directly setting className which would replace all classes.",
-          difficulty: 2,
-          order: 3,
-        },
-        {
-          question: "How do you create a new HTML element with JavaScript?",
-          options: [
-            "document.newElement('div')",
-            "document.createElement('div')",
-            "document.addElement('div')",
-            "new HTMLElement('div')",
-          ],
-          correctAnswer: 1,
-          explanation:
-            "document.createElement() creates a new HTML element with the specified tag name. The element exists in memory but must be added to the DOM using methods like appendChild().",
-          difficulty: 1,
-          order: 4,
-        },
-        {
-          question: "What does the addEventListener method do?",
-          options: [
-            "It adds a CSS class to an element",
-            "It attaches an event handler function to an element",
-            "It creates a new HTML element",
-            "It removes an element from the DOM",
-          ],
-          correctAnswer: 1,
-          explanation:
-            "addEventListener() attaches an event handler function to an element for a specified event. It's the modern way to handle events and allows multiple handlers for the same event.",
-          difficulty: 2,
-          order: 5,
-        },
-      ];
-
-      // Create quiz questions
-      for (const questionData of quizQuestions) {
-        await prisma.quizQuestion.upsert({
-          where: {
-            tutorialId_order: {
-              tutorialId: domManipulationTutorial.id,
-              order: questionData.order,
-            },
-          },
-          update: questionData,
-          create: {
-            ...questionData,
-            tutorialId: domManipulationTutorial.id,
-          },
-        });
-      }
-
-      console.log(
-        `✅ Created ${quizQuestions.length} quiz questions for DOM Manipulation tutorial`
-      );
-    }
+    // Note: Quiz creation should be handled by the quiz seeding system
+    console.log(
+      "📝 Tutorial structure created. Quizzes should be seeded separately using the quiz system."
+    );
 
     // Create sample achievements related to DOM learning
     const domAchievements = [
       {
+        key: "dom-manipulator",
         title: "DOM Manipulator",
         description: "Complete your first DOM manipulation tutorial",
         icon: "🎯",
-        type: "TUTORIAL_COMPLETION",
-        requiredValue: 1,
         category: "learning",
-        isSecret: false,
-        order: 1,
+        rarity: "COMMON",
+        points: 50,
+        requirementType: "TUTORIAL_COMPLETION",
+        requirementValue: 1,
+        isHidden: false,
       },
       {
+        key: "element-selector-master",
         title: "Element Selector Master",
         description: "Master all DOM selector techniques",
         icon: "🎪",
-        type: "TUTORIAL_COMPLETION",
-        requiredValue: 2,
         category: "learning",
-        isSecret: false,
-        order: 2,
+        rarity: "COMMON",
+        points: 75,
+        requirementType: "TUTORIAL_COMPLETION",
+        requirementValue: 2,
+        isHidden: false,
       },
       {
+        key: "event-handler-pro",
         title: "Event Handler Pro",
         description: "Complete the DOM Events Deep Dive tutorial",
         icon: "⚡",
-        type: "TUTORIAL_COMPLETION",
-        requiredValue: 3,
         category: "learning",
-        isSecret: false,
-        order: 3,
+        rarity: "RARE",
+        points: 100,
+        requirementType: "TUTORIAL_COMPLETION",
+        requirementValue: 3,
+        isHidden: false,
       },
       {
+        key: "form-wizard",
         title: "Form Wizard",
         description: "Master form handling and validation",
         icon: "🧙‍♂️",
-        type: "TUTORIAL_COMPLETION",
-        requiredValue: 4,
         category: "learning",
-        isSecret: false,
-        order: 4,
+        rarity: "RARE",
+        points: 125,
+        requirementType: "TUTORIAL_COMPLETION",
+        requirementValue: 4,
+        isHidden: false,
       },
       {
+        key: "browser-master",
         title: "Browser Master",
         description: "Complete all DOM and Browser API tutorials",
         icon: "🌐",
-        type: "TUTORIAL_COMPLETION",
-        requiredValue: 5,
         category: "learning",
-        isSecret: false,
-        order: 5,
+        rarity: "EPIC",
+        points: 200,
+        requirementType: "TUTORIAL_COMPLETION",
+        requirementValue: 5,
+        isHidden: false,
       },
     ];
 
     for (const achievementData of domAchievements) {
       await prisma.achievement.upsert({
         where: {
-          title: achievementData.title,
+          key: achievementData.key,
         },
         update: achievementData,
         create: achievementData,
@@ -335,14 +217,11 @@ async function seedDomTutorials() {
 
 export default seedDomTutorials;
 
-// Allow running this seeder directly
-if (require.main === module) {
-  seedDomTutorials()
-    .catch((e) => {
-      console.error("❌ Seeding failed:", e);
-      process.exit(1);
-    })
-    .finally(async () => {
-      await prisma.$disconnect();
-    });
-}
+seedDomTutorials()
+  .catch((e) => {
+    console.error("❌ Seeding failed:", e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

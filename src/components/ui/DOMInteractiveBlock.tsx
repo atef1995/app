@@ -107,7 +107,7 @@ export function DOMInteractiveBlock({
             </div>
 
             {/* Execute Button */}
-            <div className="mt-4 flex justify-center">
+            <div className="mt-4 flex flex-col items-center gap-3">
               <button
                 onClick={executeCode}
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
@@ -115,6 +115,14 @@ export function DOMInteractiveBlock({
                 <Play className="w-4 h-4" />
                 Run Code & See Result
               </button>
+              
+              {/* Console Tip */}
+              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-lg border border-blue-200 dark:border-blue-800">
+                <span className="font-mono">💡</span>
+                <span>
+                  <strong>Tip:</strong> Open your browser's Developer Tools (F12) and check the Console tab to see any logging output from your code!
+                </span>
+              </div>
             </div>
           </div>
         )}

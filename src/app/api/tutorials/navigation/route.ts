@@ -1,23 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import { TutorialService } from "@/lib/tutorialService";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const tutorialId = searchParams.get("tutorialId");
+    const slug = searchParams.get("slug");
+    const categorySlug = searchParams.get("category");
+    const tutorialId = searchParams.get("tutorialId"); // Keep backward compatibility
 
-    if (!tutorialId) {
+    // Support both new slug-based and old ID-based requests
+    if (!slug && !tutorialId) {
       return NextResponse.json(
         {
           success: false,
-          error: { code: "MISSING_PARAMETER", message: "Tutorial ID is required" },
+          error: { code: "MISSING_PARAMETER", message: "Tutorial slug or ID is required" },
         },
         { status: 400 }
       );
     }
 
-    // Get the current tutorial
-    const currentTutorial = await TutorialService.getTutorialById(tutorialId);
+    let currentTutorial;
+    
+    if (slug) {
+      // Get the current tutorial by slug
+      currentTutorial = await prisma.tutorial.findUnique({
+        where: { slug },
+        include: { category: true },
+      });
+    } else {
+      // Get the current tutorial by ID (backward compatibility)
+      currentTutorial = await TutorialService.getTutorialById(tutorialId!);
+    }
+
     if (!currentTutorial) {
       return NextResponse.json(
         {
@@ -28,16 +43,40 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get all tutorials to determine navigation
-    const allTutorials = await TutorialService.getAllTutorials();
-    const sortedTutorials = allTutorials.sort((a, b) => a.order - b.order);
+    let allTutorials;
+    
+    if (categorySlug || currentTutorial.category) {
+      // Get tutorials in the same category
+      const targetCategory = categorySlug || currentTutorial.category?.slug;
+      
+      allTutorials = await prisma.tutorial.findMany({
+        where: {
+          category: {
+            slug: targetCategory,
+          },
+          published: true,
+        },
+        include: {
+          category: true,
+        },
+        orderBy: {
+          order: "asc",
+        },
+      });
+    } else {
+      // Fallback to all tutorials (backward compatibility)
+      allTutorials = await TutorialService.getAllTutorials();
+      allTutorials.sort((a, b) => a.order - b.order);
+    }
 
     // Find current tutorial index
-    const currentIndex = sortedTutorials.findIndex(t => t.id === tutorialId);
+    const currentIndex = allTutorials.findIndex(t => 
+      slug ? t.slug === slug : t.id === tutorialId
+    );
     
     // Get previous and next tutorials
-    const prevTutorial = currentIndex > 0 ? sortedTutorials[currentIndex - 1] : null;
-    const nextTutorial = currentIndex < sortedTutorials.length - 1 ? sortedTutorials[currentIndex + 1] : null;
+    const prevTutorial = currentIndex > 0 ? allTutorials[currentIndex - 1] : null;
+    const nextTutorial = currentIndex < allTutorials.length - 1 ? allTutorials[currentIndex + 1] : null;
 
     const navigationInfo = {
       current: {
@@ -50,14 +89,24 @@ export async function GET(request: NextRequest) {
         id: prevTutorial.id,
         slug: prevTutorial.slug,
         title: prevTutorial.title,
-        order: prevTutorial.order
+        order: prevTutorial.order,
+        difficulty: prevTutorial.difficulty,
+        estimatedTime: prevTutorial.estimatedTime
       } : null,
       next: nextTutorial ? {
         id: nextTutorial.id,
         slug: nextTutorial.slug,
         title: nextTutorial.title,
-        order: nextTutorial.order
-      } : null
+        order: nextTutorial.order,
+        difficulty: nextTutorial.difficulty,
+        estimatedTime: nextTutorial.estimatedTime
+      } : null,
+      category: currentTutorial.category ? {
+        slug: currentTutorial.category.slug,
+        title: currentTutorial.category.title,
+      } : null,
+      totalInCategory: allTutorials.length,
+      currentPosition: currentIndex + 1,
     };
 
     return NextResponse.json({

@@ -2,7 +2,23 @@
 
 import React, { Suspense } from "react";
 import { DynamicStudyPlan } from "@/lib/services/studyPlanService";
-import { Clock, Target, BookOpen, Award, Play, Loader2 } from "lucide-react";
+import { 
+  Clock, 
+  Target, 
+  BookOpen, 
+  Award, 
+  Play, 
+  Loader2,
+  Globe,
+  Palette,
+  Sprout,
+  MousePointer,
+  Building,
+  Zap,
+  Flame,
+  Database,
+  Circle
+} from "lucide-react";
 
 interface StudyPlanOverviewProps {
   studyPlan: DynamicStudyPlan;
@@ -11,6 +27,23 @@ interface StudyPlanOverviewProps {
   onStartStep?: (stepId: string) => void;
   navigatingStepId?: string | null;
 }
+
+// Map icon names to Lucide components
+const getPhaseIcon = (iconName: string) => {
+  const iconMap = {
+    'Globe': Globe,
+    'Palette': Palette,
+    'Sprout': Sprout,
+    'MousePointer': MousePointer,
+    'Building': Building,
+    'Zap': Zap,
+    'Flame': Flame,
+    'Database': Database,
+  };
+  
+  const IconComponent = iconMap[iconName as keyof typeof iconMap] || Circle;
+  return <IconComponent className="w-6 h-6" />;
+};
 
 // Loading skeletons for individual sections
 const HeaderSkeleton = () => (
@@ -227,7 +260,9 @@ const StudyPlanProgress = ({ studyPlan, completedSteps, onStartStep, navigatingS
           </h3>
           <div className={`bg-gradient-to-r ${currentPhase.color} rounded-lg p-4 text-white mb-4`}>
             <div className="flex items-center gap-3">
-              <span className="text-2xl">{currentPhase.icon}</span>
+              <div className="text-white">
+                {getPhaseIcon(currentPhase.icon)}
+              </div>
               <div>
                 <h4 className="font-semibold">{currentPhase.title}</h4>
                 <p className="text-sm opacity-90">{currentPhase.description}</p>

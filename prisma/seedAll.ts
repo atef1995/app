@@ -3,6 +3,7 @@ import { seedCategories } from "./seedCategories";
 import { seedTutorials } from "./seedTutorials";
 import seedHtmlTutorials from "./seedHtmlTutorials";
 import seedCssTutorials from "./seedCssTutorials";
+import { seedSkills } from "./seeds/skillSeeds";
 
 const prisma = new PrismaClient();
 
@@ -10,7 +11,10 @@ async function seedAll() {
   try {
     console.log("🚀 Starting complete database seeding...");
     
-    // First seed categories
+    // First seed skills (independent)
+    await seedSkills();
+    
+    // Then seed categories
     await seedCategories();
     
     // Then seed tutorials (which depend on categories)

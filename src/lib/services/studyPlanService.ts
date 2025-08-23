@@ -3,6 +3,7 @@ import { TutorialService } from "@/lib/tutorialService";
 import { ProjectService, ProjectWithCount } from "@/lib/projectService";
 import { ProgressService } from "@/lib/progressService";
 import { getAllChallenges, ChallengeWithTests } from "@/lib/challengeService";
+import { SkillService } from "@/lib/services/skillService";
 import { Tutorial, Category, Quiz } from "@prisma/client";
 
 // Types for tutorials with their relationships
@@ -133,10 +134,10 @@ export class StudyPlanService {
     // Phase 0: HTML Foundations (prerequisite for JavaScript)
     const htmlPhase = await this.buildPhase(
       "html-foundations",
-      "🌐 HTML Foundations",
+      "HTML Foundations",
       "Learn the building blocks of web development with HTML",
       "from-orange-400 to-red-500",
-      "🌐",
+      "Globe",
       2,
       "html",
       tutorials,
@@ -145,13 +146,28 @@ export class StudyPlanService {
       ["html", "elements", "structure", "semantic", "forms"]
     );
 
-    // Phase 1: JavaScript Fundamentals
+    // Phase 1:
+    const cssPhase = await this.buildPhase(
+      "css-foundations",
+      "CSS Foundations",
+      "Learn CSS",
+      "from-blue-400 to-purple-500",
+      "Palette",
+      2,
+      "css",
+      tutorials,
+      challenges,
+      projects,
+      ["css"]
+    );
+
+    // Phase 2: JavaScript Fundamentals
     const fundamentalPhase = await this.buildPhase(
       "foundations",
-      "🌱 JavaScript Fundamentals",
+      "JavaScript Fundamentals",
       "Master the core concepts and syntax of JavaScript",
       "from-green-400 to-blue-500",
-      "🌱",
+      "Sprout",
       4,
       "fundamentals",
       tutorials,
@@ -160,13 +176,13 @@ export class StudyPlanService {
       ["variables", "functions", "arrays", "objects", "control"]
     );
 
-    // Phase 2: DOM & Interactivity
+    // Phase 3: DOM & Interactivity
     const domPhase = await this.buildPhase(
       "dom-interactive",
-      "🎨 DOM Manipulation & Interactivity",
+      "DOM Manipulation & Interactivity",
       "Learn to make web pages interactive and dynamic",
       "from-purple-400 to-pink-500",
-      "🎨",
+      "MousePointer",
       3,
       "dom",
       tutorials,
@@ -175,13 +191,13 @@ export class StudyPlanService {
       ["dom", "event", "interactive"]
     );
 
-    // Phase 3: Object-Oriented Programming
+    // Phase 4: Object-Oriented Programming
     const oopPhase = await this.buildPhase(
       "oop-concepts",
-      "🏗️ Object-Oriented Programming",
+      "Object-Oriented Programming",
       "Master classes, inheritance, and OOP principles",
       "from-orange-400 to-red-500",
-      "🏗️",
+      "Building",
       3,
       "oop",
       tutorials,
@@ -190,13 +206,13 @@ export class StudyPlanService {
       ["class", "object", "inheritance", "encapsulation"]
     );
 
-    // Phase 4: Asynchronous Programming
+    // Phase 5: Asynchronous Programming
     const asyncPhase = await this.buildPhase(
       "async-programming",
-      "⚡ Asynchronous JavaScript",
+      "Asynchronous JavaScript",
       "Master promises, async/await, and API integration",
       "from-yellow-400 to-orange-500",
-      "⚡",
+      "Zap",
       4,
       "async",
       tutorials,
@@ -205,13 +221,13 @@ export class StudyPlanService {
       ["async", "promise", "api", "fetch"]
     );
 
-    // Phase 5: Advanced Concepts
+    // Phase 6: Advanced Concepts
     const advancedPhase = await this.buildPhase(
       "advanced-concepts",
-      "🔥 Advanced JavaScript",
+      "Advanced JavaScript",
       "Deep dive into advanced concepts and patterns",
       "from-red-400 to-purple-600",
-      "🔥",
+      "Flame",
       5,
       "advanced",
       tutorials,
@@ -220,13 +236,13 @@ export class StudyPlanService {
       ["advanced", "pattern", "performance", "testing"]
     );
 
-    // Phase 6: Data Structures & Algorithms
+    // Phase 7: Data Structures & Algorithms
     const dataStructuresPhase = await this.buildPhase(
       "data-structures",
-      "📊 Data Structures & Algorithms",
+      "Data Structures & Algorithms",
       "Master computer science fundamentals",
       "from-blue-400 to-indigo-600",
-      "📊",
+      "Database",
       4,
       "data-structures",
       tutorials,
@@ -237,6 +253,7 @@ export class StudyPlanService {
 
     return [
       htmlPhase,
+      cssPhase,
       fundamentalPhase,
       domPhase,
       oopPhase,
@@ -323,7 +340,11 @@ export class StudyPlanService {
         difficulty: this.mapDifficulty(tutorial.difficulty),
         category: tutorial.category.slug,
         prerequisites: order === 1 ? [] : [steps[steps.length - 1]?.id],
-        skills: this.extractSkills(tutorial.title, tutorial.description),
+        skills: await SkillService.extractSkillsFromContent(
+          tutorial.title,
+          tutorial.description,
+          tutorial.category.slug
+        ),
         isOptional: false,
         order: order++,
         isPremium: tutorial.isPremium,
@@ -343,7 +364,11 @@ export class StudyPlanService {
           difficulty: this.mapDifficulty(tutorial.difficulty),
           category: tutorial.category.slug,
           prerequisites: [`tutorial-${tutorial.slug}`],
-          skills: this.extractSkills(tutorial.title, tutorial.description),
+          skills: await SkillService.extractSkillsFromContent(
+            tutorial.title,
+            tutorial.description,
+            tutorial.category.slug
+          ),
           isOptional: false,
           order: order++,
           isPremium: tutorial.quiz.isPremium,
@@ -369,7 +394,11 @@ export class StudyPlanService {
           | "advanced",
         category: category,
         prerequisites: steps.length > 0 ? [steps[steps.length - 1]?.id] : [],
-        skills: this.extractSkills(challenge.title, challenge.description),
+        skills: await SkillService.extractSkillsFromContent(
+          challenge.title,
+          challenge.description,
+          category
+        ),
         isOptional: false,
         order: order++,
         isPremium: challenge.isPremium || false,
@@ -378,9 +407,8 @@ export class StudyPlanService {
     }
 
     // Phase projects (separate from steps)
-    const phaseProjectSteps = phaseProjects
-      .slice(0, 2)
-      .map((project, index) => ({
+    const phaseProjectSteps = await Promise.all(
+      phaseProjects.slice(0, 2).map(async (project, index) => ({
         id: `project-${project.slug}`,
         title: project.title,
         description: project.description || "",
@@ -391,12 +419,17 @@ export class StudyPlanService {
         difficulty: this.mapDifficulty(project.difficulty || 1),
         category: project.category || category,
         prerequisites: steps.length > 0 ? [steps[steps.length - 1]?.id] : [],
-        skills: this.extractSkills(project.title, project.description || ""),
+        skills: await SkillService.extractSkillsFromContent(
+          project.title,
+          project.description || "",
+          project.category || category
+        ),
         isOptional: false,
         order: index + 1,
         isPremium: project.isPremium || false,
         requiredPlan: project.requiredPlan || "FREE",
-      }));
+      }))
+    );
 
     return {
       id,
@@ -454,51 +487,6 @@ export class StudyPlanService {
     return (
       (baseHours[type as keyof typeof baseHours] || 3) * difficultyMultiplier
     );
-  }
-
-  /**
-   * Extract skills from title and description
-   */
-  private static extractSkills(
-    title: string,
-    description: string | null
-  ): string[] {
-    const skillKeywords = [
-      // HTML skills
-      "html",
-      "elements",
-      "tags",
-      "attributes",
-      "semantic",
-      "forms",
-      "structure",
-      // JavaScript skills
-      "variables",
-      "functions",
-      "arrays",
-      "objects",
-      "loops",
-      "conditionals",
-      "dom",
-      "events",
-      "async",
-      "promises",
-      "classes",
-      "inheritance",
-      "api",
-      "fetch",
-      "json",
-      "testing",
-      "debugging",
-      "performance",
-      "algorithms",
-      "data structures",
-      "sorting",
-      "searching",
-    ];
-
-    const text = `${title} ${description || ""}`.toLowerCase();
-    return skillKeywords.filter((skill) => text.includes(skill));
   }
 
   /**

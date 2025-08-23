@@ -210,9 +210,9 @@ HTML has six heading levels, from `<h1>` (most important) to `<h6>` (least impor
 
 ### Links and Images
 
-<HTMLPreviewWindow
+<HTMLEditorPreview
   title="Links and Images"
-  html={`<!-- External Link -->
+  initialHtml={`<!-- External Link -->
 <a href="https://example.com">Visit Example.com</a>
 
 <!-- Internal Link -->
@@ -234,9 +234,9 @@ HTML has six heading levels, from `<h1>` (most important) to `<h6>` (least impor
 
 Semantic HTML uses elements that describe their meaning, not just appearance. This improves accessibility and SEO.
 
-<HTMLPreviewWindow
+<HTMLEditorPreview
   title="Semantic Structure"
-  html={`<header style="border: 2px solid #3b82f6; padding: 16px; margin: 8px 0; background: #eff6ff;">
+  initialHtml={`<header style="border: 2px solid #3b82f6; padding: 16px; margin: 8px 0; background: #eff6ff;">
     <nav>
         <ul style="display: flex; list-style: none; gap: 16px; margin: 0; padding: 0;">
             <li><a href="#home">Home</a></li>
@@ -285,9 +285,9 @@ Semantic HTML uses elements that describe their meaning, not just appearance. Th
 
 Attributes provide additional information about elements. They're written inside the opening tag.
 
-<HTMLPreviewWindow
+<HTMLEditorPreview
   title="Common Attributes"
-  html={`<!-- Class and ID for CSS styling -->
+  initialHtml={`<!-- Class and ID for CSS styling -->
 <div class="container" id="main-content" style="border: 1px solid #e5e7eb; padding: 16px; margin: 8px 0;">
     <p class="highlight" style="background: #fef3c7; padding: 8px;">This paragraph has a class.</p>
 </div>
@@ -430,9 +430,9 @@ Use headings to create a logical document outline.
 
 Let's create a complete personal webpage:
 
-<HTMLPreviewWindow
+<HTMLEditorPreview
   title="Complete Personal Website Example"
-  html={`<header style="background: #f8fafc; padding: 20px; border-bottom: 1px solid #e2e8f0;">
+  initialHtml={`<header style="background: #f8fafc; padding: 20px; border-bottom: 1px solid #e2e8f0;">
     <h1 style="margin: 0 0 16px 0; color: #1f2937;">John Doe</h1>
     <nav>
         <ul style="display: flex; list-style: none; gap: 24px; margin: 0; padding: 0;">

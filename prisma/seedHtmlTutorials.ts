@@ -80,12 +80,32 @@ export async function seedHtmlTutorials() {
       },
     ];
 
+    // Get the HTML category
+    const htmlCategory = await prisma.category.findUnique({
+      where: { slug: "html" },
+    });
+
+    if (!htmlCategory) {
+      throw new Error("HTML category not found. Please run seedCategories first.");
+    }
+
     // Create tutorials
     for (const tutorial of htmlTutorials) {
+      const { category, ...tutorialData } = tutorial;
       const createdTutorial = await prisma.tutorial.upsert({
         where: { slug: tutorial.slug },
-        update: tutorial,
-        create: tutorial,
+        update: {
+          ...tutorialData,
+          category: {
+            connect: { id: htmlCategory.id }
+          }
+        },
+        create: {
+          ...tutorialData,
+          category: {
+            connect: { id: htmlCategory.id }
+          }
+        },
       });
 
       console.log(`✅ Created/updated tutorial: ${createdTutorial.title}`);

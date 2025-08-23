@@ -2,11 +2,6 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Eye, EyeOff, RotateCcw, Code, Play, Copy, Check } from "lucide-react";
-import Editor from "react-simple-code-editor";
-import Prism from "prismjs";
-import "prismjs/components/prism-markup";
-import "prismjs/components/prism-markup-templating";
-import "../../styles/syntax-highlighting.css";
 
 interface HTMLEditorPreviewProps {
   initialHtml: string;
@@ -29,7 +24,6 @@ export function HTMLEditorPreview({
 }: HTMLEditorPreviewProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [showEditor, setShowEditor] = useState(false);
-  const [showSyntaxHighlight, setShowSyntaxHighlight] = useState(true);
   const [html, setHtml] = useState(initialHtml);
   const [srcDoc, setSrcDoc] = useState("");
   const [forceUpdate, setForceUpdate] = useState(0);
@@ -226,15 +220,6 @@ export function HTMLEditorPreview({
     }
   }, []);
 
-  // Custom syntax highlighting function
-  const highlightCode = (code: string) => {
-    try {
-      return Prism.highlight(code, Prism.languages.markup, "markup");
-    } catch (error) {
-      console.error("Syntax highlighting error:", error);
-      return code;
-    }
-  };
 
   useEffect(() => {
     if (showEditor) {
@@ -278,29 +263,6 @@ export function HTMLEditorPreview({
               >
                 <Play className="w-4 h-4" />
               </button>
-              {showEditor && (
-                <button
-                  onClick={() => setShowSyntaxHighlight(!showSyntaxHighlight)}
-                  className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded ${
-                    showSyntaxHighlight
-                      ? "text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30"
-                      : "text-gray-600 dark:text-gray-400"
-                  }`}
-                  title={
-                    showSyntaxHighlight
-                      ? "Disable Syntax Highlighting"
-                      : "Enable Syntax Highlighting"
-                  }
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" />
-                  </svg>
-                </button>
-              )}
               <button
                 onClick={() => setShowEditor(!showEditor)}
                 className={`p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded ${
@@ -342,50 +304,21 @@ export function HTMLEditorPreview({
             <span>
               HTML Editor - Edit the code below and click Run to see changes
             </span>
-            {showSyntaxHighlight && (
-              <span className="text-blue-600 dark:text-blue-400">
-                ✨ Syntax Highlighting On
-              </span>
-            )}
           </div>
 
-          {showSyntaxHighlight ? (
-            <div className="bg-gray-900">
-              <Editor
-                value={html}
-                onValueChange={(code) => setHtml(code)}
-                highlight={highlightCode}
-                padding={16}
-                style={{
-                  fontFamily:
-                    "'Fira Code', 'Monaco', 'Cascadia Code', 'Segoe UI Mono', monospace",
-                  fontSize: "14px",
-                  lineHeight: "1.5",
-                  minHeight: "120px",
-                  backgroundColor: "#111827",
-                  color: "#f9fafb",
-                  outline: "none",
-                  border: "none",
-                }}
-                className="syntax-html-editor"
-                placeholder="Enter your HTML code here..."
-              />
-            </div>
-          ) : (
-            <textarea
-              ref={textareaRef}
-              value={html}
-              onChange={(e) => {
-                setHtml(e.target.value);
-                adjustTextareaHeight();
-              }}
-              onInput={adjustTextareaHeight}
-              className="w-full p-4 font-mono text-sm text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-900 border-none resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-              style={{ minHeight: "120px" }}
-              placeholder="Enter your HTML code here..."
-              spellCheck={false}
-            />
-          )}
+          <textarea
+            ref={textareaRef}
+            value={html}
+            onChange={(e) => {
+              setHtml(e.target.value);
+              adjustTextareaHeight();
+            }}
+            onInput={adjustTextareaHeight}
+            className="w-full p-4 font-mono text-sm text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-900 border-none resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+            style={{ minHeight: "120px" }}
+            placeholder="Enter your HTML code here..."
+            spellCheck={false}
+          />
         </div>
       )}
 

@@ -11,6 +11,7 @@ import { DOMInteractiveBlock } from "@/components/ui/DOMInteractiveBlock";
 import TableOfContents from "@/components/TableOfContents";
 import { MDXRemote } from "next-mdx-remote";
 import { useTutorial, type TutorialData } from "@/hooks/useTutorial";
+import { useTutorialNavigation } from "@/hooks/useTutorialNavigation";
 import {
   Sprout,
   Target,
@@ -51,6 +52,10 @@ export default function TutorialClient({
 
   // Use TanStack Query hook for tutorial data
   const { data: tutorial, isLoading, error, isError } = useTutorial(slug);
+
+  // Use navigation hook for prev/next tutorial navigation
+  const { data: navigationData, isLoading: isNavigationLoading } =
+    useTutorialNavigation(slug, category);
 
   // Track tutorial start when tutorial loads
   useEffect(() => {
@@ -608,27 +613,78 @@ export default function TutorialClient({
 
           {/* Tutorial Navigation */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl mt-8">
-            <div className="flex justify-between items-center">
-              <Link
-                href={`/tutorials/category/${category}`}
-                className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                <span className="text-sm">Back to {category}</span>
-              </Link>
-
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                {category} / {tutorial.slug}
+            {isNavigationLoading ? (
+              <div className="flex justify-between items-center animate-pulse">
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
               </div>
+            ) : (
+              <div className="flex justify-between items-center">
+                {/* Previous Tutorial / Back to Category */}
+                {navigationData?.data?.prev ? (
+                  <Link
+                    href={`/tutorials/category/${category}/${navigationData.data.prev.slug}`}
+                    className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors group"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <div className="text-left">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        Previous
+                      </div>
+                      <div className="text-sm font-medium group-hover:underline">
+                        {navigationData.data.prev.title.slice(0, 16) + "..."}
+                      </div>
+                    </div>
+                  </Link>
+                ) : (
+                  <Link
+                    href={`/tutorials/category/${category}`}
+                    className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span className="text-sm">Back to {category}</span>
+                  </Link>
+                )}
 
-              <Link
-                href="/practice"
-                className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-              >
-                <span className="text-sm">Practice Challenges</span>
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
+                {/* Current Progress */}
+                <div className="text-center">
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {navigationData?.data?.currentPosition || "?"} of{" "}
+                    {navigationData?.data?.totalInCategory || "?"}
+                  </div>
+                  <div className="text-xs text-gray-400 dark:text-gray-500">
+                    {navigationData?.data?.category?.title || category}
+                  </div>
+                </div>
+
+                {/* Next Tutorial / Practice Challenges */}
+                {navigationData?.data?.next ? (
+                  <Link
+                    href={`/tutorials/category/${category}/${navigationData.data.next.slug}`}
+                    className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors group"
+                  >
+                    <div className="text-right">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        Next
+                      </div>
+                      <div className="text-sm font-medium group-hover:underline">
+                        {navigationData.data.next.title.slice(0, 16) + "..."}
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4" />
+                  </Link>
+                ) : (
+                  <Link
+                    href="/practice"
+                    className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                  >
+                    <span className="text-sm">Practice Challenges</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

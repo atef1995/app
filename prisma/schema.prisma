@@ -612,3 +612,19 @@ model UserStudyProgress {
   @@unique([userId, studyPlanId])
   @@map("user_study_progress")
 }
+
+model Skill {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  category    String
+  keywords    String[]
+  iconName    String
+  level       String   @default("BEGINNER") // BEGINNER, INTERMEDIATE, ADVANCED
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("skills")
+}
