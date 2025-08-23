@@ -94,7 +94,7 @@ export function TutorialErrorFallback({ error, resetError }: { error: Error; res
           Tutorial Loading Error
         </h3>
         <p className="text-gray-600 dark:text-gray-300 mb-6">
-          We couldn't load this tutorial. This might be due to a network issue or the tutorial might be temporarily unavailable.
+          We couldn&apos;t load this tutorial. This might be due to a network issue or the tutorial might be temporarily unavailable.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-3 justify-center">

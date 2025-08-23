@@ -37,44 +37,44 @@ model Session {
 }
 
 model User {
-  id                     String              @id @default(cuid())
-  name                   String?
-  username               String?             @unique
-  email                  String              @unique
-  emailVerified          DateTime?
-  image                  String?
-  role                   String              @default("USER")
-  mood                   String              @default("CHILL")
-  subscription           String              @default("FREE")
-  subscriptionStatus     String              @default("INACTIVE")
-  subscriptionEndsAt     DateTime?
-  stripeCustomerId       String?
-  createdAt              DateTime            @default(now())
-  updatedAt              DateTime            @updatedAt
-  accounts               Account[]
-  challengeAttempts      ChallengeAttempt[]
-  challengeProgress      ChallengeProgress[]
-  challengeCodeProgress  ChallengeCodeProgress[]
-  friendRequestsReceived FriendRequest[]     @relation("FriendRequestReceiver")
-  friendRequestsSent     FriendRequest[]     @relation("FriendRequestSender")
-  friendships1           Friendship[]        @relation("User1")
-  friendships2           Friendship[]        @relation("User2")
-  notifications          Notification[]
-  payments               Payment[]
-  progress               Progress[]
-  progressShares         ProgressShare[]
-  quizAttempts           QuizAttempt[]
-  reactions              Reaction[]
-  sessions               Session[]
-  subscriptions          Subscription[]
-  tutorialProgress       TutorialProgress[]
-  achievements           UserAchievement[]
-  userSettings           UserSettings?
-  projectSubmissions     ProjectSubmission[]
-  projectReviews         ProjectReview[]
+  id                       String                    @id @default(cuid())
+  name                     String?
+  username                 String?                   @unique
+  email                    String                    @unique
+  emailVerified            DateTime?
+  image                    String?
+  mood                     String                    @default("CHILL")
+  subscription             String                    @default("FREE")
+  subscriptionStatus       String                    @default("INACTIVE")
+  subscriptionEndsAt       DateTime?
+  stripeCustomerId         String?
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  role                     String                    @default("USER")
+  accounts                 Account[]
+  challengeAttempts        ChallengeAttempt[]
+  challengeCodeProgress    ChallengeCodeProgress[]
+  challengeProgress        ChallengeProgress[]
+  friendRequestsReceived   FriendRequest[]           @relation("FriendRequestReceiver")
+  friendRequestsSent       FriendRequest[]           @relation("FriendRequestSender")
+  friendships1             Friendship[]              @relation("User1")
+  friendships2             Friendship[]              @relation("User2")
+  notifications            Notification[]
+  payments                 Payment[]
+  progress                 Progress[]
+  progressShares           ProgressShare[]
+  projectProgress          ProjectProgress[]
   projectReviewAssignments ProjectReviewAssignment[]
-  projectProgress        ProjectProgress[]
-  studyProgress          UserStudyProgress[]
+  projectReviews           ProjectReview[]
+  projectSubmissions       ProjectSubmission[]
+  quizAttempts             QuizAttempt[]
+  reactions                Reaction[]
+  sessions                 Session[]
+  subscriptions            Subscription[]
+  tutorialProgress         TutorialProgress[]
+  achievements             UserAchievement[]
+  userSettings             UserSettings?
+  studyProgress            UserStudyProgress[]
 
   @@map("users")
 }
@@ -89,23 +89,23 @@ model VerificationToken {
 }
 
 model Category {
-  id           String    @id @default(cuid())
-  slug         String    @unique
-  title        String
-  description  String
-  difficulty   String    @default("beginner") // "beginner", "intermediate", "advanced"
-  topics       String[]  // Array of topic strings
-  duration     String    // e.g., "4-6 hours"
-  iconBg       String    @default("bg-blue-100 dark:bg-blue-900")
-  iconColor    String    @default("text-blue-600 dark:text-blue-400")
-  badgeBg      String    @default("bg-blue-100 dark:bg-blue-900")
-  badgeColor   String    @default("text-blue-800 dark:text-blue-200")
-  dotColor     String    @default("bg-blue-600")
-  order        Int       @default(0)
-  published    Boolean   @default(true)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  tutorials    Tutorial[]
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  title       String
+  description String
+  difficulty  String     @default("beginner")
+  topics      String[]
+  duration    String
+  iconBg      String     @default("bg-blue-100 dark:bg-blue-900")
+  iconColor   String     @default("text-blue-600 dark:text-blue-400")
+  badgeBg     String     @default("bg-blue-100 dark:bg-blue-900")
+  badgeColor  String     @default("text-blue-800 dark:text-blue-200")
+  dotColor    String     @default("bg-blue-600")
+  order       Int        @default(0)
+  published   Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  tutorials   Tutorial[]
 
   @@map("categories")
 }
@@ -117,19 +117,19 @@ model Tutorial {
   description      String?
   content          String?
   mdxFile          String?
-  categoryId       String
   difficulty       Int                @default(1)
-  estimatedTime    Float              @default(60.0)
   order            Int
   published        Boolean            @default(false)
   isPremium        Boolean            @default(false)
   requiredPlan     String             @default("FREE")
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
-  category         Category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  estimatedTime    Float              @default(60.0)
+  categoryId       String
   progress         Progress[]
   quizzes          Quiz[]
   tutorialProgress TutorialProgress[]
+  category         Category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@map("tutorials")
 }
@@ -256,9 +256,9 @@ model Challenge {
   createdAt         DateTime                  @default(now())
   updatedAt         DateTime                  @updatedAt
   attempts          ChallengeAttempt[]
+  codeProgress      ChallengeCodeProgress[]
   moodAdaptations   ChallengeMoodAdaptation[]
   challengeProgress ChallengeProgress[]
-  codeProgress      ChallengeCodeProgress[]
   tests             ChallengeTest[]
 
   @@map("challenges")
@@ -303,15 +303,15 @@ model ChallengeAttempt {
 }
 
 model ChallengeCodeProgress {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   userId       String
   challengeId  String
   code         String
-  lastModified DateTime @default(now())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  lastModified DateTime  @default(now())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
   challenge    Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, challengeId])
   @@map("challenge_code_progress")
@@ -364,11 +364,11 @@ model UserSettings {
   allowAnalytics           Boolean  @default(true)
   dailyGoalMinutes         Int      @default(30)
   reminderTime             String   @default("18:00")
-  timezone                 String   @default("UTC")
   difficulty               String   @default("MEDIUM")
   autoSubmit               Boolean  @default(false)
   createdAt                DateTime @default(now())
   updatedAt                DateTime @updatedAt
+  timezone                 String   @default("UTC")
   user                     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_settings")
@@ -474,81 +474,80 @@ model Notification {
   @@map("notifications")
 }
 
-// Project System Models
 model Project {
-  id              String            @id @default(cuid())
-  slug            String            @unique
+  id              String              @id @default(cuid())
+  slug            String              @unique
   title           String
   description     String
-  requirements    Json              // Array of requirement objects
-  category        String            // "fundamentals", "oop", etc.
-  difficulty      Int               @default(1)
-  estimatedHours  Int               @default(4)
-  order           Int               @default(0)
-  published       Boolean           @default(false)
-  isPremium       Boolean           @default(false)
-  requiredPlan    String            @default("FREE")
-  submissionType  String            @default("CODE") // "CODE", "LINK", "FILE"
-  reviewType      String            @default("PEER") // "PEER", "INSTRUCTOR", "AUTO"
-  minReviews      Int               @default(2)
+  requirements    Json
+  category        String
+  difficulty      Int                 @default(1)
+  estimatedHours  Int                 @default(4)
+  order           Int                 @default(0)
+  published       Boolean             @default(false)
+  isPremium       Boolean             @default(false)
+  requiredPlan    String              @default("FREE")
+  submissionType  String              @default("CODE")
+  reviewType      String              @default("PEER")
+  minReviews      Int                 @default(2)
   dueDate         DateTime?
-  resources       Json?             // Array of helpful resources
-  rubric          Json?             // Grading rubric
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  submissions     ProjectSubmission[]
+  resources       Json?
+  rubric          Json?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
   projectProgress ProjectProgress[]
+  submissions     ProjectSubmission[]
 
   @@map("projects")
 }
 
 model ProjectSubmission {
-  id                String                     @id @default(cuid())
+  id                String                    @id @default(cuid())
   userId            String
   projectId         String
   title             String?
   description       String?
-  submissionUrl     String?                    // GitHub repo, CodePen, etc.
-  submissionFiles   Json?                      // File uploads metadata
-  sourceCode        String?                    // Inline code submission
-  notes             String?                    // Student notes
-  status            String                     @default("DRAFT") // "DRAFT", "SUBMITTED", "UNDER_REVIEW", "REVIEWED", "APPROVED", "NEEDS_REVISION"
+  submissionUrl     String?
+  submissionFiles   Json?
+  sourceCode        String?
+  notes             String?
+  status            String                    @default("DRAFT")
   submittedAt       DateTime?
   reviewedAt        DateTime?
-  grade             Float?                     // 0-100 score
-  isPublic          Boolean                    @default(true)
-  allowFeedback     Boolean                    @default(true)
-  createdAt         DateTime                   @default(now())
-  updatedAt         DateTime                   @updatedAt
-  project           Project                    @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  user              User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reviews           ProjectReview[]
+  grade             Float?
+  isPublic          Boolean                   @default(true)
+  allowFeedback     Boolean                   @default(true)
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
   reviewAssignments ProjectReviewAssignment[]
+  reviews           ProjectReview[]
+  project           Project                   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user              User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, projectId])
   @@map("project_submissions")
 }
 
 model ProjectReview {
-  id                String            @id @default(cuid())
-  submissionId      String
-  reviewerId        String
-  assignmentId      String?           // Links to assignment for tracking
-  type              String            @default("PEER") // "PEER", "INSTRUCTOR", "SELF"
-  status            String            @default("PENDING") // "PENDING", "IN_PROGRESS", "COMPLETED", "OVERDUE"
-  overallScore      Float?            // 0-100
-  criteriaScores    Json?             // Object with scores for each criteria
-  strengths         String?           // What was done well
-  improvements      String?           // Areas for improvement
-  suggestions       String?           // Specific suggestions
-  isConstructive    Boolean?          // Flagged by system/users
-  timeSpent         Int?              // Minutes spent reviewing
-  submittedAt       DateTime?
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  assignment        ProjectReviewAssignment? @relation(fields: [assignmentId], references: [id])
-  reviewer          User              @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
-  submission        ProjectSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  id             String                   @id @default(cuid())
+  submissionId   String
+  reviewerId     String
+  assignmentId   String?
+  type           String                   @default("PEER")
+  status         String                   @default("PENDING")
+  overallScore   Float?
+  criteriaScores Json?
+  strengths      String?
+  improvements   String?
+  suggestions    String?
+  isConstructive Boolean?
+  timeSpent      Int?
+  submittedAt    DateTime?
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+  assignment     ProjectReviewAssignment? @relation(fields: [assignmentId], references: [id])
+  reviewer       User                     @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+  submission     ProjectSubmission        @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   @@map("project_reviews")
 }
@@ -557,9 +556,9 @@ model ProjectReviewAssignment {
   id             String            @id @default(cuid())
   submissionId   String
   reviewerId     String
-  assignedBy     String            @default("SYSTEM") // "SYSTEM", user_id for manual assignment
-  priority       Int               @default(1) // Higher number = higher priority
-  status         String            @default("ASSIGNED") // "ASSIGNED", "ACCEPTED", "DECLINED", "COMPLETED", "OVERDUE"
+  assignedBy     String            @default("SYSTEM")
+  priority       Int               @default(1)
+  status         String            @default("ASSIGNED")
   dueDate        DateTime
   acceptedAt     DateTime?
   completedAt    DateTime?
@@ -594,21 +593,21 @@ model ProjectProgress {
 }
 
 model UserStudyProgress {
-  id                       String   @id @default(cuid())
-  userId                   String
-  studyPlanId              String
-  currentPhaseId           String
-  currentStepId            String
-  completedSteps           String[]
-  completedPhases          String[]
-  totalProgressPercentage  Int      @default(0)
-  hoursSpent               Float    @default(0)
-  startedAt                DateTime @default(now())
-  estimatedCompletionDate  DateTime
-  lastActivityAt           DateTime @default(now())
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
-  user                     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                      String   @id @default(cuid())
+  userId                  String
+  studyPlanId             String
+  currentPhaseId          String
+  currentStepId           String
+  completedSteps          String[]
+  completedPhases         String[]
+  totalProgressPercentage Int      @default(0)
+  hoursSpent              Float    @default(0)
+  startedAt               DateTime @default(now())
+  estimatedCompletionDate DateTime
+  lastActivityAt          DateTime @default(now())
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, studyPlanId])
   @@map("user_study_progress")
