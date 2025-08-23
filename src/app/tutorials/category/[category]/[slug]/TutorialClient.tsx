@@ -26,7 +26,9 @@ import SyntaxHighlighter from "@/components/SyntaxHighlighter";
 import { HTMLPreviewWindow } from "@/components/ui/HTMLPreviewWindow";
 import { HTMLEditorPreview } from "@/components/ui/HTMLEditorPreview";
 import { SeparatedEditorPreview } from "@/components/ui/SeparatedEditorPreview";
-
+import { useSubscription } from "@/hooks/useSubscription";
+import PremiumModal from "@/components/ui/PremiumModal";
+import { useRouter } from "next/navigation";
 interface UnlockedAchievement {
   achievement: {
     id: string;
@@ -49,7 +51,8 @@ export default function TutorialClient({
   const { data: session } = useSession();
   const toast = useToastContext();
   const [contentLoaded, setContentLoaded] = useState(false);
-
+  const { data } = useSubscription();
+  const [isOpen, setIsOpen] = useState(true);
   // Use TanStack Query hook for tutorial data
   const { data: tutorial, isLoading, error, isError } = useTutorial(slug);
 
@@ -59,6 +62,10 @@ export default function TutorialClient({
 
   // Track tutorial start when tutorial loads
   useEffect(() => {
+    if (!data?.canAccessPremium) {
+      return;
+    }
+
     if (tutorial && session?.user?.id) {
       // Mark tutorial as started for progress tracking and achievements using server action
       startTutorialAction(tutorial.id)
@@ -129,6 +136,10 @@ export default function TutorialClient({
         };
     }
   };
+
+  if (!data?.canAccessPremium && tutorial?.isPremium) {
+    return <PremiumModal isOpen={isOpen} onClose={() => setIsOpen(!isOpen)} />;
+  }
 
   // Helper function to get icon based on tutorial data
   const getTutorialIcon = (tutorial: TutorialData) => {

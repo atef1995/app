@@ -32,6 +32,7 @@ export interface TutorialData {
   meta: TutorialMeta;
   content: string;
   mdxSource: MDXRemoteSerializeResult;
+  isPremium: boolean;
   quiz?: {
     id: string;
     title: string;
@@ -60,7 +61,9 @@ const fetchTutorial = async (slug: string): Promise<TutorialData> => {
   let frontmatter = {};
 
   if (tutorialInfo.mdxFile) {
-    const mdxResponse = await fetch(`/api/tutorials/mdx?file=${tutorialInfo.mdxFile}`);
+    const mdxResponse = await fetch(
+      `/api/tutorials/mdx?file=${tutorialInfo.mdxFile}`
+    );
     if (!mdxResponse.ok) {
       throw new Error("Failed to fetch MDX content");
     }
@@ -97,6 +100,7 @@ const fetchTutorial = async (slug: string): Promise<TutorialData> => {
     content: finalContent,
     mdxSource,
     quiz: tutorialInfo.quiz,
+    isPremium: tutorialInfo.isPremium,
   };
 };
 
