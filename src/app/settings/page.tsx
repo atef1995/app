@@ -195,7 +195,7 @@ export default function SettingsPage() {
     };
 
     loadSettings();
-  }, [session, router]); // Removed settings and showError from dependency array
+  }, [session, router, currentMood.id, showError]);
 
   const handleSettingsChange = (newSettings: Partial<UserSettings>) => {
     const updatedSettings = { ...settings, ...newSettings };
@@ -278,7 +278,7 @@ export default function SettingsPage() {
       } else {
         throw new Error("Export failed");
       }
-    } catch (_error) {
+    } catch {
       showError("Export failed", "Unable to export your data at this time");
     }
   };
@@ -708,15 +708,17 @@ export default function SettingsPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label htmlFor="daily-goal" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Daily Learning Goal (minutes) *
                       </label>
                       <input
+                        id="daily-goal"
                         type="number"
                         min="5"
                         max="480"
                         step="5"
                         value={settings.learning.dailyGoal}
+                        aria-label="Daily Learning Goal in minutes"
                         onChange={(e) =>
                           handleSettingsChange({
                             learning: {
@@ -740,12 +742,14 @@ export default function SettingsPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label htmlFor="reminder-time" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Reminder Time
                       </label>
                       <input
+                        id="reminder-time"
                         type="time"
                         value={settings.learning.reminderTime}
+                        aria-label="Daily reminder time for learning"
                         onChange={(e) =>
                           handleSettingsChange({
                             learning: {
@@ -762,11 +766,13 @@ export default function SettingsPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label htmlFor="default-difficulty" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Default Difficulty
                       </label>
                       <select
+                        id="default-difficulty"
                         value={settings.learning.difficulty}
+                        aria-label="Default learning difficulty level"
                         onChange={(e) =>
                           handleSettingsChange({
                             learning: {
