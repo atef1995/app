@@ -78,7 +78,7 @@ interface TutorialAccessResult {
 }
 
 async function checkTutorialAccessLimits(
-  sessionToken: any,
+  sessionToken: { name: string; value: string } | undefined,
   pathname: string,
   req: NextRequest
 ): Promise<TutorialAccessResult> {

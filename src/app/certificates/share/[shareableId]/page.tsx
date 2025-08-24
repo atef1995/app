@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { Certificate } from "@prisma/client";
 import { Award, ExternalLink, Share } from "lucide-react";
 import CertificateCard from "@/components/ui/CertificateCard";
@@ -180,9 +181,9 @@ export default function ShareableCertificatePage() {
         <div className="text-center mt-8 text-gray-500 dark:text-gray-400">
           <p>
             Want to earn your own certificates?{" "}
-            <a href="/" className="text-blue-600 dark:text-blue-400 hover:underline">
+            <Link href="/" className="text-blue-600 dark:text-blue-400 hover:underline">
               Start learning on Vibed to Cracked
-            </a>
+            </Link>
           </p>
         </div>
       </div>

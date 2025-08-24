@@ -1,26 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Certificate, CertificateType } from "@prisma/client";
 import { Award, Trophy, Filter } from "lucide-react";
 import CertificateCard from "@/components/ui/CertificateCard";
 import { useMood } from "@/components/providers/MoodProvider";
 
-interface CertificatesPageProps {}
-
-export default function CertificatesPage({}: CertificatesPageProps) {
+export default function CertificatesPage() {
   const { data: session } = useSession();
   const { currentMood } = useMood();
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<CertificateType | "ALL">("ALL");
 
-  useEffect(() => {
-    fetchCertificates();
-  }, [filter]);
-
-  const fetchCertificates = async () => {
+  const fetchCertificates = useCallback(async () => {
     try {
       const params = new URLSearchParams();
       if (filter !== "ALL") {
@@ -38,7 +32,11 @@ export default function CertificatesPage({}: CertificatesPageProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
+
+  useEffect(() => {
+    fetchCertificates();
+  }, [fetchCertificates]);
 
   const getMoodColors = () => {
     switch (currentMood.id) {

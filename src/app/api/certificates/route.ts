@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { CertificateService } from "@/lib/certificateService";
+import { CertificateType } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
     
     const certificates = await CertificateService.getUserCertificates(
       session.user.id,
-      type as any
+      type ? (type as CertificateType) : undefined
     );
 
     return NextResponse.json({
