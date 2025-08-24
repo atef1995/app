@@ -1,3 +1,6 @@
+// This file handles /api/payments/webhook (without trailing slash)
+// Next.js will serve this for the exact path that Stripe is calling
+
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import Stripe from "stripe";
@@ -16,7 +19,7 @@ const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("🚀 Webhook endpoint called");
+    console.log("🚀 Webhook endpoint called (webhook.ts)");
     
     const body = await request.text();
     const headersList = await headers();
@@ -202,6 +205,8 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
     };
     const subscriptionEndsAt = new Date(stripeData.current_period_end * 1000);
 
+    console.log(`🔄 Updating user subscription: userId=${userId}, plan=${plan}, endsAt=${subscriptionEndsAt}`);
+
     // Update user subscription
     await SubscriptionService.updateUserSubscription(
       userId,
@@ -223,27 +228,27 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
       },
     });
 
-    console.log(`Subscription created for user ${userId}, plan ${plan}`);
+    console.log(`✅ Subscription created for user ${userId}, plan ${plan}`);
   } catch (error) {
-    console.error("Error handling subscription created:", error);
+    console.error("❌ Error handling subscription created:", error);
   }
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   try {
-    console.log("Processing subscription updated:", subscription.id);
+    console.log("🎯 Processing subscription updated:", subscription.id);
 
     const customerId = subscription.customer as string;
     const customer = await stripe.customers.retrieve(customerId);
 
     if (customer.deleted) {
-      console.error("Customer is deleted");
+      console.error("❌ Customer is deleted");
       return;
     }
 
     const userId = customer.metadata?.userId;
     if (!userId) {
-      console.error("No userId found in customer metadata");
+      console.error("❌ No userId found in customer metadata");
       return;
     }
 
@@ -306,27 +311,27 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
       },
     });
 
-    console.log(`Subscription updated for user ${userId}, status ${status}`);
+    console.log(`✅ Subscription updated for user ${userId}, status ${status}`);
   } catch (error) {
-    console.error("Error handling subscription updated:", error);
+    console.error("❌ Error handling subscription updated:", error);
   }
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   try {
-    console.log("Processing subscription deleted:", subscription.id);
+    console.log("🎯 Processing subscription deleted:", subscription.id);
 
     const customerId = subscription.customer as string;
     const customer = await stripe.customers.retrieve(customerId);
 
     if (customer.deleted) {
-      console.error("Customer is deleted");
+      console.error("❌ Customer is deleted");
       return;
     }
 
     const userId = customer.metadata?.userId;
     if (!userId) {
-      console.error("No userId found in customer metadata");
+      console.error("❌ No userId found in customer metadata");
       return;
     }
 
@@ -350,15 +355,15 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
       },
     });
 
-    console.log(`Subscription deleted for user ${userId}`);
+    console.log(`✅ Subscription deleted for user ${userId}`);
   } catch (error) {
-    console.error("Error handling subscription deleted:", error);
+    console.error("❌ Error handling subscription deleted:", error);
   }
 }
 
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
   try {
-    console.log("Processing invoice payment succeeded:", invoice.id);
+    console.log("🎯 Processing invoice payment succeeded:", invoice.id);
 
     const invoiceData = invoice as unknown as { subscription?: string };
     if (!invoiceData.subscription) {
@@ -372,13 +377,13 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     const customer = await stripe.customers.retrieve(customerId);
 
     if (customer.deleted) {
-      console.error("Customer is deleted");
+      console.error("❌ Customer is deleted");
       return;
     }
 
     const userId = customer.metadata?.userId;
     if (!userId) {
-      console.error("No userId found in customer metadata");
+      console.error("❌ No userId found in customer metadata");
       return;
     }
 
@@ -394,16 +399,16 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     });
 
     console.log(
-      `Invoice payment succeeded for user ${userId}, amount ${invoice.amount_paid}`
+      `✅ Invoice payment succeeded for user ${userId}, amount ${invoice.amount_paid}`
     );
   } catch (error) {
-    console.error("Error handling invoice payment succeeded:", error);
+    console.error("❌ Error handling invoice payment succeeded:", error);
   }
 }
 
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   try {
-    console.log("Processing invoice payment failed:", invoice.id);
+    console.log("🎯 Processing invoice payment failed:", invoice.id);
 
     const invoiceData = invoice as unknown as { subscription?: string };
     if (!invoiceData.subscription) {
@@ -417,13 +422,13 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     const customer = await stripe.customers.retrieve(customerId);
 
     if (customer.deleted) {
-      console.error("Customer is deleted");
+      console.error("❌ Customer is deleted");
       return;
     }
 
     const userId = customer.metadata?.userId;
     if (!userId) {
-      console.error("No userId found in customer metadata");
+      console.error("❌ No userId found in customer metadata");
       return;
     }
 
@@ -442,9 +447,9 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     // #TODO: Implement dunning management
 
     console.log(
-      `Invoice payment failed for user ${userId}, amount ${invoice.amount_due}`
+      `✅ Invoice payment failed for user ${userId}, amount ${invoice.amount_due}`
     );
   } catch (error) {
-    console.error("Error handling invoice payment failed:", error);
+    console.error("❌ Error handling invoice payment failed:", error);
   }
 }

@@ -46,6 +46,7 @@
     "@types/nodemailer": "^6.4.17",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@webcontainer/api": "^1.6.1",
+    "date-fns": "^4.1.0",
     "dotenv": "^17.2.0",
     "framer-motion": "^12.23.6",
     "gray-matter": "^4.0.3",

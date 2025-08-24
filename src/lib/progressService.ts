@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { ChallengeMoodAdaptation } from "@prisma/client";
 import { AchievementService } from "./achievementService";
+import { CertificateService } from "./certificateService";
 import { MoodId } from "@/types/mood";
 import { AchievementAction, AchievementMetadata } from "@/types/common";
 
@@ -178,6 +179,29 @@ export class ProgressService {
           mood: submission.ChallengeMoodAdaptation.mood as MoodId,
         },
       });
+
+      // Generate tutorial certificate
+      const tutorialCertificate = await CertificateService.generateTutorialCertificate(
+        userId,
+        submission.tutorialId,
+        {
+          score,
+          timeSpent: submission.timeSpent,
+          difficulty: 1, // Default difficulty, should be fetched from tutorial
+          quizPassed: true,
+          completionPercentage: 100
+        }
+      );
+
+      // Check if user is now eligible for category certificate
+      const tutorial = await prisma.tutorial.findUnique({
+        where: { id: submission.tutorialId },
+        select: { categoryId: true }
+      });
+      
+      if (tutorial?.categoryId) {
+        await CertificateService.generateCategoryCertificate(userId, tutorial.categoryId);
+      }
 
       // Share quiz completion to social feed if user has sharing enabled
       await this.shareQuizCompletion(userId, submission.tutorialId, score, submission.timeSpent, submission.ChallengeMoodAdaptation.mood);

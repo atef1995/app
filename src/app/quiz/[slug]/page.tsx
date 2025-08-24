@@ -125,6 +125,7 @@ export default function QuizPage({
         timeTaken={timeTaken}
         currentMoodConfig={currentMoodConfig}
         tutorialNavigation={tutorialNavigation}
+        shuffledQuestions={shuffledQuestions}
       />
     );
   }

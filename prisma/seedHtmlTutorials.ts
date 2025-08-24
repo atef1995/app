@@ -130,7 +130,7 @@ export async function seedHtmlTutorials() {
               "Home Tool Markup Language",
               "Hyperlink and Text Markup Language",
             ],
-            correctAnswer: 0,
+            correct: 0,
             explanation:
               "HTML stands for Hypertext Markup Language. It is the standard markup language used to create web pages.",
           },
@@ -139,7 +139,7 @@ export async function seedHtmlTutorials() {
             question: "Which HTML element is used for the largest heading?",
             type: "multiple-choice",
             options: ["<h6>", "<h1>", "<heading>", "<header>"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "<h1> represents the largest heading in HTML. Headings range from <h1> (largest) to <h6> (smallest).",
           },
@@ -149,7 +149,7 @@ export async function seedHtmlTutorials() {
               "What is the correct HTML element for creating a line break?",
             type: "multiple-choice",
             options: ["<break>", "<br>", "<lb>", "<newline>"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "<br> is the correct HTML element for creating a line break. It is a self-closing element.",
           },
@@ -158,7 +158,7 @@ export async function seedHtmlTutorials() {
             question: "Which attribute specifies the URL of a link?",
             type: "multiple-choice",
             options: ["src", "link", "href", "url"],
-            correctAnswer: 2,
+            correct: 2,
             explanation:
               "The href attribute specifies the URL of the page the link goes to.",
           },
@@ -173,7 +173,7 @@ export async function seedHtmlTutorials() {
               "To set the image source",
               "To add a border to the image",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The alt attribute provides alternative text for images, which is crucial for accessibility and screen readers.",
           },
@@ -182,7 +182,7 @@ export async function seedHtmlTutorials() {
             question: "Which HTML element is used to define a paragraph?",
             type: "multiple-choice",
             options: ["<paragraph>", "<p>", "<para>", "<text>"],
-            correctAnswer: 1,
+            correct: 1,
             explanation: "<p> is the HTML element used to define a paragraph.",
           },
           {
@@ -195,7 +195,7 @@ export async function seedHtmlTutorials() {
               "The largest text on the page",
               "The navigation title",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The <title> element defines the title shown in the browser tab and is also used by search engines.",
           },
@@ -204,7 +204,7 @@ export async function seedHtmlTutorials() {
             question: "Which HTML element creates an unordered list?",
             type: "multiple-choice",
             options: ["<ol>", "<ul>", "<list>", "<unordered>"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "<ul> creates an unordered (bulleted) list, while <ol> creates an ordered (numbered) list.",
           },
@@ -218,7 +218,7 @@ export async function seedHtmlTutorials() {
               '<link href="http://example.com">Link</link>',
               '<a src="http://example.com">Link</a>',
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               '<a href="URL">Link text</a> is the correct syntax for creating a hyperlink.',
           },
@@ -227,7 +227,7 @@ export async function seedHtmlTutorials() {
             question: "Which HTML element is used to display code?",
             type: "multiple-choice",
             options: ["<code>", "<script>", "<pre>", "<programming>"],
-            correctAnswer: 0,
+            correct: 0,
             explanation:
               "<code> is used to display inline code. <pre> can be used for preformatted text including code blocks.",
           },
@@ -241,7 +241,7 @@ export async function seedHtmlTutorials() {
               "To include CSS styles",
               "To create a comment",
             ],
-            correctAnswer: 0,
+            correct: 0,
             explanation:
               "DOCTYPE tells the browser which version of HTML the page is written in and ensures proper rendering.",
           },
@@ -250,7 +250,7 @@ export async function seedHtmlTutorials() {
             question: "Which element is used to group table rows?",
             type: "multiple-choice",
             options: ["<tbody>", "<tgroup>", "<rows>", "<group>"],
-            correctAnswer: 0,
+            correct: 0,
             explanation:
               "<tbody> is used to group the body content in a table, separate from <thead> and <tfoot>.",
           },
@@ -264,7 +264,7 @@ export async function seedHtmlTutorials() {
               "<!-- This is a comment -->",
               "# This is a comment",
             ],
-            correctAnswer: 2,
+            correct: 2,
             explanation:
               "<!-- comment --> is the correct syntax for HTML comments.",
           },
@@ -273,7 +273,7 @@ export async function seedHtmlTutorials() {
             question: "Which attribute makes an input field required?",
             type: "multiple-choice",
             options: ["mandatory", "required", "needed", "must"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The required attribute makes an input field mandatory before form submission.",
           },
@@ -287,7 +287,7 @@ export async function seedHtmlTutorials() {
               "The location of the website",
               "The layout direction",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The lang attribute specifies the natural language of the content, which helps browsers and screen readers.",
           },
@@ -306,7 +306,7 @@ export async function seedHtmlTutorials() {
               "Which HTTP method is typically used for form submissions that modify data?",
             type: "multiple-choice",
             options: ["GET", "POST", "PUT", "DELETE"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "POST is used for form submissions that modify server data, while GET is used for retrieving data.",
           },
@@ -321,7 +321,7 @@ export async function seedHtmlTutorials() {
               "To set the input type",
               "To validate the input",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The name attribute identifies the data when the form is submitted to the server.",
           },
@@ -330,7 +330,7 @@ export async function seedHtmlTutorials() {
             question: "Which input type provides a date picker?",
             type: "multiple-choice",
             options: ["date", "datetime", "calendar", "picker"],
-            correctAnswer: 0,
+            correct: 0,
             explanation:
               "The date input type provides a native date picker in most modern browsers.",
           },
@@ -344,7 +344,7 @@ export async function seedHtmlTutorials() {
               "Creates a label for the input",
               "Validates the input format",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "Placeholder provides hint text that disappears when the user starts typing.",
           },
@@ -353,7 +353,7 @@ export async function seedHtmlTutorials() {
             question: "Which element is used to group related form controls?",
             type: "multiple-choice",
             options: ["<group>", "<fieldset>", "<section>", "<div>"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "<fieldset> is specifically designed to group related form controls, often with a <legend>.",
           },
@@ -368,7 +368,7 @@ export async function seedHtmlTutorials() {
               "Radio buttons are for text, checkboxes for numbers",
               "There is no difference",
             ],
-            correctAnswer: 0,
+            correct: 0,
             explanation:
               "Radio buttons allow only one selection from a group, while checkboxes allow multiple selections.",
           },
@@ -377,7 +377,7 @@ export async function seedHtmlTutorials() {
             question: "Which attribute associates a label with its input?",
             type: "multiple-choice",
             options: ["name", "for", "id", "target"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The for attribute on a label should match the id attribute of its associated input.",
           },
@@ -391,7 +391,7 @@ export async function seedHtmlTutorials() {
               "Sets a default value",
               "Enables autocomplete",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The required attribute prevents form submission if the field is empty or invalid.",
           },
@@ -400,7 +400,7 @@ export async function seedHtmlTutorials() {
             question: "Which input type is best for email addresses?",
             type: "multiple-choice",
             options: ["text", "email", "mail", "address"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The email input type provides built-in validation and mobile-optimized keyboards.",
           },
@@ -414,7 +414,7 @@ export async function seedHtmlTutorials() {
               "To set the form encoding",
               "To validate the form",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The action attribute specifies the URL where the form data should be sent when submitted.",
           },
@@ -423,7 +423,7 @@ export async function seedHtmlTutorials() {
             question: "Which element creates a dropdown selection list?",
             type: "multiple-choice",
             options: ["<dropdown>", "<select>", "<list>", "<options>"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "<select> creates a dropdown list, containing <option> elements for each choice.",
           },
@@ -438,7 +438,7 @@ export async function seedHtmlTutorials() {
               "Duplicates the select element",
               "Enables keyboard navigation",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The multiple attribute allows users to select more than one option from a select list.",
           },
@@ -447,7 +447,7 @@ export async function seedHtmlTutorials() {
             question: "Which input type creates a slider control?",
             type: "multiple-choice",
             options: ["slider", "range", "number", "control"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The range input type creates a slider control for selecting values within a range.",
           },
@@ -461,7 +461,7 @@ export async function seedHtmlTutorials() {
               "To display help text",
               "To group inputs",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The legend element provides a caption or title for a fieldset, improving accessibility.",
           },
@@ -471,7 +471,7 @@ export async function seedHtmlTutorials() {
               "Which attribute specifies the accepted file types for file uploads?",
             type: "multiple-choice",
             options: ["types", "accept", "files", "formats"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The accept attribute specifies which file types are accepted for file input elements.",
           },
@@ -494,7 +494,7 @@ export async function seedHtmlTutorials() {
               "Alternative source",
               "Alternative dimensions",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The alt attribute provides alternative text that describes the image for screen readers and when images fail to load.",
           },
@@ -503,7 +503,7 @@ export async function seedHtmlTutorials() {
             question: "Which element is used to provide captions for images?",
             type: "multiple-choice",
             options: ["<caption>", "<figcaption>", "<description>", "<title>"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "<figcaption> is used within a <figure> element to provide captions for images or other content.",
           },
@@ -518,7 +518,7 @@ export async function seedHtmlTutorials() {
               "To set video quality",
               "To enable autoplay",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The poster attribute specifies an image to show before the video starts playing.",
           },
@@ -528,7 +528,7 @@ export async function seedHtmlTutorials() {
               "Which attribute makes a video play automatically when the page loads?",
             type: "multiple-choice",
             options: ["play", "auto", "autoplay", "start"],
-            correctAnswer: 2,
+            correct: 2,
             explanation:
               "The autoplay attribute makes videos start playing automatically, though most browsers require the muted attribute as well.",
           },
@@ -542,7 +542,7 @@ export async function seedHtmlTutorials() {
               "Sets image quality",
               "Enables lazy loading",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "srcset allows you to provide multiple image sources for different screen resolutions and sizes.",
           },
@@ -552,7 +552,7 @@ export async function seedHtmlTutorials() {
               "Which element is used for grouping media content with captions?",
             type: "multiple-choice",
             options: ["<media>", "<figure>", "<container>", "<wrapper>"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "<figure> is used to group media content like images with their captions using <figcaption>.",
           },
@@ -567,7 +567,7 @@ export async function seedHtmlTutorials() {
               "Allows remote control",
               "Enables keyboard shortcuts",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The controls attribute displays the browser's default playback controls for video and audio elements.",
           },
@@ -576,7 +576,7 @@ export async function seedHtmlTutorials() {
             question: "Which format is best for photographs on the web?",
             type: "multiple-choice",
             options: ["PNG", "SVG", "JPEG", "GIF"],
-            correctAnswer: 2,
+            correct: 2,
             explanation:
               "JPEG is typically best for photographs due to good compression while maintaining quality.",
           },
@@ -590,7 +590,7 @@ export async function seedHtmlTutorials() {
               "To enable progressive download",
               "To set buffer size",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The preload attribute specifies whether and how much of the media should be loaded when the page loads.",
           },
@@ -605,7 +605,7 @@ export async function seedHtmlTutorials() {
               "<alternative>",
               "<backup>",
             ],
-            correctAnswer: 0,
+            correct: 0,
             explanation:
               "Content placed inside video or audio elements serves as fallback for browsers that don't support the media.",
           },
@@ -619,7 +619,7 @@ export async function seedHtmlTutorials() {
               "Reduces image quality",
               "Enables progressive loading",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               'loading="lazy" defers loading images until they are about to enter the viewport, improving page performance.',
           },
@@ -629,7 +629,7 @@ export async function seedHtmlTutorials() {
               "Which track kind is used for subtitles in different languages?",
             type: "multiple-choice",
             options: ["captions", "subtitles", "descriptions", "chapters"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               'kind="subtitles" is used for translations of dialogue in different languages.',
           },
@@ -653,7 +653,7 @@ export async function seedHtmlTutorials() {
               "They load faster",
               "They are easier to style",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "Semantic elements provide meaning that benefits screen readers, search engines, and code maintainability.",
           },
@@ -663,7 +663,7 @@ export async function seedHtmlTutorials() {
               "Which element represents the main content of a document?",
             type: "multiple-choice",
             options: ["<content>", "<main>", "<primary>", "<body>"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "<main> represents the main content of a document, excluding navigation, sidebars, and footers.",
           },
@@ -677,7 +677,7 @@ export async function seedHtmlTutorials() {
               "At least two",
               "Zero or one",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "A page should have exactly one <main> element representing the primary content.",
           },
@@ -687,7 +687,7 @@ export async function seedHtmlTutorials() {
               "Which element is used for content that is tangentially related?",
             type: "multiple-choice",
             options: ["<sidebar>", "<aside>", "<related>", "<secondary>"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "<aside> is used for content that is related but not central to the main content.",
           },
@@ -701,7 +701,7 @@ export async function seedHtmlTutorials() {
               "News articles only",
               "The main page content",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "<article> represents self-contained content that could be distributed independently.",
           },
@@ -711,7 +711,7 @@ export async function seedHtmlTutorials() {
               "Which element groups related content with a thematic purpose?",
             type: "multiple-choice",
             options: ["<group>", "<section>", "<theme>", "<division>"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "<section> groups related content that shares a common theme or purpose.",
           },
@@ -725,7 +725,7 @@ export async function seedHtmlTutorials() {
               "To style navigation menus",
               "To create dropdown menus",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "<nav> is for major navigation sections, not every group of links.",
           },
@@ -734,7 +734,7 @@ export async function seedHtmlTutorials() {
             question: "Which element represents contact information?",
             type: "multiple-choice",
             options: ["<contact>", "<address>", "<info>", "<details>"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "<address> provides contact information for its nearest ancestor <article> or document.",
           },
@@ -748,7 +748,7 @@ export async function seedHtmlTutorials() {
               "Time zones",
               "Scheduling information",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "<time> represents dates, times, or durations in a machine-readable format.",
           },
@@ -758,7 +758,7 @@ export async function seedHtmlTutorials() {
               "Which attribute is required for the <time> element to be machine-readable?",
             type: "multiple-choice",
             options: ["date", "datetime", "time", "value"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The datetime attribute provides the machine-readable version of the time.",
           },
@@ -772,7 +772,7 @@ export async function seedHtmlTutorials() {
               "<header> is for titles, <h1> is for introductions",
               "<header> is semantic, <h1> is not",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "<header> is a container for introductory content, while <h1> is specifically the top-level heading.",
           },
@@ -786,7 +786,7 @@ export async function seedHtmlTutorials() {
               "Yes, each section can have its own header",
               "Only if they have different classes",
             ],
-            correctAnswer: 2,
+            correct: 2,
             explanation:
               "You can have multiple <header> elements - for the page, articles, sections, etc.",
           },
@@ -806,7 +806,7 @@ export async function seedHtmlTutorials() {
               "What is the minimum color contrast ratio for normal text according to WCAG?",
             type: "multiple-choice",
             options: ["3:1", "4.5:1", "7:1", "2:1"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "WCAG requires a minimum contrast ratio of 4.5:1 for normal text to meet AA standards.",
           },
@@ -820,7 +820,7 @@ export async function seedHtmlTutorials() {
               "Automated Reader Interface Access",
               "Accessible Resource Integration API",
             ],
-            correctAnswer: 0,
+            correct: 0,
             explanation:
               "ARIA stands for Accessible Rich Internet Applications, a set of attributes to enhance HTML accessibility.",
           },
@@ -835,7 +835,7 @@ export async function seedHtmlTutorials() {
               "aria-visible",
               "aria-state",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "aria-expanded indicates whether a collapsible element is currently expanded (true) or collapsed (false).",
           },
@@ -849,7 +849,7 @@ export async function seedHtmlTutorials() {
               "To skip form validation",
               "To skip advertisements",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "Skip links allow keyboard users to jump directly to the main content, bypassing navigation.",
           },
@@ -864,7 +864,7 @@ export async function seedHtmlTutorials() {
               'role="presentation"',
               'display="none"',
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               'aria-hidden="true" hides content from assistive technologies while keeping it visible.',
           },
@@ -878,7 +878,7 @@ export async function seedHtmlTutorials() {
               "Adds error styling",
               "Validates form inputs",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               'role="alert" causes screen readers to announce the content immediately when it appears or changes.',
           },
@@ -892,7 +892,7 @@ export async function seedHtmlTutorials() {
               "<button>Submit</button>",
               '<a href="#" onclick="submit()">Submit</a>',
             ],
-            correctAnswer: 2,
+            correct: 2,
             explanation:
               "Native <button> elements are automatically accessible with proper keyboard handling and semantics.",
           },
@@ -906,7 +906,7 @@ export async function seedHtmlTutorials() {
               "CSS styling labels",
               "Form validation labels",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "aria-label provides an accessible name for elements when visible labels are not appropriate.",
           },
@@ -920,7 +920,7 @@ export async function seedHtmlTutorials() {
               "h1 → h2 → h3",
               "h2 → h1 → h3",
             ],
-            correctAnswer: 2,
+            correct: 2,
             explanation:
               "Headings should follow a logical hierarchy without skipping levels: h1, then h2, then h3, etc.",
           },
@@ -934,7 +934,7 @@ export async function seedHtmlTutorials() {
               'Nothing - use empty alt=""',
               "The image dimensions",
             ],
-            correctAnswer: 2,
+            correct: 2,
             explanation:
               'Decorative images should have empty alt text (alt="") so screen readers skip them.',
           },
@@ -949,7 +949,7 @@ export async function seedHtmlTutorials() {
               "aria-labelledby",
               "aria-details",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "aria-describedby references elements that provide additional descriptive text.",
           },
@@ -963,7 +963,7 @@ export async function seedHtmlTutorials() {
               "To set the location",
               "To define language preferences",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "The lang attribute specifies the natural language of content, helping screen readers pronounce text correctly.",
           },
@@ -977,7 +977,7 @@ export async function seedHtmlTutorials() {
               "Title attributes on inputs",
               "ARIA labels on every element",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "Proper label elements provide the best accessibility and user experience for forms.",
           },
@@ -991,7 +991,7 @@ export async function seedHtmlTutorials() {
               "Reduces volume of announcements",
               "Delays all announcements",
             ],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               'aria-live="polite" announces content changes when the screen reader finishes current announcements.',
           },
@@ -1001,7 +1001,7 @@ export async function seedHtmlTutorials() {
               "Which keyboard key typically activates buttons and links?",
             type: "multiple-choice",
             options: ["Tab", "Enter/Space", "Arrow keys", "Escape"],
-            correctAnswer: 1,
+            correct: 1,
             explanation:
               "Enter and Space keys activate buttons and links, while Tab navigates between focusable elements.",
           },

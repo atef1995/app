@@ -28,7 +28,7 @@ import { HTMLEditorPreview } from "@/components/ui/HTMLEditorPreview";
 import { SeparatedEditorPreview } from "@/components/ui/SeparatedEditorPreview";
 import { useSubscription } from "@/hooks/useSubscription";
 import PremiumModal from "@/components/ui/PremiumModal";
-import { useRouter } from "next/navigation";
+
 interface UnlockedAchievement {
   achievement: {
     id: string;
@@ -62,7 +62,7 @@ export default function TutorialClient({
 
   // Track tutorial start when tutorial loads
   useEffect(() => {
-    if (!data?.canAccessPremium) {
+    if (!data?.canAccessPremium && tutorial?.isPremium) {
       return;
     }
 
@@ -608,7 +608,6 @@ export default function TutorialClient({
                       <li>• Passing Score: 70%</li>
                     </ul>
                   </div>
-
                   <Link
                     href={
                       tutorial.quiz?.slug ? `/quiz/${tutorial.quiz.slug}` : "#"

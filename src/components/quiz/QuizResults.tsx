@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { PartyPopper, ThumbsUp, Dumbbell, Star, Book } from "lucide-react";
 import { ProgressBadge } from "@/components/ProgressComponents";
-import { QuizState, TutorialNavigation } from "@/types/quiz";
+import { QuizState, TutorialNavigation, Question } from "@/types/quiz";
 import { MoodConfig } from "@/lib/moods";
 
 interface QuizResultsProps {
@@ -14,6 +14,7 @@ interface QuizResultsProps {
   timeTaken: number;
   currentMoodConfig: MoodConfig;
   tutorialNavigation: TutorialNavigation | null;
+  shuffledQuestions: Question[];
 }
 
 export function QuizResults({
@@ -24,12 +25,24 @@ export function QuizResults({
   timeTaken,
   currentMoodConfig,
   tutorialNavigation,
+  shuffledQuestions,
 }: QuizResultsProps) {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
+
+  // Find incorrect answers
+  const incorrectAnswers = shuffledQuestions
+    .map((question, index) => ({
+      question,
+      userAnswer: quizState.answers[index],
+      correctAnswer: question.correct,
+      isCorrect: quizState.answers[index] === question.correct,
+      questionNumber: index + 1,
+    }))
+    .filter((item) => !item.isCorrect && item.userAnswer !== undefined);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 select-none">
@@ -128,6 +141,57 @@ export function QuizResults({
                 </div>
               </div>
             </div>
+
+            {/* Incorrect Answers Section */}
+            {incorrectAnswers.length > 0 && (
+              <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-6">
+                <h3 className="text-lg font-semibold text-red-800 dark:text-red-300 mb-4 flex items-center gap-2">
+                  <span>📝</span>
+                  Questions You Missed ({incorrectAnswers.length})
+                </h3>
+                <div className="space-y-4 max-h-80 overflow-y-auto">
+                  {incorrectAnswers.map((item) => (
+                    <div
+                      key={item.questionNumber}
+                      className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-red-200 dark:border-red-700"
+                    >
+                      <div className="mb-3">
+                        <span className="text-sm font-medium text-red-600 dark:text-red-400">
+                          Question {item.questionNumber}
+                        </span>
+                        <p className="text-gray-900 dark:text-gray-100 font-medium mt-1">
+                          {item.question.question}
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-2">
+                          <span className="text-red-600 dark:text-red-400 font-medium min-w-fit">Your answer:</span>
+                          <span className="text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/20 px-2 py-1 rounded text-sm">
+                            {item.question.options[item.userAnswer]}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-start gap-2">
+                          <span className="text-green-600 dark:text-green-400 font-medium min-w-fit">Correct answer:</span>
+                          <span className="text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/20 px-2 py-1 rounded text-sm">
+                            {item.question.options[item.correctAnswer]}
+                          </span>
+                        </div>
+
+                        {item.question.explanation && (
+                          <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 dark:border-blue-500">
+                            <p className="text-sm text-blue-800 dark:text-blue-300">
+                              <strong>Explanation:</strong> {item.question.explanation}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="space-y-4">
               {percentage >= 70 ? (

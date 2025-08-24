@@ -99,7 +99,7 @@ const fetchTutorial = async (slug: string): Promise<TutorialData> => {
     meta: frontmatter as TutorialMeta,
     content: finalContent,
     mdxSource,
-    quiz: tutorialInfo.quiz,
+    quiz: tutorialInfo.quizzes && tutorialInfo.quizzes.length > 0 ? tutorialInfo.quizzes[0] : undefined,
     isPremium: tutorialInfo.isPremium,
   };
 };
