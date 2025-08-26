@@ -1,0 +1,1484 @@
+---
+title: "HTML Responsive Design Basics: Mobile-First Web Development"
+description: "Learn responsive design fundamentals with HTML and CSS, including viewport configuration, flexible layouts, and mobile-first development principles"
+level: "intermediate"
+estimatedTime: "65 minutes"
+topics: ["Responsive Design", "Mobile-First", "Viewport", "Flexible Layouts", "Media Queries"]
+quizQuestions: 16
+order: 10
+---
+
+# HTML Responsive Design Basics: Mobile-First Web Development
+
+Welcome to responsive web design! 📱 In today's multi-device world, your websites must work perfectly on everything from smartwatches to ultrawide monitors. Let's master the HTML foundations that make responsive design possible.
+
+## What is Responsive Design?
+
+Responsive design is an approach that makes web pages render well on all devices by using flexible layouts, images, and CSS media queries. The layout adapts to the viewing environment.
+
+<HTMLEditorPreview title="Responsive Design Principles" description="The core concepts of responsive web design:"
+initialHtml=
+{`<!-- Responsive design includes: -->
+
+1. Fluid grids (flexible layouts)
+2. Flexible images and media
+3. CSS media queries
+4. Mobile-first approach
+5. Touch-friendly interfaces
+
+<!-- Example responsive structure -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Page</title>
+</head>
+<body>
+  <header class="header">Navigation</header>
+  <main class="main-content">
+    <section class="content">Main Content</section>
+    <aside class="sidebar">Sidebar</aside>
+  </main>
+  <footer class="footer">Footer</footer>
+</body>
+</html>`}
+>
+</HTMLEditorPreview>
+
+> **📱 Mobile-First:** Design for mobile devices first, then enhance for larger screens. This ensures better performance and user experience on the devices most people use.
+
+## The Viewport Meta Tag
+
+The viewport meta tag is crucial for responsive design - it controls how your page is displayed on mobile devices.
+
+<HTMLEditorPreview title="Viewport Configuration" description="Essential viewport settings for responsive design:"
+initialHtml=
+{`<!-- Basic viewport (most common) -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Detailed viewport options -->
+<meta name="viewport" content="
+  width=device-width,     <!-- Use device's screen width -->
+  initial-scale=1.0,      <!-- Initial zoom level (1.0 = 100%) -->
+  minimum-scale=0.5,      <!-- Minimum zoom out level -->
+  maximum-scale=2.0,      <!-- Maximum zoom in level -->
+  user-scalable=yes       <!-- Allow user to zoom (default: yes) -->
+">
+
+<!-- Fixed width viewport (NOT recommended) -->
+<meta name="viewport" content="width=320">
+
+<!-- Prevent zooming (NOT recommended for accessibility) -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<!-- High DPI displays -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">`}
+>
+</HTMLEditorPreview>
+
+### Common Viewport Problems
+
+<HTMLEditorPreview title="Viewport Issues and Solutions" description="Fixing common viewport problems:"
+initialHtml=
+{`<!-- ❌ Problem: Missing viewport tag -->
+<!-- Page appears zoomed out on mobile -->
+
+<!-- ❌ Problem: Fixed width -->
+<meta name="viewport" content="width=1024">
+<!-- Creates horizontal scrolling on mobile -->
+
+<!-- ❌ Problem: Disabling zoom -->
+<meta name="viewport" content="user-scalable=no">
+<!-- Hurts accessibility - users can't zoom to read -->
+
+<!-- ✅ Solution: Proper responsive viewport -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ✅ For notched displays (iPhone X+) -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<!-- Add safe area support -->
+<style>
+  .safe-area {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+</style>`}
+>
+</HTMLEditorPreview>
+
+## Flexible Layouts with HTML
+
+### Semantic Structure for Responsiveness
+
+<HTMLEditorPreview title="Responsive HTML Structure" description="Semantic HTML that adapts well to different layouts:"
+initialHtml=
+{`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Layout</title>
+  <style>
+    /* Mobile-first CSS */
+    .container { max-width: 100%; padding: 1rem; }
+    .header { background: #333; color: white; padding: 1rem; }
+    .nav { background: #555; }
+    .main-content { display: flex; flex-direction: column; }
+    .content { flex: 1; padding: 1rem; }
+    .sidebar { padding: 1rem; background: #f5f5f5; }
+    .footer { background: #333; color: white; padding: 1rem; text-align: center; }
+    
+    /* Tablet and up */
+    @media (min-width: 768px) {
+      .container { max-width: 1200px; margin: 0 auto; }
+      .main-content { flex-direction: row; }
+      .content { flex: 2; }
+      .sidebar { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Semantic structure -->
+    <header class="header">
+      <h1>Site Title</h1>
+    </header>
+    
+    <nav class="nav" role="navigation">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/services">Services</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </nav>
+    
+    <div class="main-content">
+      <main class="content" role="main">
+        <article>
+          <h2>Main Article</h2>
+          <p>This is the primary content area that adapts to different screen sizes.</p>
+        </article>
+      </main>
+      
+      <aside class="sidebar" role="complementary">
+        <h3>Related Links</h3>
+        <ul>
+          <li><a href="/related1">Related Article 1</a></li>
+          <li><a href="/related2">Related Article 2</a></li>
+        </ul>
+      </aside>
+    </div>
+    
+    <footer class="footer" role="contentinfo">
+      <p>&copy; 2024 Your Site Name</p>
+    </footer>
+  </div>
+</body>
+</html>`}
+>
+</HTMLEditorPreview>
+
+## Responsive Images
+
+### Flexible Image Techniques
+
+<HTMLEditorPreview title="Responsive Images" description="Making images adapt to different screen sizes:"
+initialHtml=
+{`<!-- Basic responsive image -->
+<img src="image.jpg" alt="Description" style="max-width: 100%; height: auto;">
+
+<!-- Picture element for art direction -->
+<picture>
+  <!-- Large screens: wide landscape image -->
+  <source media="(min-width: 1024px)" srcset="landscape-large.jpg">
+  
+  <!-- Medium screens: standard landscape -->
+  <source media="(min-width: 768px)" srcset="landscape-medium.jpg">
+  
+  <!-- Small screens: portrait crop -->
+  <source media="(max-width: 767px)" srcset="portrait-small.jpg">
+  
+  <!-- Fallback -->
+  <img src="landscape-medium.jpg" alt="Responsive image example">
+</picture>
+
+<!-- Srcset for resolution switching -->
+<img srcset="
+  image-320w.jpg 320w,
+  image-640w.jpg 640w,
+  image-1280w.jpg 1280w
+" 
+sizes="
+  (max-width: 320px) 280px,
+  (max-width: 640px) 600px,
+  1200px
+" 
+src="image-640w.jpg" 
+alt="Resolution-adaptive image">
+
+<!-- High DPI support -->
+<img srcset="
+  image.jpg 1x,
+  image-2x.jpg 2x,
+  image-3x.jpg 3x
+" 
+src="image.jpg" 
+alt="High DPI image">
+
+<!-- Background images with CSS -->
+<style>
+.hero-image {
+  background-image: url('mobile-hero.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 50vh;
+}
+
+@media (min-width: 768px) {
+  .hero-image {
+    background-image: url('tablet-hero.jpg');
+    height: 60vh;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-image {
+    background-image: url('desktop-hero.jpg');
+    height: 70vh;
+  }
+}
+</style>
+
+<div class="hero-image" role="img" aria-label="Hero banner image"></div>`}
+>
+</HTMLEditorPreview>
+
+### Responsive Media
+
+<HTMLEditorPreview title="Responsive Video and Embedded Content" description="Making all media responsive:"
+initialHtml=
+{`<!-- Responsive video -->
+<div class="video-container">
+  <video controls>
+    <source src="video-mobile.mp4" media="(max-width: 767px)">
+    <source src="video-desktop.mp4" media="(min-width: 768px)">
+    Your browser doesn't support video.
+  </video>
+</div>
+
+<!-- Responsive embedded content (YouTube, etc.) -->
+<div class="embed-container">
+  <iframe src="https://www.youtube.com/embed/VIDEO_ID" 
+          frameborder="0" 
+          allowfullscreen
+          title="Video title">
+  </iframe>
+</div>
+
+<!-- Responsive audio -->
+<audio controls style="width: 100%;">
+  <source src="audio.mp3" type="audio/mpeg">
+  <source src="audio.ogg" type="audio/ogg">
+  Your browser doesn't support audio.
+</audio>
+
+<style>
+/* Responsive video container */
+.video-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+}
+
+.video-container video {
+  width: 100%;
+  height: auto;
+}
+
+/* Responsive embed (16:9 aspect ratio) */
+.embed-container {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.embed-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+</style>`}
+>
+</HTMLEditorPreview>
+
+## CSS Grid and Flexbox for Responsive Layouts
+
+### Flexbox Responsive Patterns
+
+<HTMLEditorPreview title="Responsive Flexbox Layouts" description="Using flexbox for responsive design:"
+initialHtml=
+{`<!-- Navigation that stacks on mobile -->
+<nav class="flex-nav">
+  <a href="/" class="logo">Logo</a>
+  <ul class="nav-links">
+    <li><a href="/about">About</a></li>
+    <li><a href="/services">Services</a></li>
+    <li><a href="/contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Card layout that reflows -->
+<div class="card-container">
+  <div class="card">
+    <h3>Card 1</h3>
+    <p>Content goes here</p>
+  </div>
+  <div class="card">
+    <h3>Card 2</h3>
+    <p>Content goes here</p>
+  </div>
+  <div class="card">
+    <h3>Card 3</h3>
+    <p>Content goes here</p>
+  </div>
+</div>
+
+<style>
+/* Responsive navigation */
+.flex-nav {
+  display: flex;
+  flex-direction: column;
+  background: #333;
+  color: white;
+}
+
+.logo {
+  padding: 1rem;
+  font-weight: bold;
+  text-decoration: none;
+  color: white;
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  padding: 1rem;
+  color: white;
+  text-decoration: none;
+  border-bottom: 1px solid #555;
+}
+
+/* Desktop navigation */
+@media (min-width: 768px) {
+  .flex-nav {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .nav-links {
+    flex-direction: row;
+    margin-left: auto;
+  }
+  
+  .nav-links a {
+    border-bottom: none;
+    border-left: 1px solid #555;
+  }
+}
+
+/* Responsive card layout */
+.card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Tablet and up: side-by-side cards */
+@media (min-width: 768px) {
+  .card-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .card {
+    flex: 1;
+    min-width: 300px;
+  }
+}
+</style>`}
+>
+</HTMLEditorPreview>
+
+### CSS Grid Responsive Patterns
+
+<HTMLEditorPreview title="Responsive CSS Grid Layouts" description="Modern grid layouts for responsive design:"
+initialHtml=
+{`<!-- Grid layout that adapts -->
+<div class="grid-layout">
+  <header class="header">Header</header>
+  <nav class="navigation">Navigation</nav>
+  <main class="main">Main Content</main>
+  <aside class="sidebar">Sidebar</aside>
+  <footer class="footer">Footer</footer>
+</div>
+
+<!-- Auto-fitting grid cards -->
+<div class="auto-grid">
+  <div class="grid-item">Item 1</div>
+  <div class="grid-item">Item 2</div>
+  <div class="grid-item">Item 3</div>
+  <div class="grid-item">Item 4</div>
+  <div class="grid-item">Item 5</div>
+  <div class="grid-item">Item 6</div>
+</div>
+
+<style>
+/* Mobile-first grid layout */
+.grid-layout {
+  display: grid;
+  grid-template-areas: 
+    "header"
+    "navigation"
+    "main"
+    "sidebar"
+    "footer";
+  gap: 1rem;
+  min-height: 100vh;
+}
+
+.header { grid-area: header; background: #333; color: white; padding: 1rem; }
+.navigation { grid-area: navigation; background: #555; color: white; padding: 1rem; }
+.main { grid-area: main; background: #f9f9f9; padding: 1rem; }
+.sidebar { grid-area: sidebar; background: #e9e9e9; padding: 1rem; }
+.footer { grid-area: footer; background: #333; color: white; padding: 1rem; }
+
+/* Tablet layout */
+@media (min-width: 768px) {
+  .grid-layout {
+    grid-template-areas: 
+      "header header"
+      "navigation navigation"
+      "main sidebar"
+      "footer footer";
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* Desktop layout */
+@media (min-width: 1024px) {
+  .grid-layout {
+    grid-template-areas: 
+      "header header header"
+      "navigation main sidebar"
+      "footer footer footer";
+    grid-template-columns: 200px 2fr 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+}
+
+/* Auto-fitting grid */
+.auto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.grid-item {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+/* Responsive grid with defined breakpoints */
+@media (max-width: 767px) {
+  .auto-grid {
+    grid-template-columns: 1fr; /* Single column on mobile */
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .auto-grid {
+    grid-template-columns: repeat(2, 1fr); /* Two columns on tablet */
+  }
+}
+
+@media (min-width: 1024px) {
+  .auto-grid {
+    grid-template-columns: repeat(3, 1fr); /* Three columns on desktop */
+  }
+}
+</style>`}
+>
+</HTMLEditorPreview>
+
+## Responsive Typography
+
+### Scalable Text and Spacing
+
+<HTMLEditorPreview title="Responsive Typography" description="Text that scales appropriately across devices:"
+initialHtml=
+{`<!-- HTML with varied content lengths -->
+<article class="responsive-article">
+  <h1>Responsive Typography</h1>
+  <h2>Subheading Example</h2>
+  <p>This paragraph demonstrates how typography should scale across different device sizes while maintaining readability and appropriate line lengths.</p>
+  
+  <blockquote>
+    "Good typography is invisible. Bad typography is everywhere."
+  </blockquote>
+  
+  <ul>
+    <li>Scalable font sizes</li>
+    <li>Appropriate line heights</li>
+    <li>Readable line lengths</li>
+    <li>Proper spacing</li>
+  </ul>
+</article>
+
+<style>
+/* Base typography (mobile-first) */
+.responsive-article {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  max-width: 100%;
+  padding: 1rem;
+  margin: 0 auto;
+}
+
+.responsive-article h1 {
+  font-size: 1.875rem; /* 30px */
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+.responsive-article h2 {
+  font-size: 1.5rem; /* 24px */
+  line-height: 1.3;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.responsive-article p {
+  margin-bottom: 1rem;
+  max-width: 65ch; /* Optimal reading length */
+}
+
+.responsive-article blockquote {
+  font-style: italic;
+  border-left: 3px solid #007bff;
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  color: #666;
+}
+
+/* Tablet typography adjustments */
+@media (min-width: 768px) {
+  .responsive-article {
+    font-size: 18px;
+    padding: 2rem;
+    max-width: 800px;
+  }
+  
+  .responsive-article h1 {
+    font-size: 2.5rem; /* 40px */
+  }
+  
+  .responsive-article h2 {
+    font-size: 2rem; /* 32px */
+  }
+}
+
+/* Desktop typography */
+@media (min-width: 1024px) {
+  .responsive-article {
+    font-size: 20px;
+    padding: 3rem;
+    max-width: 1000px;
+  }
+  
+  .responsive-article h1 {
+    font-size: 3rem; /* 48px */
+  }
+  
+  .responsive-article h2 {
+    font-size: 2.25rem; /* 36px */
+  }
+}
+
+/* Fluid typography using clamp() */
+.fluid-heading {
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  /* Minimum: 1.5rem (24px)
+     Preferred: 4% of viewport width
+     Maximum: 3rem (48px) */
+}
+
+.fluid-text {
+  font-size: clamp(0.875rem, 2.5vw, 1.25rem);
+  line-height: clamp(1.4, 1.5, 1.6);
+}
+</style>`}
+>
+</HTMLEditorPreview>
+
+## Touch-Friendly Interfaces
+
+### Mobile Interaction Considerations
+
+<HTMLEditorPreview title="Touch-Friendly Design" description="Designing for finger navigation:"
+initialHtml=
+{`<!-- Touch-friendly navigation and buttons -->
+<nav class="mobile-nav">
+  <button class="menu-toggle" aria-expanded="false" aria-controls="nav-menu">
+    <span class="hamburger">☰</span>
+    Menu
+  </button>
+  
+  <ul id="nav-menu" class="nav-menu">
+    <li><a href="/">Home</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/services">Services</a></li>
+    <li><a href="/contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Touch-friendly form elements -->
+<form class="mobile-form">
+  <div class="form-group">
+    <label for="email">Email Address</label>
+    <input type="email" id="email" name="email" required>
+  </div>
+  
+  <div class="form-group">
+    <label for="phone">Phone Number</label>
+    <input type="tel" id="phone" name="phone">
+  </div>
+  
+  <div class="form-group">
+    <label for="message">Message</label>
+    <textarea id="message" name="message" rows="4"></textarea>
+  </div>
+  
+  <button type="submit" class="submit-btn">Send Message</button>
+</form>
+
+<!-- Touch-friendly card interactions -->
+<div class="touch-cards">
+  <div class="touch-card">
+    <h3>Touch Target</h3>
+    <p>This card has proper touch target sizing.</p>
+    <a href="#" class="card-link">Learn More</a>
+  </div>
+</div>
+
+<style>
+/* Touch target guidelines (minimum 44px) */
+.menu-toggle {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 1rem;
+  min-height: 44px;
+  min-width: 44px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: none;
+}
+
+.nav-menu.open {
+  display: block;
+}
+
+.nav-menu a {
+  display: block;
+  padding: 1rem;
+  min-height: 44px;
+  text-decoration: none;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  /* Ensure touch target is large enough */
+  line-height: 1.2;
+}
+
+.nav-menu a:hover,
+.nav-menu a:focus {
+  background-color: #f5f5f5;
+}
+
+/* Mobile form styling */
+.mobile-form {
+  max-width: 100%;
+  padding: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  min-height: 44px;
+  font-size: 16px; /* Prevents zoom on iOS */
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 1rem;
+  min-height: 44px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.submit-btn:hover,
+.submit-btn:focus {
+  background: #0056b3;
+}
+
+/* Touch-friendly cards */
+.touch-cards {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.touch-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card-link {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  min-height: 44px;
+  background: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  text-align: center;
+  /* Ensure adequate touch target */
+  min-width: 120px;
+}
+
+/* Increase touch targets on small screens */
+@media (max-width: 767px) {
+  .nav-menu a,
+  .form-group input,
+  .form-group textarea,
+  .submit-btn,
+  .card-link {
+    min-height: 48px;
+  }
+}
+</style>`}
+>
+</HTMLEditorPreview>
+
+## Responsive Tables
+
+### Making Tables Mobile-Friendly
+
+<HTMLEditorPreview title="Responsive Table Techniques" description="Tables that work on mobile devices:"
+initialHtml=
+{`<!-- Responsive table with scroll -->
+<div class="table-wrapper">
+  <table class="responsive-table">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Category</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td data-label="Product">Laptop Pro</td>
+        <td data-label="Price">$1,299</td>
+        <td data-label="Stock">15</td>
+        <td data-label="Category">Electronics</td>
+        <td data-label="Actions">
+          <button class="btn-small">Edit</button>
+          <button class="btn-small">Delete</button>
+        </td>
+      </tr>
+      <tr>
+        <td data-label="Product">Wireless Mouse</td>
+        <td data-label="Price">$29</td>
+        <td data-label="Stock">50</td>
+        <td data-label="Category">Accessories</td>
+        <td data-label="Actions">
+          <button class="btn-small">Edit</button>
+          <button class="btn-small">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Card-style table for mobile -->
+<div class="card-table">
+  <div class="table-card">
+    <h3>Laptop Pro</h3>
+    <div class="card-details">
+      <span class="detail"><strong>Price:</strong> $1,299</span>
+      <span class="detail"><strong>Stock:</strong> 15</span>
+      <span class="detail"><strong>Category:</strong> Electronics</span>
+    </div>
+    <div class="card-actions">
+      <button class="btn-small">Edit</button>
+      <button class="btn-small">Delete</button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Desktop table styles */
+.table-wrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.responsive-table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  background: white;
+}
+
+.responsive-table th,
+.responsive-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.responsive-table th {
+  background: #f8f9fa;
+  font-weight: bold;
+}
+
+.btn-small {
+  padding: 0.25rem 0.5rem;
+  margin: 0 0.25rem;
+  font-size: 0.875rem;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  background: white;
+  cursor: pointer;
+}
+
+/* Mobile table transformation */
+@media (max-width: 767px) {
+  .responsive-table {
+    min-width: auto;
+  }
+  
+  .responsive-table,
+  .responsive-table thead,
+  .responsive-table tbody,
+  .responsive-table th,
+  .responsive-table td,
+  .responsive-table tr {
+    display: block;
+  }
+  
+  .responsive-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  
+  .responsive-table tr {
+    border: 1px solid #ccc;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 4px;
+    background: white;
+  }
+  
+  .responsive-table td {
+    border: none;
+    position: relative;
+    padding: 0.5rem 0 0.5rem 50%;
+    text-align: right;
+  }
+  
+  .responsive-table td:before {
+    content: attr(data-label) ": ";
+    position: absolute;
+    left: 0;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    font-weight: bold;
+    text-align: left;
+  }
+}
+
+/* Card-style table (alternative approach) */
+.card-table {
+  display: none;
+}
+
+.table-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 767px) {
+  .table-wrapper {
+    display: none; /* Hide complex table on mobile */
+  }
+  
+  .card-table {
+    display: block; /* Show card version */
+  }
+}
+</style>`}
+>
+</HTMLEditorPreview>
+
+## Performance Considerations
+
+### Responsive Performance Optimization
+
+<HTMLEditorPreview title="Performance for Mobile Devices" description="Optimizing responsive sites for performance:"
+initialHtml=
+{`<!-- Efficient image loading -->
+<img loading="lazy" 
+     srcset="small-image.jpg 480w, 
+             medium-image.jpg 768w, 
+             large-image.jpg 1200w"
+     sizes="(max-width: 480px) 440px,
+            (max-width: 768px) 720px,
+            1160px"
+     src="medium-image.jpg"
+     alt="Responsive image with lazy loading">
+
+<!-- Critical CSS inlined -->
+<style>
+/* Critical above-the-fold styles */
+.header { background: #333; color: white; padding: 1rem; }
+.hero { min-height: 50vh; display: flex; align-items: center; }
+</style>
+
+<!-- Non-critical CSS loaded asynchronously -->
+<link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="styles.css"></noscript>
+
+<!-- Resource hints for better loading -->
+<link rel="dns-prefetch" href="//fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<!-- Optimized font loading -->
+<link rel="preload" href="font.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+  @font-face {
+    font-family: 'CustomFont';
+    src: url('font.woff2') format('woff2');
+    font-display: swap; /* Improve loading experience */
+  }
+</style>
+
+<!-- Responsive JavaScript loading -->
+<script>
+  // Only load heavy scripts on larger screens
+  if (window.innerWidth > 768) {
+    const script = document.createElement('script');
+    script.src = 'desktop-features.js';
+    document.head.appendChild(script);
+  }
+  
+  // Load mobile-specific features
+  if ('ontouchstart' in window) {
+    const touchScript = document.createElement('script');
+    touchScript.src = 'touch-interactions.js';
+    document.head.appendChild(touchScript);
+  }
+</script>`}
+>
+</HTMLEditorPreview>
+
+## Testing Responsive Design
+
+### Tools and Techniques
+
+<HTMLEditorPreview title="Testing Your Responsive Design" description="Ensure your site works across all devices:"
+initialHtml=
+{`<!-- Testing checklist and tools -->
+
+1. Browser Developer Tools
+   - Chrome DevTools Device Mode
+   - Firefox Responsive Design Mode
+   - Safari Web Inspector
+
+2. Physical Device Testing
+   - iOS devices (iPhone, iPad)
+   - Android devices (various sizes)
+   - Windows tablets
+
+3. Online Testing Tools
+   - BrowserStack
+   - Responsinator
+   - Am I Responsive?
+
+4. Accessibility Testing
+   - Screen reader compatibility
+   - Keyboard navigation
+   - Color contrast
+   - Touch target sizes
+
+<!-- CSS debugging helpers -->
+<style>
+/* Debug breakpoints (remove in production) */
+.debug-breakpoints::before {
+  content: "XS";
+  position: fixed;
+  top: 0;
+  right: 0;
+  background: red;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  z-index: 9999;
+}
+
+@media (min-width: 576px) {
+  .debug-breakpoints::before { content: "SM"; background: orange; }
+}
+
+@media (min-width: 768px) {
+  .debug-breakpoints::before { content: "MD"; background: green; }
+}
+
+@media (min-width: 992px) {
+  .debug-breakpoints::before { content: "LG"; background: blue; }
+}
+
+@media (min-width: 1200px) {
+  .debug-breakpoints::before { content: "XL"; background: purple; }
+}
+
+/* Grid overlay for alignment checking */
+.debug-grid {
+  position: relative;
+}
+
+.debug-grid::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(rgba(255,0,0,0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,0,0,0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  z-index: 1000;
+}
+</style>
+
+<div class="debug-breakpoints"></div>
+
+<!-- Performance testing -->
+<script>
+  // Monitor performance on mobile
+  if ('connection' in navigator) {
+    const connection = navigator.connection;
+    console.log('Network type:', connection.effectiveType);
+    
+    if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+      // Load minimal resources for slow connections
+      console.log('Slow connection detected - loading minimal resources');
+    }
+  }
+  
+  // Test touch vs mouse
+  const hasTouch = 'ontouchstart' in window;
+  console.log('Touch support:', hasTouch);
+  
+  // Monitor viewport changes
+  window.addEventListener('resize', function() {
+    console.log('Viewport size:', window.innerWidth, 'x', window.innerHeight);
+  });
+</script>`}
+>
+</HTMLEditorPreview>
+
+## Common Responsive Patterns
+
+### Proven Layout Patterns
+
+<HTMLEditorPreview title="Responsive Design Patterns" description="Common patterns that work well:"
+initialHtml=
+{`<!-- Pattern 1: Mostly Fluid -->
+<div class="mostly-fluid">
+  <div class="content">
+    <p>Content that flows fluidly but has max-width constraints.</p>
+  </div>
+</div>
+
+<!-- Pattern 2: Column Drop -->
+<div class="column-drop">
+  <div class="primary">Primary Content</div>
+  <div class="secondary">Secondary Content</div>
+  <div class="tertiary">Tertiary Content</div>
+</div>
+
+<!-- Pattern 3: Layout Shifter -->
+<div class="layout-shifter">
+  <header class="ls-header">Header</header>
+  <main class="ls-main">Main</main>
+  <aside class="ls-sidebar">Sidebar</aside>
+  <nav class="ls-nav">Navigation</nav>
+  <footer class="ls-footer">Footer</footer>
+</div>
+
+<!-- Pattern 4: Tiny Tweaks -->
+<div class="tiny-tweaks">
+  <h1>Responsive Typography</h1>
+  <p>Small adjustments for different screen sizes.</p>
+</div>
+
+<style>
+/* Mostly Fluid Pattern */
+.mostly-fluid .content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Column Drop Pattern */
+.column-drop {
+  display: flex;
+  flex-direction: column;
+}
+
+.primary { order: 1; flex: 1; }
+.secondary { order: 2; }
+.tertiary { order: 3; }
+
+@media (min-width: 768px) {
+  .column-drop {
+    flex-direction: row;
+  }
+  .secondary,
+  .tertiary {
+    flex: 0 0 25%;
+  }
+}
+
+/* Layout Shifter Pattern */
+.layout-shifter {
+  display: grid;
+  grid-template-areas:
+    "header"
+    "nav"
+    "main"
+    "sidebar"
+    "footer";
+}
+
+.ls-header { grid-area: header; }
+.ls-nav { grid-area: nav; }
+.ls-main { grid-area: main; }
+.ls-sidebar { grid-area: sidebar; }
+.ls-footer { grid-area: footer; }
+
+@media (min-width: 768px) {
+  .layout-shifter {
+    grid-template-areas:
+      "header header"
+      "nav main"
+      "sidebar main"
+      "footer footer";
+    grid-template-columns: 200px 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .layout-shifter {
+    grid-template-areas:
+      "header header header"
+      "nav main sidebar"
+      "footer footer footer";
+    grid-template-columns: 200px 1fr 200px;
+  }
+}
+
+/* Tiny Tweaks Pattern */
+.tiny-tweaks h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.tiny-tweaks p {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+@media (min-width: 768px) {
+  .tiny-tweaks h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .tiny-tweaks p {
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+}
+</style>`}
+>
+</HTMLEditorPreview>
+
+## Accessibility in Responsive Design
+
+### Ensuring Universal Access
+
+<HTMLEditorPreview title="Responsive Accessibility" description="Making responsive sites accessible to everyone:"
+initialHtml=
+{`<!-- Accessible responsive navigation -->
+<nav class="accessible-nav" role="navigation" aria-label="Main navigation">
+  <button class="nav-toggle" 
+          aria-expanded="false" 
+          aria-controls="nav-list"
+          aria-label="Toggle navigation menu">
+    <span class="sr-only">Menu</span>
+    <span class="hamburger-icon" aria-hidden="true">☰</span>
+  </button>
+  
+  <ul id="nav-list" class="nav-list" role="menubar">
+    <li role="none">
+      <a href="/" role="menuitem" aria-current="page">Home</a>
+    </li>
+    <li role="none">
+      <a href="/about" role="menuitem">About</a>
+    </li>
+    <li role="none">
+      <a href="/contact" role="menuitem">Contact</a>
+    </li>
+  </ul>
+</nav>
+
+<!-- Accessible responsive form -->
+<form class="accessible-form" role="form" aria-label="Contact form">
+  <fieldset>
+    <legend>Contact Information</legend>
+    
+    <div class="form-row">
+      <label for="name" class="required">
+        Full Name
+        <span class="sr-only">required</span>
+      </label>
+      <input type="text" 
+             id="name" 
+             name="name" 
+             required 
+             aria-describedby="name-error"
+             autocomplete="name">
+      <div id="name-error" class="error-message" role="alert"></div>
+    </div>
+    
+    <div class="form-row">
+      <label for="email" class="required">
+        Email Address
+        <span class="sr-only">required</span>
+      </label>
+      <input type="email" 
+             id="email" 
+             name="email" 
+             required 
+             aria-describedby="email-error"
+             autocomplete="email">
+      <div id="email-error" class="error-message" role="alert"></div>
+    </div>
+  </fieldset>
+  
+  <button type="submit" class="submit-button">
+    Send Message
+    <span class="sr-only">Press Enter or Space to submit form</span>
+  </button>
+</form>
+
+<style>
+/* Screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus indicators that work on all screen sizes */
+.nav-toggle:focus,
+.nav-list a:focus,
+.accessible-form input:focus,
+.submit-button:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .nav-toggle,
+  .nav-list a,
+  .accessible-form input,
+  .submit-button {
+    border: 2px solid;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .nav-list {
+    transition: none;
+  }
+  
+  .nav-toggle .hamburger-icon {
+    animation: none;
+  }
+}
+
+/* Large text support */
+@media (min-resolution: 150dpi) {
+  .accessible-form {
+    font-size: 1.125rem;
+  }
+  
+  .nav-toggle,
+  .submit-button {
+    min-height: 48px;
+    font-size: 1.125rem;
+  }
+}
+
+/* Color scheme preferences */
+@media (prefers-color-scheme: dark) {
+  .accessible-nav,
+  .accessible-form {
+    background: #1a1a1a;
+    color: #ffffff;
+  }
+  
+  .nav-list a:focus {
+    outline-color: #ffffff;
+  }
+}
+</style>`}
+>
+</HTMLEditorPreview>
+
+## Key Takeaways
+
+✅ **Always include viewport meta tag** for proper mobile rendering
+✅ **Use mobile-first CSS** approach for better performance
+✅ **Make touch targets 44px minimum** for accessibility
+✅ **Test on real devices** not just browser dev tools
+✅ **Optimize images** with srcset and responsive techniques
+✅ **Consider performance** on slower mobile connections
+✅ **Use semantic HTML** that works without CSS
+✅ **Implement proper focus indicators** for keyboard navigation
+✅ **Test accessibility** with screen readers and keyboard only
+✅ **Monitor Core Web Vitals** for mobile user experience
+
+Responsive design is essential for modern web development. Master these techniques to create websites that work beautifully on every device! 📱💻🖥️
+
+---
+
+## Practice Exercises
+
+Try building these responsive components:
+1. **Mobile navigation menu** with hamburger toggle
+2. **Responsive image gallery** with different layouts per breakpoint
+3. **Dashboard layout** that adapts from mobile cards to desktop grid
+4. **Responsive data table** with mobile card transformation
+
+Congratulations! You've completed the HTML tutorial series. You now have a solid foundation in HTML fundamentals, from basic structure to advanced responsive design. Ready to move on to CSS and JavaScript? 🚀

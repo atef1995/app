@@ -41,8 +41,8 @@ Many countries have laws requiring digital accessibility:
 
 Semantic HTML provides meaning and structure that assistive technologies can understand:
 
-<InteractiveCodeBlock title="Semantic vs Non-Semantic HTML" description="How semantic elements improve accessibility:">
-{`<!-- ❌ Non-accessible HTML -->
+<HTMLEditorPreview title="Semantic vs Non-Semantic HTML" description="How semantic elements improve accessibility:"
+initialHtml={`<!-- ❌ Non-accessible HTML -->
 <div class="header">
     <div class="nav">
         <div onclick="navigate()">Home</div>
@@ -70,8 +70,7 @@ Semantic HTML provides meaning and structure that assistive technologies can und
         <h1>Breaking News</h1>
         <p>Article content here...</p>
     </article>
-</main>`}
-</InteractiveCodeBlock>
+</main>`}/>
 
 ### Why Semantic HTML Helps
 - **Screen readers** can navigate by headings, landmarks, and lists
@@ -83,8 +82,8 @@ Semantic HTML provides meaning and structure that assistive technologies can und
 
 Headings create a document outline that screen readers use for navigation:
 
-<InteractiveCodeBlock title="Proper Heading Hierarchy" description="Creating a logical heading structure:">
-{`<!-- ✅ Proper heading hierarchy -->
+<HTMLEditorPreview title="Proper Heading Hierarchy" description="Creating a logical heading structure:"
+initialHtml={`<!-- ✅ Proper heading hierarchy -->
 <article>
     <h1>Web Accessibility Guide</h1>
     
@@ -118,8 +117,7 @@ Headings create a document outline that screen readers use for navigation:
     <p>Content...</p>
     <h2>Implementation</h2>
     <h4>Semantic HTML</h4> <!-- Skips h3 -->
-</article>`}
-</InteractiveCodeBlock>
+</article>`}/>
 
 ### Heading Best Practices
 - **Start with h1** - Only one per page for the main title
@@ -131,8 +129,8 @@ Headings create a document outline that screen readers use for navigation:
 
 Alternative text (alt text) describes images for users who can't see them:
 
-<InteractiveCodeBlock title="Effective Alt Text" description="Writing meaningful alternative text for images:">
-{`<!-- ✅ Good alt text examples -->
+<HTMLEditorPreview title="Effective Alt Text" description="Writing meaningful alternative text for images:"
+initialHtml={`<!-- ✅ Good alt text examples -->
 
 <!-- Informative image -->
 <img src="sales-chart.png" 
@@ -177,8 +175,7 @@ Alternative text (alt text) describes images for users who can't see them:
 <a href="/download">
     <img src="button.png" alt="Green rectangular button">
     <!-- Should be: alt="Download report" -->
-</a>`}
-</InteractiveCodeBlock>
+</a>`}/>
 
 ### Alt Text Guidelines
 - **Be descriptive** but concise (aim for 125 characters or less)
@@ -191,8 +188,8 @@ Alternative text (alt text) describes images for users who can't see them:
 
 Forms are critical interaction points that must be accessible:
 
-<InteractiveCodeBlock title="Accessible Form Design" description="Creating forms that work for everyone:">
-{`<!-- ✅ Accessible form -->
+<HTMLEditorPreview title="Accessible Form Design" description="Creating forms that work for everyone:"
+initialHtml={`<!-- ✅ Accessible form -->
 <form>
     <fieldset>
         <legend>Personal Information</legend>
@@ -272,8 +269,7 @@ Forms are critical interaction points that must be accessible:
     <!-- No grouping for related fields -->
     <input type="radio" name="contact" value="email"> Email
     <input type="radio" name="contact" value="phone"> Phone
-</form>`}
-</InteractiveCodeBlock>
+</form>`}/>
 
 ### Form Accessibility Checklist
 - **Associate labels** with inputs using `for` and `id`
@@ -287,8 +283,8 @@ Forms are critical interaction points that must be accessible:
 
 ARIA attributes enhance HTML semantics for complex interfaces:
 
-<InteractiveCodeBlock title="Essential ARIA Attributes" description="Using ARIA to improve accessibility:">
-{`<!-- aria-label: Provides accessible name -->
+<HTMLEditorPreview title="Essential ARIA Attributes" description="Using ARIA to improve accessibility:"
+initialHtml={`<!-- aria-label: Provides accessible name -->
 <button aria-label="Close dialog">×</button>
 <input type="search" aria-label="Search products">
 
@@ -338,13 +334,12 @@ ARIA attributes enhance HTML semantics for complex interfaces:
         <li><a href="/products">Products</a></li>
         <li><a href="/products/laptops" aria-current="page">Laptops</a></li>
     </ol>
-</nav>`}
-</InteractiveCodeBlock>
+</nav>`}/>
 
 ### Common ARIA Patterns
 
-<InteractiveCodeBlock title="ARIA Design Patterns" description="Common interactive components with proper ARIA:">
-{`<!-- Dropdown Menu -->
+<HTMLEditorPreview title="ARIA Design Patterns" description="Common interactive components with proper ARIA:"
+initialHtml={`<!-- Dropdown Menu -->
 <div class="dropdown">
     <button aria-expanded="false" 
             aria-haspopup="true" 
@@ -413,15 +408,14 @@ ARIA attributes enhance HTML semantics for complex interfaces:
      aria-valuemax="100"
      aria-label="Upload progress">
     <div class="progress-bar" style="width: 70%"></div>
-</div>`}
-</InteractiveCodeBlock>
+</div>`}/>
 
 ## Keyboard Navigation
 
 Many users navigate with keyboards only, so all interactive elements must be keyboard accessible:
 
-<InteractiveCodeBlock title="Keyboard Accessibility" description="Ensuring proper keyboard navigation:">
-{`<!-- ✅ Keyboard accessible elements -->
+<HTMLEditorPreview title="Keyboard Accessibility" description="Ensuring proper keyboard navigation:"
+initialHtml={`<!-- ✅ Keyboard accessible elements -->
 
 <!-- Skip link for keyboard users -->
 <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -484,8 +478,7 @@ Many users navigate with keyboards only, so all interactive elements must be key
         <div onclick="selectItem()">Item 1</div>
         <div onclick="selectItem()">Item 2</div>
     </div>
-</div>`}
-</InteractiveCodeBlock>
+</div>`}/>
 
 ### Keyboard Navigation Requirements
 - **All interactive elements** must be focusable
@@ -499,8 +492,8 @@ Many users navigate with keyboards only, so all interactive elements must be key
 
 Visual design must work for users with various vision capabilities:
 
-<InteractiveCodeBlock title="Color and Contrast Guidelines" description="Ensuring content is visible to everyone:">
-{`<!-- ✅ Good contrast and color usage -->
+<HTMLEditorPreview title="Color and Contrast Guidelines" description="Ensuring content is visible to everyone:"
+initialHtml={`<!-- ✅ Good contrast and color usage -->
 <style>
 .good-contrast {
     background: #ffffff;
@@ -587,8 +580,7 @@ a:focus {
 .color-only-error {
     color: red; /* Information conveyed by color alone */
 }
-</style>`}
-</InteractiveCodeBlock>
+</style>`}/>
 
 ### Color Guidelines
 - **Normal text**: 4.5:1 contrast ratio minimum
@@ -599,8 +591,8 @@ a:focus {
 
 ## Testing for Accessibility
 
-<InteractiveCodeBlock title="Accessibility Testing Methods" description="How to test your website's accessibility:">
-{`<!-- Manual testing checklist -->
+<HTMLEditorPreview title="Accessibility Testing Methods" description="How to test your website's accessibility:"
+initialHtml={`<!-- Manual testing checklist -->
 
 <!-- 1. Keyboard navigation test -->
 <!-- Can you navigate the entire site using only Tab, Enter, Escape, and arrow keys? -->
@@ -648,8 +640,7 @@ a:focus {
         </nav>
     </footer>
 </body>
-</html>`}
-</InteractiveCodeBlock>
+</html>`}/>
 
 ### Testing Tools
 - **Automated**: WAVE, axe DevTools, Lighthouse

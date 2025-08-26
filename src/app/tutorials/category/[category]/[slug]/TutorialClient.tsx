@@ -28,6 +28,8 @@ import { HTMLEditorPreview } from "@/components/ui/HTMLEditorPreview";
 import { SeparatedEditorPreview } from "@/components/ui/SeparatedEditorPreview";
 import { useSubscription } from "@/hooks/useSubscription";
 import PremiumModal from "@/components/ui/PremiumModal";
+import getMoodColors from "@/lib/getMoodColors";
+import TutorialLoading from "./loading";
 
 interface UnlockedAchievement {
   achievement: {
@@ -105,38 +107,6 @@ export default function TutorialClient({
     }
   }, [tutorial?.mdxSource]);
 
-  const getMoodColors = () => {
-    switch (currentMood.id) {
-      case "rush":
-        return {
-          gradient:
-            "from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20",
-          border: "border-red-500",
-          text: "text-red-700 dark:text-red-300",
-          bg: "bg-red-50 dark:bg-red-900/20",
-          accent: "bg-red-600 dark:bg-red-700",
-        };
-      case "grind":
-        return {
-          gradient:
-            "from-gray-50 via-slate-50 to-blue-50 dark:from-gray-900/20 dark:via-slate-900/20 dark:to-blue-900/20",
-          border: "border-blue-500",
-          text: "text-blue-700 dark:text-blue-300",
-          bg: "bg-blue-50 dark:bg-blue-900/20",
-          accent: "bg-blue-600 dark:bg-blue-700",
-        };
-      default: // chill
-        return {
-          gradient:
-            "from-purple-50 via-pink-50 to-indigo-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-indigo-900/20",
-          border: "border-purple-500",
-          text: "text-purple-700 dark:text-purple-300",
-          bg: "bg-purple-50 dark:bg-purple-900/20",
-          accent: "bg-purple-600 dark:bg-purple-700",
-        };
-    }
-  };
-
   if (!data?.canAccessPremium && tutorial?.isPremium) {
     return <PremiumModal isOpen={isOpen} onClose={() => setIsOpen(!isOpen)} />;
   }
@@ -162,7 +132,7 @@ export default function TutorialClient({
     return <BookOpen className="w-12 h-12 text-gray-600 dark:text-gray-400" />; // default
   };
 
-  const moodColors = getMoodColors();
+  const moodColors = getMoodColors(currentMood.id);
 
   // Helper function to generate anchor IDs from text
   const generateAnchorId = (text: string): string => {
@@ -257,73 +227,7 @@ export default function TutorialClient({
   };
 
   if (isLoading) {
-    return (
-      <div className={`min-h-screen bg-gradient-to-br ${moodColors.gradient}`}>
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            {/* Tutorial Header Skeleton */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl mb-8 animate-pulse">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-                <div className="flex-1">
-                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-2"></div>
-                  <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-96 mb-2"></div>
-                  <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-64"></div>
-                  <div className="flex items-center gap-4 mt-2">
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Tutorial Content Skeleton */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl mb-8 animate-pulse">
-              <div className="space-y-4">
-                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-4/5"></div>
-
-                <div className="my-6 h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
-
-                <div className="my-6 h-20 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
-              </div>
-            </div>
-
-            {/* Quiz Section Skeleton */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl animate-pulse">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2"></div>
-                  <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-96"></div>
-                </div>
-                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-              </div>
-              <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded-lg mb-6"></div>
-              <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg w-32"></div>
-            </div>
-
-            {/* Navigation Skeleton */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl mt-8 animate-pulse">
-              <div className="flex justify-between items-center">
-                <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
-                <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-28"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <TutorialLoading />;
   }
 
   if (isError || !tutorial) {
@@ -586,7 +490,7 @@ export default function TutorialClient({
                   </div>
 
                   <div
-                    className={`p-4 rounded-lg ${moodColors.bg} border-2 ${moodColors.border} mb-6`}
+                    className={`p-4 rounded-lg ${moodColors.gradient} border-2 ${moodColors.border} mb-6`}
                   >
                     <h3 className={`font-bold mb-2 ${moodColors.text}`}>
                       {currentMood.name} Mode Quiz Settings

@@ -1,0 +1,1602 @@
+---
+title: "CSS Variables (Custom Properties)"
+description: "Learn to create maintainable, dynamic stylesheets using CSS custom properties for themes, design systems, and reusable values."
+category: "css"
+subcategory: "variables"
+order: 9
+premium: false
+estimatedTime: 70
+quizQuestions: 16
+---
+
+# CSS Variables (Custom Properties)
+
+Welcome to CSS Variables! In this tutorial, you'll learn how to use CSS custom properties to create dynamic, maintainable stylesheets with reusable values, themes, and design systems.
+
+## What are CSS Variables?
+
+CSS Variables (officially called Custom Properties) allow you to store values that can be reused throughout your stylesheet. They make your CSS more maintainable, flexible, and powerful.
+
+### Basic Syntax
+
+```css
+:root {
+  --primary-color: #3498db;
+  --font-size: 16px;
+}
+
+.button {
+  background: var(--primary-color);
+  font-size: var(--font-size);
+}
+```
+
+## Declaring CSS Variables
+
+Variables must be declared within a CSS rule and prefixed with `--`:
+
+<SeparatedEditorPreview 
+  title="Basic CSS Variables"
+  mission="Create and use basic CSS variables for consistent styling"
+  instructions="Define variables in :root and use them to style elements consistently"
+initialHtml={`
+<div class="variables-demo">
+  <div class="color-palette">
+    <div class="color-box primary">Primary Color</div>
+    <div class="color-box secondary">Secondary Color</div>
+    <div class="color-box accent">Accent Color</div>
+    <div class="color-box neutral">Neutral Color</div>
+  </div>
+  
+  <div class="typography-samples">
+    <h1 class="heading-large">Large Heading</h1>
+    <h2 class="heading-medium">Medium Heading</h2>
+    <h3 class="heading-small">Small Heading</h3>
+    <p class="body-text">This is body text using our design system variables.</p>
+  </div>
+  
+  <div class="spacing-demo">
+    <div class="box spacing-small">Small</div>
+    <div class="box spacing-medium">Medium</div>
+    <div class="box spacing-large">Large</div>
+  </div>
+</div>
+`}
+
+initialCss={`
+/* Define variables in :root for global access */
+:root {
+  /* Color variables */
+  --color-primary: #3498db;
+  --color-secondary: #2ecc71;
+  --color-accent: #e74c3c;
+  --color-neutral: #95a5a6;
+  --color-white: #ffffff;
+  --color-dark: #2c3e50;
+  
+  /* Typography variables */
+  --font-size-small: 14px;
+  --font-size-medium: 16px;
+  --font-size-large: 20px;
+  --font-size-xl: 28px;
+  --font-size-xxl: 36px;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+  
+  /* Spacing variables */
+  --spacing-xs: 8px;
+  --spacing-sm: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+  --spacing-xl: 48px;
+  
+  /* Border radius */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  
+  /* Shadow variables */
+  --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --shadow-heavy: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.variables-demo {
+  padding: var(--spacing-lg);
+  background: var(--color-white);
+  font-family: Arial, sans-serif;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-medium);
+  margin: var(--spacing-md) 0;
+}
+
+.color-palette {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xl);
+}
+
+.color-box {
+  height: 100px;
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
+  text-align: center;
+  box-shadow: var(--shadow-light);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.color-box:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-heavy);
+}
+
+.primary { background: var(--color-primary); }
+.secondary { background: var(--color-secondary); }
+.accent { background: var(--color-accent); }
+.neutral { background: var(--color-neutral); }
+
+.typography-samples {
+  margin-bottom: var(--spacing-xl);
+}
+
+.heading-large {
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-dark);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.heading-medium {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-dark);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.heading-small {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-dark);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.body-text {
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-dark);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.spacing-demo {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.box {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-radius: var(--border-radius-md);
+  font-weight: var(--font-weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+  height: 60px;
+}
+
+.spacing-small { padding: var(--spacing-xs); }
+.spacing-medium { padding: var(--spacing-md); }
+.spacing-large { padding: var(--spacing-xl); }
+`}/>
+
+📚 **How This Demo Works:**
+This example demonstrates the foundation of CSS Variables - defining them in **`:root`** (global scope) and using them with the **`var()`** function. Notice how the **`--color-primary`** variable is consistently used across multiple elements, creating a unified color scheme. The **`:root`** selector gives variables the highest scope, making them accessible everywhere in your stylesheet.
+
+🎯 **Try This Challenge:**
+1. Change the **`--color-primary`** value from `#3498db` to `#e74c3c` (red) and watch how all primary-colored elements update instantly
+2. Add a new variable **`--border-radius-xl: 20px;`** and apply it to the **`.variables-demo`** class using **`border-radius: var(--border-radius-xl);`**
+3. Create a new color variable **`--color-highlight: #f39c12;`** and use it as the background for **`.box:hover`** state
+
+## Variable Scope and Inheritance
+
+CSS variables follow the cascade and can be scoped to specific elements:
+
+<SeparatedEditorPreview 
+  title="Variable Scope and Inheritance"
+  mission="Understand how CSS variables inherit and can be scoped"
+  instructions="See how variables cascade down and can be overridden in specific contexts"
+initialHtml={`
+<div class="scope-demo">
+  <div class="global-section">
+    <h3>Global Variables</h3>
+    <p class="text-sample">This text uses global variables.</p>
+    <button class="btn">Global Button</button>
+  </div>
+  
+  <div class="themed-section dark-theme">
+    <h3>Dark Theme Section</h3>
+    <p class="text-sample">This section overrides variables for a dark theme.</p>
+    <button class="btn">Dark Theme Button</button>
+    
+    <div class="nested-section">
+      <p class="text-sample">Nested content inherits theme variables.</p>
+      <button class="btn special">Special Button</button>
+    </div>
+  </div>
+  
+  <div class="themed-section light-theme">
+    <h3>Light Theme Section</h3>
+    <p class="text-sample">This section uses a light theme override.</p>
+    <button class="btn">Light Theme Button</button>
+  </div>
+</div>
+`}
+
+initialCss={`
+/* Global variables */
+:root {
+  --bg-color: #f8f9fa;
+  --text-color: #2c3e50;
+  --primary-color: #3498db;
+  --secondary-color: #ecf0f1;
+  --border-color: #bdc3c7;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --padding: 20px;
+  --border-radius: 8px;
+  --transition: all 0.3s ease;
+}
+
+.scope-demo {
+  padding: var(--padding);
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-family: Arial, sans-serif;
+  border-radius: var(--border-radius);
+}
+
+/* Dark theme overrides variables */
+.dark-theme {
+  --bg-color: #2c3e50;
+  --text-color: #ecf0f1;
+  --primary-color: #e74c3c;
+  --secondary-color: #34495e;
+  --border-color: #7f8c8d;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Light theme overrides */
+.light-theme {
+  --bg-color: #ffffff;
+  --text-color: #2c3e50;
+  --primary-color: #27ae60;
+  --secondary-color: #f8f9fa;
+  --border-color: #ddd;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.global-section,
+.themed-section {
+  margin: 20px 0;
+  padding: var(--padding);
+  background: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.nested-section {
+  margin-top: 15px;
+  padding: 15px;
+  background: var(--secondary-color);
+  border-radius: calc(var(--border-radius) / 2);
+  border: 1px dashed var(--border-color);
+}
+
+.text-sample {
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+.btn {
+  background: var(--primary-color);
+  color: var(--bg-color);
+  border: 2px solid var(--primary-color);
+  padding: 10px 20px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: bold;
+  transition: var(--transition);
+  margin: 5px;
+}
+
+.btn:hover {
+  background: var(--bg-color);
+  color: var(--primary-color);
+}
+
+/* Local variable override for special button */
+.btn.special {
+  --primary-color: #f39c12;
+  --bg-color: #fff;
+}
+
+/* Variables can be calculated */
+.themed-section {
+  border-width: calc(var(--padding) / 10);
+}
+`}/>
+
+📚 **How This Demo Works:**
+This example shows CSS Variables' **inheritance and scope** - how variables cascade down to child elements and can be **overridden locally**. The **`.dark-theme`** and **`.light-theme`** classes redefine the same variable names, creating contextual theming. Notice how the **`.btn.special`** button locally overrides **`--primary-color`** to `#f39c12`, affecting only that specific element.
+
+🎯 **Try This Challenge:**
+1. Add a new theme class **`.blue-theme`** that sets **`--primary-color: #3498db`** and **`--bg-color: #ecf0f1`**
+2. In the **`.nested-section`**, override the **`--text-color`** variable to `#e67e22` to see how nested scoping works
+3. Create a **`.btn.danger`** variant that locally sets **`--primary-color: #e74c3c`** and apply it to one of the buttons
+
+## Dynamic Theme Switching
+
+Use CSS variables to create dynamic themes that can be switched with JavaScript:
+
+<SeparatedEditorPreview 
+  title="Dynamic Theme System"
+  mission="Create a theme switching system using CSS variables"
+  instructions="Toggle between different themes using JavaScript and CSS variables"
+initialHtml={`
+<div class="theme-switcher-demo" id="themeSwitcher">
+  <header class="demo-header">
+    <h2>Dynamic Theme System</h2>
+    <div class="theme-controls">
+      <button onclick="setTheme('default')" class="theme-btn">Default</button>
+      <button onclick="setTheme('dark')" class="theme-btn">Dark</button>
+      <button onclick="setTheme('neon')" class="theme-btn">Neon</button>
+      <button onclick="setTheme('nature')" class="theme-btn">Nature</button>
+    </div>
+  </header>
+  
+  <main class="demo-content">
+    <div class="card">
+      <h3>Welcome Card</h3>
+      <p>This card adapts to different themes using CSS variables.</p>
+      <button class="action-btn">Take Action</button>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">1,234</div>
+        <div class="stat-label">Users</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">5,678</div>
+        <div class="stat-label">Views</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">90%</div>
+        <div class="stat-label">Success</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+function setTheme(themeName) {
+  const element = document.getElementById('themeSwitcher');
+  element.setAttribute('data-theme', themeName);
+}
+
+// Set default theme
+document.addEventListener('DOMContentLoaded', function() {
+  setTheme('default');
+});
+</script>
+`}
+
+initialCss={`
+/* Base theme variables */
+.theme-switcher-demo {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --accent-primary: #3498db;
+  --accent-secondary: #2980b9;
+  --border-color: #dee2e6;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --success-color: #27ae60;
+  --warning-color: #f39c12;
+  --danger-color: #e74c3c;
+  
+  /* Spacing and sizing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+  --border-radius: 0.5rem;
+  --transition-speed: 0.3s;
+}
+
+/* Dark theme */
+.theme-switcher-demo[data-theme="dark"] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --accent-primary: #64b5f6;
+  --accent-secondary: #42a5f5;
+  --border-color: #404040;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Neon theme */
+.theme-switcher-demo[data-theme="neon"] {
+  --bg-primary: #0d0d0d;
+  --bg-secondary: #1a1a2e;
+  --text-primary: #00ff41;
+  --text-secondary: #00d4aa;
+  --accent-primary: #ff0080;
+  --accent-secondary: #e6006b;
+  --border-color: #00ff41;
+  --shadow-color: rgba(0, 255, 65, 0.3);
+  --success-color: #00ff41;
+  --warning-color: #ffff00;
+  --danger-color: #ff0080;
+}
+
+/* Nature theme */
+.theme-switcher-demo[data-theme="nature"] {
+  --bg-primary: #f0f8e8;
+  --bg-secondary: #e8f5e8;
+  --text-primary: #2d5016;
+  --text-secondary: #5d7c47;
+  --accent-primary: #6ba042;
+  --accent-secondary: #5a8f35;
+  --border-color: #a8d982;
+  --shadow-color: rgba(107, 160, 66, 0.2);
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --danger-color: #f44336;
+}
+
+/* Layout styles using variables */
+.theme-switcher-demo {
+  min-height: 400px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  transition: all var(--transition-speed) ease;
+  box-shadow: 0 4px 20px var(--shadow-color);
+}
+
+.demo-header {
+  background: var(--bg-secondary);
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.demo-header h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+}
+
+.theme-controls {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.theme-btn {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  border: 2px solid var(--accent-primary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: calc(var(--border-radius) / 2);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all var(--transition-speed) ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.theme-btn:hover {
+  background: var(--bg-primary);
+  color: var(--accent-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.demo-content {
+  padding: var(--spacing-lg);
+}
+
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: 0 2px 8px var(--shadow-color);
+  transition: all var(--transition-speed) ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px var(--shadow-color);
+}
+
+.card h3 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+}
+
+.card p {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.action-btn {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all var(--transition-speed) ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.action-btn:hover {
+  background: var(--accent-secondary);
+  transform: scale(1.05);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.stat-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  text-align: center;
+  transition: all var(--transition-speed) ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  transition: transform var(--transition-speed) ease;
+  transform: translateX(-100%);
+}
+
+.stat-card:hover::before {
+  transform: translateX(0);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .demo-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+`}/>
+
+📚 **How This Demo Works:**
+This demonstrates **dynamic theming** using **`data-theme`** attributes and CSS Variables. The JavaScript **`setTheme()`** function changes the **`data-theme`** attribute, which triggers different CSS variable definitions. Each theme (default, dark, neon, nature) completely redefines the color palette while keeping the same variable names, creating seamless theme switching.
+
+🎯 **Try This Challenge:**
+1. Create a new **"sunset"** theme by adding **`[data-theme="sunset"]`** with warm colors: **`--accent-primary: #ff6b35`**, **`--bg-primary: #fff3e0`**
+2. Add the sunset theme button to the HTML: **`<button onclick="setTheme('sunset')" class="theme-btn">Sunset</button>`**
+3. Modify the **`--transition-speed`** variable to `0.5s` to make theme changes more dramatic and noticeable
+
+## Fallback Values
+
+CSS variables support fallback values in case a variable is undefined:
+
+<SeparatedEditorPreview 
+  title="CSS Variable Fallbacks"
+  mission="Learn how to provide fallback values for CSS variables"
+  instructions="See how fallback values work when variables are undefined or invalid"
+initialHtml={`
+<div class="fallback-demo">
+  <h3>CSS Variable Fallbacks</h3>
+  
+  <div class="example-cards">
+    <div class="card defined-vars">
+      <h4>Defined Variables</h4>
+      <p>This card uses defined CSS variables for styling.</p>
+    </div>
+    
+    <div class="card undefined-vars">
+      <h4>Undefined Variables</h4>
+      <p>This card uses undefined variables, so fallbacks are applied.</p>
+    </div>
+    
+    <div class="card nested-fallbacks">
+      <h4>Nested Fallbacks</h4>
+      <p>This card demonstrates multiple fallback levels.</p>
+    </div>
+    
+    <div class="card computed-fallbacks">
+      <h4>Computed Fallbacks</h4>
+      <p>This card uses calculated fallback values.</p>
+    </div>
+  </div>
+</div>
+`}
+
+initialCss={`
+/* Define some variables, but not others */
+.fallback-demo {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --base-padding: 20px;
+  /* Note: --undefined-color is not defined */
+  /* Note: --undefined-spacing is not defined */
+  
+  padding: var(--base-padding);
+  background: #f8f9fa;
+  font-family: Arial, sans-serif;
+  border-radius: 12px;
+}
+
+.example-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.card {
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card h4 {
+  margin: 0 0 15px 0;
+  font-size: 18px;
+}
+
+.card p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Card with defined variables */
+.defined-vars {
+  background: var(--primary-color, #ff0000);
+  color: white;
+  border: 2px solid var(--secondary-color, #ff0000);
+}
+
+/* Card with undefined variables - fallbacks will be used */
+.undefined-vars {
+  background: var(--undefined-color, #e74c3c);
+  color: white;
+  border: 2px solid var(--undefined-border, #c0392b);
+  padding: var(--undefined-spacing, 25px);
+}
+
+/* Card with nested fallbacks - first fallback is also undefined */
+.nested-fallbacks {
+  background: var(--undefined-primary, var(--also-undefined, #9b59b6));
+  color: white;
+  border: 2px solid var(--undefined-border, var(--secondary-color, #8e44ad));
+  /* Multiple fallbacks: first tries --undefined-spacing, then --base-padding, then 30px */
+  padding: var(--undefined-spacing, var(--base-padding, 30px));
+}
+
+/* Card with computed fallbacks */
+.computed-fallbacks {
+  background: var(--undefined-bg, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  color: white;
+  /* Fallback with calculation */
+  padding: var(--undefined-padding, calc(var(--base-padding) + 10px));
+  /* Fallback with CSS function */
+  border: var(--undefined-border-width, max(2px, 0.1em)) solid var(--undefined-border-color, rgba(255, 255, 255, 0.3));
+  /* Fallback with complex value */
+  box-shadow: var(--undefined-shadow, 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1));
+}
+
+/* Demonstrate inheritance with fallbacks */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--accent-stripe, var(--primary-color, #3498db));
+  border-radius: 8px 8px 0 0;
+}
+
+.card {
+  position: relative;
+}
+
+/* Show different fallback scenarios */
+.defined-vars::after {
+  content: '✓ Variables defined';
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 12px;
+  opacity: 0.8;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.undefined-vars::after {
+  content: '⚠ Using fallbacks';
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 12px;
+  opacity: 0.8;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.nested-fallbacks::after {
+  content: '🔄 Nested fallbacks';
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 12px;
+  opacity: 0.8;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.computed-fallbacks::after {
+  content: '📐 Computed fallbacks';
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 12px;
+  opacity: 0.8;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+`}/>
+
+📚 **How This Demo Works:**
+This example demonstrates CSS Variables **fallback values** using the **`var(--variable-name, fallback-value)`** syntax. The **`.undefined-vars`** card uses variables that don't exist, so the fallback values are applied. The **`.nested-fallbacks`** card shows **multiple fallback levels** - if the first variable is undefined, it tries the second, then the third.
+
+🎯 **Try This Challenge:**
+1. In the **`.undefined-vars`** card, change the fallback color from `#e74c3c` to `#9b59b6` in **`var(--undefined-color, #9b59b6)`**
+2. Create a new variable **`--custom-spacing: 40px;`** in the **`:root`** and use it as a fallback: **`padding: var(--undefined-padding, var(--custom-spacing, 20px));`**
+3. Add a **`.test-card`** that uses **`var(--non-existent-bg, linear-gradient(45deg, #ff6b6b, #4ecdc4))`** as its background
+
+## Advanced Variable Techniques
+
+### Using calc() with Variables
+
+<SeparatedEditorPreview 
+  title="CSS Variables with calc()"
+  mission="Combine CSS variables with calc() for dynamic calculations"
+  instructions="Create flexible layouts using variables and mathematical calculations"
+initialHtml={`
+<div class="calc-demo">
+  <h3>CSS Variables + calc() = Powerful Layouts</h3>
+  
+  <div class="responsive-grid">
+    <div class="grid-item">
+      <h4>Dynamic Sizing</h4>
+      <p>Width calculated from base unit</p>
+    </div>
+    <div class="grid-item">
+      <h4>Responsive Spacing</h4>
+      <p>Padding scales with screen size</p>
+    </div>
+    <div class="grid-item">
+      <h4>Fluid Typography</h4>
+      <p>Font size adapts smoothly</p>
+    </div>
+  </div>
+  
+  <div class="progress-bars">
+    <div class="progress-bar">
+      <div class="progress-fill" style="--progress: 75;">75%</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="--progress: 90;">90%</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="--progress: 45;">45%</div>
+    </div>
+  </div>
+  
+  <div class="scaling-elements">
+    <div class="scalable-box" style="--scale-factor: 1;">Normal</div>
+    <div class="scalable-box" style="--scale-factor: 1.2;">120%</div>
+    <div class="scalable-box" style="--scale-factor: 1.5;">150%</div>
+    <div class="scalable-box" style="--scale-factor: 0.8;">80%</div>
+  </div>
+</div>
+`}
+
+initialCss={`
+.calc-demo {
+  --base-unit: 20px;
+  --golden-ratio: 1.618;
+  --container-width: 800px;
+  --gutter: calc(var(--base-unit) * 1.5);
+  --border-width: 2px;
+  --border-radius: calc(var(--base-unit) / 4);
+  
+  padding: var(--base-unit);
+  background: #f8f9fa;
+  font-family: Arial, sans-serif;
+  border-radius: calc(var(--border-radius) * 2);
+  max-width: var(--container-width);
+  margin: 0 auto;
+}
+
+.calc-demo h3 {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: calc(var(--base-unit) * 2);
+  font-size: calc(var(--base-unit) * var(--golden-ratio));
+}
+
+/* Responsive grid with calculated dimensions */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(calc(var(--container-width) / 4), 1fr));
+  gap: var(--gutter);
+  margin-bottom: calc(var(--base-unit) * 2);
+}
+
+.grid-item {
+  background: white;
+  border: var(--border-width) solid #e9ecef;
+  border-radius: var(--border-radius);
+  padding: calc(var(--base-unit) * 1.5);
+  box-shadow: 0 calc(var(--border-width) * 2) calc(var(--base-unit)) rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.grid-item:hover {
+  transform: translateY(calc(var(--border-width) * -2));
+  box-shadow: 0 calc(var(--border-width) * 4) calc(var(--base-unit) * 2) rgba(0, 0, 0, 0.15);
+}
+
+.grid-item h4 {
+  margin: 0 0 calc(var(--base-unit) / 2) 0;
+  color: #495057;
+  font-size: calc(var(--base-unit) * 0.9);
+}
+
+.grid-item p {
+  margin: 0;
+  color: #6c757d;
+  font-size: calc(var(--base-unit) * 0.7);
+  line-height: var(--golden-ratio);
+}
+
+/* Progress bars with variable-driven widths */
+.progress-bars {
+  margin-bottom: calc(var(--base-unit) * 2);
+}
+
+.progress-bar {
+  background: #e9ecef;
+  height: calc(var(--base-unit) * 1.5);
+  border-radius: calc(var(--base-unit) * 0.75);
+  margin: calc(var(--base-unit) / 2) 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  width: calc(var(--progress) * 1%);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: calc(var(--base-unit) / 2);
+  color: white;
+  font-size: calc(var(--base-unit) * 0.6);
+  font-weight: bold;
+  transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  min-width: calc(var(--base-unit) * 2);
+}
+
+/* Scaling elements */
+.scaling-elements {
+  display: flex;
+  gap: var(--gutter);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.scalable-box {
+  --base-size: 80px;
+  
+  width: calc(var(--base-size) * var(--scale-factor));
+  height: calc(var(--base-size) * var(--scale-factor));
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(var(--border-radius) * var(--scale-factor));
+  font-size: calc(var(--base-unit) * 0.7 * var(--scale-factor));
+  font-weight: bold;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+  box-shadow: 0 calc(var(--border-width) * var(--scale-factor)) calc(var(--base-unit) * var(--scale-factor)) 
+              rgba(0, 0, 0, calc(0.2 * var(--scale-factor)));
+}
+
+.scalable-box:hover {
+  transform: scale(calc(1 + (var(--scale-factor) - 1) * 0.1));
+}
+
+/* Responsive typography using clamp() and calc() */
+@media (max-width: 768px) {
+  .calc-demo {
+    --base-unit: calc(20px * 0.8);
+    --container-width: 100%;
+  }
+  
+  .responsive-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .scaling-elements {
+    gap: calc(var(--gutter) / 2);
+  }
+}
+
+/* Advanced calculations with CSS variables */
+.calc-demo::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--base-unit) / 5);
+  background: linear-gradient(90deg, 
+    hsl(200, 100%, 50%) 0%, 
+    hsl(220, 100%, 50%) 25%, 
+    hsl(240, 100%, 50%) 50%, 
+    hsl(260, 100%, 50%) 75%, 
+    hsl(280, 100%, 50%) 100%);
+  border-radius: calc(var(--border-radius) * 2) calc(var(--border-radius) * 2) 0 0;
+}
+
+.calc-demo {
+  position: relative;
+}
+`}/>
+
+📚 **How This Demo Works:**
+This showcases the power of **combining CSS Variables with `calc()`** for dynamic calculations. Notice how **`--gutter: calc(var(--base-unit) * 1.5)`** creates responsive spacing, and **`grid-template-columns: repeat(auto-fit, minmax(calc(var(--container-width) / 4), 1fr))`** creates responsive grid columns. The progress bars use **`width: calc(var(--progress) * 1%)`** to convert the progress number to a percentage.
+
+🎯 **Try This Challenge:**
+1. Change the **`--golden-ratio`** from `1.618` to `2.0` and observe how the typography scales proportionally
+2. Create a new scalable element with **`--scale-factor: 0.5`** and see how it affects all calculated properties
+3. Modify the **`--base-unit`** from `20px` to `25px` and watch how the entire layout scales proportionally using calc() calculations
+
+## CSS Variables in JavaScript
+
+You can manipulate CSS variables with JavaScript for dynamic theming:
+
+```javascript
+// Get a CSS variable value
+const primaryColor = getComputedStyle(document.documentElement)
+  .getPropertyValue('--primary-color');
+
+// Set a CSS variable value
+document.documentElement.style
+  .setProperty('--primary-color', '#e74c3c');
+
+// Remove a CSS variable
+document.documentElement.style
+  .removeProperty('--primary-color');
+```
+
+## Design System with CSS Variables
+
+Create a comprehensive design system:
+
+<SeparatedEditorPreview 
+  title="Complete Design System"
+  mission="Build a comprehensive design system using CSS variables"
+  instructions="See how CSS variables enable consistent, maintainable design systems"
+initialHtml={`
+<div class="design-system">
+  <header class="ds-header">
+    <h1 class="ds-title">Design System Demo</h1>
+    <p class="ds-subtitle">Built with CSS Variables</p>
+  </header>
+  
+  <section class="ds-section">
+    <h2 class="ds-section-title">Typography Scale</h2>
+    <div class="typography-examples">
+      <h1 class="text-h1">Heading 1</h1>
+      <h2 class="text-h2">Heading 2</h2>
+      <h3 class="text-h3">Heading 3</h3>
+      <p class="text-body">Body text with proper line height and spacing</p>
+      <p class="text-small">Small text for captions and metadata</p>
+    </div>
+  </section>
+  
+  <section class="ds-section">
+    <h2 class="ds-section-title">Color System</h2>
+    <div class="color-grid">
+      <div class="color-item primary">
+        <span class="color-name">Primary</span>
+      </div>
+      <div class="color-item secondary">
+        <span class="color-name">Secondary</span>
+      </div>
+      <div class="color-item success">
+        <span class="color-name">Success</span>
+      </div>
+      <div class="color-item warning">
+        <span class="color-name">Warning</span>
+      </div>
+      <div class="color-item danger">
+        <span class="color-name">Danger</span>
+      </div>
+      <div class="color-item info">
+        <span class="color-name">Info</span>
+      </div>
+    </div>
+  </section>
+  
+  <section class="ds-section">
+    <h2 class="ds-section-title">Component Library</h2>
+    <div class="component-grid">
+      <button class="btn btn-primary">Primary Button</button>
+      <button class="btn btn-secondary">Secondary Button</button>
+      <button class="btn btn-outline">Outline Button</button>
+      
+      <div class="input-group">
+        <input type="text" class="form-input" placeholder="Enter text...">
+        <button class="btn btn-primary">Submit</button>
+      </div>
+      
+      <div class="alert alert-info">
+        <strong>Info:</strong> This is an informational alert.
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Card Title</h3>
+        </div>
+        <div class="card-body">
+          <p class="card-text">Card content goes here with consistent spacing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+`}
+
+initialCss={`
+/* Design System Variables */
+.design-system {
+  /* Color Palette */
+  --color-primary: #007bff;
+  --color-primary-dark: #0056b3;
+  --color-primary-light: #66b3ff;
+  
+  --color-secondary: #6c757d;
+  --color-secondary-dark: #545b62;
+  --color-secondary-light: #a8adb3;
+  
+  --color-success: #28a745;
+  --color-success-dark: #1e7e34;
+  --color-success-light: #71dd8a;
+  
+  --color-warning: #ffc107;
+  --color-warning-dark: #d39e00;
+  --color-warning-light: #ffe066;
+  
+  --color-danger: #dc3545;
+  --color-danger-dark: #c82333;
+  --color-danger-light: #f5c6cb;
+  
+  --color-info: #17a2b8;
+  --color-info-dark: #117a8b;
+  --color-info-light: #7fdbea;
+  
+  /* Neutral Colors */
+  --color-white: #ffffff;
+  --color-light: #f8f9fa;
+  --color-gray-100: #e9ecef;
+  --color-gray-200: #dee2e6;
+  --color-gray-300: #ced4da;
+  --color-gray-400: #adb5bd;
+  --color-gray-500: #6c757d;
+  --color-gray-600: #495057;
+  --color-gray-700: #343a40;
+  --color-gray-800: #212529;
+  --color-dark: #343a40;
+  
+  /* Typography Scale */
+  --font-size-h1: 2.5rem;
+  --font-size-h2: 2rem;
+  --font-size-h3: 1.75rem;
+  --font-size-h4: 1.5rem;
+  --font-size-h5: 1.25rem;
+  --font-size-h6: 1rem;
+  --font-size-base: 1rem;
+  --font-size-sm: 0.875rem;
+  --font-size-xs: 0.75rem;
+  
+  /* Font Weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  
+  /* Spacing Scale */
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  
+  /* Border Radius */
+  --radius-none: 0;
+  --radius-sm: 0.125rem;
+  --radius-base: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 300ms ease;
+  
+  /* Container */
+  --container-max-width: 1200px;
+  --container-padding: var(--space-4);
+}
+
+/* Base Styles */
+.design-system {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--container-padding);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  color: var(--color-gray-800);
+  background: var(--color-white);
+  line-height: var(--line-height-normal);
+}
+
+/* Header */
+.ds-header {
+  text-align: center;
+  padding: var(--space-12) 0;
+  border-bottom: 1px solid var(--color-gray-200);
+  margin-bottom: var(--space-12);
+}
+
+.ds-title {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.ds-subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-gray-600);
+  margin: 0;
+}
+
+/* Sections */
+.ds-section {
+  margin-bottom: var(--space-16);
+}
+
+.ds-section-title {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-800);
+  margin: 0 0 var(--space-8) 0;
+  padding-bottom: var(--space-4);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+/* Typography Examples */
+.typography-examples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.text-h1 {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  margin: 0;
+}
+
+.text-h2 {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  margin: 0;
+}
+
+.text-h3 {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  margin: 0;
+}
+
+.text-body {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
+
+.text-small {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  margin: 0;
+}
+
+/* Color Grid */
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-4);
+}
+
+.color-item {
+  height: 100px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+  font-weight: var(--font-weight-semibold);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-fast);
+}
+
+.color-item:hover {
+  transform: translateY(-2px);
+}
+
+.color-item.primary { background: var(--color-primary); }
+.color-item.secondary { background: var(--color-secondary); }
+.color-item.success { background: var(--color-success); }
+.color-item.warning { background: var(--color-warning); color: var(--color-gray-800); }
+.color-item.danger { background: var(--color-danger); }
+.color-item.info { background: var(--color-info); }
+
+/* Component Grid */
+.component-grid {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* Button System */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background: var(--color-secondary);
+  color: var(--color-white);
+  border-color: var(--color-secondary);
+}
+
+.btn-secondary:hover {
+  background: var(--color-secondary-dark);
+  border-color: var(--color-secondary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-outline:hover {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+/* Form Components */
+.input-group {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.form-input {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-base);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-base);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* Alert Component */
+.alert {
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+}
+
+.alert-info {
+  background: var(--color-info-light);
+  color: var(--color-info-dark);
+  border-color: var(--color-info);
+}
+
+/* Card Component */
+.card {
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-base);
+  overflow: hidden;
+  transition: box-shadow var(--transition-base);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+  padding: var(--space-4) var(--space-6);
+  background: var(--color-light);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.card-title {
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+  color: var(--color-gray-800);
+}
+
+.card-body {
+  padding: var(--space-6);
+}
+
+.card-text {
+  margin: 0;
+  color: var(--color-gray-600);
+  line-height: var(--line-height-relaxed);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .design-system {
+    --container-padding: var(--space-2);
+  }
+  
+  .component-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .color-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+  
+  .input-group {
+    flex-direction: column;
+  }
+}
+`}/>
+
+📚 **How This Demo Works:**
+This demonstrates a **complete design system** built entirely with CSS Variables. Notice the systematic organization - colors are grouped by function (primary, secondary, semantic colors), typography uses a modular scale, and spacing follows a consistent rhythm. The **design tokens** approach makes it easy to maintain consistency and make global changes by updating just the variables.
+
+🎯 **Try This Challenge:**
+1. Add a new semantic color **`--color-purple: #6f42c1;`** and create a **`.color-item.purple`** in the color grid
+2. Modify the **`--font-size-h1`** from `2.5rem` to `3rem` and see how it affects the hierarchy
+3. Create a new button variant **`.btn-success`** using **`--color-success`** and **`--color-success-dark`** for hover states
+4. Add a new spacing value **`--space-24: 6rem;`** and apply it to the **`.ds-header`** padding
+
+## Browser Support and Polyfills
+
+CSS Variables are well-supported in modern browsers:
+
+- **Chrome**: 49+
+- **Firefox**: 31+
+- **Safari**: 9.1+
+- **Edge**: 16+
+- **IE**: Not supported
+
+For older browsers, consider:
+
+```css
+/* Fallback for older browsers */
+.element {
+  color: #3498db; /* Fallback */
+  color: var(--primary-color, #3498db);
+}
+```
+
+## Performance Considerations
+
+### Best Practices
+
+1. **Define variables at the appropriate scope**: Use `:root` for global variables
+2. **Group related variables**: Organize by purpose (colors, spacing, etc.)
+3. **Use meaningful names**: `--primary-color` instead of `--blue`
+4. **Minimize inheritance depth**: Avoid too many nested variable redefinitions
+
+### Variable Naming Conventions
+
+```css
+/* Good naming conventions */
+:root {
+  /* Brand colors */
+  --brand-primary: #3498db;
+  --brand-secondary: #2ecc71;
+  
+  /* UI colors */
+  --ui-background: #ffffff;
+  --ui-text: #2c3e50;
+  --ui-border: #dee2e6;
+  
+  /* Spacing system */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  
+  /* Typography */
+  --font-size-small: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-large: 1.25rem;
+}
+```
+
+## Conclusion
+
+You've mastered CSS Variables! You can now:
+
+- Create maintainable design systems
+- Build dynamic themes
+- Use fallback values effectively
+- Combine variables with calc() for powerful calculations
+- Implement responsive design with variables
+- Understand scope and inheritance
+- Follow best practices for naming and organization
+
+CSS Variables revolutionize how we write maintainable, scalable CSS. They enable dynamic theming, design systems, and much more flexible styling approaches.
+
+## What's Next?
+
+In the next tutorial, we'll explore **Typography & Web Fonts**, where you'll learn advanced typography techniques, web font loading strategies, and how to create beautiful text layouts.

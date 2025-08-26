@@ -217,18 +217,20 @@ export default function TutorialsPage() {
     >
       {/* Mood Impact */}
       <div className="mb-8">
-        <Suspense fallback={<MoodImpactSkeleton />}>
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <MoodImpactIndicator context="tutorial" />
-              </div>
-              <div className="ml-6">
-                <QuickMoodSwitcher />
+        <ErrorBoundary fallback={ComponentErrorFallback}>
+          <Suspense fallback={<MoodImpactSkeleton />}>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <MoodImpactIndicator context="tutorial" />
+                </div>
+                <div className="ml-6">
+                  <QuickMoodSwitcher />
+                </div>
               </div>
             </div>
-          </div>
-        </Suspense>
+          </Suspense>
+        </ErrorBoundary>
       </div>
 
       {/* Categories Grid */}
@@ -236,94 +238,100 @@ export default function TutorialsPage() {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
           Choose a Learning Path
         </h2>
-        <Suspense fallback={<CategoriesGridSkeleton />}>
-          <ContentGrid>
-            {categories.map((category) => {
-              const stats = getCategoryStats(category.slug);
+        <ErrorBoundary fallback={ComponentErrorFallback}>
+          <Suspense fallback={<CategoriesGridSkeleton />}>
+            <ContentGrid>
+              {categories.map((category) => {
+                const stats = getCategoryStats(category.slug);
 
-              return (
-                <CategoryCard
-                  key={category.id}
-                  category={category.slug}
-                  title={category.title}
-                  tutorialCount={stats.total}
-                  completedCount={stats.completed}
-                  totalDuration={category.duration}
-                  difficulty={
-                    category.difficulty as
-                      | "beginner"
-                      | "intermediate"
-                      | "advanced"
-                  }
-                  description={category.description}
-                  topics={category.topics}
-                  onClick={() =>
-                    router.push(`/tutorials/category/${category.slug}`)
-                  }
-                />
-              );
-            })}
-          </ContentGrid>
-        </Suspense>
+                return (
+                  <CategoryCard
+                    key={category.id}
+                    category={category.slug}
+                    title={category.title}
+                    tutorialCount={stats.total}
+                    completedCount={stats.completed}
+                    totalDuration={category.duration}
+                    difficulty={
+                      category.difficulty as
+                        | "beginner"
+                        | "intermediate"
+                        | "advanced"
+                    }
+                    description={category.description}
+                    topics={category.topics}
+                    onClick={() =>
+                      router.push(`/tutorials/category/${category.slug}`)
+                    }
+                  />
+                );
+              })}
+            </ContentGrid>
+          </Suspense>
+        </ErrorBoundary>
 
         {/* Categories Pagination */}
         {totalPages > 1 && (
-          <div className="mt-6">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
-              onPageChange={handlePageChange}
-              showInfo={true}
-              showSizeSelector={true}
-              sizeOptions={[3, 6, 9, 12]}
-              onSizeChange={handleItemsPerPageChange}
-              className="justify-center"
-              compact={false}
-            />
-          </div>
+          <ErrorBoundary fallback={ComponentErrorFallback}>
+            <div className="mt-6">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={handlePageChange}
+                showInfo={true}
+                showSizeSelector={true}
+                sizeOptions={[3, 6, 9, 12]}
+                onSizeChange={handleItemsPerPageChange}
+                className="justify-center"
+                compact={false}
+              />
+            </div>
+          </ErrorBoundary>
         )}
       </div>
 
       {/* Quick Stats */}
       <div className="mb-8">
-        <Suspense fallback={<StatsCardSkeleton />}>
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-              Your Learning Progress
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                  {allTutorials.length}
+        <ErrorBoundary fallback={ComponentErrorFallback}>
+          <Suspense fallback={<StatsCardSkeleton />}>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                Your Learning Progress
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    {allTutorials.length}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    Total Tutorials
+                  </div>
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Total Tutorials
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    {
+                      tutorialsWithProgress.filter((t) => t.progress?.quizPassed)
+                        .length
+                    }
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    Completed
+                  </div>
                 </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {
-                    tutorialsWithProgress.filter((t) => t.progress?.quizPassed)
-                      .length
-                  }
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Completed
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                  {categories.length}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Categories
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    {categories.length}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    Categories
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </Suspense>
+          </Suspense>
+        </ErrorBoundary>
       </div>
 
       {/* Coming Soon */}

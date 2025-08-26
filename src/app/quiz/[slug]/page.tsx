@@ -52,19 +52,22 @@ export default function QuizPage({
   }, [session, router]);
 
   useEffect(() => {
-    // Set up timer based on user's mood
+    // Set up total timer based on user's mood and number of questions
     const moodConfig = MOODS[currentMood.id.toLowerCase()];
     if (
       moodConfig.quizSettings.timeLimit &&
       !quizState.showResults &&
-      !quizState.timeLeft
+      !quizState.timeLeft &&
+      shuffledQuestions.length > 0
     ) {
+      // Calculate total time: timeLimit per question × number of questions
+      const totalTime = moodConfig.quizSettings.timeLimit * shuffledQuestions.length;
       setQuizState((prev) => ({
         ...prev,
-        timeLeft: moodConfig.quizSettings.timeLimit,
+        timeLeft: totalTime,
       }));
     }
-  }, [currentMood, quizState.showResults, quizState.timeLeft, setQuizState]);
+  }, [currentMood, quizState.showResults, quizState.timeLeft, shuffledQuestions.length, setQuizState]);
 
   if (loadingQuiz) {
     return (
@@ -183,6 +186,9 @@ export default function QuizPage({
           timeLeft={quizState.timeLeft || 0}
           onTimeUp={handleQuizComplete}
           isActive={!!quizState.timeLeft && quizState.timeLeft > 0}
+          totalQuestions={shuffledQuestions.length}
+          currentQuestion={quizState.currentQuestion}
+          timePerQuestion={MOODS[currentMood.id.toLowerCase()].quizSettings.timeLimit}
         />
 
         <div className="max-w-2xl mx-auto space-y-6">

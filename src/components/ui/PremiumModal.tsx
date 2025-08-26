@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
 import { X, Crown, Sparkles, Check, Star, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import getMoodColors from "@/lib/getMoodColors";
 
 interface PremiumModalProps {
   isOpen: boolean;
@@ -86,33 +87,7 @@ export default function PremiumModal({
     };
   }, [isOpen, onClose]);
 
-  const getMoodColors = () => {
-    switch (currentMood.id) {
-      case "rush":
-        return {
-          gradient: "from-orange-400 to-red-500",
-          bg: "bg-orange-50 dark:bg-orange-900/20",
-          button: "bg-orange-500 hover:bg-orange-600",
-          text: "text-orange-700 dark:text-orange-300",
-        };
-      case "grind":
-        return {
-          gradient: "from-blue-400 to-indigo-500",
-          bg: "bg-blue-50 dark:bg-blue-900/20",
-          button: "bg-blue-500 hover:bg-blue-600",
-          text: "text-blue-700 dark:text-blue-300",
-        };
-      default: // chill
-        return {
-          gradient: "from-purple-400 to-pink-500",
-          bg: "bg-purple-50 dark:bg-purple-900/20",
-          button: "bg-purple-500 hover:bg-purple-600",
-          text: "text-purple-700 dark:text-purple-300",
-        };
-    }
-  };
-
-  const moodColors = getMoodColors();
+  const moodColors = getMoodColors(currentMood.id);
 
   const handleUpgrade = async (planId: string) => {
     if (!session) {

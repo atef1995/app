@@ -18,12 +18,12 @@ export function HTMLEditorPreview({
   css = "",
   javascript = "",
   title = "HTML Editor & Preview",
-  height = 300,
+  height = 400,
   editable = true,
   forceUpdateTrigger = 0,
 }: HTMLEditorPreviewProps) {
   const [isVisible, setIsVisible] = useState(true);
-  const [showEditor, setShowEditor] = useState(false);
+  const [showEditor, setShowEditor] = useState(true);
   const [html, setHtml] = useState(initialHtml);
   const [srcDoc, setSrcDoc] = useState("");
   const [forceUpdate, setForceUpdate] = useState(0);
@@ -220,7 +220,6 @@ export function HTMLEditorPreview({
     }
   }, []);
 
-
   useEffect(() => {
     if (showEditor) {
       adjustTextareaHeight();
@@ -314,7 +313,7 @@ export function HTMLEditorPreview({
               adjustTextareaHeight();
             }}
             onInput={adjustTextareaHeight}
-            className="w-full p-4 font-mono text-sm text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-900 border-none resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+            className="w-full p-4 font-mono text-sm text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-900 border-none resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 max-h-96 overflow-scroll"
             style={{ minHeight: "120px" }}
             placeholder="Enter your HTML code here..."
             spellCheck={false}

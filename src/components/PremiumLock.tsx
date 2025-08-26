@@ -6,6 +6,7 @@ import { useMood } from "@/components/providers/MoodProvider";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Lock, Crown, Sparkles, Zap, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import getMoodColors from "@/lib/getMoodColors";
 
 interface PremiumLockProps {
   requiredPlan?: "VIBED" | "CRACKED";
@@ -52,37 +53,7 @@ export default function PremiumLock({
     }
   }, [session, requiredPlan, isPremium, loading, subscription]);
 
-  // Get mood-specific styling
-  const getMoodColors = () => {
-    switch (currentMood.id) {
-      case "rush":
-        return {
-          gradient: "from-orange-400 to-red-500",
-          bg: "bg-orange-50 dark:bg-orange-900/20",
-          border: "border-orange-300 dark:border-orange-600",
-          text: "text-orange-700 dark:text-orange-300",
-          button: "bg-orange-500 hover:bg-orange-600",
-        };
-      case "grind":
-        return {
-          gradient: "from-blue-400 to-indigo-500",
-          bg: "bg-blue-50 dark:bg-blue-900/20",
-          border: "border-blue-300 dark:border-blue-600",
-          text: "text-blue-700 dark:text-blue-300",
-          button: "bg-blue-500 hover:bg-blue-600",
-        };
-      default: // chill
-        return {
-          gradient: "from-purple-400 to-pink-500",
-          bg: "bg-purple-50 dark:bg-purple-900/20",
-          border: "border-purple-300 dark:border-purple-600",
-          text: "text-purple-700 dark:text-purple-300",
-          button: "bg-purple-500 hover:bg-purple-600",
-        };
-    }
-  };
-
-  const moodColors = getMoodColors();
+  const moodColors = getMoodColors(currentMood.id);
 
   // Show loading state
   if (loading) {

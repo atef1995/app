@@ -14,6 +14,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import Link from "next/link";
+import getMoodColors from "@/lib/getMoodColors";
 
 interface ProjectCardProps {
   project: ProjectWithDetails;
@@ -110,30 +111,7 @@ export default function ProjectCard({
   const SubmissionIcon = getSubmissionTypeIcon(project.submissionType);
   const StatusIcon = getStatusIcon(userProgress?.submissionStatus);
 
-  const getMoodColors = () => {
-    switch (currentMood.id) {
-      case "rush":
-        return {
-          border: "border-orange-200 dark:border-orange-800",
-          hover: "hover:border-orange-300 dark:hover:border-orange-600",
-          accent: "text-orange-600 dark:text-orange-400",
-        };
-      case "grind":
-        return {
-          border: "border-blue-200 dark:border-blue-800",
-          hover: "hover:border-blue-300 dark:hover:border-blue-600",
-          accent: "text-blue-600 dark:text-blue-400",
-        };
-      default:
-        return {
-          border: "border-purple-200 dark:border-purple-800",
-          hover: "hover:border-purple-300 dark:hover:border-purple-600",
-          accent: "text-purple-600 dark:text-purple-400",
-        };
-    }
-  };
-
-  const moodColors = getMoodColors();
+  const moodColors = getMoodColors(currentMood.id);
 
   return (
     <Link href={`/projects/${project.slug}`}>

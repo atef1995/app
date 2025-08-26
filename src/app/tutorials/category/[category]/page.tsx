@@ -28,7 +28,7 @@ import {
   Clock,
   Loader2,
 } from "lucide-react";
-
+import CategoryTutorialsLoading from "./loading";
 
 export default function CategoryPage() {
   const params = useParams();
@@ -38,7 +38,9 @@ export default function CategoryPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
-  const [navigatingToTutorial, setNavigatingToTutorial] = useState<string | null>(null);
+  const [navigatingToTutorial, setNavigatingToTutorial] = useState<
+    string | null
+  >(null);
 
   const {
     handlePremiumContent,
@@ -49,7 +51,11 @@ export default function CategoryPage() {
   } = usePremiumContentHandler();
 
   // Fetch tutorials for this category with server-side pagination
-  const categoryTutorialsQuery = useTutorialsByCategory(category, currentPage, itemsPerPage);
+  const categoryTutorialsQuery = useTutorialsByCategory(
+    category,
+    currentPage,
+    itemsPerPage
+  );
   const tutorialsData = categoryTutorialsQuery.data?.data || [];
   const pagination = categoryTutorialsQuery.data?.pagination;
 
@@ -70,9 +76,9 @@ export default function CategoryPage() {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     // Scroll to top of tutorials list
-    const tutorialsSection = document.getElementById('tutorials-section');
+    const tutorialsSection = document.getElementById("tutorials-section");
     if (tutorialsSection) {
-      tutorialsSection.scrollIntoView({ behavior: 'smooth' });
+      tutorialsSection.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -130,21 +136,7 @@ export default function CategoryPage() {
   }
 
   if (categoryTutorialsQuery.isLoading || categoryQuery.isLoading) {
-    return (
-      <PageLayout
-        title={categoryMeta?.title || category}
-        subtitle="Loading tutorials..."
-      >
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">
-              Loading tutorials...
-            </p>
-          </div>
-        </div>
-      </PageLayout>
-    );
+    return <CategoryTutorialsLoading />;
   }
 
   if (categoryTutorialsQuery.error || categoryQuery.error) {
@@ -192,7 +184,6 @@ export default function CategoryPage() {
       </PageLayout>
     );
   }
-
 
   return (
     <PageLayout
@@ -311,140 +302,141 @@ export default function CategoryPage() {
 
       {/* Tutorials List */}
       <div id="tutorials-section">
-      {tutorialsWithProgress.length === 0 ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">
-              No tutorials available in this category yet.
-            </p>
+        {tutorialsWithProgress.length === 0 ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 dark:text-gray-400">
+                No tutorials available in this category yet.
+              </p>
+            </div>
           </div>
-        </div>
-      ) : (
-        <ContentGrid className={viewMode === "list" ? "grid-cols-1" : ""}>
-          {tutorialsWithProgress.map((tutorial, index) => {
-            // Calculate the actual index in the full list for numbering
-            const actualIndex = ((currentPage - 1) * itemsPerPage) + index;
-            const isLocked = isPremiumLocked(tutorial);
+        ) : (
+          <ContentGrid className={viewMode === "list" ? "grid-cols-1" : ""}>
+            {tutorialsWithProgress.map((tutorial, index) => {
+              // Calculate the actual index in the full list for numbering
+              const actualIndex = (currentPage - 1) * itemsPerPage + index;
+              const isLocked = isPremiumLocked(tutorial);
 
-            return (
-              <Card
-                key={tutorial.id}
-                isPremium={isLocked}
-                requiredPlan={tutorial.requiredPlan as "VIBED" | "CRACKED"}
-                onPremiumClick={() => handleTutorialClick(tutorial)}
-                onClick={
-                  !isLocked ? () => handleTutorialClick(tutorial) : undefined
-                }
-                title={`${actualIndex + 1}. ${tutorial.title}`}
-                description={tutorial.description || ""}
-                className="h-full"
-                actions={
-                  <div className="flex items-center justify-between w-full">
-                    <CardAction.TimeInfo
-                      time={tutorial.estimatedTime || "15 min"}
-                    />
-                    <CardAction.Primary
-                      onClick={() => handleTutorialClick(tutorial)}
-                      disabled={navigatingToTutorial === tutorial.slug}
-                    >
-                      {navigatingToTutorial === tutorial.slug ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                          Loading...
-                        </>
-                      ) : (
-                        <>
-                          {isLocked
-                            ? "Unlock"
-                            : tutorial.progress?.quizPassed
-                            ? "Review"
-                            : "Start"}{" "}
-                          Tutorial
-                        </>
-                      )}
-                    </CardAction.Primary>
-                  </div>
-                }
-              >
-                {/* Tutorial Header */}
-                <div className="mb-4">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
-                    {actualIndex + 1}. {tutorial.title}
-                  </h3>
-                  {tutorial.description && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                      {tutorial.description}
-                    </p>
-                  )}
-                </div>
-
-                {/* Tutorial Content */}
-                <div className="space-y-4">
-                  {/* Progress Badge */}
-                  {tutorial.progress?.quizPassed && (
-                    <div>
-                      <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs px-2 py-1 rounded-full flex items-center gap-1 font-medium w-fit">
-                        <CheckCircle className="w-3 h-3" /> Completed
-                      </span>
+              return (
+                <Card
+                  key={tutorial.id}
+                  isPremium={isLocked}
+                  requiredPlan={tutorial.requiredPlan as "VIBED" | "CRACKED"}
+                  onPremiumClick={() => handleTutorialClick(tutorial)}
+                  onClick={
+                    !isLocked ? () => handleTutorialClick(tutorial) : undefined
+                  }
+                  title={`${actualIndex + 1}. ${tutorial.title}`}
+                  description={tutorial.description || ""}
+                  className="h-full"
+                  actions={
+                    <div className="flex items-center justify-between w-full">
+                      <CardAction.TimeInfo
+                        time={tutorial.estimatedTime || "15 min"}
+                      />
+                      <CardAction.Primary
+                        onClick={() => handleTutorialClick(tutorial)}
+                        disabled={navigatingToTutorial === tutorial.slug}
+                      >
+                        {navigatingToTutorial === tutorial.slug ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                            Loading...
+                          </>
+                        ) : (
+                          <>
+                            {isLocked
+                              ? "Unlock"
+                              : tutorial.progress?.quizPassed
+                              ? "Review"
+                              : "Start"}{" "}
+                            Tutorial
+                          </>
+                        )}
+                      </CardAction.Primary>
                     </div>
-                  )}
-                  {tutorial.progress?.quizAttempts &&
-                  !tutorial.progress.quizPassed ? (
-                    <div>
-                      <span className="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-xs px-2 py-1 rounded-full flex items-center gap-1 font-medium w-fit">
-                        <Circle className="w-3 h-3" /> In Progress
-                      </span>
-                    </div>
-                  ) : null}
-
-                  {/* Difficulty */}
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`text-xs px-2 py-1 rounded-md font-medium ${categoryMeta.badgeBg} ${categoryMeta.badgeColor}`}
-                    >
-                      Difficulty: {tutorial.difficulty}/5
-                    </span>
+                  }
+                >
+                  {/* Tutorial Header */}
+                  <div className="mb-4">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
+                      {actualIndex + 1}. {tutorial.title}
+                    </h3>
+                    {tutorial.description && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                        {tutorial.description}
+                      </p>
+                    )}
                   </div>
 
-                  {/* Stats */}
-                  {tutorial.progress && (
-                    <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                      <div className="flex items-center gap-1">
-                        <Trophy className="w-3 h-3" />
-                        <span>
-                          Best: {tutorial.progress.bestScore?.toFixed(0) || 0}%
+                  {/* Tutorial Content */}
+                  <div className="space-y-4">
+                    {/* Progress Badge */}
+                    {tutorial.progress?.quizPassed && (
+                      <div>
+                        <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs px-2 py-1 rounded-full flex items-center gap-1 font-medium w-fit">
+                          <CheckCircle className="w-3 h-3" /> Completed
                         </span>
                       </div>
-                      {tutorial.progress.quizAttempts > 0 && (
-                        <span>{tutorial.progress.quizAttempts} attempts</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </Card>
-            );
-          })}
-        </ContentGrid>
-      )}
+                    )}
+                    {tutorial.progress?.quizAttempts &&
+                    !tutorial.progress.quizPassed ? (
+                      <div>
+                        <span className="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-xs px-2 py-1 rounded-full flex items-center gap-1 font-medium w-fit">
+                          <Circle className="w-3 h-3" /> In Progress
+                        </span>
+                      </div>
+                    ) : null}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-8">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalItems={totalItems}
-            itemsPerPage={itemsPerPage}
-            onPageChange={handlePageChange}
-            showInfo={true}
-            showSizeSelector={true}
-            sizeOptions={[6, 12, 18, 24]}
-            onSizeChange={handleItemsPerPageChange}
-            className="justify-center"
-          />
-        </div>
-      )}
+                    {/* Difficulty */}
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs px-2 py-1 rounded-md font-medium ${categoryMeta.badgeBg} ${categoryMeta.badgeColor}`}
+                      >
+                        Difficulty: {tutorial.difficulty}/5
+                      </span>
+                    </div>
+
+                    {/* Stats */}
+                    {tutorial.progress && (
+                      <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                        <div className="flex items-center gap-1">
+                          <Trophy className="w-3 h-3" />
+                          <span>
+                            Best: {tutorial.progress.bestScore?.toFixed(0) || 0}
+                            %
+                          </span>
+                        </div>
+                        {tutorial.progress.quizAttempts > 0 && (
+                          <span>{tutorial.progress.quizAttempts} attempts</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              );
+            })}
+          </ContentGrid>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-8">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+              showInfo={true}
+              showSizeSelector={true}
+              sizeOptions={[6, 12, 18, 24]}
+              onSizeChange={handleItemsPerPageChange}
+              className="justify-center"
+            />
+          </div>
+        )}
       </div>
 
       {/* Premium Modal */}

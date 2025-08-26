@@ -1,0 +1,707 @@
+---
+title: "HTML Document Head: SEO and Meta Information"
+description: "Master the HTML head section with meta tags, SEO optimization, social media integration, and performance enhancements for better web presence"
+level: "intermediate"
+estimatedTime: "60 minutes"
+topics: ["HTML Head", "Meta Tags", "SEO", "Open Graph", "Performance", "Social Media"]
+quizQuestions: 18
+order: 9
+---
+
+# HTML Document Head: SEO and Meta Information
+
+Welcome to the invisible powerhouse of web pages! 🔍 The HTML `<head>` section contains crucial metadata that affects SEO, social media sharing, performance, and user experience - even though users never see it directly.
+
+## Understanding the Document Head
+
+The `<head>` element contains machine-readable information about the document. It's not displayed on the page but provides essential information to browsers, search engines, and other tools.
+
+<HTMLEditorPreview title="Basic Head Structure" description="Essential elements every head should have:"
+initialHtml={`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Character encoding (must be first) -->
+  <meta charset="UTF-8">
+  
+  <!-- Viewport for responsive design -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Page title (appears in browser tab) -->
+  <title>Your Page Title - Your Site Name</title>
+  
+  <!-- Meta description for search engines -->
+  <meta name="description" content="A compelling description of your page content that appears in search results.">
+  
+  <!-- Stylesheet links -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+  <!-- Visible content goes here -->
+</body>
+</html>`}
+>
+</HTMLEditorPreview>
+
+> **⚡ Performance Tip:** The `<meta charset>` declaration should be within the first 1024 bytes of the document and is usually placed first in the head.
+
+## Essential Meta Tags
+
+### Character Encoding and Viewport
+
+<HTMLEditorPreview title="Fundamental Meta Tags" description="Critical meta tags for proper rendering:"
+initialHtml={`<!-- Character encoding - MUST be first -->
+<meta charset="UTF-8">
+
+<!-- Viewport for responsive design -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- IE compatibility mode (if supporting older IE) -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Prevent automatic phone number detection -->
+<meta name="format-detection" content="telephone=no">
+
+<!-- Control browser caching -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">`}
+>
+</HTMLEditorPreview>
+
+### SEO Meta Tags
+
+<HTMLEditorPreview title="SEO Meta Tags" description="Essential tags for search engine optimization:"
+initialHtml={`<!-- Page title (50-60 characters recommended) -->
+<title>HTML Document Head Guide - Complete SEO Tutorial</title>
+
+<!-- Meta description (150-160 characters recommended) -->
+<meta name="description" content="Learn HTML head elements, meta tags, and SEO optimization techniques to improve your website's search rankings and performance.">
+
+<!-- Keywords (less important now, but still used) -->
+<meta name="keywords" content="HTML, head, meta tags, SEO, web development">
+
+<!-- Author information -->
+<meta name="author" content="Your Name">
+
+<!-- Copyright information -->
+<meta name="copyright" content="© 2024 Your Company Name">
+
+<!-- Robots directive for search engines -->
+<meta name="robots" content="index, follow">
+
+<!-- Specific robot instructions -->
+<meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large">
+
+<!-- Canonical URL to prevent duplicate content -->
+<link rel="canonical" href="https://yoursite.com/current-page">
+
+<!-- Language alternatives -->
+<link rel="alternate" hreflang="en" href="https://yoursite.com/en/">
+<link rel="alternate" hreflang="es" href="https://yoursite.com/es/">
+<link rel="alternate" hreflang="fr" href="https://yoursite.com/fr/">`}
+>
+</HTMLEditorPreview>
+
+## Social Media Integration
+
+### Open Graph (Facebook, LinkedIn, etc.)
+
+<HTMLEditorPreview title="Open Graph Meta Tags" description="Control how your content appears when shared:"
+initialHtml={`<!-- Open Graph basic tags -->
+<meta property="og:title" content="HTML Document Head Guide - Complete Tutorial">
+<meta property="og:description" content="Master HTML head elements and meta tags for better SEO and social sharing.">
+<meta property="og:image" content="https://yoursite.com/images/tutorial-preview.jpg">
+<meta property="og:url" content="https://yoursite.com/html-head-guide">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Your Site Name">
+
+<!-- Additional Open Graph tags -->
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="Your Name">
+<meta property="article:published_time" content="2024-01-15T10:00:00Z">
+<meta property="article:modified_time" content="2024-01-20T14:30:00Z">
+<meta property="article:section" content="Web Development">
+<meta property="article:tag" content="HTML">
+<meta property="article:tag" content="SEO">
+
+<!-- Image specifications -->
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="HTML head elements tutorial preview">
+
+<!-- For video content -->
+<meta property="og:video" content="https://yoursite.com/video.mp4">
+<meta property="og:video:width" content="1920">
+<meta property="og:video:height" content="1080">`}
+>
+</HTMLEditorPreview>
+
+### Twitter Cards
+
+<HTMLEditorPreview title="Twitter Card Meta Tags" description="Optimize content appearance on Twitter:"
+initialHtml={`<!-- Twitter Card type -->
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- Twitter account associated with the site -->
+<meta name="twitter:site" content="@yourtwitterhandle">
+
+<!-- Twitter account of content creator -->
+<meta name="twitter:creator" content="@authorhandle">
+
+<!-- Content information -->
+<meta name="twitter:title" content="HTML Document Head Guide - Complete Tutorial">
+<meta name="twitter:description" content="Master HTML head elements and meta tags for better SEO and social sharing.">
+<meta name="twitter:image" content="https://yoursite.com/images/tutorial-preview.jpg">
+<meta name="twitter:image:alt" content="HTML head elements tutorial preview">
+
+<!-- For app cards -->
+<meta name="twitter:app:name:iphone" content="Your App Name">
+<meta name="twitter:app:id:iphone" content="123456789">
+<meta name="twitter:app:url:iphone" content="yourapp://tutorial/html-head">
+
+<!-- For player cards (video/audio) -->
+<meta name="twitter:player" content="https://yoursite.com/player.html">
+<meta name="twitter:player:width" content="640">
+<meta name="twitter:player:height" content="360">`}
+>
+</HTMLEditorPreview>
+
+## Favicons and Icons
+
+### Modern Favicon Implementation
+
+<HTMLEditorPreview title="Comprehensive Favicon Setup" description="Icons for all devices and platforms:"
+initialHtml={`<!-- Modern favicon (SVG preferred) -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<!-- Fallback favicon for older browsers -->
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+
+<!-- Apple Touch Icons -->
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+
+<!-- Android Chrome icons -->
+<link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+
+<!-- Microsoft tiles -->
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="msapplication-TileImage" content="/mstile-144x144.png">
+<meta name="msapplication-square70x70logo" content="/mstile-70x70.png">
+<meta name="msapplication-square150x150logo" content="/mstile-150x150.png">
+<meta name="msapplication-wide310x150logo" content="/mstile-310x150.png">
+<meta name="msapplication-square310x310logo" content="/mstile-310x310.png">
+
+<!-- Web app manifest -->
+<link rel="manifest" href="/site.webmanifest">
+
+<!-- Theme colors -->
+<meta name="theme-color" content="#ffffff">
+<meta name="msapplication-navbutton-color" content="#ffffff">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">`}
+>
+</HTMLEditorPreview>
+
+### Web App Manifest
+
+<HTMLEditorPreview title="Progressive Web App Configuration" description="Making your site installable:"
+initialHtml={`<!-- Link to manifest file -->
+<link rel="manifest" href="/site.webmanifest">
+
+<!-- Apple-specific PWA meta tags -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Your App Name">
+
+<!-- Microsoft-specific PWA meta tags -->
+<meta name="msapplication-starturl" content="/">
+<meta name="msapplication-TileColor" content="#2b5797">
+<meta name="msapplication-config" content="/browserconfig.xml">`}
+>
+</HTMLEditorPreview>
+
+## Performance Optimization
+
+### Resource Hints
+
+<HTMLEditorPreview title="Performance Resource Hints" description="Help browsers optimize loading:"
+initialHtml={`<!-- DNS prefetch for external domains -->
+<link rel="dns-prefetch" href="//fonts.googleapis.com">
+<link rel="dns-prefetch" href="//cdn.example.com">
+<link rel="dns-prefetch" href="//api.analytics.com">
+
+<!-- Preconnect to origins with CORS -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.example.com" crossorigin>
+
+<!-- Prefetch likely next page -->
+<link rel="prefetch" href="/likely-next-page.html">
+
+<!-- Preload critical resources -->
+<link rel="preload" href="/critical-font.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/hero-image.jpg" as="image">
+<link rel="preload" href="/critical.css" as="style">
+<link rel="preload" href="/important.js" as="script">
+
+<!-- Module preload for ES modules -->
+<link rel="modulepreload" href="/modules/app.js">
+
+<!-- Prefetch for likely user actions -->
+<link rel="prefetch" href="/search-results.html">
+<link rel="prefetch" href="/product-details.html">`}
+>
+</HTMLEditorPreview>
+
+### CSS and JavaScript Loading
+
+<HTMLEditorPreview title="Optimized Resource Loading" description="Control how stylesheets and scripts load:"
+initialHtml={`<!-- Critical CSS inline (first 14KB) -->
+<style>
+/* Critical above-the-fold styles inline */
+body { font-family: system-ui, sans-serif; margin: 0; }
+.header { background: #333; color: white; padding: 1rem; }
+</style>
+
+<!-- Non-critical CSS with media query -->
+<link rel="stylesheet" href="/styles.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="/styles.css"></noscript>
+
+<!-- Async CSS loading -->
+<link rel="preload" href="/styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/styles.css"></noscript>
+
+<!-- Font loading optimization -->
+<link rel="preload" href="/fonts/main.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face {
+  font-family: 'MainFont';
+  src: url('/fonts/main.woff2') format('woff2');
+  font-display: swap; /* Improve loading performance */
+}
+</style>
+
+<!-- JavaScript loading strategies -->
+<!-- Defer execution until HTML parsing complete -->
+<script src="/main.js" defer></script>
+
+<!-- Async loading (don't block HTML parsing) -->
+<script src="/analytics.js" async></script>
+
+<!-- Module loading -->
+<script type="module" src="/modules/app.js"></script>
+<script nomodule src="/fallback.js"></script>`}
+>
+</HTMLEditorPreview>
+
+## Analytics and Tracking
+
+### Google Analytics and Search Console
+
+<HTMLEditorPreview title="Analytics Implementation" description="Tracking and search engine integration:"
+initialHtml={`<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'GA_MEASUREMENT_ID');
+</script>
+
+<!-- Google Tag Manager -->
+<script>
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-XXXXXXX');
+</script>
+
+<!-- Google Search Console verification -->
+<meta name="google-site-verification" content="your-verification-code">
+
+<!-- Bing Webmaster Tools verification -->
+<meta name="msvalidate.01" content="your-bing-verification-code">
+
+<!-- Yandex verification -->
+<meta name="yandex-verification" content="your-yandex-verification-code">
+
+<!-- Schema.org structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "HTML Document Head Guide",
+  "description": "Complete guide to HTML head elements and meta tags",
+  "author": {
+    "@type": "Person",
+    "name": "Your Name"
+  },
+  "datePublished": "2024-01-15",
+  "dateModified": "2024-01-20",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Your Site Name"
+  }
+}
+</script>`}
+>
+</HTMLEditorPreview>
+
+## Security Headers
+
+### Content Security and Safety
+
+<HTMLEditorPreview title="Security Meta Tags" description="Protect your site and users:"
+initialHtml={`<!-- Content Security Policy -->
+<meta http-equiv="Content-Security-Policy" 
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://trusted-cdn.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;">
+
+<!-- Prevent MIME type sniffing -->
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+<!-- XSS Protection -->
+<meta http-equiv="X-XSS-Protection" content="1; mode=block">
+
+<!-- Frame options (prevent clickjacking) -->
+<meta http-equiv="X-Frame-Options" content="DENY">
+
+<!-- Referrer policy -->
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<!-- Permissions policy -->
+<meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+
+<!-- HTTPS enforcement -->
+<meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains">`}
+>
+</HTMLEditorPreview>
+
+## Complete Head Example
+
+<HTMLEditorPreview title="Production-Ready HTML Head" description="Comprehensive head section for modern websites:"
+initialHtml={`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Essential meta tags -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <!-- SEO meta tags -->
+  <title>HTML Head Guide - Complete Tutorial | YourSite</title>
+  <meta name="description" content="Master HTML head elements, meta tags, and SEO optimization. Complete guide with examples for better search rankings and social sharing.">
+  <meta name="keywords" content="HTML, head, meta tags, SEO, web development, tutorial">
+  <meta name="author" content="Your Name">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Canonical and language -->
+  <link rel="canonical" href="https://yoursite.com/html-head-guide">
+  <link rel="alternate" hreflang="en" href="https://yoursite.com/en/html-head-guide">
+  <link rel="alternate" hreflang="es" href="https://yoursite.com/es/guia-html-head">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="HTML Head Guide - Complete Tutorial">
+  <meta property="og:description" content="Master HTML head elements and meta tags for better SEO and social sharing.">
+  <meta property="og:image" content="https://yoursite.com/images/html-head-guide-preview.jpg">
+  <meta property="og:url" content="https://yoursite.com/html-head-guide">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="YourSite">
+  <meta property="og:locale" content="en_US">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@yoursite">
+  <meta name="twitter:creator" content="@yourname">
+  <meta name="twitter:title" content="HTML Head Guide - Complete Tutorial">
+  <meta name="twitter:description" content="Master HTML head elements and meta tags for better SEO and social sharing.">
+  <meta name="twitter:image" content="https://yoursite.com/images/html-head-guide-preview.jpg">
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#ffffff">
+  
+  <!-- Performance hints -->
+  <link rel="dns-prefetch" href="//fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="/fonts/main.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <!-- Styles -->
+  <style>
+    /* Critical CSS inline */
+    body { font-family: system-ui, sans-serif; margin: 0; line-height: 1.6; }
+    .header { background: #333; color: white; padding: 1rem; }
+  </style>
+  <link rel="preload" href="/styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="/styles.css"></noscript>
+  
+  <!-- Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'GA_MEASUREMENT_ID');
+  </script>
+  
+  <!-- Verification -->
+  <meta name="google-site-verification" content="your-verification-code">
+  
+  <!-- Security -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "HTML Head Guide - Complete Tutorial",
+    "description": "Master HTML head elements and meta tags for better SEO and social sharing.",
+    "author": {
+      "@type": "Person",
+      "name": "Your Name"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "YourSite"
+    },
+    "datePublished": "2024-01-15",
+    "dateModified": "2024-01-20"
+  }
+  </script>
+</head>
+<body>
+  <!-- Page content -->
+</body>
+</html>`}
+>
+</HTMLEditorPreview>
+
+## Testing and Validation
+
+### Tools for Head Optimization
+
+<HTMLEditorPreview title="Testing Your HTML Head" description="Essential tools for validation:"
+initialHtml={`<!-- Use these tools to test your head section: -->
+
+1. HTML Validator: https://validator.w3.org/
+2. Meta Tags Analyzer: https://metatags.io/
+3. Open Graph Debugger: https://developers.facebook.com/tools/debug/
+4. Twitter Card Validator: https://cards-dev.twitter.com/validator
+5. Google Rich Results Test: https://search.google.com/test/rich-results
+6. PageSpeed Insights: https://pagespeed.web.dev/
+7. Security Headers: https://securityheaders.com/
+
+<!-- Quick validation checklist -->
+✓ Character encoding declared (UTF-8)
+✓ Viewport meta tag present
+✓ Title tag 50-60 characters
+✓ Meta description 150-160 characters
+✓ Open Graph tags complete
+✓ Twitter Card tags present
+✓ Favicon implemented
+✓ Canonical URL set
+✓ Analytics tracking code
+✓ Security headers configured`}
+>
+</HTMLEditorPreview>
+
+## Common Mistakes to Avoid
+
+### Head Section Pitfalls
+
+<HTMLEditorPreview title="Avoid These Mistakes" description="Common head section errors:"
+initialHtml={`<!-- ❌ Wrong: Missing charset or placed after other elements -->
+<head>
+  <title>Page Title</title>
+  <meta charset="UTF-8"> <!-- Should be first -->
+</head>
+
+<!-- ❌ Wrong: Title too long or generic -->
+<title>Home - Welcome to Our Website - The Best Website Ever</title>
+
+<!-- ❌ Wrong: Missing viewport meta tag -->
+<head>
+  <meta charset="UTF-8">
+  <!-- Missing viewport tag = not mobile friendly -->
+</head>
+
+<!-- ❌ Wrong: Blocking CSS in head -->
+<head>
+  <link rel="stylesheet" href="/large-styles.css"> <!-- Blocks rendering -->
+</head>
+
+<!-- ❌ Wrong: Missing Open Graph image dimensions -->
+<meta property="og:image" content="image.jpg">
+<!-- Should include width/height for optimal display -->
+
+<!-- ❌ Wrong: Too many keywords -->
+<meta name="keywords" content="html, css, js, web, design, development, tutorial, guide, best, awesome, amazing, perfect, ultimate">
+
+<!-- ✅ Correct: Proper structure -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specific Page Title - Brand Name</title>
+  <meta name="description" content="Concise, compelling description under 160 characters.">
+  <meta property="og:image" content="https://example.com/image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+</head>`}
+>
+</HTMLEditorPreview>
+
+## Advanced Techniques
+
+### Dynamic Meta Tags
+
+<HTMLEditorPreview title="Dynamic Head Management" description="Managing head content with JavaScript:"
+initialHtml={`<!-- Base template with placeholders -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">Default Title</title>
+  <meta name="description" content="Default description" id="page-description">
+  
+  <!-- Dynamic meta management with JavaScript -->
+  <script>
+    // Update page meta information
+    function updatePageMeta(data) {
+      // Update title
+      document.title = data.title + ' - Your Site';
+      document.getElementById('page-title').textContent = document.title;
+      
+      // Update description
+      const description = document.querySelector('meta[name="description"]');
+      description.setAttribute('content', data.description);
+      
+      // Update Open Graph
+      updateMetaProperty('og:title', data.title);
+      updateMetaProperty('og:description', data.description);
+      updateMetaProperty('og:url', window.location.href);
+      
+      // Update Twitter Card
+      updateMetaName('twitter:title', data.title);
+      updateMetaName('twitter:description', data.description);
+    }
+    
+    function updateMetaProperty(property, content) {
+      let meta = document.querySelector(\`meta[property="\${property}"]\`);
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('property', property);
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute('content', content);
+    }
+    
+    function updateMetaName(name, content) {
+      let meta = document.querySelector(\`meta[name="\${name}"]\`);
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('name', name);
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute('content', content);
+    }
+    
+    // Example usage for SPA route changes
+    function handleRouteChange(route) {
+      const pageData = {
+        '/about': {
+          title: 'About Us',
+          description: 'Learn about our company and mission.'
+        },
+        '/contact': {
+          title: 'Contact Us',
+          description: 'Get in touch with our team.'
+        }
+      };
+      
+      if (pageData[route]) {
+        updatePageMeta(pageData[route]);
+      }
+    }
+  </script>
+</head>`}
+>
+</HTMLEditorPreview>
+
+## Performance Impact
+
+### Measuring Head Performance
+
+<HTMLEditorPreview title="Head Performance Optimization" description="Minimize impact on loading speed:"
+initialHtml={`<!-- Performance considerations -->
+
+1. Character encoding FIRST (within first 1024 bytes)
+2. Critical CSS inline (< 14KB)
+3. Non-critical CSS with media queries
+4. Minimize number of DNS lookups
+5. Use resource hints strategically
+6. Compress and optimize images
+7. Limit third-party scripts in head
+
+<!-- Example optimized loading strategy -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Critical inline CSS -->
+  <style>/* Critical styles only */</style>
+  
+  <!-- Resource hints for external resources -->
+  <link rel="dns-prefetch" href="//fonts.googleapis.com">
+  <link rel="preconnect" href="//analytics.google.com">
+  
+  <!-- Non-critical CSS -->
+  <link rel="preload" href="/styles.css" as="style" 
+        onload="this.onload=null;this.rel='stylesheet'">
+  
+  <!-- Analytics loaded asynchronously -->
+  <script async src="//analytics.js"></script>
+</head>`}
+>
+</HTMLEditorPreview>
+
+## Key Takeaways
+
+✅ **Always start with charset** declaration within first 1024 bytes
+✅ **Include viewport meta tag** for responsive design
+✅ **Write compelling titles** (50-60 characters) and descriptions (150-160 characters)
+✅ **Implement Open Graph** and Twitter Card tags for social sharing
+✅ **Use proper favicon** implementation with multiple sizes
+✅ **Add resource hints** for performance optimization
+✅ **Include structured data** for rich search results
+✅ **Test with validation tools** and social media debuggers
+✅ **Consider security headers** for user protection
+✅ **Monitor performance impact** of head elements
+
+The HTML head is your website's control center - master it to improve SEO, performance, and user experience! 🎯
+
+---
+
+## Practice Exercises
+
+Try implementing these head configurations:
+1. **Blog post head** with complete social sharing setup
+2. **E-commerce product page** with schema.org structured data
+3. **Multi-language site** with proper hreflang implementation
+4. **Progressive Web App** with full manifest configuration
+
+Ready for the final topic? Let's explore **HTML Responsive Basics** to make your sites work perfectly on all devices! 📱

@@ -16,8 +16,8 @@ Welcome to semantic HTML! 🏗️ Semantic elements are the difference between a
 
 Semantic HTML uses elements that clearly describe their meaning and purpose, rather than just their appearance. It's about **what** content is, not **how** it looks.
 
-<InteractiveCodeBlock title="Semantic vs Non-Semantic" description="Compare meaningful structure with generic divs:">
-{`<!-- ❌ Non-semantic HTML -->
+<HTMLEditorPreview title="Semantic vs Non-Semantic" description="Compare meaningful structure with generic divs:"
+initialHtml={`<!-- ❌ Non-semantic HTML -->
 <div class="header">
     <div class="nav">
         <div class="nav-item">Home</div>
@@ -58,8 +58,8 @@ Semantic HTML uses elements that clearly describe their meaning and purpose, rat
 </main>
 <footer>
     <p>&copy; 2024 My Website</p>
-</footer>`}
-</InteractiveCodeBlock>
+</footer>`}>
+</HTMLEditorPreview>
 
 > **💡 Why Semantic HTML Matters** Screen readers understand structure better, search engines rank content more accurately, and other developers can understand your code faster.
 
@@ -69,8 +69,8 @@ Semantic HTML uses elements that clearly describe their meaning and purpose, rat
 
 The `<header>` represents introductory content or navigational aids:
 
-<InteractiveCodeBlock title="Header Element Usage" description="Different ways to use the header element:">
-{`<!-- Page header -->
+<HTMLEditorPreview title="Header Element Usage" description="Different ways to use the header element:"
+initialHtml={`<!-- Page header -->
 <header>
     <img src="logo.png" alt="Company Logo">
     <h1>Welcome to Our Website</h1>
@@ -100,15 +100,15 @@ The `<header>` represents introductory content or navigational aids:
         <p>See what our clients are saying about us</p>
     </header>
     <!-- testimonials content -->
-</section>`}
-</InteractiveCodeBlock>
+</section>`}>
+</HTMLEditorPreview>
 
 ### Navigation Element
 
 The `<nav>` element defines navigation links:
 
-<InteractiveCodeBlock title="Navigation Patterns" description="Different navigation structures:">
-{`<!-- Main site navigation -->
+<HTMLEditorPreview title="Navigation Patterns" description="Different navigation structures:"
+initialHtml={`<!-- Main site navigation -->
 <nav aria-label="Main navigation">
     <ul>
         <li><a href="/" aria-current="page">Home</a></li>
@@ -147,15 +147,15 @@ The `<nav>` element defines navigation links:
     <a href="/page/2" aria-current="page">2</a>
     <a href="/page/3">3</a>
     <a href="/page/3" rel="next">Next</a>
-</nav>`}
-</InteractiveCodeBlock>
+</nav>`}>
+</HTMLEditorPreview>
 
 ### Main Content Element
 
 The `<main>` element contains the dominant content of the page:
 
-<InteractiveCodeBlock title="Main Element" description="Proper usage of the main element:">
-{`<!DOCTYPE html>
+<HTMLEditorPreview title="Main Element" description="Proper usage of the main element:"
+initialHtml={`<!DOCTYPE html>
 <html>
 <head>
     <title>Article Page</title>
@@ -185,8 +185,8 @@ The `<main>` element contains the dominant content of the page:
         <!-- site footer -->
     </footer>
 </body>
-</html>`}
-</InteractiveCodeBlock>
+</html>`}>
+</HTMLEditorPreview>
 
 > **⚠️ Important** There should only be one `<main>` element per page, and it should not be inside `<article>`, `<aside>`, `<footer>`, `<header>`, or `<nav>` elements.
 
@@ -194,8 +194,8 @@ The `<main>` element contains the dominant content of the page:
 
 The `<footer>` represents concluding content:
 
-<InteractiveCodeBlock title="Footer Variations" description="Different footer implementations:">
-{`<!-- Page footer -->
+<HTMLEditorPreview title="Footer Variations" description="Different footer implementations:"
+initialHtml={`<!-- Page footer -->
 <footer>
     <div class="footer-content">
         <div class="company-info">
@@ -247,8 +247,8 @@ The `<footer>` represents concluding content:
     <footer>
         <p>Average rating: 4.8/5 based on 127 reviews</p>
     </footer>
-</section>`}
-</InteractiveCodeBlock>
+</section>`}>
+</HTMLEditorPreview>
 
 ## Content Sectioning Elements
 
@@ -256,8 +256,8 @@ The `<footer>` represents concluding content:
 
 The `<section>` groups related content with a thematic purpose:
 
-<InteractiveCodeBlock title="Section Element Usage" description="Organizing content into thematic sections:">
-{`<!-- Product page sections -->
+<HTMLEditorPreview title="Section Element Usage" description="Organizing content into thematic sections:"
+initialHtml={`<!-- Product page sections -->
 <main>
     <section>
         <h2>Product Overview</h2>
@@ -289,15 +289,15 @@ The `<section>` groups related content with a thematic purpose:
             <!-- related product cards -->
         </div>
     </section>
-</main>`}
-</InteractiveCodeBlock>
+</main>`}>
+</HTMLEditorPreview>
 
 ### Article Element
 
 The `<article>` represents standalone, reusable content:
 
-<InteractiveCodeBlock title="Article Element Examples" description="Self-contained content pieces:">
-{`<!-- Blog post -->
+<HTMLEditorPreview title="Article Element Examples" description="Self-contained content pieces:"
+initialHtml={`<!-- Blog post -->
 <article>
     <header>
         <h1>10 Tips for Better Web Design</h1>
@@ -349,15 +349,15 @@ The `<article>` represents standalone, reusable content:
             <li><a href="/tech-trends-2024">Tech Trends 2024</a></li>
         </ul>
     </aside>
-</article>`}
-</InteractiveCodeBlock>
+</article>`}>
+</HTMLEditorPreview>
 
 ### Aside Element
 
 The `<aside>` contains content related to the main content:
 
-<InteractiveCodeBlock title="Aside Element Applications" description="Supplementary content examples:">
-{`<!-- Sidebar in a blog -->
+<HTMLEditorPreview title="Aside Element Applications" description="Supplementary content examples:"
+initialHtml={`<!-- Sidebar in a blog -->
 <main>
     <article>
         <h1>The History of the Internet</h1>
@@ -410,8 +410,8 @@ The `<aside>` contains content related to the main content:
         <p>Learn Modern Web Development</p>
         <a href="/book">Buy Now - $29.99</a>
     </div>
-</aside>`}
-</InteractiveCodeBlock>
+</aside>`}>
+</HTMLEditorPreview>
 
 ## Content Elements
 
@@ -419,8 +419,8 @@ The `<aside>` contains content related to the main content:
 
 The `<time>` element represents dates and times:
 
-<InteractiveCodeBlock title="Time Element Usage" description="Marking up dates and times properly:">
-{`<!-- Publication date -->
+<HTMLEditorPreview title="Time Element Usage" description="Marking up dates and times properly:"
+initialHtml={`<!-- Publication date -->
 <p>Article published on <time datetime="2024-03-15">March 15, 2024</time></p>
 
 <!-- Specific time -->
@@ -449,15 +449,15 @@ The `<time>` element represents dates and times:
 <!-- Birth date -->
 <p>Albert Einstein was born on 
    <time datetime="1879-03-14">March 14, 1879</time>
-</p>`}
-</InteractiveCodeBlock>
+</p>`}>
+</HTMLEditorPreview>
 
 ### Address Element
 
 The `<address>` element provides contact information:
 
-<InteractiveCodeBlock title="Address Element" description="Contact information markup:">
-{`<!-- Company contact info -->
+<HTMLEditorPreview title="Address Element" description="Contact information markup:"
+initialHtml={`<!-- Company contact info -->
 <footer>
     <address>
         <h3>Contact Us</h3>
@@ -503,13 +503,13 @@ The `<address>` element provides contact information:
             <a href="https://linkedin.com/company/company">LinkedIn</a>
         </div>
     </div>
-</address>`}
-</InteractiveCodeBlock>
+</address>`}>
+</HTMLEditorPreview>
 
 ## Complete Semantic Page Example
 
-<InteractiveCodeBlock title="Complete Semantic HTML Page" description="A real-world example using all semantic elements:">
-{`<!DOCTYPE html>
+<HTMLEditorPreview title="Complete Semantic HTML Page" description="A real-world example using all semantic elements:"
+initialHtml={`<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -637,8 +637,8 @@ The `<address>` element provides contact information:
         <p>&copy; 2024 TechBlog. All rights reserved.</p>
     </footer>
 </body>
-</html>`}
-</InteractiveCodeBlock>
+</html>`}>
+</HTMLEditorPreview>
 
 ## Benefits of Semantic HTML
 

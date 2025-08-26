@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 import { SubscriptionService } from "@/lib/subscriptionService";
+import { StripeHelpers } from "@/lib/stripeHelpers";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-06-30.basil",
@@ -64,30 +64,25 @@ export async function POST(request: NextRequest) {
       session.user.id
     );
 
-    // Get user's Stripe customer ID from database
-    const dbUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { stripeCustomerId: true },
-    });
-
-    // Create customer if doesn't exist
-    let customerId = dbUser?.stripeCustomerId;
-    if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: session.user.email!,
-        name: session.user.name || undefined,
-        metadata: {
-          userId: session.user.id,
+    // Prevent users from purchasing the same plan they already have
+    if (userSubscription.plan === plan && userSubscription.status === "ACTIVE") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            message: `You already have an active ${plan} subscription. Please cancel your current subscription first if you want to change billing cycles.`,
+          },
         },
-      });
-      customerId = customer.id;
-
-      // Update user with Stripe customer ID
-      await prisma.user.update({
-        where: { id: session.user.id },
-        data: { stripeCustomerId: customerId },
-      });
+        { status: 400 }
+      );
     }
+
+    // Validate and get/create Stripe customer
+    const customerId = await StripeHelpers.validateAndGetCustomer(
+      session.user.id,
+      session.user.email!,
+      session.user.name || undefined
+    );
 
     // Create checkout session
     const checkoutSession = await stripe.checkout.sessions.create({

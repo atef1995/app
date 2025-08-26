@@ -2,9 +2,18 @@
 
 import { Certificate, CertificateType } from "@prisma/client";
 import { useState } from "react";
-import { Award, Share, Copy, Check, ExternalLink, Lock, Unlock } from "lucide-react";
+import {
+  Award,
+  Share,
+  Copy,
+  Check,
+  ExternalLink,
+  Lock,
+  Unlock,
+} from "lucide-react";
 import { useMood } from "@/components/providers/MoodProvider";
 import { format } from "date-fns";
+import getMoodColors from "@/lib/getMoodColors";
 
 interface CertificateCardProps {
   certificate: Certificate;
@@ -24,10 +33,10 @@ interface CertificateMetadata {
   totalTimeSpent?: number;
 }
 
-export default function CertificateCard({ 
-  certificate, 
-  showActions = true, 
-  compact = false 
+export default function CertificateCard({
+  certificate,
+  showActions = true,
+  compact = false,
 }: CertificateCardProps) {
   const { currentMood } = useMood();
   const [copied, setCopied] = useState(false);
@@ -35,33 +44,7 @@ export default function CertificateCard({
 
   const metadata = certificate.metadata as CertificateMetadata;
 
-  const getMoodColors = () => {
-    switch (currentMood.id) {
-      case "rush":
-        return {
-          bg: "from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20",
-          accent: "bg-red-600 dark:bg-red-500",
-          text: "text-red-700 dark:text-red-300",
-          border: "border-red-200 dark:border-red-700",
-        };
-      case "grind":
-        return {
-          bg: "from-gray-50 via-slate-50 to-blue-50 dark:from-gray-900/20 dark:via-slate-900/20 dark:to-blue-900/20",
-          accent: "bg-blue-600 dark:bg-blue-500",
-          text: "text-blue-700 dark:text-blue-300",
-          border: "border-blue-200 dark:border-blue-700",
-        };
-      default: // chill
-        return {
-          bg: "from-purple-50 via-pink-50 to-indigo-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-indigo-900/20",
-          accent: "bg-purple-600 dark:bg-purple-500",
-          text: "text-purple-700 dark:text-purple-300",
-          border: "border-purple-200 dark:border-purple-700",
-        };
-    }
-  };
-
-  const moodColors = getMoodColors();
+  const moodColors = getMoodColors(currentMood.id);
 
   const getCertificateIcon = () => {
     return certificate.type === CertificateType.TUTORIAL ? "🎯" : "🏆";
@@ -76,7 +59,7 @@ export default function CertificateCard({
 
   const copyShareableUrl = async () => {
     if (!certificate.shareableUrl) return;
-    
+
     try {
       await navigator.clipboard.writeText(certificate.shareableUrl);
       setCopied(true);
@@ -94,8 +77,8 @@ export default function CertificateCard({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           certificateId: certificate.id,
-          isPublic: !certificate.isPublic
-        })
+          isPublic: !certificate.isPublic,
+        }),
       });
 
       if (response.ok) {
@@ -111,7 +94,9 @@ export default function CertificateCard({
 
   if (compact) {
     return (
-      <div className={`bg-gradient-to-r ${moodColors.bg} border ${moodColors.border} rounded-lg p-4`}>
+      <div
+        className={`bg-gradient-to-r ${moodColors.bg} border ${moodColors.border} rounded-lg p-4`}
+      >
         <div className="flex items-center gap-3">
           <div className={`${moodColors.accent} p-2 rounded-full`}>
             <Award className="h-4 w-4 text-white" />
@@ -132,7 +117,11 @@ export default function CertificateCard({
               onClick={copyShareableUrl}
               className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
             >
-              {copied ? <Check className="h-4 w-4" /> : <Share className="h-4 w-4" />}
+              {copied ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Share className="h-4 w-4" />
+              )}
             </button>
           )}
         </div>
@@ -141,7 +130,9 @@ export default function CertificateCard({
   }
 
   return (
-    <div className={`bg-gradient-to-br ${moodColors.bg} border ${moodColors.border} rounded-xl p-6 shadow-lg`}>
+    <div
+      className={`bg-gradient-to-br ${moodColors.bg} border ${moodColors.border} rounded-xl p-6 shadow-lg`}
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -156,11 +147,14 @@ export default function CertificateCard({
               </h3>
             </div>
             <p className={`text-sm ${moodColors.text} font-medium`}>
-              Certificate of Completion • {certificate.type === CertificateType.TUTORIAL ? "Tutorial" : "Category"}
+              Certificate of Completion •{" "}
+              {certificate.type === CertificateType.TUTORIAL
+                ? "Tutorial"
+                : "Category"}
             </p>
           </div>
         </div>
-        
+
         {showActions && (
           <div className="flex items-center gap-2">
             <button
@@ -169,14 +163,22 @@ export default function CertificateCard({
               className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
               title={certificate.isPublic ? "Make private" : "Make public"}
             >
-              {certificate.isPublic ? <Unlock className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+              {certificate.isPublic ? (
+                <Unlock className="h-4 w-4" />
+              ) : (
+                <Lock className="h-4 w-4" />
+              )}
             </button>
             <button
               onClick={copyShareableUrl}
               className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
               title="Copy shareable link"
             >
-              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              {copied ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
             </button>
             {certificate.shareableUrl && (
               <a
@@ -201,9 +203,11 @@ export default function CertificateCard({
               {metadata.score !== undefined && (
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    {metadata.score}%
+                    {metadata.score.toPrecision(2)}%
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Score</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Score
+                  </div>
                 </div>
               )}
               {metadata.timeSpent !== undefined && (
@@ -211,7 +215,9 @@ export default function CertificateCard({
                   <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {formatTimeSpent(metadata.timeSpent)}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Time Spent</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Time Spent
+                  </div>
                 </div>
               )}
               {metadata.difficulty !== undefined && (
@@ -219,28 +225,35 @@ export default function CertificateCard({
                   <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {"⭐".repeat(Math.min(5, metadata.difficulty))}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Difficulty</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Difficulty
+                  </div>
                 </div>
               )}
             </>
           )}
-          
+
           {certificate.type === CertificateType.CATEGORY && (
             <>
-              {metadata.tutorialsCompleted !== undefined && metadata.totalTutorials !== undefined && (
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    {metadata.tutorialsCompleted}/{metadata.totalTutorials}
+              {metadata.tutorialsCompleted !== undefined &&
+                metadata.totalTutorials !== undefined && (
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                      {metadata.tutorialsCompleted}/{metadata.totalTutorials}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      Tutorials
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Tutorials</div>
-                </div>
-              )}
+                )}
               {metadata.averageScore !== undefined && (
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {metadata.averageScore.toFixed(0)}%
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Avg Score</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Avg Score
+                  </div>
                 </div>
               )}
               {metadata.totalTimeSpent !== undefined && (
@@ -248,7 +261,9 @@ export default function CertificateCard({
                   <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {formatTimeSpent(metadata.totalTimeSpent)}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Total Time</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Total Time
+                  </div>
                 </div>
               )}
             </>
@@ -259,14 +274,17 @@ export default function CertificateCard({
       {/* Footer */}
       <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          Completed on {format(new Date(certificate.completedAt), "MMMM dd, yyyy")}
+          Completed on{" "}
+          {format(new Date(certificate.completedAt), "MMMM dd, yyyy")}
         </div>
         <div className="flex items-center gap-2">
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-            certificate.isPublic 
-              ? "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300" 
-              : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-          }`}>
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${
+              certificate.isPublic
+                ? "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+            }`}
+          >
             {certificate.isPublic ? "Public" : "Private"}
           </span>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import {
   Eye,
   EyeOff,
@@ -12,6 +12,20 @@ import {
   Copy,
   Check,
 } from "lucide-react";
+
+// Importing Prism grammars
+import { Editor, PrismEditor } from "prism-react-editor";
+
+import "prism-react-editor/prism/languages/css";
+import "prism-react-editor/languages/html";
+import "prism-react-editor/languages/jsx";
+
+import "prism-react-editor/layout.css";
+import "prism-react-editor/scrollbar.css";
+import "prism-react-editor/invisibles.css";
+import "prism-react-editor/themes/github-dark.css";
+import "prism-react-editor/search.css";
+import MyExtensions from "./MyExtensions";
 
 interface SeparatedEditorPreviewProps {
   initialHtml: string;
@@ -38,20 +52,10 @@ export function SeparatedEditorPreview({
   const [css, setCss] = useState(initialCss);
   const [activeTab, setActiveTab] = useState<"html" | "css" | "preview">("css");
   const [isVisible, setIsVisible] = useState(true);
-  const [isMounted, setIsMounted] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    setHtml(initialHtml);
-  }, [initialHtml]);
-
-  useEffect(() => {
-    setCss(initialCss);
-  }, [initialCss]);
+  const [resetKey, setResetKey] = useState(0);
+  const htmlEditorRef = useRef<PrismEditor | null>(null);
+  const cssEditorRef = useRef<PrismEditor | null>(null);
 
   const generatePreviewHTML = () => {
     return `<!DOCTYPE html>
@@ -100,21 +104,13 @@ ${css}
   const handleReset = () => {
     setHtml(initialHtml);
     setCss(initialCss);
+    setResetKey((prev) => prev + 1); // Force re-mount editors
   };
 
-  if (!isMounted) {
-    return (
-      <div
-        className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg"
-        style={{ height: `${height}px` }}
-      >
-        <div className="animate-pulse bg-gray-100 dark:bg-gray-700 h-full rounded-lg"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden mb-6">
+    <div
+      className={`bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden mb-6 h-[${height}px]`}
+    >
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-3">
         <div className="flex items-center justify-between">
@@ -226,68 +222,41 @@ ${css}
       </div>
 
       {/* Content Area */}
-      <div style={{ height: `${height}px` }}>
+      <div>
         {/* HTML Editor */}
         {activeTab === "html" && showHtmlEditor && (
-          <div className="h-full">
-            <textarea
-              value={html}
-              onChange={(e) => setHtml(e.target.value)}
-              className="w-full h-full p-4 font-mono text-sm bg-gray-50 dark:bg-gray-900 border-none resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100"
-              style={{
-                fontFamily: '"Fira code", "Fira Mono", monospace',
-                fontSize: 14,
-                lineHeight: 1.5,
+          <div className="h-[30rem]">
+            <Editor
+              className="h-[30rem]"
+              key={`html-${resetKey}`}
+              onUpdate={(value) => setHtml(value)}
+              language="html"
+              value={initialHtml}
+            >
+              {(editor) => {
+                htmlEditorRef.current = editor;
+                return <MyExtensions editor={editor} />;
               }}
-              placeholder="Write your HTML here..."
-              onKeyDown={(e) => {
-                // Handle tab key for indentation
-                if (e.key === 'Tab') {
-                  e.preventDefault();
-                  const textarea = e.target as HTMLTextAreaElement;
-                  const start = textarea.selectionStart;
-                  const end = textarea.selectionEnd;
-                  const newValue = html.substring(0, start) + '  ' + html.substring(end);
-                  setHtml(newValue);
-                  // Set cursor position after the inserted spaces
-                  setTimeout(() => {
-                    textarea.selectionStart = textarea.selectionEnd = start + 2;
-                  }, 0);
-                }
-              }}
-            />
+            </Editor>
           </div>
         )}
 
         {/* CSS Editor */}
         {activeTab === "css" && showCssEditor && (
-          <div className="h-full">
-            <textarea
-              value={css}
-              onChange={(e) => setCss(e.target.value)}
-              className="w-full h-full p-4 font-mono text-sm bg-gray-50 dark:bg-gray-900 border-none resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 text-gray-900 dark:text-gray-100"
-              style={{
-                fontFamily: '"Fira code", "Fira Mono", monospace',
-                fontSize: 14,
-                lineHeight: 1.5,
+          <div className="h-[30rem]">
+            <Editor
+              className="h-[30rem] max-h-dvh"
+              key={`css-${resetKey}`}
+              wordWrap
+              onUpdate={(value) => setCss(value)}
+              language="css"
+              value={initialCss}
+            >
+              {(editor) => {
+                cssEditorRef.current = editor;
+                return <MyExtensions editor={editor} />;
               }}
-              placeholder="Write your CSS here..."
-              onKeyDown={(e) => {
-                // Handle tab key for indentation
-                if (e.key === 'Tab') {
-                  e.preventDefault();
-                  const textarea = e.target as HTMLTextAreaElement;
-                  const start = textarea.selectionStart;
-                  const end = textarea.selectionEnd;
-                  const newValue = css.substring(0, start) + '  ' + css.substring(end);
-                  setCss(newValue);
-                  // Set cursor position after the inserted spaces
-                  setTimeout(() => {
-                    textarea.selectionStart = textarea.selectionEnd = start + 2;
-                  }, 0);
-                }
-              }}
-            />
+            </Editor>
           </div>
         )}
 
@@ -297,7 +266,7 @@ ${css}
             <iframe
               srcDoc={generatePreviewHTML()}
               title="Preview"
-              className="w-full h-full border-0"
+              className="w-full h-full min-h-96 border-0"
               sandbox="allow-scripts"
             />
           </div>

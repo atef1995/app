@@ -2,19 +2,23 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { ProjectWithDetails, ProjectSubmissionWithDetails } from "@/types/project";
+import {
+  ProjectWithDetails,
+  ProjectSubmissionWithDetails,
+} from "@/types/project";
 import { useSubmitProject } from "@/hooks/useProjectQueries";
 import { useMood } from "@/components/providers/MoodProvider";
-import { 
-  Save, 
-  Send, 
-  Code, 
-  Link as LinkIcon, 
+import {
+  Save,
+  Send,
+  Code,
+  Link as LinkIcon,
   AlertCircle,
   CheckCircle,
   Clock,
-  Eye
+  Eye,
 } from "lucide-react";
+import getMoodColors from "@/lib/getMoodColors";
 
 interface ProjectSubmissionFormProps {
   project: ProjectWithDetails;
@@ -40,8 +44,11 @@ export default function ProjectSubmissionForm({
   });
 
   const [activeTab, setActiveTab] = useState<string>(
-    project.submissionType === "CODE" ? "code" : 
-    project.submissionType === "LINK" ? "link" : "file"
+    project.submissionType === "CODE"
+      ? "code"
+      : project.submissionType === "LINK"
+      ? "link"
+      : "file"
   );
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -59,35 +66,15 @@ export default function ProjectSubmissionForm({
     }
   }, [existingSubmission]);
 
-  const getMoodColors = () => {
-    switch (currentMood.id) {
-      case "rush":
-        return {
-          accent: "border-orange-500 ring-orange-500",
-          button: "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600",
-        };
-      case "grind":
-        return {
-          accent: "border-blue-500 ring-blue-500",
-          button: "bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600",
-        };
-      default:
-        return {
-          accent: "border-purple-500 ring-purple-500",
-          button: "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600",
-        };
-    }
-  };
-
-  const moodColors = getMoodColors();
+  const moodColors = getMoodColors(currentMood.id);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     setIsDirty(true);
-    
+
     // Clear field-specific errors
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: "" }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
@@ -103,7 +90,8 @@ export default function ProjectSubmissionForm({
     }
 
     if (activeTab === "link" && !formData.submissionUrl.trim()) {
-      newErrors.submissionUrl = "Submission URL is required for link submissions";
+      newErrors.submissionUrl =
+        "Submission URL is required for link submissions";
     }
 
     if (activeTab === "link" && formData.submissionUrl.trim()) {
@@ -138,10 +126,12 @@ export default function ProjectSubmissionForm({
 
       onSubmissionUpdate?.(submission);
       setIsDirty(false);
-      
+
       // Show success message based on status
       if (status === "SUBMITTED") {
-        alert("Project submitted successfully! It will now be assigned for peer review.");
+        alert(
+          "Project submitted successfully! It will now be assigned for peer review."
+        );
       } else {
         alert("Draft saved successfully!");
       }
@@ -151,10 +141,11 @@ export default function ProjectSubmissionForm({
     }
   };
 
-  const canSubmit = existingSubmission?.status !== "SUBMITTED" && 
-                   existingSubmission?.status !== "UNDER_REVIEW" &&
-                   existingSubmission?.status !== "REVIEWED" &&
-                   existingSubmission?.status !== "APPROVED";
+  const canSubmit =
+    existingSubmission?.status !== "SUBMITTED" &&
+    existingSubmission?.status !== "UNDER_REVIEW" &&
+    existingSubmission?.status !== "REVIEWED" &&
+    existingSubmission?.status !== "APPROVED";
 
   const isReadOnly = !canSubmit;
 
@@ -182,10 +173,11 @@ export default function ProjectSubmissionForm({
               {isReadOnly ? "View Submission" : "Submit Your Project"}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
-              {isReadOnly 
-                ? `Status: ${existingSubmission?.status?.replace(/_/g, ' ').toLowerCase()}`
-                : "Share your work and get feedback from peers"
-              }
+              {isReadOnly
+                ? `Status: ${existingSubmission?.status
+                    ?.replace(/_/g, " ")
+                    .toLowerCase()}`
+                : "Share your work and get feedback from peers"}
             </p>
           </div>
 
@@ -195,19 +187,25 @@ export default function ProjectSubmissionForm({
                 {existingSubmission.status === "APPROVED" && (
                   <>
                     <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span className="text-green-600 dark:text-green-400">Approved</span>
+                    <span className="text-green-600 dark:text-green-400">
+                      Approved
+                    </span>
                   </>
                 )}
                 {existingSubmission.status === "UNDER_REVIEW" && (
                   <>
                     <Clock className="w-4 h-4 text-yellow-500" />
-                    <span className="text-yellow-600 dark:text-yellow-400">Under Review</span>
+                    <span className="text-yellow-600 dark:text-yellow-400">
+                      Under Review
+                    </span>
                   </>
                 )}
                 {existingSubmission.status === "REVIEWED" && (
                   <>
                     <Eye className="w-4 h-4 text-blue-500" />
-                    <span className="text-blue-600 dark:text-blue-400">Reviewed</span>
+                    <span className="text-blue-600 dark:text-blue-400">
+                      Reviewed
+                    </span>
                   </>
                 )}
               </div>
@@ -266,7 +264,9 @@ export default function ProjectSubmissionForm({
               placeholder="Give your project a descriptive title"
             />
             {errors.title && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.title}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {errors.title}
+              </p>
             )}
           </div>
 
@@ -289,7 +289,9 @@ export default function ProjectSubmissionForm({
               placeholder="Describe what you built, what challenges you faced, and what you learned"
             />
             {errors.description && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.description}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {errors.description}
+              </p>
             )}
           </div>
 
@@ -301,7 +303,9 @@ export default function ProjectSubmissionForm({
               </label>
               <textarea
                 value={formData.sourceCode}
-                onChange={(e) => handleInputChange("sourceCode", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("sourceCode", e.target.value)
+                }
                 readOnly={isReadOnly}
                 rows={12}
                 className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
@@ -313,7 +317,9 @@ export default function ProjectSubmissionForm({
                 placeholder="Paste your JavaScript code here..."
               />
               {errors.sourceCode && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.sourceCode}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {errors.sourceCode}
+                </p>
               )}
             </div>
           )}
@@ -326,7 +332,9 @@ export default function ProjectSubmissionForm({
               <input
                 type="url"
                 value={formData.submissionUrl}
-                onChange={(e) => handleInputChange("submissionUrl", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("submissionUrl", e.target.value)
+                }
                 readOnly={isReadOnly}
                 className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
                   focus:outline-none focus:ring-2 focus:${moodColors.accent}
@@ -337,7 +345,9 @@ export default function ProjectSubmissionForm({
                 placeholder="https://github.com/username/project or https://codepen.io/username/pen/..."
               />
               {errors.submissionUrl && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.submissionUrl}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {errors.submissionUrl}
+                </p>
               )}
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Link to your GitHub repository, CodePen, or live demo
@@ -392,7 +402,9 @@ export default function ProjectSubmissionForm({
                   ${moodColors.button}`}
               >
                 <Send className="w-4 h-4" />
-                {submitProject.isPending ? "Submitting..." : "Submit for Review"}
+                {submitProject.isPending
+                  ? "Submitting..."
+                  : "Submit for Review"}
               </button>
             </div>
           </div>
@@ -401,7 +413,8 @@ export default function ProjectSubmissionForm({
         {isReadOnly && existingSubmission?.submittedAt && (
           <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Submitted on {new Date(existingSubmission.submittedAt).toLocaleDateString()}
+              Submitted on{" "}
+              {new Date(existingSubmission.submittedAt).toLocaleDateString()}
             </p>
           </div>
         )}

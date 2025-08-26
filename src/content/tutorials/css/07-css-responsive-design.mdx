@@ -1,0 +1,1099 @@
+---
+title: "Responsive Design & Media Queries"
+description: "Learn to create websites that look perfect on any device using CSS media queries, flexible layouts, and responsive design principles."
+category: "css"
+subcategory: "responsive"
+order: 7
+premium: false
+estimatedTime: 90
+quizQuestions: 22
+---
+
+# Responsive Design & Media Queries
+
+Welcome to Responsive Design! In this tutorial, you'll learn how to create websites that adapt beautifully to any screen size, from mobile phones to ultra-wide monitors.
+
+## What is Responsive Design?
+
+Responsive design is an approach to web design that ensures your website looks and functions well on all devices and screen sizes. Instead of creating separate mobile and desktop versions, you create one flexible design that adapts.
+
+### Core Principles
+
+1. **Fluid Grids**: Use relative units instead of fixed pixels
+2. **Flexible Images**: Images that scale with their container
+3. **Media Queries**: CSS rules that apply based on device characteristics
+4. **Mobile-First Approach**: Design for mobile first, then enhance for larger screens
+
+## Understanding Viewport
+
+The viewport meta tag is essential for responsive design:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+```
+
+## Media Queries Fundamentals
+
+Media queries allow you to apply CSS rules based on device characteristics:
+
+<SeparatedEditorPreview 
+  title="Basic Media Query Example"
+  mission="Create a responsive layout that changes colors based on screen size"
+  instructions="Use media queries to apply different styles for different screen widths"
+initialHtml={`
+<div class="responsive-container">
+  <h1>Responsive Design Demo</h1>
+  <p>Resize your browser window to see the magic happen!</p>
+  <div class="content-box">
+    <p>This box changes appearance based on screen size.</p>
+  </div>
+</div>
+`}
+
+initialCss={`
+.responsive-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.content-box {
+  padding: 20px;
+  border-radius: 8px;
+  margin: 20px 0;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+/* Mobile First - Default styles for mobile */
+.responsive-container {
+  background: #3498db;
+  color: white;
+}
+
+.content-box {
+  background: rgba(255, 255, 255, 0.2);
+  font-size: 16px;
+}
+
+/* Tablet - 768px and up */
+@media screen and (min-width: 768px) {
+  .responsive-container {
+    background: #27ae60;
+  }
+  
+  .content-box {
+    background: rgba(255, 255, 255, 0.3);
+    font-size: 18px;
+    display: inline-block;
+    width: 70%;
+  }
+}
+
+/* Desktop - 1024px and up */
+@media screen and (min-width: 1024px) {
+  .responsive-container {
+    background: #9b59b6;
+  }
+  
+  .content-box {
+    background: rgba(255, 255, 255, 0.4);
+    font-size: 20px;
+    width: 50%;
+  }
+}
+
+/* Large Desktop - 1200px and up */
+@media screen and (min-width: 1200px) {
+  .responsive-container {
+    background: #e74c3c;
+  }
+  
+  .content-box {
+    background: rgba(255, 255, 255, 0.5);
+    font-size: 22px;
+    width: 40%;
+  }
+}
+`}/>
+
+📚 **How This Demo Works:**
+This example demonstrates the mobile-first approach to responsive design. The CSS starts with base styles for mobile devices, then uses `@media screen and (min-width: X)` queries to progressively enhance the design for larger screens:
+
+- **Mobile (default)**: Blue background with simple layout
+- **Tablet (768px+)**: Green background, content box becomes 70% width
+- **Desktop (1024px+)**: Purple background, content box becomes 50% width  
+- **Large Desktop (1200px+)**: Red background, content box becomes 40% width
+
+The **`.responsive-container`** uses `max-width: 1200px` and `margin: 0 auto` to center the content and prevent it from becoming too wide on large screens.
+
+🎯 **Try This Challenge:**
+1. In **`.responsive-container`** (mobile styles), change the background from `background: #3498db;` to `background: #e67e22;` 
+2. In the **tablet media query (768px)**, change `width: 70%;` to `width: 90%;` in **`.content-box`**
+3. Add a new media query for extra large screens at 1400px that makes the background `#16a085` and the content box only `30%` width
+
+## Common Breakpoints
+
+Industry-standard breakpoints for different devices:
+
+<SeparatedEditorPreview 
+  title="Standard Breakpoints Demo"
+  mission="Understand common responsive breakpoints"
+  instructions="See how different breakpoints affect layout on various device sizes"
+initialHtml={`
+<div class="breakpoint-demo">
+  <div class="device-indicator">
+    <span class="device-name"></span>
+    <span class="screen-size"></span>
+  </div>
+  <div class="grid-example">
+    <div class="item">Item 1</div>
+    <div class="item">Item 2</div>
+    <div class="item">Item 3</div>
+    <div class="item">Item 4</div>
+    <div class="item">Item 5</div>
+    <div class="item">Item 6</div>
+  </div>
+</div>
+`}
+
+initialCss={`
+.breakpoint-demo {
+  padding: 20px;
+  background: #ecf0f1;
+  font-family: Arial, sans-serif;
+}
+
+.device-indicator {
+  text-align: center;
+  padding: 15px;
+  background: #34495e;
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.grid-example {
+  display: grid;
+  gap: 15px;
+  grid-template-columns: 1fr;
+}
+
+.item {
+  background: #3498db;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+/* Mobile phones - Default (up to 479px) */
+.device-name::before {
+  content: "📱 Mobile";
+}
+.screen-size::before {
+  content: " (< 480px)";
+}
+
+/* Large phones / Small tablets - 480px and up */
+@media screen and (min-width: 480px) {
+  .grid-example {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .device-name::before {
+    content: "📱 Large Mobile";
+  }
+  .screen-size::before {
+    content: " (480px - 767px)";
+  }
+}
+
+/* Tablets - 768px and up */
+@media screen and (min-width: 768px) {
+  .grid-example {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .device-name::before {
+    content: "📱 Tablet";
+  }
+  .screen-size::before {
+    content: " (768px - 1023px)";
+  }
+}
+
+/* Desktop - 1024px and up */
+@media screen and (min-width: 1024px) {
+  .grid-example {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .device-name::before {
+    content: "💻 Desktop";
+  }
+  .screen-size::before {
+    content: " (1024px - 1199px)";
+  }
+}
+
+/* Large Desktop - 1200px and up */
+@media screen and (min-width: 1200px) {
+  .grid-example {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .device-name::before {
+    content: "🖥️ Large Desktop";
+  }
+  .screen-size::before {
+    content: " (1200px+)";
+  }
+}
+`}/>
+
+📚 **How This Demo Works:**
+This demo showcases industry-standard responsive breakpoints and how grid layouts adapt at each breakpoint. The magic happens through:
+
+- **`.grid-example`** starts with `grid-template-columns: 1fr` (single column)
+- **480px+**: Grid becomes `repeat(2, 1fr)` (2 columns)  
+- **768px+**: Grid becomes `repeat(3, 1fr)` (3 columns)
+- **1024px+**: Grid becomes `repeat(4, 1fr)` (4 columns)
+- **1200px+**: Grid becomes `repeat(6, 1fr)` (6 columns)
+
+The **`.device-indicator`** dynamically shows which breakpoint is active using `::before` pseudo-elements with different `content` values for each media query.
+
+🎯 **Try This Challenge:**
+1. In **`.item`**, change the background from `background: #3498db;` to `background: #e74c3c;`
+2. In the **480px media query**, change `grid-template-columns: repeat(2, 1fr);` to `repeat(3, 1fr);` 
+3. Add a new breakpoint at 1440px that creates 8 columns and displays "🖥️ Ultra Wide" with " (1440px+)" in **`.device-name`** and **`.screen-size`**
+
+## Flexible Typography
+
+Create typography that scales smoothly across devices:
+
+<SeparatedEditorPreview 
+  title="Responsive Typography"
+  mission="Create scalable typography using relative units"
+  instructions="Use rem, em, and viewport units for fluid typography"
+initialHtml={`
+<article class="typography-demo">
+  <h1 class="main-title">Responsive Typography</h1>
+  <h2 class="sub-title">Fluid scaling across all devices</h2>
+  <p class="body-text">
+    This paragraph demonstrates responsive typography using relative units. 
+    The text scales smoothly as the viewport changes, maintaining readability 
+    and visual hierarchy across all device sizes.
+  </p>
+  <blockquote class="quote">
+    "Good typography is invisible. Bad typography is everywhere."
+  </blockquote>
+  <p class="small-text">
+    This smaller text uses relative sizing to maintain proportional relationships.
+  </p>
+</article>
+`}
+
+initialCss={`
+.typography-demo {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  line-height: 1.6;
+}
+
+/* Base typography - Mobile first */
+.main-title {
+  font-size: clamp(1.8rem, 4vw, 3.5rem);
+  margin: 0 0 1rem 0;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.sub-title {
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  margin: 0 0 1.5rem 0;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.body-text {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  margin: 0 0 1.5rem 0;
+}
+
+.quote {
+  font-size: clamp(1.1rem, 2.8vw, 1.4rem);
+  font-style: italic;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-left: 4px solid rgba(255, 255, 255, 0.5);
+  border-radius: 0 8px 8px 0;
+}
+
+.small-text {
+  font-size: clamp(0.85rem, 2vw, 1rem);
+  opacity: 0.8;
+  margin: 1rem 0 0 0;
+}
+
+/* Tablet adjustments */
+@media screen and (min-width: 768px) {
+  .typography-demo {
+    padding: 3rem;
+  }
+}
+
+/* Desktop adjustments */
+@media screen and (min-width: 1024px) {
+  .typography-demo {
+    padding: 4rem;
+  }
+}
+`}/>
+
+📚 **How This Demo Works:**
+This demo showcases modern responsive typography using the `clamp()` function, which creates fluid scaling between minimum and maximum values:
+
+- **`clamp(min, preferred, max)`** automatically adjusts font size based on viewport width
+- **`.main-title`** uses `clamp(1.8rem, 4vw, 3.5rem)` - starts at 1.8rem, scales at 4% of viewport width, caps at 3.5rem
+- **`vw` units** (viewport width) make text scale proportionally with screen size
+- **`rem` units** provide accessibility by respecting user's font size preferences
+
+The **`.typography-demo`** also uses responsive padding that increases from 2rem → 3rem → 4rem as screens get larger, creating better visual balance.
+
+🎯 **Try This Challenge:**
+1. In **`.main-title`**, change the clamp values from `clamp(1.8rem, 4vw, 3.5rem)` to `clamp(2rem, 5vw, 4rem)`
+2. In **`.quote`**, change the background from `background: rgba(255, 255, 255, 0.1);` to `background: rgba(255, 255, 255, 0.2);`
+3. Add a new style for **`.body-text`** that changes the `color` to `#f1c40f` in the tablet media query (768px+)
+
+## Responsive Images
+
+Make images adapt to their containers:
+
+<SeparatedEditorPreview 
+  title="Responsive Images"
+  mission="Create images that scale properly on all devices"
+  instructions="Use CSS techniques to make images flexible and responsive"
+initialHtml={`
+<div class="image-gallery">
+  <div class="image-container">
+    <div class="placeholder-image large">Large Hero Image</div>
+    <p>Hero images should scale to full width</p>
+  </div>
+  
+  <div class="image-grid">
+    <div class="image-item">
+      <div class="placeholder-image small">Thumb 1</div>
+    </div>
+    <div class="image-item">
+      <div class="placeholder-image small">Thumb 2</div>
+    </div>
+    <div class="image-item">
+      <div class="placeholder-image small">Thumb 3</div>
+    </div>
+    <div class="image-item">
+      <div class="placeholder-image small">Thumb 4</div>
+    </div>
+  </div>
+</div>
+`}
+
+initialCss={`
+.image-gallery {
+  padding: 20px;
+  background: #f8f9fa;
+}
+
+.image-container {
+  margin-bottom: 30px;
+}
+
+.placeholder-image {
+  background: linear-gradient(45deg, #3498db, #2980b9);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.large {
+  width: 100%;
+  height: 200px;
+  font-size: 18px;
+}
+
+.image-grid {
+  display: grid;
+  gap: 15px;
+  grid-template-columns: 1fr;
+}
+
+.small {
+  width: 100%;
+  height: 120px;
+  font-size: 14px;
+}
+
+/* Responsive image grid */
+@media screen and (min-width: 480px) {
+  .image-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .large {
+    height: 250px;
+    font-size: 20px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .image-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .large {
+    height: 300px;
+    font-size: 24px;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .image-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .large {
+    height: 350px;
+    font-size: 28px;
+  }
+}
+
+/* Maintain aspect ratio */
+.aspect-ratio-container {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+}
+
+.aspect-ratio-container .placeholder-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+`}/>
+
+📚 **How This Demo Works:**
+This demo demonstrates responsive images and grid systems that adapt to different screen sizes:
+
+- **`.placeholder-image`** with `width: 100%` makes images fluid and responsive
+- **`.image-grid`** starts as single column, then expands: 1 → 2 → 3 → 4 columns based on breakpoints
+- **`.large`** image scales height from 200px → 250px → 300px → 350px for better proportions
+- **`.aspect-ratio-container`** shows advanced technique using `padding-bottom: 56.25%` to maintain 16:9 aspect ratio
+
+The grid uses `gap: 15px` for consistent spacing and `grid-template-columns: repeat(X, 1fr)` to create equal-width columns that scale perfectly.
+
+🎯 **Try This Challenge:**
+1. In **`.large`**, change the gradient from `linear-gradient(45deg, #3498db, #2980b9)` to `linear-gradient(45deg, #e74c3c, #c0392b)`
+2. In the **768px media query**, change `grid-template-columns: repeat(3, 1fr);` to `repeat(2, 1fr);` 
+3. In **`.small`**, change the height from `height: 120px;` to `height: 150px;` and add `border: 2px solid #34495e;`
+
+## Container Queries (Modern Approach)
+
+Container queries are the future of responsive design:
+
+<SeparatedEditorPreview 
+  title="Container Queries Demo"
+  mission="Explore container-based responsive design"
+  instructions="See how elements respond to their container size, not viewport size"
+initialHtml={`
+<div class="container-demo">
+  <div class="sidebar">
+    <div class="card-container small">
+      <div class="responsive-card">
+        <h3>Sidebar Card</h3>
+        <p>This card responds to its container width</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="main-content">
+    <div class="card-container large">
+      <div class="responsive-card">
+        <h3>Main Content Card</h3>
+        <p>Same component, different layout based on available space</p>
+      </div>
+    </div>
+  </div>
+</div>
+`}
+
+initialCss={`
+.container-demo {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+  padding: 20px;
+  background: #34495e;
+  min-height: 400px;
+}
+
+.sidebar {
+  background: #2c3e50;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.main-content {
+  background: #2c3e50;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.card-container {
+  container-type: inline-size;
+  width: 100%;
+}
+
+.responsive-card {
+  background: white;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.responsive-card h3 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-size: 18px;
+}
+
+.responsive-card p {
+  margin: 0;
+  color: #7f8c8d;
+  line-height: 1.5;
+}
+
+/* Container query - when container is wider than 300px */
+@container (min-width: 300px) {
+  .responsive-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 30px;
+  }
+  
+  .responsive-card h3 {
+    font-size: 20px;
+    color: #27ae60;
+  }
+}
+
+/* Container query - when container is wider than 400px */
+@container (min-width: 400px) {
+  .responsive-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px;
+  }
+  
+  .responsive-card h3 {
+    font-size: 24px;
+    color: white;
+  }
+  
+  .responsive-card p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+  }
+}
+
+/* Mobile responsive */
+@media screen and (max-width: 768px) {
+  .container-demo {
+    grid-template-columns: 1fr;
+  }
+}
+`}/>
+
+📚 **How This Demo Works:**
+This demo introduces **container queries** - a revolutionary CSS feature that lets elements respond to their container's size instead of the viewport:
+
+- **`.card-container`** has `container-type: inline-size` which establishes it as a query container
+- **`@container (min-width: 300px)`** - when container is 300px+ wide, card becomes centered with green heading
+- **`@container (min-width: 400px)`** - when container is 400px+ wide, card gets gradient background and white text
+- **Same component, different layouts** based on available space, not screen size!
+
+The **`.container-demo`** uses `grid-template-columns: 1fr 2fr` to create sidebar (narrow) and main content (wide) areas, showing how the same **`.responsive-card`** component adapts differently in each space.
+
+🎯 **Try This Challenge:**
+1. In **`.sidebar`**, change the background from `background: #2c3e50;` to `background: #8e44ad;`
+2. In the **300px container query**, change the heading color from `color: #27ae60;` to `color: #e67e22;`  
+3. Change the 400px container query threshold to 350px and see how it affects the layout transition
+
+## Navigation Patterns
+
+Create responsive navigation menus:
+
+<SeparatedEditorPreview 
+  title="Responsive Navigation"
+  mission="Build a mobile-friendly navigation menu"
+  instructions="Create a hamburger menu that transforms on different screen sizes"
+initialHtml={`
+<nav class="responsive-nav">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <span class="logo">🌟 Brand</span>
+    </div>
+    
+    <button class="nav-toggle" onclick="toggleMenu()">
+      <span class="hamburger"></span>
+      <span class="hamburger"></span>
+      <span class="hamburger"></span>
+    </button>
+    
+    <ul class="nav-menu" id="navMenu">
+      <li class="nav-item">
+        <a href="#" class="nav-link">Home</a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">About</a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">Services</a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">Contact</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<script>
+function toggleMenu() {
+  const navMenu = document.getElementById('navMenu');
+  navMenu.classList.toggle('active');
+}
+</script>
+`}
+
+initialCss={`
+.responsive-nav {
+  background: #2c3e50;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 60px;
+}
+
+.nav-brand .logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.hamburger {
+  width: 25px;
+  height: 3px;
+  background: white;
+  margin: 3px 0;
+  transition: 0.3s;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2rem;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 10px 0;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.nav-link:hover {
+  color: #3498db;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #3498db;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Mobile styles */
+@media screen and (max-width: 768px) {
+  .nav-toggle {
+    display: flex;
+  }
+  
+  .nav-menu {
+    position: fixed;
+    top: 60px;
+    left: -100%;
+    width: 100%;
+    height: calc(100vh - 60px);
+    background: #2c3e50;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 2rem;
+    transition: left 0.3s ease;
+  }
+  
+  .nav-menu.active {
+    left: 0;
+  }
+  
+  .nav-item {
+    margin: 1rem 0;
+  }
+  
+  .nav-link {
+    font-size: 18px;
+    padding: 15px 30px;
+  }
+  
+  /* Hamburger animation */
+  .nav-menu.active ~ .nav-toggle .hamburger:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px);
+  }
+  
+  .nav-menu.active ~ .nav-toggle .hamburger:nth-child(2) {
+    opacity: 0;
+  }
+  
+  .nav-menu.active ~ .nav-toggle .hamburger:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px);
+  }
+}
+`}/>
+
+📚 **How This Demo Works:**
+This demo showcases a fully responsive navigation that transforms from desktop horizontal layout to mobile hamburger menu:
+
+**Desktop Behavior:**
+- **`.nav-menu`** displays as `display: flex` with horizontal links  
+- **`.nav-toggle`** (hamburger) is hidden with `display: none`
+- **`.nav-link:hover::after`** creates animated underline effect with `width: 0` → `width: 100%`
+
+**Mobile Transformation (768px and below):**
+- **`.nav-toggle`** becomes visible and functional
+- **`.nav-menu`** transforms into full-screen overlay with `position: fixed` and `left: -100%` (hidden)
+- JavaScript `toggleMenu()` adds **`.active`** class to slide menu in (`left: 0`)
+- **Hamburger animation** transforms into X: top line rotates 45°, middle disappears, bottom rotates -45°
+
+🎯 **Try This Challenge:**
+1. In **`.nav-menu`** (mobile), change the background from `background: #2c3e50;` to `background: #8e44ad;`
+2. In **`.nav-link:hover`**, change the hover color from `color: #3498db;` to `color: #e74c3c;`
+3. In **`.hamburger`**, change the transition duration from `transition: 0.3s;` to `transition: 0.6s;` for slower animations
+
+## Advanced Media Query Features
+
+Explore advanced media query capabilities:
+
+<SeparatedEditorPreview 
+  title="Advanced Media Query Features"
+  mission="Use advanced media query features for better user experiences"
+  instructions="Implement dark mode, reduced motion, and high-DPI display support"
+initialHtml={`
+<div class="advanced-features">
+  <div class="feature-card">
+    <h3>🌙 Dark Mode Support</h3>
+    <p>Automatically adapts to user's color scheme preference</p>
+  </div>
+  
+  <div class="feature-card">
+    <h3>🎭 Reduced Motion</h3>
+    <p>Respects user's motion preferences for accessibility</p>
+  </div>
+  
+  <div class="feature-card">
+    <h3>📱 High-DPI Displays</h3>
+    <p>Optimized for retina and high-resolution screens</p>
+  </div>
+  
+  <div class="feature-card">
+    <h3>🖱️ Hover Support</h3>
+    <p>Different interactions for touch and mouse devices</p>
+  </div>
+</div>
+`}
+
+initialCss={`
+.advanced-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  background: #f8f9fa;
+}
+
+.feature-card {
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: white;
+  border: 2px solid transparent;
+}
+
+.feature-card h3 {
+  margin: 0 0 15px 0;
+  color: #2c3e50;
+  font-size: 20px;
+}
+
+.feature-card p {
+  margin: 0;
+  color: #7f8c8d;
+  line-height: 1.6;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .advanced-features {
+    background: #1a1a1a;
+  }
+  
+  .feature-card {
+    background: #2d2d2d;
+    color: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  .feature-card h3 {
+    color: #ffffff;
+  }
+  
+  .feature-card p {
+    color: #b0b0b0;
+  }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .feature-card {
+    transition: none;
+  }
+}
+
+/* High-DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .feature-card {
+    border-width: 1px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Hover support - only apply hover effects on devices that support it */
+@media (hover: hover) {
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    border-color: #3498db;
+  }
+}
+
+/* Touch devices - different interaction */
+@media (hover: none) {
+  .feature-card:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Orientation changes */
+@media screen and (orientation: landscape) and (max-height: 600px) {
+  .advanced-features {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  
+  .feature-card {
+    padding: 20px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .advanced-features {
+    background: white;
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .feature-card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+    break-inside: avoid;
+  }
+}
+`}/>
+
+📚 **How This Demo Works:**
+This demo showcases cutting-edge CSS media queries that respond to user preferences and device capabilities:
+
+**Advanced Media Query Types:**
+- **`@media (prefers-color-scheme: dark)`** - Automatically detects if user prefers dark mode in their OS settings
+- **`@media (prefers-reduced-motion: reduce)`** - Respects accessibility preference to reduce animations
+- **`@media (-webkit-min-device-pixel-ratio: 2)`** - Targets high-DPI/retina displays for sharper visuals  
+- **`@media (hover: hover)`** - Only applies hover effects on devices that actually support hovering (not touch)
+- **`@media (hover: none)`** - Targets touch devices with different interaction (`:active` instead of `:hover`)
+
+**Contextual Adaptations:**
+- **`@media (orientation: landscape)`** - Adjusts layout for landscape orientation on mobile
+- **`@media print`** - Optimizes design for printing (removes shadows, adjusts colors)
+
+🎯 **Try This Challenge:**
+1. In the **dark mode media query**, change **`.advanced-features`** background from `background: #1a1a1a;` to `background: #2c3e50;`
+2. In **`@media (hover: hover)`**, change the hover transform from `translateY(-5px)` to `scale(1.05)` in **`.feature-card:hover`**
+3. In the **print media query**, change `grid-template-columns: 1fr 1fr;` to `grid-template-columns: 1fr;` for single-column printing
+
+## Best Practices for Responsive Design
+
+### 1. Mobile-First Approach
+Always start with mobile styles and progressively enhance for larger screens:
+
+```css
+/* Base styles for mobile */
+.container {
+  padding: 1rem;
+  width: 100%;
+}
+
+/* Enhance for tablet */
+@media (min-width: 768px) {
+  .container {
+    padding: 2rem;
+    max-width: 750px;
+    margin: 0 auto;
+  }
+}
+
+/* Enhance for desktop */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1200px;
+    padding: 3rem;
+  }
+}
+`}>
+
+### 2. Use Relative Units
+Prefer `rem`, `em`, `%`, and viewport units over fixed pixels:
+
+```css
+/* Good - Responsive */
+.text { font-size: 1.125rem; }
+.container { width: 100%; max-width: 75rem; }
+.hero { height: 100vh; }
+
+/* Avoid - Fixed */
+.text { font-size: 18px; }
+.container { width: 1200px; }
+.hero { height: 600px; }
+```
+
+### 3. Optimize Images
+Use responsive image techniques:
+
+```css
+/* Responsive images */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Art direction with picture element */
+picture {
+  display: block;
+}
+```
+
+### 4. Touch-Friendly Design
+Ensure interactive elements are large enough for touch:
+
+```css
+/* Minimum touch target size */
+.button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 12px 20px;
+}
+```
+
+## Testing Responsive Design
+
+### Browser Developer Tools
+- Use device simulation modes
+- Test various screen sizes
+- Check network throttling
+
+### Real Device Testing
+- Test on actual mobile devices
+- Use services like BrowserStack
+- Check different operating systems
+
+### Performance Considerations
+- Optimize images for mobile
+- Minimize HTTP requests
+- Use compression and caching
+
+## Conclusion
+
+You've mastered responsive design! You can now:
+
+- Create layouts that work on any device
+- Use media queries effectively
+- Implement mobile-first design
+- Create flexible typography and images
+- Build responsive navigation patterns
+- Use advanced media query features
+- Apply responsive design best practices
+
+Responsive design is essential in today's multi-device world. Your websites will now provide excellent user experiences across all screen sizes.
+
+## What's Next?
+
+In the next tutorial, we'll explore **Advanced CSS Selectors**, where you'll learn powerful selection techniques to target elements with precision and create more maintainable stylesheets.

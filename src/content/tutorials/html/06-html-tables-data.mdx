@@ -1,0 +1,631 @@
+---
+title: "HTML Tables: Organizing and Displaying Data"
+description: "Master HTML tables to effectively organize, display, and make data accessible with proper structure and semantic markup"
+level: "beginner"
+estimatedTime: "50 minutes"
+topics: ["Tables", "Data Structure", "Accessibility", "Semantic Markup", "Responsive Design"]
+quizQuestions: 12
+order: 6
+---
+
+# HTML Tables: Organizing and Displaying Data
+
+Welcome to data organization! 📊 HTML tables are perfect for displaying structured data like spreadsheets, comparison charts, schedules, and any information that benefits from rows and columns.
+
+## When to Use Tables
+
+Tables should be used for **tabular data** - information that has a logical relationship between rows and columns. 
+
+<HTMLEditorPreview 
+  title="Good Uses for Tables" 
+  description="Examples of appropriate table usage:"
+  initialHtml={`<!-- ✅ Perfect for tables -->
+<table>
+  <caption>Monthly Sales Data</caption>
+  <thead>
+    <tr>
+      <th>Month</th>
+      <th>Revenue</th>
+      <th>Orders</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>January</td>
+      <td>$12,500</td>
+      <td>89</td>
+    </tr>
+    <tr>
+      <td>February</td>
+      <td>$15,200</td>
+      <td>102</td>
+    </tr>
+  </tbody>
+</table>`}
+/>
+
+> **⚠️ Important:** Never use tables for layout! Use CSS Grid or Flexbox instead. Tables are for data, not design.
+
+## Basic Table Structure
+
+Every table follows a specific structure with these essential elements:
+
+<HTMLEditorPreview 
+  title="Table Anatomy" 
+  description="Understanding table structure:"
+  initialHtml={`<table>
+  <!-- Table caption (optional but recommended) -->
+  <caption>Student Grades</caption>
+  
+  
+  <thead>
+    <tr> 
+      <th>Name</th>     
+      <th>Math</th>
+      <th>Science</th>
+      <th>English</th>
+    </tr>
+  </thead>
+  
+  <!-- Table body section -->
+  <tbody>
+    <tr>
+      <td>Alice Johnson</td>  <!-- Table data cell -->
+      <td>95</td>
+      <td>87</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <td>Bob Smith</td>
+      <td>78</td>
+      <td>91</td>
+      <td>85</td>
+    </tr>
+  </tbody>
+  
+  <!-- Table footer section (optional) -->
+  <tfoot>
+    <tr>
+      <td>Average</td>
+      <td>86.5</td>
+      <td>89</td>
+      <td>88.5</td>
+    </tr>
+  </tfoot>
+</table>`}
+/>
+
+## Table Elements Explained
+
+### Essential Elements
+
+- **`<table>`** - Container for entire table
+- **`<tr>`** - Table row (contains cells)
+- **`<th>`** - Header cell (bold, centered by default)
+- **`<td>`** - Data cell (regular content)
+
+### Semantic Structure Elements
+
+- **`<caption>`** - Table title/description
+- **`<thead>`** - Groups header rows
+- **`<tbody>`** - Groups body rows  
+- **`<tfoot>`** - Groups footer rows
+
+## Advanced Table Features
+
+### Spanning Cells
+
+Sometimes you need cells that span multiple columns or rows:
+
+<HTMLEditorPreview 
+  title="Spanning Cells" 
+  description="colspan and rowspan in action:"
+  initialHtml={`<table>
+  <caption>Project Timeline</caption>
+  <thead>
+    <tr>
+      <th>Task</th>
+      <th colspan="3">Timeline (Weeks)</th>
+      <th>Owner</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>Week 1</th>
+      <th>Week 2</th>
+      <th>Week 3</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Design</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td></td>
+      <td rowspan="2">Sarah</td>
+    </tr>
+    <tr>
+      <td>Development</td>
+      <td></td>
+      <td>✓</td>
+      <td>✓</td>
+    </tr>
+  </tbody>
+</table>`}
+/>
+
+### Accessible Table Headers
+
+Use `scope` attribute to clarify header relationships:
+
+<HTMLEditorPreview 
+  title="Accessible Headers" 
+  description="Using scope for clarity:"
+  initialHtml={`<table>
+  <caption>Sales by Region and Quarter</caption>
+  <thead>
+    <tr>
+      <th scope="col">Region</th>
+      <th scope="col">Q1</th>
+      <th scope="col">Q2</th>
+      <th scope="col">Q3</th>
+      <th scope="col">Q4</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">North</th>
+      <td>$45K</td>
+      <td>$52K</td>
+      <td>$48K</td>
+      <td>$61K</td>
+    </tr>
+    <tr>
+      <th scope="row">South</th>
+      <td>$38K</td>
+      <td>$44K</td>
+      <td>$51K</td>
+      <td>$47K</td>
+    </tr>
+  </tbody>
+</table>`}
+/>
+
+### Complex Headers
+
+For complex tables, use `id` and `headers` attributes:
+
+<HTMLEditorPreview 
+  title="Complex Header Relationships" 
+  description="Linking cells to multiple headers:"
+  initialHtml={`<table>
+  <caption>Quarterly Performance by Department</caption>
+  <thead>
+    <tr>
+      <th id="dept">Department</th>
+      <th id="q1" colspan="2">Q1</th>
+      <th id="q2" colspan="2">Q2</th>
+    </tr>
+    <tr>
+      <th id="empty"></th>
+      <th id="q1-rev">Revenue</th>
+      <th id="q1-exp">Expenses</th>
+      <th id="q2-rev">Revenue</th>
+      <th id="q2-exp">Expenses</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="sales" headers="dept">Sales</th>
+      <td headers="sales q1 q1-rev">$120K</td>
+      <td headers="sales q1 q1-exp">$45K</td>
+      <td headers="sales q2 q2-rev">$135K</td>
+      <td headers="sales q2 q2-exp">$52K</td>
+    </tr>
+  </tbody>
+</table>`}
+/>
+
+## Styling Tables with CSS
+
+While HTML provides structure, CSS makes tables visually appealing:
+
+<HTMLEditorPreview 
+  title="Basic Table Styling" 
+  description="Essential CSS for better table appearance:"
+  initialHtml={`<style>
+  /* Basic table styling */
+  table {
+    border-collapse: collapse;  /* Merge borders */
+    width: 100%;
+    font-family: Arial, sans-serif;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 12px 15px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+  }
+
+  /* Stripe rows for readability */
+  tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  tbody tr:hover {
+    background-color: #f5f5f5;
+  }
+
+  caption {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  </style>
+
+<table>
+  <caption>Styled Employee Data</caption>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Position</th>
+      <th>Salary</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>John Doe</td>
+      <td>Developer</td>
+      <td>$75,000</td>
+    </tr>
+    <tr>
+      <td>Jane Smith</td>
+      <td>Designer</td>
+      <td>$68,000</td>
+    </tr>
+  </tbody>
+</table>`}>
+</HTMLEditorPreview>
+
+## Responsive Tables
+
+Tables can be challenging on mobile devices. Here are strategies:
+
+### Horizontal Scroll Approach
+
+<HTMLEditorPreview 
+  title="Scrollable Table" 
+  description="Let wide tables scroll horizontally:"
+  initialHtml={`<style>
+  .table-container {
+    overflow-x: auto;
+    margin: 1em 0;
+  }
+
+  table {
+    min-width: 600px; /* Ensure minimum width */
+    white-space: nowrap; /* Prevent text wrapping */
+  }
+  </style>
+
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Category</th>
+        <th>Supplier</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Laptop Pro</td>
+        <td>High-performance laptop</td>
+        <td>$1,299</td>
+        <td>15</td>
+        <td>Electronics</td>
+        <td>TechCorp</td>
+      </tr>
+    </tbody>
+  </table>
+</div>`}>
+</HTMLEditorPreview>
+
+### Stack on Mobile
+
+<HTMLEditorPreview 
+  title="Mobile-Friendly Stacking" 
+  description="Transform table to cards on small screens:"
+  initialHtml={`
+  <style>
+  /* Desktop: normal table */
+  @media (min-width: 768px) {
+    .responsive-table {
+      display: table;
+    }
+  
+    .responsive-table thead,
+    .responsive-table tbody,
+    .responsive-table tr,
+    .responsive-table th,
+    .responsive-table td {
+      display: table-cell;
+    }
+  }
+
+  /* Mobile: stack as cards */
+  @media (max-width: 767px) {
+    .responsive-table,
+    .responsive-table thead,
+    .responsive-table tbody,
+    .responsive-table tr {
+      display: block;
+    }
+    
+    .responsive-table thead {
+      display: none; /* Hide header on mobile */
+    }
+    
+    .responsive-table tr {
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  
+    .responsive-table td {
+      display: block;
+      text-align: right;
+      padding: 5px 0;
+      border: none;
+    }
+    
+    .responsive-table td::before {
+      content: attr(data-label) ": ";
+      float: left;
+      font-weight: bold;
+    }
+  }
+</style>
+<table class="responsive-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td data-label="Name">Alice Johnson</td>
+      <td data-label="Email">alice@email.com</td>
+      <td data-label="Phone">(555) 123-4567</td>
+    </tr>
+  </tbody>
+</table>`}
+/>
+
+## Table Accessibility Best Practices
+
+### 1. Always Use Captions
+
+<HTMLEditorPreview 
+  title="Descriptive Captions" 
+  description="Help users understand table purpose:"
+  initialHtml={`<!-- ✅ Good: Descriptive caption -->
+<table>
+  <caption>
+    Monthly website traffic by source for 2024
+    (sorted by total visits, descending)
+  </caption>
+  <!-- table content -->
+</table>
+
+<!-- ❌ Poor: No caption -->
+<table>
+  <!-- table content without context -->
+</table>`}
+/>
+
+### 2. Use Proper Header Structure
+
+<HTMLEditorPreview 
+  title="Proper Header Markup" 
+  description="Clear header relationships:"
+  initialHtml={`<!-- ✅ Good: Proper semantic structure -->
+<table>
+  <caption>Course Schedule</caption>
+  <thead>
+    <tr>
+      <th scope="col">Time</th>
+      <th scope="col">Monday</th>
+      <th scope="col">Tuesday</th>
+      <th scope="col">Wednesday</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">9:00 AM</th>
+      <td>Math 101</td>
+      <td>Physics</td>
+      <td>Chemistry</td>
+    </tr>
+  </tbody>
+</table>`}
+/>
+
+### 3. Provide Summary for Complex Tables
+
+<HTMLEditorPreview 
+  title="Table Summary" 
+  description="Add context for screen readers:"
+  initialHtml={`<table>
+  <caption>
+    Sales Performance by Quarter
+    <div class="table-summary">
+      This table shows sales data across 4 quarters for 3 regions.
+      Data is organized with regions as rows and quarters as columns.
+      Highest performance was North region in Q4 with $95,000.
+    </div>
+  </caption>
+  <!-- table content -->
+</table>
+
+<style>
+.table-summary {
+  font-size: 0.9em;
+  font-weight: normal;
+  color: #666;
+  margin-top: 5px;
+}
+</style>`}
+/>
+
+## Common Table Patterns
+
+### Data Comparison Table
+
+<HTMLEditorPreview 
+  title="Product Comparison" 
+  description="Side-by-side feature comparison:"
+  initialHtml={`<table>
+  <caption>Subscription Plan Comparison</caption>
+  <thead>
+    <tr>
+      <th scope="col">Feature</th>
+      <th scope="col">Basic</th>
+      <th scope="col">Pro</th>
+      <th scope="col">Enterprise</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Storage</th>
+      <td>10 GB</td>
+      <td>100 GB</td>
+      <td>Unlimited</td>
+    </tr>
+    <tr>
+      <th scope="row">Users</th>
+      <td>1</td>
+      <td>10</td>
+      <td>Unlimited</td>
+    </tr>
+    <tr>
+      <th scope="row">Support</th>
+      <td>Email</td>
+      <td>Priority Email</td>
+      <td>24/7 Phone + Email</td>
+    </tr>
+    <tr>
+      <th scope="row">Price</th>
+      <td>$9/month</td>
+      <td>$29/month</td>
+      <td>$99/month</td>
+    </tr>
+  </tbody>
+</table>`}
+/>
+
+### Financial Data Table
+
+<HTMLEditorPreview 
+  title="Financial Report" 
+  description="Numeric data with proper alignment:"
+  initialHtml={`<table>
+  <caption>Quarterly Financial Summary (in thousands)</caption>
+  <thead>
+    <tr>
+      <th scope="col">Metric</th>
+      <th scope="col" class="number">Q1 2024</th>
+      <th scope="col" class="number">Q2 2024</th>
+      <th scope="col" class="number">Q3 2024</th>
+      <th scope="col" class="number">Change (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Revenue</th>
+      <td class="number">$245.6</td>
+      <td class="number">$267.8</td>
+      <td class="number">$298.4</td>
+      <td class="number positive">+21.5%</td>
+    </tr>
+    <tr>
+      <th scope="row">Expenses</th>
+      <td class="number">$189.2</td>
+      <td class="number">$201.5</td>
+      <td class="number">$215.9</td>
+      <td class="number negative">+14.1%</td>
+    </tr>
+    <tr>
+      <th scope="row">Profit</th>
+      <td class="number">$56.4</td>
+      <td class="number">$66.3</td>
+      <td class="number">$82.5</td>
+      <td class="number positive">+46.3%</td>
+    </tr>
+  </tbody>
+</table>
+
+<style>
+.number {
+  text-align: right;
+  font-family: 'Courier New', monospace;
+}
+
+.positive { color: #28a745; }
+.negative { color: #dc3545; }
+</style>`}
+/>
+
+## Testing Your Tables
+
+### Accessibility Testing
+
+1. **Navigate with keyboard only** (Tab, Arrow keys)
+2. **Test with screen reader** (or screen reader simulator)
+3. **Check color contrast** for text and backgrounds
+4. **Verify on mobile devices**
+
+### Validation Checklist
+
+- [ ] Table has a descriptive caption
+- [ ] Headers use `<th>` with appropriate `scope`
+- [ ] Complex relationships use `headers` attribute
+- [ ] Table is responsive or has overflow handling
+- [ ] Numeric data is right-aligned
+- [ ] Color isn't the only way to convey information
+
+## Key Takeaways
+
+✅ **Use tables for tabular data only**
+✅ **Always include semantic structure** (`thead`, `tbody`, `tfoot`)
+✅ **Provide descriptive captions** for context
+✅ **Use proper header markup** with scope attributes
+✅ **Make tables responsive** for mobile users
+✅ **Test accessibility** with keyboard and screen readers
+✅ **Style thoughtfully** - readability over decoration
+
+Tables are powerful tools for data presentation when used correctly. Focus on semantic markup, accessibility, and responsive design to create tables that work for everyone! 📊
+
+---
+
+## Practice Exercises
+
+Try creating these tables:
+1. **Employee directory** with sorting capabilities
+2. **Product inventory** with stock status indicators
+3. **Event schedule** with time slots and multiple tracks
+4. **Grade book** with student performance data
+
+Ready to move on? Next, we'll explore **HTML Links and Navigation** to connect your content together! 🔗

@@ -1,21 +1,24 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { 
-  Crown, 
-  Zap, 
-  Check, 
-  X, 
-  Calendar, 
-  CreditCard, 
+import {
+  Crown,
+  Zap,
+  Check,
+  X,
+  Calendar,
+  CreditCard,
   TrendingUp,
   AlertTriangle,
   RefreshCw,
   ExternalLink,
-  Settings
+  Settings,
 } from "lucide-react";
 import { Plan, PLAN_CONFIGS } from "@/lib/subscriptionService";
-import { useSubscriptionWithAccess, useSubscriptionCancellation } from "@/hooks/useSubscription";
+import {
+  useSubscriptionWithAccess,
+  useSubscriptionCancellation,
+} from "@/hooks/useSubscription";
 
 interface SubscriptionManagerProps {
   onUpgrade?: (plan: Plan) => void;
@@ -23,18 +26,24 @@ interface SubscriptionManagerProps {
 
 export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
   const router = useRouter();
-  const { data, isLoading: loading, error: queryError, refetch } = useSubscriptionWithAccess();
-  const { mutate: cancelSubscription, isPending: cancelling } = useSubscriptionCancellation();
+  const {
+    data,
+    isLoading: loading,
+    error: queryError,
+    refetch,
+  } = useSubscriptionWithAccess();
+  const { mutate: cancelSubscription, isPending: cancelling } =
+    useSubscriptionCancellation();
 
   const error = queryError?.message || null;
 
   const handleCancelSubscription = async () => {
     if (!data?.subscription) return;
-    
+
     const confirmed = window.confirm(
-      'Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your current billing period.'
+      "Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your current billing period."
     );
-    
+
     if (!confirmed) return;
 
     cancelSubscription();
@@ -49,7 +58,7 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
   };
 
   const formatDate = (date: Date | null) => {
-    if (!date) return 'Never';
+    if (!date) return "Never";
     return new Date(date).toLocaleDateString();
   };
 
@@ -59,9 +68,9 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
 
   const getPlanIcon = (plan: Plan) => {
     switch (plan) {
-      case 'CRACKED':
+      case "CRACKED":
         return <Zap className="w-5 h-5 text-purple-500" />;
-      case 'VIBED':
+      case "VIBED":
         return <Crown className="w-5 h-5 text-yellow-500" />;
       default:
         return <Settings className="w-5 h-5 text-gray-500" />;
@@ -70,12 +79,12 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
 
   const getPlanColor = (plan: Plan) => {
     switch (plan) {
-      case 'CRACKED':
-        return 'from-purple-500 to-pink-500';
-      case 'VIBED':
-        return 'from-yellow-400 to-orange-500';
+      case "CRACKED":
+        return "from-purple-500 to-pink-500";
+      case "VIBED":
+        return "from-yellow-400 to-orange-500";
       default:
-        return 'from-gray-400 to-gray-600';
+        return "from-gray-400 to-gray-600";
     }
   };
 
@@ -121,6 +130,7 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
   const { subscription, access } = data;
   const currentPlan = subscription.plan;
   const isActive = subscription.isActive;
+  console.log({ data });
 
   return (
     <div className="space-y-6">
@@ -134,13 +144,17 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
                 {currentPlan} Plan
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {isActive ? 'Active' : 'Inactive'} • {subscription.status}
+                {isActive ? "Active" : "Inactive"} • {subscription.status}
               </p>
             </div>
           </div>
-          
-          {currentPlan !== 'FREE' && isActive && (
-            <div className={`px-3 py-1 rounded-full bg-gradient-to-r ${getPlanColor(currentPlan)} text-white text-sm font-medium`}>
+
+          {currentPlan !== "FREE" && isActive && (
+            <div
+              className={`px-3 py-1 rounded-full bg-gradient-to-r ${getPlanColor(
+                currentPlan
+              )} text-white text-sm font-medium`}
+            >
               Premium
             </div>
           )}
@@ -168,7 +182,10 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
               </span>
             </div>
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              {access.tutorialLimits.current} / {access.tutorialLimits.max === Infinity ? '∞' : access.tutorialLimits.max}
+              {access.tutorialLimits.current} /{" "}
+              {access.tutorialLimits.max === null
+                ? "Unlimited"
+                : access.tutorialLimits.max}
             </p>
           </div>
 
@@ -180,28 +197,39 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
               </span>
             </div>
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              {access.challengeLimits.current} / {access.challengeLimits.max === Infinity ? '∞' : access.challengeLimits.max}
+              {access.challengeLimits.current} /{" "}
+              {access.challengeLimits.max === null
+                ? "Unlimited"
+                : access.challengeLimits.max}
             </p>
           </div>
         </div>
 
         {/* Current Plan Features */}
         <div className="mb-6">
-          <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Your Plan Includes:</h4>
+          <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
+            Your Plan Includes:
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {Object.entries(PLAN_CONFIGS[currentPlan]).map(([key, value]) => {
               const featureLabels = {
-                maxTutorials: value === Infinity ? 'Unlimited Tutorials' : `${value} Tutorials`,
-                maxChallenges: value === Infinity ? 'Unlimited Challenges' : `${value} Challenges`,
-                hasQuizzes: 'Quiz System',
-                hasMoodAdaptation: 'Mood Adaptation',
-                hasProgressTracking: 'Progress Tracking',
-                hasAdvancedFeatures: 'Advanced Features'
+                maxTutorials:
+                  value === Infinity
+                    ? "Unlimited Tutorials"
+                    : `${value} Tutorials`,
+                maxChallenges:
+                  value === Infinity
+                    ? "Unlimited Challenges"
+                    : `${value} Challenges`,
+                hasQuizzes: "Quiz System",
+                hasMoodAdaptation: "Mood Adaptation",
+                hasProgressTracking: "Progress Tracking",
+                hasAdvancedFeatures: "Advanced Features",
               };
-              
+
               const label = featureLabels[key as keyof typeof featureLabels];
-              const included = typeof value === 'boolean' ? value : true;
-              
+              const included = typeof value === "boolean" ? value : true;
+
               return (
                 <div key={key} className="flex items-center gap-2">
                   {included ? (
@@ -209,7 +237,13 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
                   ) : (
                     <X className="w-4 h-4 text-red-500" />
                   )}
-                  <span className={`text-sm ${included ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500'}`}>
+                  <span
+                    className={`text-sm ${
+                      included
+                        ? "text-gray-900 dark:text-gray-100"
+                        : "text-gray-500"
+                    }`}
+                  >
                     {label}
                   </span>
                 </div>
@@ -220,17 +254,21 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-3">
-          {currentPlan !== 'CRACKED' && (
+          {currentPlan !== "CRACKED" && (
             <button
-              onClick={() => handleUpgrade(currentPlan === 'FREE' ? 'VIBED' : 'CRACKED')}
+              onClick={() =>
+                handleUpgrade(currentPlan === "FREE" ? "VIBED" : "CRACKED")
+              }
               className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
             >
               <Crown className="w-4 h-4" />
-              {currentPlan === 'FREE' ? 'Upgrade to Vibed' : 'Upgrade to Cracked'}
+              {currentPlan === "FREE"
+                ? "Upgrade to Vibed"
+                : "Upgrade to Cracked"}
             </button>
           )}
-          
-          {currentPlan !== 'FREE' && isActive && (
+
+          {currentPlan !== "FREE" && isActive && (
             <button
               onClick={handleCancelSubscription}
               disabled={cancelling}
@@ -241,12 +279,12 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
               ) : (
                 <X className="w-4 h-4" />
               )}
-              {cancelling ? 'Cancelling...' : 'Cancel Subscription'}
+              {cancelling ? "Cancelling..." : "Cancel Subscription"}
             </button>
           )}
-          
+
           <button
-            onClick={() => router.push('/pricing')}
+            onClick={() => router.push("/pricing")}
             className="flex items-center gap-2 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg transition-colors"
           >
             <ExternalLink className="w-4 h-4" />
@@ -256,7 +294,8 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
       </div>
 
       {/* Usage Warnings */}
-      {(!access.tutorialLimits.withinLimits || !access.challengeLimits.withinLimits) && (
+      {(!access.tutorialLimits.withinLimits ||
+        !access.challengeLimits.withinLimits) && (
         <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
@@ -265,21 +304,25 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
             </h4>
           </div>
           <p className="text-yellow-700 dark:text-yellow-300 mb-3">
-            You&apos;ve reached your plan limits. Consider upgrading to continue learning without restrictions.
+            You&apos;ve reached your plan limits. Consider upgrading to continue
+            learning without restrictions.
           </p>
           {access.recommendations && (
             <button
-              onClick={() => handleUpgrade(access.recommendations!.suggestedPlan as Plan)}
+              onClick={() =>
+                handleUpgrade(access.recommendations!.suggestedPlan as Plan)
+              }
               className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             >
-              Upgrade to {access.recommendations!.suggestedPlan} - {formatPrice(access.recommendations!.price)}/month
+              Upgrade to {access.recommendations!.suggestedPlan} -{" "}
+              {formatPrice(access.recommendations!.price)}/month
             </button>
           )}
         </div>
       )}
 
       {/* Upgrade Recommendations */}
-      {access.recommendations && currentPlan !== 'CRACKED' && (
+      {access.recommendations && currentPlan !== "CRACKED" && (
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-blue-600 rounded-lg">
@@ -294,18 +337,25 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
               </p>
             </div>
           </div>
-          
+
           <ul className="space-y-2 mb-4">
-            {access.recommendations!.benefits.map((benefit: string, index: number) => (
-              <li key={index} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                {benefit}
-              </li>
-            ))}
+            {access.recommendations!.benefits.map(
+              (benefit: string, index: number) => (
+                <li
+                  key={index}
+                  className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300"
+                >
+                  <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                  {benefit}
+                </li>
+              )
+            )}
           </ul>
-          
+
           <button
-            onClick={() => handleUpgrade(access.recommendations!.suggestedPlan as Plan)}
+            onClick={() =>
+              handleUpgrade(access.recommendations!.suggestedPlan as Plan)
+            }
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
           >
             Upgrade Now

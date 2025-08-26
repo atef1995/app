@@ -1,0 +1,1926 @@
+---
+title: "Typography & Web Fonts"
+description: "Master advanced typography techniques, web font loading strategies, and create beautiful, readable text layouts that enhance user experience."
+category: "css"
+subcategory: "typography"
+order: 10
+premium: false
+estimatedTime: 85
+quizQuestions: 20
+---
+
+# Typography & Web Fonts
+
+Welcome to Typography & Web Fonts! In this tutorial, you'll learn advanced typography techniques, web font loading strategies, and how to create beautiful, readable text layouts that enhance user experience.
+
+## Typography Fundamentals
+
+Typography is more than just choosing fonts. It's about creating hierarchy, improving readability, and enhancing the overall user experience through thoughtful text design.
+
+### Key Typography Concepts
+
+- **Typeface vs Font**: Typeface is the design, font is the file
+- **Font Weight**: Thickness of characters (100-900)
+- **Font Style**: Normal, italic, oblique
+- **Line Height**: Space between lines of text
+- **Letter Spacing**: Space between characters
+- **Word Spacing**: Space between words
+
+<SeparatedEditorPreview 
+  title="Typography Fundamentals"
+  mission="Understand basic typography properties and their effects"
+  instructions="Explore different typography settings and see how they impact readability"
+initialHtml={`
+<div class="typography-demo">
+  <section class="font-weights">
+    <h3>Font Weights</h3>
+    <p class="weight-100">Weight 100 - Thin</p>
+    <p class="weight-300">Weight 300 - Light</p>
+    <p class="weight-400">Weight 400 - Normal (Regular)</p>
+    <p class="weight-500">Weight 500 - Medium</p>
+    <p class="weight-700">Weight 700 - Bold</p>
+    <p class="weight-900">Weight 900 - Black</p>
+  </section>
+  
+  <section class="font-styles">
+    <h3>Font Styles & Variants</h3>
+    <p class="normal">Normal text with regular styling</p>
+    <p class="italic">Italic text with slanted appearance</p>
+    <p class="oblique">Oblique text (artificially slanted)</p>
+    <p class="small-caps">Small caps text variant</p>
+  </section>
+  
+  <section class="spacing-demo">
+    <h3>Spacing Controls</h3>
+    <p class="tight-spacing">Tight letter spacing example</p>
+    <p class="normal-spacing">Normal letter spacing example</p>
+    <p class="loose-spacing">Loose letter spacing example</p>
+    
+    <div class="line-height-examples">
+      <p class="tight-lines">This paragraph has tight line height (1.2). Notice how the lines feel cramped together, making it harder to read longer blocks of text.</p>
+      <p class="normal-lines">This paragraph has normal line height (1.5). This is generally considered optimal for body text readability and comfort.</p>
+      <p class="loose-lines">This paragraph has loose line height (2.0). While more spacious, very loose line height can actually hurt readability in body text.</p>
+    </div>
+  </section>
+</div>
+`}
+
+initialCss={`
+.typography-demo {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #f8f9fa;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  border-radius: 12px;
+}
+
+.typography-demo section {
+  margin-bottom: 3rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.typography-demo h3 {
+  margin: 0 0 1.5rem 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+  font-weight: 600;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 0.5rem;
+}
+
+/* Font Weight Examples */
+.weight-100 { font-weight: 100; }
+.weight-300 { font-weight: 300; }
+.weight-400 { font-weight: 400; }
+.weight-500 { font-weight: 500; }
+.weight-700 { font-weight: 700; }
+.weight-900 { font-weight: 900; }
+
+.font-weights p {
+  margin: 0.8rem 0;
+  font-size: 1.1rem;
+}
+
+/* Font Style Examples */
+.normal { font-style: normal; }
+.italic { font-style: italic; }
+.oblique { font-style: oblique; }
+.small-caps { font-variant: small-caps; font-weight: 500; }
+
+.font-styles p {
+  margin: 0.8rem 0;
+  font-size: 1.1rem;
+}
+
+/* Spacing Examples */
+.tight-spacing { 
+  letter-spacing: -0.05em; 
+  font-size: 1.1rem;
+  margin: 0.8rem 0;
+}
+
+.normal-spacing { 
+  letter-spacing: normal; 
+  font-size: 1.1rem;
+  margin: 0.8rem 0;
+}
+
+.loose-spacing { 
+  letter-spacing: 0.1em; 
+  font-size: 1.1rem;
+  margin: 0.8rem 0;
+}
+
+/* Line Height Examples */
+.line-height-examples {
+  margin-top: 2rem;
+}
+
+.tight-lines {
+  line-height: 1.2;
+  background: #fff5f5;
+  padding: 1rem;
+  border-left: 4px solid #e74c3c;
+  border-radius: 4px;
+  margin: 1rem 0;
+}
+
+.normal-lines {
+  line-height: 1.5;
+  background: #f0fff4;
+  padding: 1rem;
+  border-left: 4px solid #27ae60;
+  border-radius: 4px;
+  margin: 1rem 0;
+}
+
+.loose-lines {
+  line-height: 2.0;
+  background: #fff8e1;
+  padding: 1rem;
+  border-left: 4px solid #f39c12;
+  border-radius: 4px;
+  margin: 1rem 0;
+}
+
+/* General styling */
+.typography-demo p {
+  color: #34495e;
+  margin: 0.5rem 0;
+}
+`}/>
+
+**What's Happening Here?**
+This interactive demo showcases the core typography properties:
+- **Font weights** from 100 (thin) to 900 (black) create visual hierarchy
+- **Font styles** like italic and oblique add emphasis and personality
+- **Letter spacing** affects readability and visual density
+- **Line height** is crucial for comfortable reading - too tight feels cramped, too loose breaks reading flow
+
+**Your Turn - Experiment!**
+1. **Add a new font weight**: In the HTML, add `<p class="weight-600">Weight 600 - Semi-Bold</p>` after line 42
+2. **Create your CSS rule**: Add `.weight-600 { font-weight: 600; }` in the CSS after line 101
+3. **Try extreme letter spacing**: Change the `.loose-spacing` letter-spacing from `0.1em` to `0.3em` and see how it affects readability
+4. **Experiment with line height**: Try changing `.tight-lines` line-height to `1.0` - notice how cramped it becomes!
+
+## Web Font Loading
+
+Modern web fonts require careful loading strategies for performance and user experience:
+
+### Font Loading Strategies
+
+<SeparatedEditorPreview 
+  title="Web Font Loading Strategies"
+  mission="Compare different font loading approaches and their effects"
+  instructions="See how different loading strategies affect rendering and performance"
+initialHtml={`
+<div class="font-loading-demo">
+  <div class="strategy-comparison">
+    <div class="strategy-card">
+      <h3>System Fonts</h3>
+      <p class="system-font">This text uses system fonts for instant rendering with no loading delay. Perfect for performance-critical applications.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <strong>Pros:</strong> Fast, no FOIT/FOUT, accessible
+        </div>
+        <div class="cons">
+          <strong>Cons:</strong> Limited design control, platform differences
+        </div>
+      </div>
+    </div>
+    
+    <div class="strategy-card">
+      <h3>Font Display: Swap</h3>
+      <p class="swap-font">This text uses font-display: swap for progressive enhancement. Shows fallback first, then swaps to custom font when loaded.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <strong>Pros:</strong> Content visible immediately, graceful enhancement
+        </div>
+        <div class="cons">
+          <strong>Cons:</strong> Layout shift when font swaps
+        </div>
+      </div>
+    </div>
+    
+    <div class="strategy-card">
+      <h3>Font Display: Optional</h3>
+      <p class="optional-font">This text uses font-display: optional for performance-first approach. Only loads custom font if network is fast.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <strong>Pros:</strong> No layout shift, respects slow connections
+        </div>
+        <div class="cons">
+          <strong>Cons:</strong> Inconsistent font loading across users
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="loading-states">
+    <h3>Font Loading States Simulation</h3>
+    <div class="state-examples">
+      <div class="loading-state" data-state="loading">
+        <span class="state-label">Loading State</span>
+        <p>This text shows the fallback font during loading...</p>
+      </div>
+      <div class="loading-state" data-state="loaded">
+        <span class="state-label">Loaded State</span>
+        <p>This text shows the custom font after loading!</p>
+      </div>
+      <div class="loading-state" data-state="error">
+        <span class="state-label">Error State</span>
+        <p>This text shows fallback when font fails to load.</p>
+      </div>
+    </div>
+  </div>
+</div>
+`}
+
+initialCss={`
+/* Font Faces with Different Loading Strategies */
+@font-face {
+  font-family: 'SwapFont';
+  src: url('data:font/woff2;base64,') format('woff2');
+  font-display: swap;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'OptionalFont';
+  src: url('data:font/woff2;base64,') format('woff2');
+  font-display: optional;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'CustomFont';
+  src: url('data:font/woff2;base64,') format('woff2');
+  font-display: block;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.font-loading-demo {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-family: system-ui, -apple-system, sans-serif;
+  border-radius: 12px;
+}
+
+.strategy-comparison {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.strategy-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.strategy-card:hover {
+  transform: translateY(-5px);
+}
+
+.strategy-card h3 {
+  margin: 0 0 1rem 0;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.strategy-card p {
+  margin: 0 0 1.5rem 0;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* Different Font Loading Strategies */
+.system-font {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.swap-font {
+  font-family: 'SwapFont', system-ui, sans-serif;
+  /* Fallback styling to match custom font as closely as possible */
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+}
+
+.optional-font {
+  font-family: 'OptionalFont', system-ui, sans-serif;
+  font-size: 0.95rem;
+}
+
+.pros-cons {
+  font-size: 0.85rem;
+}
+
+.pros {
+  color: #a8e6cf;
+  margin-bottom: 0.5rem;
+}
+
+.cons {
+  color: #ffaaa5;
+}
+
+/* Loading States Demo */
+.loading-states {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+}
+
+.loading-states h3 {
+  margin: 0 0 2rem 0;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.state-examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.loading-state {
+  padding: 1.5rem;
+  border-radius: 6px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.loading-state[data-state="loading"] {
+  background: rgba(255, 193, 7, 0.2);
+  border: 2px solid rgba(255, 193, 7, 0.5);
+  animation: loadingPulse 2s infinite;
+}
+
+.loading-state[data-state="loaded"] {
+  background: rgba(40, 167, 69, 0.2);
+  border: 2px solid rgba(40, 167, 69, 0.5);
+  font-family: 'Times New Roman', serif; /* Simulate loaded custom font */
+}
+
+.loading-state[data-state="error"] {
+  background: rgba(220, 53, 69, 0.2);
+  border: 2px solid rgba(220, 53, 69, 0.5);
+  opacity: 0.8;
+}
+
+.state-label {
+  position: absolute;
+  top: -10px;
+  left: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.loading-state p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+@keyframes loadingPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .font-loading-demo {
+    padding: 1rem;
+  }
+  
+  .strategy-comparison {
+    grid-template-columns: 1fr;
+  }
+  
+  .state-examples {
+    grid-template-columns: 1fr;
+  }
+}
+`}/>
+
+**Understanding Font Loading Strategies**
+This demo illustrates three critical font loading approaches:
+- **System fonts**: Instant rendering, no network delay, but limited design control
+- **font-display: swap**: Shows fallback text immediately, then swaps to custom font when loaded (causes layout shift)
+- **font-display: optional**: Only loads custom font on fast connections, prevents layout shift
+
+The loading states simulation shows what users experience during font loading phases.
+
+**Your Turn - Practice Font Loading!**
+1. **Add a new loading strategy**: In the HTML, add a new strategy card after line 227:
+```html
+<div class="strategy-card">
+  <h3>Font Display: Block</h3>
+  <p class="block-font">This text uses font-display: block and waits up to 3 seconds for the font to load before showing fallback.</p>
+  <div class="pros-cons">
+    <div class="pros">
+      <strong>Pros:</strong> No layout shift, consistent branding
+    </div>
+    <div class="cons">
+      <strong>Cons:</strong> Invisible text during loading (FOIT)
+    </div>
+  </div>
+</div>
+```
+
+2. **Create the CSS font-face**: Add this @font-face rule after line 274:
+```css
+@font-face {
+  font-family: 'BlockFont';
+  src: url('data:font/woff2;base64,') format('woff2');
+  font-display: block;
+  font-weight: 400;
+  font-style: normal;
+}
+```
+
+3. **Style the block font**: Add `.block-font { font-family: 'BlockFont', system-ui, sans-serif; font-size: 0.95rem; }` after line 334
+
+## Typography Scale and Hierarchy
+
+Create consistent typography scales for better visual hierarchy:
+
+<SeparatedEditorPreview 
+  title="Typography Scale & Hierarchy"
+  mission="Build a consistent typography system with proper hierarchy"
+  instructions="See how different font sizes and weights create visual hierarchy"
+initialHtml={`
+<div class="typography-scale">
+  <article class="content-example">
+    <header class="article-header">
+      <span class="category">Design System</span>
+      <h1 class="display-title">The Art of Typography</h1>
+      <p class="subtitle">Creating beautiful and readable text layouts for the web</p>
+      <div class="meta">
+        <span class="author">By Design Team</span>
+        <span class="date">March 15, 2024</span>
+        <span class="reading-time">5 min read</span>
+      </div>
+    </header>
+    
+    <div class="article-content">
+      <h2>Understanding Typography Hierarchy</h2>
+      <p class="lead">Typography hierarchy is the system of organizing text to guide readers through content in order of importance. It's achieved through variations in size, weight, color, and spacing.</p>
+      
+      <p>Regular body text should be comfortable to read for extended periods. The font size, line height, and measure (line length) all contribute to readability. This paragraph demonstrates optimal body text styling.</p>
+      
+      <h3>Key Principles of Good Typography</h3>
+      <p>When designing with typography, consider these fundamental principles that will improve both aesthetics and usability of your content.</p>
+      
+      <ol>
+        <li><strong>Contrast:</strong> Use different weights and sizes to create clear hierarchy</li>
+        <li><strong>Consistency:</strong> Maintain consistent spacing and sizing throughout</li>
+        <li><strong>Readability:</strong> Prioritize legibility over decorative elements</li>
+        <li><strong>Spacing:</strong> Use whitespace effectively to improve comprehension</li>
+      </ol>
+      
+      <h4>Typography in Modern Web Design</h4>
+      <p>Modern web typography has evolved significantly with better font support and CSS capabilities. We now have more control over font loading, variable fonts, and responsive typography.</p>
+      
+      <blockquote>
+        "Typography is the craft of endowing human language with a durable visual form."
+        <cite>— Robert Bringhurst</cite>
+      </blockquote>
+      
+      <h5>Technical Considerations</h5>
+      <p class="small">Technical aspects like font loading performance, cross-browser compatibility, and accessibility should always be considered when implementing custom typography.</p>
+      
+      <h6>Final Notes</h6>
+      <p class="caption">Remember that great typography should be invisible to the reader while enhancing the content's message and improving the overall user experience.</p>
+    </div>
+  </article>
+</div>
+`}
+
+initialCss={`
+/* Typography Scale Variables */
+.typography-scale {
+  --font-family-serif: 'Georgia', 'Times New Roman', serif;
+  --font-family-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-mono: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  
+  /* Font Size Scale (Perfect Fourth - 1.333 ratio) */
+  --font-size-xs: 0.75rem;     /* 12px */
+  --font-size-sm: 0.875rem;    /* 14px */
+  --font-size-base: 1rem;      /* 16px */
+  --font-size-lg: 1.125rem;    /* 18px */
+  --font-size-xl: 1.25rem;     /* 20px */
+  --font-size-2xl: 1.5rem;     /* 24px */
+  --font-size-3xl: 1.875rem;   /* 30px */
+  --font-size-4xl: 2.25rem;    /* 36px */
+  --font-size-5xl: 3rem;       /* 48px */
+  --font-size-6xl: 3.75rem;    /* 60px */
+  
+  /* Font Weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+  
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0em;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+  
+  /* Colors */
+  --text-primary: #1a202c;
+  --text-secondary: #2d3748;
+  --text-muted: #718096;
+  --text-accent: #3182ce;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7fafc;
+  --border-color: #e2e8f0;
+}
+
+.typography-scale {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: var(--bg-primary);
+  font-family: var(--font-family-sans);
+  color: var(--text-primary);
+  line-height: var(--line-height-normal);
+}
+
+.content-example {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Article Header */
+.article-header {
+  padding: 3rem 2rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+}
+
+.category {
+  display: inline-block;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-widest);
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  margin-bottom: 1rem;
+}
+
+.display-title {
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  margin: 0 0 1rem 0;
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.subtitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-snug);
+  margin: 0 0 2rem 0;
+  opacity: 0.9;
+}
+
+.meta {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  font-size: var(--font-size-sm);
+  opacity: 0.8;
+  flex-wrap: wrap;
+}
+
+.meta span {
+  position: relative;
+}
+
+.meta span:not(:last-child)::after {
+  content: '•';
+  position: absolute;
+  right: -0.75rem;
+  opacity: 0.6;
+}
+
+/* Content Styles */
+.article-content {
+  padding: 2rem;
+}
+
+/* Heading Hierarchy */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-serif);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  margin: 2rem 0 1rem 0;
+  color: var(--text-primary);
+}
+
+h1:first-child,
+h2:first-child,
+h3:first-child {
+  margin-top: 0;
+}
+
+h2 {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--text-accent);
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+h3 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+h4 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+h5 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+}
+
+h6 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+/* Paragraph Styles */
+p {
+  margin: 1rem 0;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  color: var(--text-secondary);
+}
+
+.lead {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  color: var(--text-primary);
+  margin: 1.5rem 0;
+}
+
+.small {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.caption {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* List Styles */
+ol, ul {
+  margin: 1rem 0;
+  padding-left: 2rem;
+}
+
+li {
+  margin: 0.5rem 0;
+  line-height: var(--line-height-relaxed);
+  color: var(--text-secondary);
+}
+
+li strong {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Blockquote */
+blockquote {
+  margin: 2rem 0;
+  padding: 1.5rem 2rem;
+  background: var(--bg-secondary);
+  border-left: 4px solid var(--text-accent);
+  border-radius: 0 8px 8px 0;
+  font-size: var(--font-size-lg);
+  font-style: italic;
+  line-height: var(--line-height-relaxed);
+  color: var(--text-secondary);
+  position: relative;
+}
+
+blockquote::before {
+  content: '"';
+  font-size: 4rem;
+  color: var(--text-accent);
+  opacity: 0.3;
+  position: absolute;
+  top: -0.5rem;
+  left: 1rem;
+  font-family: var(--font-family-serif);
+}
+
+cite {
+  display: block;
+  margin-top: 1rem;
+  font-size: var(--font-size-sm);
+  font-style: normal;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-muted);
+}
+
+cite::before {
+  content: '— ';
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  .typography-scale {
+    padding: 1rem;
+  }
+  
+  .article-header {
+    padding: 2rem 1rem;
+  }
+  
+  .display-title {
+    font-size: var(--font-size-4xl);
+  }
+  
+  .subtitle {
+    font-size: var(--font-size-lg);
+  }
+  
+  .article-content {
+    padding: 1.5rem;
+  }
+  
+  .meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .meta span::after {
+    display: none;
+  }
+  
+  h2 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  h3 {
+    font-size: var(--font-size-xl);
+  }
+  
+  blockquote {
+    padding: 1rem;
+    margin: 1.5rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .display-title {
+    font-size: var(--font-size-3xl);
+  }
+  
+  ol, ul {
+    padding-left: 1.5rem;
+  }
+  
+  blockquote::before {
+    font-size: 3rem;
+    top: -0.25rem;
+  }
+}
+`}/>
+
+**Typography Hierarchy in Action**
+This comprehensive example demonstrates a complete typography system:
+- **CSS Custom Properties** create a scalable, maintainable typography system
+- **Perfect Fourth ratio (1.333)** creates harmonious size relationships
+- **Semantic heading hierarchy** (h1-h6) guides readers through content
+- **Consistent spacing** and **color system** enhance readability
+- **Responsive typography** adapts to different screen sizes
+
+Notice how each heading level has distinct size, weight, and color to create clear visual hierarchy.
+
+**Your Turn - Build Your Typography System!**
+1. **Add a new font size**: In the CSS variables (around line 507), add `--font-size-7xl: 5rem;` for extra large displays
+
+2. **Create a "hero" heading style**: Add this CSS after line 664:
+```css
+.hero-title {
+  font-size: var(--font-size-7xl);
+  font-weight: var(--font-weight-extrabold);
+  line-height: var(--line-height-tight);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+  margin: 2rem 0;
+}
+```
+
+3. **Use your new style**: In the HTML, replace the `display-title` class on line 447 with `hero-title` to see your creation!
+
+4. **Experiment with spacing**: Try changing `--letter-spacing-tight` from `-0.025em` to `-0.05em` and observe how it affects the hero title
+
+## Variable Fonts
+
+Variable fonts allow multiple font variations in a single file:
+
+<SeparatedEditorPreview 
+  title="Variable Fonts Playground"
+  mission="Explore the power and flexibility of variable fonts"
+  instructions="Adjust font variations using CSS and see real-time changes"
+initialHtml={`
+<div class="variable-fonts-demo">
+  <div class="demo-header">
+    <h2>Variable Fonts Playground</h2>
+    <p>Interactive demonstration of CSS font variations</p>
+  </div>
+  
+  <div class="font-controls">
+    <div class="control-group">
+      <label for="fontWeight">Font Weight</label>
+      <input type="range" id="fontWeight" min="100" max="900" value="400" oninput="updateFontWeight(this.value)">
+      <span id="weightValue">400</span>
+    </div>
+    
+    <div class="control-group">
+      <label for="fontWidth">Font Width</label>
+      <input type="range" id="fontWidth" min="75" max="125" value="100" oninput="updateFontWidth(this.value)">
+      <span id="widthValue">100%</span>
+    </div>
+    
+    <div class="control-group">
+      <label for="fontSize">Font Size</label>
+      <input type="range" id="fontSize" min="16" max="72" value="32" oninput="updateFontSize(this.value)">
+      <span id="sizeValue">32px</span>
+    </div>
+    
+    <div class="control-group">
+      <label for="letterSpacing">Letter Spacing</label>
+      <input type="range" id="letterSpacing" min="-0.1" max="0.2" step="0.01" value="0" oninput="updateLetterSpacing(this.value)">
+      <span id="spacingValue">0em</span>
+    </div>
+  </div>
+  
+  <div class="sample-text" id="sampleText">
+    The quick brown fox jumps over the lazy dog
+  </div>
+  
+  <div class="font-examples">
+    <div class="example-card">
+      <h4>Ultra Light</h4>
+      <p class="example-text weight-100">Elegant and minimal typography</p>
+    </div>
+    
+    <div class="example-card">
+      <h4>Regular</h4>
+      <p class="example-text weight-400">Perfect for body text and reading</p>
+    </div>
+    
+    <div class="example-card">
+      <h4>Bold</h4>
+      <p class="example-text weight-700">Strong emphasis and headings</p>
+    </div>
+    
+    <div class="example-card">
+      <h4>Black</h4>
+      <p class="example-text weight-900">Maximum impact and attention</p>
+    </div>
+    
+    <div class="example-card">
+      <h4>Condensed</h4>
+      <p class="example-text width-75">Space-efficient narrow text</p>
+    </div>
+    
+    <div class="example-card">
+      <h4>Extended</h4>
+      <p class="example-text width-125">Wide and spacious layout</p>
+    </div>
+  </div>
+  
+  <div class="animation-demo">
+    <h3>Animated Font Variations</h3>
+    <div class="animated-examples">
+      <div class="breathing-text">Breathing Text Effect</div>
+      <div class="wave-text">Wave Animation</div>
+      <div class="pulse-text">Pulse Effect</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateFontWeight(value) {
+  document.getElementById('sampleText').style.fontVariationSettings = '"wght" ' + value;
+  document.getElementById('weightValue').textContent = value;
+}
+
+function updateFontWidth(value) {
+  document.getElementById('sampleText').style.fontVariationSettings = '"wdth" ' + value;
+  document.getElementById('widthValue').textContent = value + '%';
+}
+
+function updateFontSize(value) {
+  document.getElementById('sampleText').style.fontSize = value + 'px';
+  document.getElementById('sizeValue').textContent = value + 'px';
+}
+
+function updateLetterSpacing(value) {
+  document.getElementById('sampleText').style.letterSpacing = value + 'em';
+  document.getElementById('spacingValue').textContent = value + 'em';
+}
+</script>
+`}
+
+initialCss={`
+/* Simulated Variable Font (in real implementation, use actual variable fonts) */
+.variable-fonts-demo {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #1a202c;
+  color: #e2e8f0;
+  font-family: system-ui, -apple-system, sans-serif;
+  border-radius: 16px;
+}
+
+.demo-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.demo-header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 1rem 0;
+}
+
+.demo-header p {
+  font-size: 1.1rem;
+  color: #a0aec0;
+  margin: 0;
+}
+
+/* Font Controls */
+.font-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.control-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #cbd5e0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.control-group input[type="range"] {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #4a5568;
+  outline: none;
+  transition: background 0.3s;
+}
+
+.control-group input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  cursor: pointer;
+  border: 2px solid #1a202c;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.control-group input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  cursor: pointer;
+  border: 2px solid #1a202c;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.control-group span {
+  font-weight: 600;
+  color: #667eea;
+  text-align: center;
+  padding: 0.5rem;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 6px;
+  min-width: 60px;
+}
+
+/* Sample Text */
+.sample-text {
+  font-size: 2rem;
+  font-weight: 400;
+  text-align: center;
+  padding: 3rem 2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  margin-bottom: 3rem;
+  border: 2px dashed rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  font-variation-settings: 'wght' 400, 'wdth' 100;
+}
+
+/* Font Examples Grid */
+.font-examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.example-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.example-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.example-card h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #667eea;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.example-text {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  color: #e2e8f0;
+}
+
+/* Different font variations */
+.weight-100 { font-weight: 100; }
+.weight-400 { font-weight: 400; }
+.weight-700 { font-weight: 700; }
+.weight-900 { font-weight: 900; }
+
+.width-75 { 
+  font-stretch: 75%; 
+  transform: scaleX(0.75);
+  transform-origin: left;
+}
+.width-125 { 
+  font-stretch: 125%; 
+  transform: scaleX(1.25);
+  transform-origin: left;
+}
+
+/* Animation Demo */
+.animation-demo {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.animation-demo h3 {
+  text-align: center;
+  margin: 0 0 2rem 0;
+  font-size: 1.5rem;
+  color: #667eea;
+}
+
+.animated-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.breathing-text,
+.wave-text,
+.pulse-text {
+  font-size: 2rem;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.breathing-text {
+  animation: breathe 3s ease-in-out infinite;
+  background: rgba(39, 174, 96, 0.1);
+}
+
+.wave-text {
+  animation: wave 2s ease-in-out infinite;
+  background: rgba(52, 152, 219, 0.1);
+}
+
+.pulse-text {
+  animation: fontPulse 1.5s ease-in-out infinite;
+  background: rgba(231, 76, 60, 0.1);
+}
+
+/* Animations */
+@keyframes breathe {
+  0%, 100% { 
+    font-weight: 300;
+    transform: scale(1);
+  }
+  50% { 
+    font-weight: 700;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes wave {
+  0%, 100% { 
+    font-weight: 400;
+    letter-spacing: 0em;
+  }
+  25% { 
+    font-weight: 600;
+    letter-spacing: 0.1em;
+  }
+  75% { 
+    font-weight: 200;
+    letter-spacing: -0.05em;
+  }
+}
+
+@keyframes fontPulse {
+  0%, 100% { 
+    font-weight: 400;
+    opacity: 1;
+  }
+  50% { 
+    font-weight: 800;
+    opacity: 0.8;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .variable-fonts-demo {
+    padding: 1rem;
+  }
+  
+  .font-controls {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .sample-text {
+    font-size: 1.5rem;
+    padding: 2rem 1rem;
+  }
+  
+  .font-examples {
+    grid-template-columns: 1fr;
+  }
+  
+  .breathing-text,
+  .wave-text,
+  .pulse-text {
+    font-size: 1.5rem;
+  }
+}
+`}/>
+
+**Variable Fonts - The Future of Web Typography**
+Variable fonts revolutionize web typography by:
+- **Single file, multiple variations**: One font file contains multiple weights, widths, and styles
+- **Smooth animations**: Animate between font variations for dynamic effects
+- **Performance benefits**: Fewer HTTP requests, smaller total file sizes
+- **Design flexibility**: Fine-tune typography with precise control
+
+The interactive controls demonstrate `font-variation-settings` which lets you adjust font properties in real-time.
+
+**Your Turn - Create Variable Font Magic!**
+1. **Add a new font control**: In the HTML, add this control group after line 847:
+```html
+<div class="control-group">
+  <label for="fontSlant">Font Slant</label>
+  <input type="range" id="fontSlant" min="-15" max="15" value="0" oninput="updateFontSlant(this.value)">
+  <span id="slantValue">0°</span>
+</div>
+```
+
+2. **Add the JavaScript function**: In the script section, add this after line 915:
+```javascript
+function updateFontSlant(value) {
+  document.getElementById('sampleText').style.fontStyle = value === '0' ? 'normal' : 'oblique ' + value + 'deg';
+  document.getElementById('slantValue').textContent = value + '°';
+}
+```
+
+3. **Create a custom animation**: Add this CSS animation after line 1167:
+```css
+@keyframes variableSlant {
+  0%, 100% { 
+    font-style: normal;
+    font-weight: 300;
+  }
+  25% { 
+    font-style: oblique 10deg;
+    font-weight: 500;
+  }
+  75% { 
+    font-style: oblique -10deg;
+    font-weight: 700;
+  }
+}
+
+.slant-text {
+  animation: variableSlant 4s ease-in-out infinite;
+  background: rgba(156, 39, 176, 0.1);
+}
+```
+
+4. **Add the animated example**: In the HTML, add `<div class="slant-text">Variable Slant Animation</div>` after line 891
+
+## Advanced Typography Techniques
+
+### Text Effects and Decorations
+
+<SeparatedEditorPreview 
+  title="Advanced Text Effects"
+  mission="Create stunning text effects using modern CSS techniques"
+  instructions="Explore various text effects from gradients to shadows and animations"
+initialHtml={`
+<div class="text-effects-showcase">
+  <div class="effect-grid">
+    <div class="effect-card">
+      <h3>Gradient Text</h3>
+      <div class="gradient-text">Beautiful Gradients</div>
+    </div>
+    
+    <div class="effect-card">
+      <h3>Outlined Text</h3>
+      <div class="outlined-text">Stroke Effect</div>
+    </div>
+    
+    <div class="effect-card">
+      <h3>3D Text</h3>
+      <div class="text-3d">Dimension</div>
+    </div>
+    
+    <div class="effect-card">
+      <h3>Glowing Text</h3>
+      <div class="glowing-text">Neon Glow</div>
+    </div>
+    
+    <div class="effect-card">
+      <h3>Clipped Text</h3>
+      <div class="clipped-text">Image Clip</div>
+    </div>
+    
+    <div class="effect-card">
+      <h3>Animated Text</h3>
+      <div class="typewriter-text">Typewriter Effect</div>
+    </div>
+  </div>
+  
+  <div class="advanced-effects">
+    <div class="text-reveal">
+      <span class="reveal-text">Scroll to reveal this text</span>
+    </div>
+    
+    <div class="morphing-text" id="morphingText">
+      <span class="morph-word active">Creative</span>
+      <span class="morph-word">Innovative</span>
+      <span class="morph-word">Amazing</span>
+      <span class="morph-word">Beautiful</span>
+    </div>
+    
+    <div class="floating-letters">
+      <span>F</span><span>l</span><span>o</span><span>a</span><span>t</span><span>i</span><span>n</span><span>g</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// Morphing text animation
+let currentWord = 0;
+const words = document.querySelectorAll('.morph-word');
+
+setInterval(() => {
+  words[currentWord].classList.remove('active');
+  currentWord = (currentWord + 1) % words.length;
+  words[currentWord].classList.add('active');
+}, 2000);
+
+// Scroll reveal animation
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('revealed');
+    }
+  });
+});
+
+document.querySelectorAll('.reveal-text').forEach(el => {
+  observer.observe(el);
+});
+</script>
+`}
+
+initialCss={`
+.text-effects-showcase {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #0f0f23;
+  color: white;
+  font-family: system-ui, -apple-system, sans-serif;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.effect-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.effect-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.effect-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.effect-card h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #a0aec0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Gradient Text */
+.gradient-text {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Outlined Text */
+.outlined-text {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: transparent;
+  -webkit-text-stroke: 2px #667eea;
+  text-stroke: 2px #667eea;
+  transition: all 0.3s ease;
+}
+
+.outlined-text:hover {
+  color: #667eea;
+  -webkit-text-stroke: 2px transparent;
+  text-stroke: 2px transparent;
+  text-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+}
+
+/* 3D Text */
+.text-3d {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #667eea;
+  text-shadow: 
+    1px 1px 0 #4a67c9,
+    2px 2px 0 #4a67c9,
+    3px 3px 0 #4a67c9,
+    4px 4px 0 #4a67c9,
+    5px 5px 0 #4a67c9,
+    6px 6px 10px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.text-3d:hover {
+  transform: translateY(-3px) translateX(-3px);
+  text-shadow: 
+    4px 4px 0 #4a67c9,
+    5px 5px 0 #4a67c9,
+    6px 6px 0 #4a67c9,
+    7px 7px 0 #4a67c9,
+    8px 8px 0 #4a67c9,
+    9px 9px 15px rgba(0, 0, 0, 0.6);
+}
+
+/* Glowing Text */
+.glowing-text {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #00ffff;
+  text-shadow: 
+    0 0 5px #00ffff,
+    0 0 10px #00ffff,
+    0 0 15px #00ffff,
+    0 0 20px #00ffff;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 
+      0 0 5px #00ffff,
+      0 0 10px #00ffff,
+      0 0 15px #00ffff,
+      0 0 20px #00ffff;
+  }
+  to {
+    text-shadow: 
+      0 0 10px #00ffff,
+      0 0 20px #00ffff,
+      0 0 30px #00ffff,
+      0 0 40px #00ffff;
+  }
+}
+
+/* Clipped Text */
+.clipped-text {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  animation: backgroundMove 3s ease-in-out infinite;
+}
+
+.clipped-text::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>');
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+@keyframes backgroundMove {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Typewriter Effect */
+.typewriter-text {
+  font-size: 2.5rem;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  color: #00ff00;
+  border-right: 3px solid #00ff00;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: typewriter 4s steps(16, end) infinite, blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typewriter {
+  0% { width: 0; }
+  50% { width: 100%; }
+  100% { width: 0; }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent; }
+  50% { border-color: #00ff00; }
+}
+
+/* Advanced Effects */
+.advanced-effects {
+  margin-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+/* Text Reveal */
+.text-reveal {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.reveal-text {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #667eea;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.reveal-text.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Morphing Text */
+.morphing-text {
+  position: relative;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 800;
+}
+
+.morph-word {
+  position: absolute;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.morph-word.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Floating Letters */
+.floating-letters {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: 800;
+}
+
+.floating-letters span {
+  display: inline-block;
+  color: #667eea;
+  animation: float 3s ease-in-out infinite;
+  margin: 0 0.1em;
+  transition: all 0.3s ease;
+}
+
+.floating-letters span:nth-child(1) { animation-delay: 0.1s; }
+.floating-letters span:nth-child(2) { animation-delay: 0.2s; }
+.floating-letters span:nth-child(3) { animation-delay: 0.3s; }
+.floating-letters span:nth-child(4) { animation-delay: 0.4s; }
+.floating-letters span:nth-child(5) { animation-delay: 0.5s; }
+.floating-letters span:nth-child(6) { animation-delay: 0.6s; }
+.floating-letters span:nth-child(7) { animation-delay: 0.7s; }
+.floating-letters span:nth-child(8) { animation-delay: 0.8s; }
+
+.floating-letters span:hover {
+  color: #f093fb;
+  transform: scale(1.2) translateY(-10px);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .text-effects-showcase {
+    padding: 1rem;
+  }
+  
+  .effect-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .effect-card {
+    padding: 1.5rem;
+  }
+  
+  .gradient-text,
+  .outlined-text,
+  .text-3d,
+  .glowing-text,
+  .clipped-text,
+  .typewriter-text {
+    font-size: 1.8rem;
+  }
+  
+  .reveal-text,
+  .morph-word,
+  .floating-letters {
+    font-size: 2rem;
+  }
+  
+  .floating-letters span {
+    margin: 0 0.05em;
+  }
+}
+
+@media (max-width: 480px) {
+  .gradient-text,
+  .outlined-text,
+  .text-3d,
+  .glowing-text,
+  .clipped-text,
+  .typewriter-text {
+    font-size: 1.4rem;
+  }
+  
+  .reveal-text,
+  .morph-word,
+  .floating-letters {
+    font-size: 1.5rem;
+  }
+}
+`}/>
+
+**Advanced Text Effects Breakdown**
+These stunning effects showcase modern CSS capabilities:
+- **Gradient text**: Uses `background-clip: text` to fill text with gradients or images
+- **Text stroke**: `-webkit-text-stroke` creates outlined text effects
+- **3D text**: Multiple `text-shadow` layers create depth and dimension
+- **Glowing effects**: Animated shadows simulate neon lighting
+- **Clipped backgrounds**: Complex backgrounds show through text shapes
+- **Animations**: CSS transforms and transitions bring text to life
+
+The JavaScript adds interactivity with morphing text and scroll-triggered reveals.
+
+**Your Turn - Create Your Own Text Effects!**
+1. **Design a rainbow text effect**: Add this CSS after line 1416:
+```css
+.rainbow-text {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(45deg, 
+    #ff0000, #ff7300, #fffb00, #48ff00, 
+    #00ffd5, #0078ff, #7b00ff, #ff00c8);
+  background-size: 800% 800%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rainbow 3s ease-in-out infinite;
+}
+
+@keyframes rainbow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+```
+
+2. **Add your effect to the grid**: In the HTML, add a new effect card after line 1237:
+```html
+<div class="effect-card">
+  <h3>Rainbow Text</h3>
+  <div class="rainbow-text">Rainbow Colors</div>
+</div>
+```
+
+3. **Create a shake animation**: Add this CSS after your rainbow styles:
+```css
+.shake-text {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #e74c3c;
+  animation: shake 0.5s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px) rotate(-2deg); }
+  75% { transform: translateX(5px) rotate(2deg); }
+}
+```
+
+4. **Experiment with text shadows**: Try adding this dramatic shadow to any text:
+```css
+text-shadow: 0 0 10px rgba(255,0,0,0.8), 0 0 20px rgba(255,0,0,0.8), 0 0 30px rgba(255,0,0,0.8);
+```
+
+## Typography Best Practices
+
+### Readability and Accessibility
+
+1. **Sufficient Contrast**: Ensure text meets WCAG guidelines (4.5:1 for normal text)
+2. **Readable Font Sizes**: Minimum 16px for body text
+3. **Proper Line Height**: 1.4-1.6 for body text
+4. **Optimal Line Length**: 45-75 characters per line
+5. **Clear Hierarchy**: Use consistent heading scales
+
+### Performance Optimization
+
+```css
+/* Font loading optimization */
+@font-face {
+  font-family: 'CustomFont';
+  src: url('font.woff2') format('woff2');
+  font-display: swap; /* Show fallback immediately, swap when loaded */
+  unicode-range: U+0000-00FF; /* Only load Latin characters */
+}
+
+/* Preload critical fonts */
+/* <link rel="preload" href="font.woff2" as="font" type="font/woff2" crossorigin> */
+
+/* System font stack for instant rendering */
+font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+```
+
+**Typography Performance & Accessibility Explained**
+These best practices ensure your typography is both beautiful and functional:
+
+**Font Loading Optimization:**
+- `font-display: swap` prevents invisible text (FOIT) by showing fallbacks immediately
+- `unicode-range` reduces file size by loading only needed character sets
+- `preload` hints tell browsers to fetch critical fonts early
+- System font stacks provide instant, accessible fallbacks
+
+**Accessibility Guidelines:**
+- **4.5:1 contrast ratio** ensures text is readable for users with visual impairments
+- **16px minimum** font size accommodates users who need larger text
+- **45-75 character line length** optimizes reading speed and comprehension
+- **1.4-1.6 line height** provides comfortable spacing for dyslexic users
+
+**Your Typography Mastery Challenge!**
+1. **Create an accessible color palette**: Define CSS custom properties for text colors that meet WCAG contrast requirements:
+```css
+:root {
+  --text-high-contrast: #000000; /* 21:1 ratio on white */
+  --text-medium-contrast: #333333; /* 12.6:1 ratio */
+  --text-low-contrast: #666666; /* 5.7:1 ratio */
+  --accent-accessible: #0066cc; /* 4.5:1 ratio for links */
+}
+```
+
+2. **Build a responsive typography system**: Create a mixin-like class that scales perfectly:
+```css
+.responsive-text {
+  font-size: clamp(1rem, 4vw, 1.5rem);
+  line-height: 1.5;
+  max-width: 65ch; /* Optimal line length */
+}
+```
+
+3. **Design a focus-accessible system**: Add keyboard navigation styles:
+```css
+a:focus, button:focus {
+  outline: 3px solid var(--accent-accessible);
+  outline-offset: 2px;
+  background-color: rgba(0, 102, 204, 0.1);
+}
+```
+
+4. **Test your typography**: Use browser dev tools to:
+   - Check contrast ratios (Lighthouse accessibility audit)
+   - Test with 200% zoom to ensure readability
+   - Verify font loading with slow 3G simulation
+
+## Conclusion
+
+You've mastered typography and web fonts! You can now:
+
+- Apply typography fundamentals effectively
+- Implement web font loading strategies
+- Create consistent typography scales and hierarchy
+- Use variable fonts for flexible designs
+- Create advanced text effects and animations
+- Follow accessibility and performance best practices
+- Build comprehensive typography systems
+
+Great typography enhances readability, creates visual hierarchy, and improves overall user experience.
+
+**🎉 Congratulations - You're Now a Typography Expert!**
+
+You've mastered the art and science of web typography! Through hands-on practice, you've learned to:
+
+✅ **Control every aspect** of typography from weights to spacing  
+✅ **Optimize font loading** for performance and user experience  
+✅ **Build scalable typography systems** using CSS custom properties  
+✅ **Harness variable fonts** for dynamic, efficient designs  
+✅ **Create stunning text effects** that captivate users  
+✅ **Follow accessibility standards** to include all users  
+✅ **Apply performance best practices** for fast-loading sites  
+
+**Your Typography Skills Unlock:**
+- **Professional design systems** used by companies like Apple, Google, and Airbnb
+- **Advanced animations** that bring text to life
+- **Accessibility expertise** that makes the web inclusive
+- **Performance optimization** that improves user experience
+
+**Keep Practicing!**
+Try creating a complete design system for your next project. Experiment with different font combinations, test your typography at various screen sizes, and always prioritize readability over decoration.
+
+Great typography is invisible - it should enhance content without drawing attention to itself. When readers can focus on your message instead of struggling with poor typography, you've succeeded!
+
+## What's Next?
+
+In the next tutorial, we'll explore **CSS Architecture**, where you'll learn methodologies and best practices for organizing and maintaining large-scale CSS codebases. You'll discover how to structure your CSS for teams, scalability, and maintainability!

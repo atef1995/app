@@ -2,6 +2,7 @@
 
 import { Crown, Sparkles, Lock, ArrowRight, Clock } from "lucide-react";
 import { useMood } from "@/components/providers/MoodProvider";
+import getMoodColors from "@/lib/getMoodColors";
 
 interface CardProps {
   children: React.ReactNode;
@@ -92,33 +93,7 @@ export default function Card({
 }: CardProps) {
   const { currentMood } = useMood();
 
-  const getMoodColors = () => {
-    switch (currentMood.id) {
-      case "rush":
-        return {
-          gradient: "from-orange-400 to-red-500",
-          border: "border-orange-300 dark:border-orange-600",
-          premiumBg: "bg-orange-100 dark:bg-orange-900/30",
-          lockBg: "bg-orange-500",
-        };
-      case "grind":
-        return {
-          gradient: "from-blue-400 to-indigo-500",
-          border: "border-blue-300 dark:border-blue-600",
-          premiumBg: "bg-blue-100 dark:bg-blue-900/30",
-          lockBg: "bg-blue-500",
-        };
-      default: // chill
-        return {
-          gradient: "from-purple-400 to-pink-500",
-          border: "border-purple-300 dark:border-purple-600",
-          premiumBg: "bg-purple-100 dark:bg-purple-900/30",
-          lockBg: "bg-purple-500",
-        };
-    }
-  };
-
-  const moodColors = getMoodColors();
+  const moodColors = getMoodColors(currentMood.id);
 
   const handleClick = () => {
     if (disabled) return;
@@ -142,7 +117,7 @@ export default function Card({
     ${disabled ? "opacity-50 cursor-not-allowed" : ""}
     ${
       isPremium
-        ? `${moodColors.premiumBg} hover:bg-yellow-500 ${moodColors.border}`
+        ? `${moodColors.bg} hover:bg-yellow-500 ${moodColors.border}`
         : ""
     }
     ${className}

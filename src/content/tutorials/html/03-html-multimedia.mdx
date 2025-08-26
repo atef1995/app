@@ -1,10 +1,10 @@
 ---
 title: "HTML Multimedia: Images, Videos, and Audio"
-description: "Learn to add and optimize images, videos, audio, and other multimedia content to create engaging web experiences"
+description: "Master multimedia on the web with comprehensive coverage of modern formats, optimization techniques, accessibility, security, and performance best practices"
 level: "beginner"
-estimatedTime: "50 minutes"
-topics: ["Images", "Videos", "Audio", "Multimedia", "Optimization", "Accessibility"]
-quizQuestions: 12
+estimatedTime: "75 minutes"
+topics: ["Images", "Videos", "Audio", "WebP", "AVIF", "Responsive Images", "Video Codecs", "Audio Formats", "Performance", "Accessibility", "Security", "Modern Web Standards"]
+quizQuestions: 18
 order: 3
 ---
 
@@ -18,48 +18,21 @@ Images are the most common multimedia element on websites. They communicate info
 
 ### Basic Image Usage
 
-<HTMLPreviewWindow title="Basic Image Element" height="400px">
-```html
-<!-- Basic image -->
-<img src="logo.jpg" alt="Company logo">
+<HTMLEditorPreview
+  title="Basic Image Element"
+  initialHtml={`<!-- Basic image -->
+<img src="https://cdn.pixabay.com/photo/2022/04/07/04/48/calligraphy-7116788_1280.png" alt="Company logo">
 
 <!-- Image with dimensions -->
-<img src="hero-image.jpg" alt="Beautiful mountain landscape" width="800" height="400">
+<img src="https://images.unsplash.com/photo-1434725039720-aaad6dd32dfe?q=80&w=1042&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Beautiful mountain landscape" width="800" height="400">
 
 <!-- Image with additional attributes -->
-<img src="profile.jpg" 
+<img src="https://cdn.pixabay.com/photo/2021/03/11/07/37/man-6086415_1280.png" 
      alt="John Doe, CEO" 
      width="200" 
      height="200"
      title="Click to view larger image"
      loading="lazy">
-
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    background-color: #f5f5f5;
-  }
-  
-  img {
-    display: block;
-    margin: 20px 0;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    background-color: #e9e9e9;
-    padding: 10px;
-    text-align: center;
-  }
-  
-  /* Placeholder styling for images */
-  img::before {
-    content: attr(alt);
-    display: block;
-    padding: 20px;
-    color: #666;
-    font-style: italic;
-  }
-</style>
 
 <!-- Placeholder image representations -->
 <div style="width: 200px; height: 60px; background: linear-gradient(45deg, #4285f4, #34a853); 
@@ -78,9 +51,24 @@ Images are the most common multimedia element on websites. They communicate info
             color: white; display: flex; align-items: center; justify-content: center; 
             border-radius: 50%; margin: 20px 0; text-align: center; font-size: 14px;">
   John Doe, CEO<br>Profile Photo<br>200×200
-</div>
-```
-</HTMLPreviewWindow>
+</div>`}
+  css={`body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f5f5f5;
+  }
+  
+  img {
+    display: block;
+    margin: 20px 0;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #e9e9e9;
+    padding: 10px;
+    text-align: center;
+  }`}
+  height={400}
+/>
 
 ### Essential Image Attributes
 
@@ -98,18 +86,18 @@ Images are the most common multimedia element on websites. They communicate info
 
 Modern websites need images that work on all screen sizes:
 
-<HTMLPreviewWindow title="Responsive Images" height="500px">
-```html
-<!-- Simple responsive image -->
-<img src="landscape.jpg" 
+<HTMLEditorPreview
+  title="Responsive Images"
+  initialHtml={`<!-- Simple responsive image -->
+<img src="https://images.unsplash.com/photo-1434725039720-aaad6dd32dfe?q=80&w=1042&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
      alt="Mountain landscape" 
      style="max-width: 100%; height: auto;">
 
 <!-- Using srcset for different resolutions -->
-<img src="photo-400.jpg"
-     srcset="photo-400.jpg 400w,
-             photo-800.jpg 800w,
-             photo-1200.jpg 1200w"
+<img src="https://images.unsplash.com/photo-1434725039720-aaad6dd32dfe?q=80&w=1042&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+     srcset="https://images.unsplash.com/photo-1434725039720-aaad6dd32dfe?q=80&w=1042&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 400w,
+             https://images.unsplash.com/photo-1434725039720-aaad6dd32dfe?q=80&w=1042&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 800w,
+             https://images.unsplash.com/photo-1434725039720-aaad6dd32dfe?q=80&w=1042&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D 1200w"
      sizes="(max-width: 600px) 400px,
             (max-width: 900px) 800px,
             1200px"
@@ -117,33 +105,10 @@ Modern websites need images that work on all screen sizes:
 
 <!-- Art direction with picture element -->
 <picture>
-    <source media="(max-width: 600px)" srcset="mobile-photo.jpg">
-    <source media="(max-width: 1200px)" srcset="tablet-photo.jpg">
-    <img src="desktop-photo.jpg" alt="Responsive image">
+    <source media="(max-width: 600px)" srcset="https://images.unsplash.com/photo-1434725039720-aaad6dd32dfe?q=80&w=1042&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D">
+    <source media="(max-width: 1200px)" srcset="https://images.unsplash.com/photo-1434725039720-aaad6dd32dfe?q=80&w=1042&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D">
+    <img src="https://images.unsplash.com/photo-1434725039720-aaad6dd32dfe?q=80&w=1042&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Responsive image">
 </picture>
-
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    background-color: #f8f9fa;
-  }
-  
-  .responsive-demo {
-    border: 2px dashed #007bff;
-    padding: 15px;
-    margin: 20px 0;
-    border-radius: 8px;
-    background-color: white;
-  }
-  
-  .demo-label {
-    color: #007bff;
-    font-weight: bold;
-    margin-bottom: 10px;
-    font-size: 14px;
-  }
-</style>
 
 <div class="responsive-demo">
   <div class="demo-label">Simple Responsive (max-width: 100%)</div>
@@ -170,15 +135,101 @@ Modern websites need images that work on all screen sizes:
               border-radius: 8px; font-size: 12px; text-align: center;">
     Different images for<br>Mobile / Tablet / Desktop
   </div>
-</div>
+</div>`}
+  css={`body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f8f9fa;
+  }
+  
+  .responsive-demo {
+    border: 2px dashed #007bff;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 8px;
+    background-color: white;
+  }
+  
+  .demo-label {
+    color: #007bff;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }`}
+  height={500}
+/>
+
+#### Advanced Responsive Images Techniques
+
+**1. Using `srcset` for Resolution Switching**
+The `srcset` attribute allows browsers to choose the most appropriate image based on device capabilities:
+
+```html
+<img src="photo-medium.jpg"
+     srcset="photo-small.jpg 480w,
+             photo-medium.jpg 800w,
+             photo-large.jpg 1200w,
+             photo-xlarge.jpg 1600w"
+     sizes="(max-width: 600px) 480px,
+            (max-width: 1000px) 800px,
+            1200px"
+     alt="Responsive photo">
 ```
-</HTMLPreviewWindow>
+
+**2. Using `<picture>` for Art Direction**
+The picture element gives you complete control over which image displays at different breakpoints:
+
+```html
+<picture>
+  <!-- Mobile: Portrait crop -->
+  <source media="(max-width: 600px)" 
+          srcset="hero-mobile-portrait.jpg">
+  
+  <!-- Tablet: Landscape crop -->
+  <source media="(max-width: 1200px)" 
+          srcset="hero-tablet-landscape.jpg">
+  
+  <!-- Desktop: Wide crop -->
+  <source media="(min-width: 1201px)" 
+          srcset="hero-desktop-wide.jpg">
+  
+  <!-- Fallback -->
+  <img src="hero-default.jpg" alt="Hero image">
+</picture>
+```
+
+**3. Format Selection with `<picture>`**
+Combine modern formats with fallbacks for optimal performance:
+
+```html
+<picture>
+  <!-- Modern browsers: AVIF -->
+  <source srcset="image.avif" type="image/avif">
+  
+  <!-- Widely supported: WebP -->
+  <source srcset="image.webp" type="image/webp">
+  
+  <!-- Fallback: JPEG -->
+  <img src="image.jpg" alt="Optimized image">
+</picture>
+```
+
+**4. Density-Based Switching**
+Handle high-DPI displays (Retina, etc.):
+
+```html
+<img src="photo.jpg"
+     srcset="photo.jpg 1x,
+             photo@2x.jpg 2x,
+             photo@3x.jpg 3x"
+     alt="Sharp image on all displays">
+```
 
 ### Image Formats and Optimization
 
-<HTMLPreviewWindow title="Modern Image Formats" height="400px">
-```html
-<!-- WebP with fallback -->
+<HTMLEditorPreview
+  title="Modern Image Formats"
+  initialHtml={`<!-- WebP with fallback -->
 <picture>
     <source srcset="image.webp" type="image/webp">
     <source srcset="image.avif" type="image/avif">
@@ -193,31 +244,6 @@ Modern websites need images that work on all screen sizes:
     <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
     <text x="50" y="50" text-anchor="middle" dy=".35em">Logo</text>
 </svg>
-
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    background-color: #f8f9fa;
-  }
-  
-  .format-demo {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin: 20px 0;
-    padding: 15px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  
-  .format-label {
-    font-weight: bold;
-    color: #495057;
-    min-width: 120px;
-  }
-</style>
 
 <div class="format-demo">
   <div class="format-label">Picture Element:</div>
@@ -243,24 +269,81 @@ Modern websites need images that work on all screen sizes:
     <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
     <text x="50" y="50" text-anchor="middle" dy=".35em" fill="white" font-weight="bold">Logo</text>
   </svg>
-</div>
-```
-</HTMLPreviewWindow>
+</div>`}
+  css={`body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f8f9fa;
+  }
+  
+  .format-demo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .format-label {
+    font-weight: bold;
+    color: #495057;
+    min-width: 120px;
+  }`}
+  height={400}
+/>
 
-**Image format guide:**
-- **JPEG** - Photos and complex images
-- **PNG** - Images with transparency
-- **WebP** - Modern format, smaller files
-- **AVIF** - Newest format, best compression
-- **SVG** - Vector graphics, icons, logos
+**Comprehensive Image Format Guide:**
+
+#### JPEG (Joint Photographic Experts Group)
+- **Best for**: Photographs, complex images with many colors
+- **Compression**: Lossy compression (smaller files, some quality loss)
+- **Features**: No transparency support, excellent for photos
+- **File sizes**: Medium to small depending on quality settings
+- **Browser support**: Universal (100%)
+- **Use case**: Product photos, portraits, landscapes
+
+#### PNG (Portable Network Graphics)
+- **Best for**: Images with transparency, graphics with text, simple illustrations
+- **Compression**: Lossless compression (larger files, perfect quality)
+- **Features**: Alpha transparency support, 24-bit color depth
+- **File sizes**: Larger than JPEG, smaller than uncompressed
+- **Browser support**: Universal (100%)
+- **Use case**: Logos with transparency, UI elements, screenshots
+
+#### WebP (Web Picture Format)
+- **Best for**: All types of images (modern replacement for JPEG/PNG)
+- **Compression**: Both lossy and lossless options available
+- **Features**: Transparency support, 25-50% smaller than JPEG/PNG
+- **File sizes**: Significantly smaller than equivalent JPEG/PNG
+- **Browser support**: 97%+ (IE not supported)
+- **Use case**: All modern web images with fallback
+
+#### AVIF (AV1 Image Format)
+- **Best for**: Next-generation image compression
+- **Compression**: Superior to WebP (up to 50% smaller than WebP)
+- **Features**: HDR support, transparency, wide color gamut
+- **File sizes**: Smallest of all formats
+- **Browser support**: 85%+ (growing rapidly)
+- **Use case**: High-performance websites, mobile optimization
+
+#### SVG (Scalable Vector Graphics)
+- **Best for**: Icons, logos, simple graphics, illustrations
+- **Compression**: Vector-based (infinitely scalable)
+- **Features**: CSS/JavaScript interactive, perfect at any size
+- **File sizes**: Very small for simple graphics
+- **Browser support**: Universal (100%)
+- **Use case**: Icons, logos, simple illustrations
 
 ## Figure and Figcaption
 
 Group images with their captions semantically:
 
-<HTMLPreviewWindow title="Figure and Figcaption" height="500px">
-```html
-<figure>
+<HTMLEditorPreview
+  title="Figure and Figcaption"
+  initialHtml={`<figure>
     <img src="chart.png" alt="Sales data showing 25% increase">
     <figcaption>
         Figure 1: Company sales increased by 25% in Q3 2024
@@ -283,8 +366,42 @@ Group images with their captions semantically:
     <figcaption>— Alan Kay, Computer Scientist</figcaption>
 </figure>
 
-<style>
-  body {
+<figure>
+  <div style="width: 300px; height: 200px; background: linear-gradient(45deg, #28a745, #20c997); 
+              color: white; display: flex; align-items: center; justify-content: center; 
+              border-radius: 8px; margin: 0 auto; font-weight: bold;">
+    📊 Sales Chart<br>Q3 2024: +25%
+  </div>
+  <figcaption>
+    Figure 1: Company sales increased by 25% in Q3 2024
+  </figcaption>
+</figure>
+
+<figure>
+  <div class="before-after">
+    <div style="width: 150px; height: 120px; background: linear-gradient(45deg, #dc3545, #fd7e14); 
+                color: white; display: flex; align-items: center; justify-content: center; 
+                border-radius: 8px; font-size: 12px; text-align: center;">
+      BEFORE<br>Old Kitchen
+    </div>
+    <div style="width: 150px; height: 120px; background: linear-gradient(45deg, #198754, #20c997); 
+                color: white; display: flex; align-items: center; justify-content: center; 
+                border-radius: 8px; font-size: 12px; text-align: center;">
+      AFTER<br>Renovated
+    </div>
+  </div>
+  <figcaption>
+    Before and after photos of the kitchen renovation project
+  </figcaption>
+</figure>
+
+<figure>
+  <blockquote>
+    "The best way to predict the future is to invent it."
+  </blockquote>
+  <figcaption>— Alan Kay, Computer Scientist</figcaption>
+</figure>`}
+  css={`body {
     font-family: Arial, sans-serif;
     padding: 20px;
     background-color: #f8f9fa;
@@ -323,54 +440,17 @@ Group images with their captions semantically:
     display: flex;
     gap: 20px;
     justify-content: center;
-  }
-</style>
-
-<figure>
-  <div style="width: 300px; height: 200px; background: linear-gradient(45deg, #28a745, #20c997); 
-              color: white; display: flex; align-items: center; justify-content: center; 
-              border-radius: 8px; margin: 0 auto; font-weight: bold;">
-    📊 Sales Chart<br>Q3 2024: +25%
-  </div>
-  <figcaption>
-    Figure 1: Company sales increased by 25% in Q3 2024
-  </figcaption>
-</figure>
-
-<figure>
-  <div class="before-after">
-    <div style="width: 150px; height: 120px; background: linear-gradient(45deg, #dc3545, #fd7e14); 
-                color: white; display: flex; align-items: center; justify-content: center; 
-                border-radius: 8px; font-size: 12px; text-align: center;">
-      BEFORE<br>Old Kitchen
-    </div>
-    <div style="width: 150px; height: 120px; background: linear-gradient(45deg, #198754, #20c997); 
-                color: white; display: flex; align-items: center; justify-content: center; 
-                border-radius: 8px; font-size: 12px; text-align: center;">
-      AFTER<br>Renovated
-    </div>
-  </div>
-  <figcaption>
-    Before and after photos of the kitchen renovation project
-  </figcaption>
-</figure>
-
-<figure>
-  <blockquote>
-    "The best way to predict the future is to invent it."
-  </blockquote>
-  <figcaption>— Alan Kay, Computer Scientist</figcaption>
-</figure>
-```
-</HTMLPreviewWindow>
+  }`}
+  height={500}
+/>
 
 ## HTML5 Video
 
 HTML5 made video embedding much simpler than the old Flash days:
 
-<HTMLPreviewWindow title="HTML5 Video Element" height="600px">
-```html
-<!-- Basic video -->
+<HTMLEditorPreview
+  title="HTML5 Video Element"
+  initialHtml={`<!-- Basic video -->
 <video controls>
     <source src="movie.mp4" type="video/mp4">
     <source src="movie.webm" type="video/webm">
@@ -400,8 +480,44 @@ HTML5 made video embedding much simpler than the old Flash days:
     <source src="hero-video.webm" type="video/webm">
 </video>
 
-<style>
-  body {
+<div class="video-demo">
+  <div class="video-label">Basic Video (controls)</div>
+  <div class="video-placeholder" style="width: 400px; height: 225px; background: linear-gradient(45deg, #667eea, #764ba2);">
+    <div class="play-button">▶</div>
+    <div style="text-align: center; font-size: 16px;">🎬 Movie Video<br><small>MP4 • WebM sources</small></div>
+    <div class="controls-bar">
+      ⏯ ⏹ 🔊 ——————●——— 2:34 / 5:18 ⚙ ⬜
+    </div>
+  </div>
+</div>
+
+<div class="video-demo">
+  <div class="video-label">Video with Poster & Attributes (640×360)</div>
+  <div class="video-placeholder" style="width: 640px; height: 360px; background: linear-gradient(135deg, #ff6b6b, #4ecdc4);">
+    <div style="text-align: center; font-size: 18px;">🎥 Full Featured Video<br><small>Poster • Preload • Muted • Loop</small></div>
+    <div class="controls-bar">
+      ⏯ ⏹ 🔇 ——————●——— 1:15 / 3:42 🔁 ⚙ ⬜
+    </div>
+  </div>
+</div>
+
+<div class="video-demo">
+  <div class="video-label">Autoplay Video (muted, loop, playsinline)</div>
+  <div class="video-placeholder" style="width: 300px; height: 169px; background: linear-gradient(45deg, #a8edea, #fed6e3);">
+    <div style="text-align: center; font-size: 14px; color: #333;">🎞 Hero Video<br><small>Auto-playing (muted)</small></div>
+    <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); 
+                color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px;">
+      LIVE
+    </div>
+  </div>
+</div>
+
+<p style="margin-top: 20px; padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; 
+          border-radius: 4px; color: #856404; font-size: 14px;">
+  📝 <strong>Note:</strong> Video elements shown with placeholder content. 
+  In a real browser, these would display actual video players with working controls.
+</p>`}
+  css={`body {
     font-family: Arial, sans-serif;
     padding: 20px;
     background-color: #f8f9fa;
@@ -458,48 +574,9 @@ HTML5 made video embedding much simpler than the old Flash days:
     padding: 0 15px;
     color: white;
     font-size: 12px;
-  }
-</style>
-
-<div class="video-demo">
-  <div class="video-label">Basic Video (controls)</div>
-  <div class="video-placeholder" style="width: 400px; height: 225px; background: linear-gradient(45deg, #667eea, #764ba2);">
-    <div class="play-button">▶</div>
-    <div style="text-align: center; font-size: 16px;">🎬 Movie Video<br><small>MP4 • WebM sources</small></div>
-    <div class="controls-bar">
-      ⏯ ⏹ 🔊 ——————●——— 2:34 / 5:18 ⚙ ⬜
-    </div>
-  </div>
-</div>
-
-<div class="video-demo">
-  <div class="video-label">Video with Poster & Attributes (640×360)</div>
-  <div class="video-placeholder" style="width: 640px; height: 360px; background: linear-gradient(135deg, #ff6b6b, #4ecdc4);">
-    <div style="text-align: center; font-size: 18px;">🎥 Full Featured Video<br><small>Poster • Preload • Muted • Loop</small></div>
-    <div class="controls-bar">
-      ⏯ ⏹ 🔇 ——————●——— 1:15 / 3:42 🔁 ⚙ ⬜
-    </div>
-  </div>
-</div>
-
-<div class="video-demo">
-  <div class="video-label">Autoplay Video (muted, loop, playsinline)</div>
-  <div class="video-placeholder" style="width: 300px; height: 169px; background: linear-gradient(45deg, #a8edea, #fed6e3);">
-    <div style="text-align: center; font-size: 14px; color: #333;">🎞 Hero Video<br><small>Auto-playing (muted)</small></div>
-    <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); 
-                color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px;">
-      LIVE
-    </div>
-  </div>
-</div>
-
-<p style="margin-top: 20px; padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; 
-          border-radius: 4px; color: #856404; font-size: 14px;">
-  📝 <strong>Note:</strong> Video elements shown with placeholder content. 
-  In a real browser, these would display actual video players with working controls.
-</p>
-```
-</HTMLPreviewWindow>
+  }`}
+  height={600}
+/>
 
 ### Video Attributes
 
@@ -514,11 +591,63 @@ HTML5 made video embedding much simpler than the old Flash days:
 
 > **⚠️ Autoplay Warning** Most browsers block autoplay with sound. Always use `muted` with `autoplay` and provide controls for users to unmute.
 
+### Video Formats and Codecs Deep Dive
+
+Understanding video formats is crucial for web optimization:
+
+#### Container Formats vs. Codecs
+- **Container**: The file format that holds video, audio, and metadata (MP4, WebM, AVI)
+- **Codec**: The compression algorithm that encodes/decodes the actual video data (H.264, VP9, AV1)
+
+#### Major Video Formats for Web
+
+**MP4 (MPEG-4 Part 14)**
+- **Codecs**: Usually H.264 (older) or H.265/HEVC (newer)
+- **Browser support**: Universal (100%)
+- **File sizes**: Good compression with H.264, excellent with H.265
+- **Use case**: Primary format for maximum compatibility
+- **Pros**: Universal support, good quality-to-size ratio
+- **Cons**: H.264 is aging, larger files than modern alternatives
+
+**WebM**
+- **Codecs**: VP8 (older) or VP9 (recommended)
+- **Browser support**: 98%+ (not supported in Safari on iOS < 14)
+- **File sizes**: 25-50% smaller than MP4/H.264
+- **Use case**: Modern web video with fallback to MP4
+- **Pros**: Open source, excellent compression, royalty-free
+- **Cons**: Limited Safari support on older iOS
+
+**AV1 (.mp4 or .webm container)**
+- **Codecs**: AV1 (cutting-edge)
+- **Browser support**: 85%+ (Chrome, Firefox, Edge, Safari 17+)
+- **File sizes**: 30-50% smaller than H.264, 20% smaller than VP9
+- **Use case**: Future-proof video for high-performance sites
+- **Pros**: Best compression available, royalty-free, HDR support
+- **Cons**: Limited support, high encoding complexity
+
+#### Optimal Video Format Strategy
+
+```html
+<video controls poster="video-poster.jpg">
+  <!-- Future: AV1 for maximum compression -->
+  <source src="video.av1.mp4" type="video/mp4; codecs=av01.0.08M.10">
+  
+  <!-- Modern: VP9 in WebM -->
+  <source src="video.webm" type="video/webm; codecs=vp9">
+  
+  <!-- Fallback: H.264 in MP4 -->
+  <source src="video.mp4" type="video/mp4; codecs=avc1.4d002a">
+  
+  <!-- Ultimate fallback message -->
+  Your browser doesn't support modern video formats.
+</video>
+```
+
 ### Video Tracks and Accessibility
 
-<HTMLPreviewWindow title="Video Accessibility" height="400px">
-```html
-<video controls>
+<HTMLEditorPreview
+  title="Video Accessibility"
+  initialHtml={`<video controls>
     <source src="movie.mp4" type="video/mp4">
     <source src="movie.webm" type="video/webm">
     
@@ -537,8 +666,55 @@ HTML5 made video embedding much simpler than the old Flash days:
     <track kind="descriptions" src="movie-descriptions.vtt" srclang="en" label="Audio Descriptions">
 </video>
 
-<style>
-  body {
+<div class="accessibility-demo">
+  <div style="text-align: center; font-size: 18px;">🎬 Accessible Video Player</div>
+  <div class="subtitle-overlay">
+    Hello, welcome to our tutorial!
+  </div>
+  <div class="controls-enhanced">
+    <div>⏯ ⏹ 🔊 ——————●——— 0:45 / 4:30</div>
+    <div>
+      CC <span class="cc-menu">EN ▼</span>
+      📖 <span class="cc-menu">Chapters ▼</span>
+      ⚙ ⬜
+    </div>
+  </div>
+</div>
+
+<div class="track-list">
+  <h4 style="margin: 0 0 15px 0; color: #495057;">🎯 Accessibility Tracks</h4>
+  
+  <div class="track-item">
+    <span>🌍 Subtitles (English)</span>
+    <span style="color: #28a745; font-weight: bold;">DEFAULT</span>
+  </div>
+  
+  <div class="track-item">
+    <span>🌍 Subtitles (Español)</span>
+    <span style="color: #6c757d;">Available</span>
+  </div>
+  
+  <div class="track-item">
+    <span>🌍 Subtitles (Français)</span>
+    <span style="color: #6c757d;">Available</span>
+  </div>
+  
+  <div class="track-item">
+    <span>🎧 Captions (Hearing Impaired)</span>
+    <span style="color: #6c757d;">Available</span>
+  </div>
+  
+  <div class="track-item">
+    <span>📖 Chapter Markers</span>
+    <span style="color: #6c757d;">Available</span>
+  </div>
+  
+  <div class="track-item">
+    <span>🔊 Audio Descriptions</span>
+    <span style="color: #6c757d;">Available</span>
+  </div>
+</div>`}
+  css={`body {
     font-family: Arial, sans-serif;
     padding: 20px;
     background-color: #f8f9fa;
@@ -611,67 +787,17 @@ HTML5 made video embedding much simpler than the old Flash days:
   
   .track-item:last-child {
     border-bottom: none;
-  }
-</style>
-
-<div class="accessibility-demo">
-  <div style="text-align: center; font-size: 18px;">🎬 Accessible Video Player</div>
-  <div class="subtitle-overlay">
-    Hello, welcome to our tutorial!
-  </div>
-  <div class="controls-enhanced">
-    <div>⏯ ⏹ 🔊 ——————●——— 0:45 / 4:30</div>
-    <div>
-      CC <span class="cc-menu">EN ▼</span>
-      📖 <span class="cc-menu">Chapters ▼</span>
-      ⚙ ⬜
-    </div>
-  </div>
-</div>
-
-<div class="track-list">
-  <h4 style="margin: 0 0 15px 0; color: #495057;">🎯 Accessibility Tracks</h4>
-  
-  <div class="track-item">
-    <span>🌍 Subtitles (English)</span>
-    <span style="color: #28a745; font-weight: bold;">DEFAULT</span>
-  </div>
-  
-  <div class="track-item">
-    <span>🌍 Subtitles (Español)</span>
-    <span style="color: #6c757d;">Available</span>
-  </div>
-  
-  <div class="track-item">
-    <span>🌍 Subtitles (Français)</span>
-    <span style="color: #6c757d;">Available</span>
-  </div>
-  
-  <div class="track-item">
-    <span>🎧 Captions (Hearing Impaired)</span>
-    <span style="color: #6c757d;">Available</span>
-  </div>
-  
-  <div class="track-item">
-    <span>📖 Chapter Markers</span>
-    <span style="color: #6c757d;">Available</span>
-  </div>
-  
-  <div class="track-item">
-    <span>🔊 Audio Descriptions</span>
-    <span style="color: #6c757d;">Available</span>
-  </div>
-</div>
-```
-</HTMLPreviewWindow>
+  }`}
+  height={400}
+/>
 
 ## HTML5 Audio
 
 Audio elements work similarly to video but for sound files:
 
-<HTMLPreviewWindow title="HTML5 Audio Element" height="500px">
-```html
-<!-- Basic audio player -->
+<HTMLEditorPreview
+  title="HTML5 Audio Element"
+  initialHtml={`<!-- Basic audio player -->
 <audio controls>
     <source src="podcast.mp3" type="audio/mpeg">
     <source src="podcast.ogg" type="audio/ogg">
@@ -700,8 +826,79 @@ Audio elements work similarly to video but for sound files:
     <p>Audio not supported. <a href="song.mp3">Download MP3</a></p>
 </audio>
 
-<style>
-  body {
+<div class="audio-demo">
+  <div class="audio-label">🎙 Basic Podcast Player</div>
+  <div class="audio-player">
+    <div class="play-btn">▶</div>
+    <div class="audio-info">
+      <div style="font-weight: bold; margin-bottom: 5px;">Episode 42: Web Development Tips</div>
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+      <div class="audio-controls">
+        <span>2:34 / 7:21</span>
+        <div class="volume-control">
+          🔊 ——●———
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="audio-demo">
+  <div class="audio-label">🎵 Background Music (autoplay, muted, loop)</div>
+  <div class="audio-player" style="background: linear-gradient(90deg, #ff6b6b, #4ecdc4); opacity: 0.7;">
+    <div style="width: 20px; height: 20px; background: rgba(255,255,255,0.8); border-radius: 50%; 
+                display: flex; align-items: center; justify-content: center; color: #333; font-size: 10px;">
+      🔇
+    </div>
+    <div class="audio-info">
+      <div style="font-size: 12px; font-style: italic;">Ambient Background Music (Muted)</div>
+      <div style="font-size: 10px; opacity: 0.8;">Auto-playing • Looped</div>
+    </div>
+  </div>
+</div>
+
+<div class="audio-demo">
+  <div class="audio-label">🎤 Interview Audio (preload: metadata)</div>
+  <div class="audio-player" style="background: linear-gradient(90deg, #28a745, #20c997);">
+    <div class="play-btn">▶</div>
+    <div class="audio-info">
+      <div style="font-weight: bold; margin-bottom: 5px;">CEO Interview - Future Plans</div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 0%;"></div>
+      </div>
+      <div class="audio-controls">
+        <span>0:00 / 15:42</span>
+        <span style="font-size: 10px; opacity: 0.8;">MP3 • WAV</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="audio-demo">
+  <div class="audio-label">🎶 Music Track (multiple formats)</div>
+  <div class="audio-player" style="background: linear-gradient(90deg, #6f42c1, #e83e8c);">
+    <div class="play-btn">▶</div>
+    <div class="audio-info">
+      <div style="font-weight: bold; margin-bottom: 5px;">Sample Song.mp3</div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 67%;"></div>
+      </div>
+      <div class="audio-controls">
+        <span>2:01 / 3:28</span>
+        <span style="font-size: 10px; opacity: 0.8;">MP3 • OGG • WAV</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p style="margin-top: 20px; padding: 15px; background: #d1ecf1; border: 1px solid #bee5eb; 
+          border-radius: 4px; color: #0c5460; font-size: 14px;">
+  🎵 <strong>Note:</strong> Audio players shown with mock controls. 
+  Real audio elements would have functional playback controls.
+</p>`}
+  css={`body {
     font-family: Arial, sans-serif;
     padding: 20px;
     background-color: #f8f9fa;
@@ -777,100 +974,100 @@ Audio elements work similarly to video but for sound files:
     display: flex;
     align-items: center;
     gap: 5px;
-  }
-</style>
+  }`}
+  height={500}
+/>
 
-<div class="audio-demo">
-  <div class="audio-label">🎙 Basic Podcast Player</div>
-  <div class="audio-player">
-    <div class="play-btn">▶</div>
-    <div class="audio-info">
-      <div style="font-weight: bold; margin-bottom: 5px;">Episode 42: Web Development Tips</div>
-      <div class="progress-bar">
-        <div class="progress-fill"></div>
-      </div>
-      <div class="audio-controls">
-        <span>2:34 / 7:21</span>
-        <div class="volume-control">
-          🔊 ——●———
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+### Audio Formats Deep Dive
 
-<div class="audio-demo">
-  <div class="audio-label">🎵 Background Music (autoplay, muted, loop)</div>
-  <div class="audio-player" style="background: linear-gradient(90deg, #ff6b6b, #4ecdc4); opacity: 0.7;">
-    <div style="width: 20px; height: 20px; background: rgba(255,255,255,0.8); border-radius: 50%; 
-                display: flex; align-items: center; justify-content: center; color: #333; font-size: 10px;">
-      🔇
-    </div>
-    <div class="audio-info">
-      <div style="font-size: 12px; font-style: italic;">Ambient Background Music (Muted)</div>
-      <div style="font-size: 10px; opacity: 0.8;">Auto-playing • Looped</div>
-    </div>
-  </div>
-</div>
+Understanding audio formats helps you choose the right one for your content:
 
-<div class="audio-demo">
-  <div class="audio-label">🎤 Interview Audio (preload: metadata)</div>
-  <div class="audio-player" style="background: linear-gradient(90deg, #28a745, #20c997);">
-    <div class="play-btn">▶</div>
-    <div class="audio-info">
-      <div style="font-weight: bold; margin-bottom: 5px;">CEO Interview - Future Plans</div>
-      <div class="progress-bar">
-        <div class="progress-fill" style="width: 0%;"></div>
-      </div>
-      <div class="audio-controls">
-        <span>0:00 / 15:42</span>
-        <span style="font-size: 10px; opacity: 0.8;">MP3 • WAV</span>
-      </div>
-    </div>
-  </div>
-</div>
+#### Comprehensive Audio Format Guide
 
-<div class="audio-demo">
-  <div class="audio-label">🎶 Music Track (multiple formats)</div>
-  <div class="audio-player" style="background: linear-gradient(90deg, #6f42c1, #e83e8c);">
-    <div class="play-btn">▶</div>
-    <div class="audio-info">
-      <div style="font-weight: bold; margin-bottom: 5px;">Sample Song.mp3</div>
-      <div class="progress-bar">
-        <div class="progress-fill" style="width: 67%;"></div>
-      </div>
-      <div class="audio-controls">
-        <span>2:01 / 3:28</span>
-        <span style="font-size: 10px; opacity: 0.8;">MP3 • OGG • WAV</span>
-      </div>
-    </div>
-  </div>
-</div>
+**MP3 (MPEG Layer 3)**
+- **Compression**: Lossy (smaller files, some quality loss)
+- **Browser support**: Universal (100%)
+- **File sizes**: Good compression, widely optimized
+- **Quality**: Good at 128kbps+, excellent at 192kbps+
+- **Use case**: Primary format for maximum compatibility
+- **Pros**: Universal support, mature ecosystem, predictable file sizes
+- **Cons**: Patented codec, not the most efficient modern option
 
-<p style="margin-top: 20px; padding: 15px; background: #d1ecf1; border: 1px solid #bee5eb; 
-          border-radius: 4px; color: #0c5460; font-size: 14px;">
-  🎵 <strong>Note:</strong> Audio players shown with mock controls. 
-  Real audio elements would have functional playback controls.
-</p>
+**AAC (Advanced Audio Coding)**
+- **Compression**: Lossy (better than MP3 at same bitrates)
+- **Browser support**: 98%+ (native in Safari, Chrome, supported in Firefox)
+- **File sizes**: 25% smaller than MP3 at equivalent quality
+- **Quality**: Superior to MP3, especially at lower bitrates
+- **Use case**: High-quality audio, Apple ecosystem
+- **Pros**: Better compression than MP3, supported by Apple
+- **Cons**: Not as universal as MP3
+
+**OGG Vorbis**
+- **Compression**: Lossy (excellent quality-to-size ratio)
+- **Browser support**: 85%+ (Chrome, Firefox, Edge; not Safari)
+- **File sizes**: Similar or smaller than MP3 with better quality
+- **Quality**: Superior to MP3 at equivalent bitrates
+- **Use case**: Open-source projects, modern web audio
+- **Pros**: Open source, royalty-free, excellent compression
+- **Cons**: No Safari support
+
+**FLAC (Free Lossless Audio Codec)**
+- **Compression**: Lossless (perfect quality, larger files)
+- **Browser support**: 85%+ (Chrome, Firefox, Edge; Safari 17+)
+- **File sizes**: 50-60% of original WAV size
+- **Quality**: Perfect reproduction of original
+- **Use case**: High-fidelity audio, archival purposes
+- **Pros**: Lossless quality, open source
+- **Cons**: Large file sizes, limited mobile support
+
+**WAV (Waveform Audio File)**
+- **Compression**: Usually uncompressed (huge files)
+- **Browser support**: Universal (100%)
+- **File sizes**: Very large (10MB+ per minute)
+- **Quality**: Perfect (if uncompressed)
+- **Use case**: Short sound effects, development/testing
+- **Pros**: Universal support, perfect quality
+- **Cons**: Extremely large files
+
+#### Optimal Audio Strategy
+
+```html
+<audio controls preload="metadata">
+  <!-- High quality: FLAC for audiophiles -->
+  <source src="audio.flac" type="audio/flac">
+  
+  <!-- Modern: OGG Vorbis for quality -->
+  <source src="audio.ogg" type="audio/ogg; codecs=vorbis">
+  
+  <!-- Alternative: AAC for better compression -->
+  <source src="audio.aac" type="audio/aac">
+  
+  <!-- Fallback: MP3 for universal support -->
+  <source src="audio.mp3" type="audio/mpeg">
+  
+  Your browser doesn't support modern audio formats.
+</audio>
 ```
-</HTMLPreviewWindow>
 
-### Audio Formats
+#### Audio Quality Guidelines
 
-**Common audio formats:**
-- **MP3** - Universal support, good compression
-- **OGG** - Open source, good quality
-- **WAV** - Uncompressed, large files
-- **AAC** - Good compression, Apple preferred
-- **WebM Audio** - Modern web format
+**For Music & Podcasts:**
+- MP3: 192kbps minimum, 320kbps for high quality
+- AAC: 128kbps good, 192kbps excellent
+- OGG: 160kbps good, 192kbps excellent
+
+**For Voice/Speech:**
+- MP3: 64kbps acceptable, 128kbps good
+- AAC: 48kbps acceptable, 96kbps good
+- OGG: 64kbps acceptable, 96kbps good
 
 ## Embedding External Media
 
 ### YouTube Videos
 
-<HTMLPreviewWindow title="Embedding YouTube Videos" height="600px">
-```html
-<!-- Basic YouTube embed -->
+<HTMLEditorPreview 
+  title="Embedding YouTube Videos"
+  initialHtml={`<!-- Basic YouTube embed -->
 <iframe width="560" 
         height="315" 
         src="https://www.youtube.com/embed/VIDEO_ID" 
@@ -899,8 +1096,70 @@ Audio elements work similarly to video but for sound files:
         allowfullscreen>
 </iframe>
 
-<style>
-  body {
+<div class="embed-demo">
+  <div class="embed-label">📺 Basic YouTube Embed (560×315)</div>
+  <div class="youtube-frame" style="width: 560px; height: 315px;">
+    <div class="youtube-header">
+      <span class="youtube-logo">YouTube</span>
+      <span>⚙ ⬜</span>
+    </div>
+    <div class="play-overlay">▶</div>
+    <div style="text-align: center; font-size: 16px;">🎥 Sample Tutorial Video</div>
+    <div class="video-info">
+      <div style="font-weight: bold;">How to Build Amazing Websites</div>
+      <div style="font-size: 12px; opacity: 0.8;">123K views • 2 days ago</div>
+    </div>
+  </div>
+</div>
+
+<div class="embed-demo">
+  <div class="embed-label">📱 Responsive YouTube Embed (16:9 ratio)</div>
+  <div class="responsive-container">
+    <div class="youtube-frame" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+      <div class="youtube-header">
+        <span class="youtube-logo">YouTube</span>
+        <span>📱 Responsive</span>
+      </div>
+      <div class="play-overlay">▶</div>
+      <div style="text-align: center; font-size: 16px;">🎬 Responsive Video Tutorial</div>
+      <div class="video-info">
+        <div style="font-weight: bold;">Responsive Web Design Tips</div>
+        <div style="font-size: 12px; opacity: 0.8;">456K views • 1 week ago</div>
+      </div>
+    </div>
+  </div>
+  <p style="margin-top: 10px; font-size: 12px; color: #666; font-style: italic;">
+    Try resizing the preview window to see the responsive behavior!
+  </p>
+</div>
+
+<div class="embed-demo">
+  <div class="embed-label">🔒 Privacy-Enhanced Mode (youtube-nocookie.com)</div>
+  <div class="youtube-frame" style="width: 560px; height: 315px;">
+    <div class="youtube-header">
+      <span class="youtube-logo">YouTube</span>
+      <span style="background: #28a745; padding: 2px 6px; border-radius: 3px; font-size: 10px;">🔒 PRIVACY</span>
+    </div>
+    <div class="play-overlay">▶</div>
+    <div style="text-align: center; font-size: 16px;">🛡 Privacy-Protected Video</div>
+    <div class="video-info">
+      <div style="font-weight: bold;">Web Security Best Practices</div>
+      <div style="font-size: 12px; opacity: 0.8;">No tracking until play • 789K views</div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top: 20px; padding: 15px; background: #d4edda; border: 1px solid #c3e6cb; 
+            border-radius: 4px; color: #155724; font-size: 14px;">
+  ✅ <strong>Best Practices:</strong>
+  <ul style="margin: 10px 0 0 20px;">
+    <li>Use responsive containers for mobile-friendly embeds</li>
+    <li>Consider privacy-enhanced mode for GDPR compliance</li>
+    <li>Always include meaningful title attributes</li>
+    <li>Test allowfullscreen functionality</li>
+  </ul>
+</div>`}
+  css={`body {
     font-family: Arial, sans-serif;
     padding: 20px;
     background-color: #f8f9fa;
@@ -981,80 +1240,16 @@ Audio elements work similarly to video but for sound files:
     overflow: hidden;
     background: #000;
     border-radius: 4px;
-  }
-</style>
-
-<div class="embed-demo">
-  <div class="embed-label">📺 Basic YouTube Embed (560×315)</div>
-  <div class="youtube-frame" style="width: 560px; height: 315px;">
-    <div class="youtube-header">
-      <span class="youtube-logo">YouTube</span>
-      <span>⚙ ⬜</span>
-    </div>
-    <div class="play-overlay">▶</div>
-    <div style="text-align: center; font-size: 16px;">🎥 Sample Tutorial Video</div>
-    <div class="video-info">
-      <div style="font-weight: bold;">How to Build Amazing Websites</div>
-      <div style="font-size: 12px; opacity: 0.8;">123K views • 2 days ago</div>
-    </div>
-  </div>
-</div>
-
-<div class="embed-demo">
-  <div class="embed-label">📱 Responsive YouTube Embed (16:9 ratio)</div>
-  <div class="responsive-container">
-    <div class="youtube-frame" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
-      <div class="youtube-header">
-        <span class="youtube-logo">YouTube</span>
-        <span>📱 Responsive</span>
-      </div>
-      <div class="play-overlay">▶</div>
-      <div style="text-align: center; font-size: 16px;">🎬 Responsive Video Tutorial</div>
-      <div class="video-info">
-        <div style="font-weight: bold;">Responsive Web Design Tips</div>
-        <div style="font-size: 12px; opacity: 0.8;">456K views • 1 week ago</div>
-      </div>
-    </div>
-  </div>
-  <p style="margin-top: 10px; font-size: 12px; color: #666; font-style: italic;">
-    Try resizing the preview window to see the responsive behavior!
-  </p>
-</div>
-
-<div class="embed-demo">
-  <div class="embed-label">🔒 Privacy-Enhanced Mode (youtube-nocookie.com)</div>
-  <div class="youtube-frame" style="width: 560px; height: 315px;">
-    <div class="youtube-header">
-      <span class="youtube-logo">YouTube</span>
-      <span style="background: #28a745; padding: 2px 6px; border-radius: 3px; font-size: 10px;">🔒 PRIVACY</span>
-    </div>
-    <div class="play-overlay">▶</div>
-    <div style="text-align: center; font-size: 16px;">🛡 Privacy-Protected Video</div>
-    <div class="video-info">
-      <div style="font-weight: bold;">Web Security Best Practices</div>
-      <div style="font-size: 12px; opacity: 0.8;">No tracking until play • 789K views</div>
-    </div>
-  </div>
-</div>
-
-<div style="margin-top: 20px; padding: 15px; background: #d4edda; border: 1px solid #c3e6cb; 
-            border-radius: 4px; color: #155724; font-size: 14px;">
-  ✅ <strong>Best Practices:</strong>
-  <ul style="margin: 10px 0 0 20px;">
-    <li>Use responsive containers for mobile-friendly embeds</li>
-    <li>Consider privacy-enhanced mode for GDPR compliance</li>
-    <li>Always include meaningful title attributes</li>
-    <li>Test allowfullscreen functionality</li>
-  </ul>
-</div>
-```
-</HTMLPreviewWindow>
+  }`}
+  height={600}
+/>
 
 ### Other Embedded Content
 
-<HTMLPreviewWindow title="Other Embeds" height="700px">
-```html
-<!-- Vimeo video -->
+<HTMLEditorPreview 
+  title="Other Embeds"
+  height={500}
+  initialHtml={`<!-- Vimeo video -->
 <iframe src="https://player.vimeo.com/video/VIDEO_ID" 
         width="640" 
         height="360" 
@@ -1092,49 +1287,6 @@ Audio elements work similarly to video but for sound files:
     <a href="https://twitter.com/username/status/123456789">Date</a>
 </blockquote>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    background-color: #f8f9fa;
-  }
-  
-  .embed-section {
-    margin: 30px 0;
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  
-  .platform-label {
-    font-weight: bold;
-    color: #495057;
-    margin-bottom: 15px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .embed-frame {
-    border-radius: 8px;
-    overflow: hidden;
-    position: relative;
-  }
-  
-  .platform-header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 8px 15px;
-    font-size: 12px;
-    color: white;
-    z-index: 10;
-  }
-</style>
 
 <div class="embed-section">
   <div class="platform-label">🎬 Vimeo Video Player (640×360)</div>
@@ -1230,16 +1382,56 @@ Audio elements work similarly to video but for sound files:
             border-radius: 4px; color: #856404; font-size: 14px;">
   ⚠️ <strong>External Embeds Note:</strong> These examples show placeholder content. 
   Real embeds would load interactive content from their respective platforms.
-</div>
-```
-</HTMLPreviewWindow>
+</div>`}
+  css={`body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f8f9fa;
+  }
+  
+  .embed-section {
+    margin: 30px 0;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .platform-label {
+    font-weight: bold;
+    color: #495057;
+    margin-bottom: 15px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .embed-frame {
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .platform-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 8px 15px;
+    font-size: 12px;
+    color: white;
+    z-index: 10;
+  }`}
+  height={700}
+/>
 
 ## Multimedia Best Practices
 
 ### 1. Optimize File Sizes
 
-<HTMLPreviewWindow title="File Size Optimization" height="400px">
-```html
+<HTMLEditorPreview title="File Size Optimization"
+initialHtml={`html
 <!-- Use appropriate dimensions -->
 <img src="thumbnail.jpg" 
      alt="Product thumbnail" 
@@ -1342,13 +1534,13 @@ Audio elements work similarly to video but for sound files:
     <li>Always include poster images for videos</li>
   </ul>
 </div>
-```
-</HTMLPreviewWindow>
+`}>
+</HTMLEditorPreview>
 
 ### 2. Progressive Enhancement
 
-<HTMLPreviewWindow title="Progressive Enhancement" height="500px">
-```html
+<HTMLEditorPreview title="Progressive Enhancement"
+initialHtml={`html
 <!-- Provide meaningful fallbacks -->
 <video controls>
     <source src="tutorial.mp4" type="video/mp4">
@@ -1463,13 +1655,13 @@ Audio elements work similarly to video but for sound files:
     <li>Download options work even when streaming fails</li>
   </ul>
 </div>
-```
-</HTMLPreviewWindow>
+`}>
+</HTMLEditorPreview>
 
 ### 3. Accessibility Considerations
 
-<HTMLPreviewWindow title="Multimedia Accessibility" height="600px">
-```html
+<HTMLEditorPreview title="Multimedia Accessibility"
+initialHtml={`html
 <!-- Descriptive alt text -->
 <img src="chart.png" 
      alt="Bar chart showing 40% increase in sales from Q1 to Q2">
@@ -1631,8 +1823,262 @@ Audio elements work similarly to video but for sound files:
     <li>Multimedia controls are keyboard accessible</li>
   </ul>
 </div>
+`}>
+</HTMLEditorPreview>
+
+#### Complete Multimedia Accessibility Guide
+
+Making multimedia accessible requires understanding different user needs:
+
+**Visual Impairments:**
+- **Total blindness**: Need alt text, audio descriptions, screen reader compatibility
+- **Low vision**: Need high contrast, scalable text, zoom support
+- **Color blindness**: Avoid color-only information conveyance
+
+**Hearing Impairments:**
+- **Deafness**: Need captions, sign language interpretation, visual alerts
+- **Hard of hearing**: Need volume control, caption options, visual indicators
+
+**Motor Impairments:**
+- **Limited mobility**: Need keyboard navigation, large click targets, pause controls
+- **Tremors**: Need stable controls, click tolerance, pause functionality
+
+**Cognitive Impairments:**
+- **Processing difficulties**: Need clear navigation, pause/replay options, simple controls
+- **Attention disorders**: Need minimal distractions, clear focus indicators
+
+#### Accessibility Implementation Examples
+
+```html
+<!-- Fully accessible image -->
+<figure role="img" aria-labelledby="chart-title" aria-describedby="chart-desc">
+  <img src="sales-chart.png" alt="" id="chart-image">
+  <figcaption>
+    <h3 id="chart-title">Q2 Sales Performance</h3>
+    <p id="chart-desc">
+      Bar chart showing monthly sales: April $45K, May $52K, June $61K. 
+      Represents 35% growth over Q1. Highest performer was June with 
+      $61K in sales, exceeding target by 18%.
+    </p>
+    <details>
+      <summary>View data table</summary>
+      <table>
+        <caption>Q2 2024 Sales Data</caption>
+        <thead>
+          <tr><th>Month</th><th>Sales</th><th>vs Target</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>April</td><td>$45,000</td><td>+12%</td></tr>
+          <tr><td>May</td><td>$52,000</td><td>+15%</td></tr>
+          <tr><td>June</td><td>$61,000</td><td>+18%</td></tr>
+        </tbody>
+      </table>
+    </details>
+  </figcaption>
+</figure>
+
+<!-- Fully accessible video -->
+<figure>
+  <video controls 
+         preload="metadata"
+         aria-labelledby="video-title" 
+         aria-describedby="video-desc">
+    
+    <!-- Multiple formats for compatibility -->
+    <source src="tutorial.av1.mp4" type="video/mp4; codecs=av01">
+    <source src="tutorial.webm" type="video/webm">
+    <source src="tutorial.mp4" type="video/mp4">
+    
+    <!-- Comprehensive accessibility tracks -->
+    <track kind="captions" 
+           src="tutorial-captions-en.vtt" 
+           srclang="en" 
+           label="English Captions" 
+           default>
+    <track kind="captions" 
+           src="tutorial-captions-es.vtt" 
+           srclang="es" 
+           label="Spanish Captions">
+    <track kind="descriptions" 
+           src="tutorial-descriptions.vtt" 
+           srclang="en" 
+           label="Audio Descriptions">
+    <track kind="chapters" 
+           src="tutorial-chapters.vtt" 
+           srclang="en" 
+           label="Chapters">
+    
+    <!-- Fallback for non-supporting browsers -->
+    <p>Your browser doesn't support video. 
+       <a href="tutorial.mp4">Download the video</a> or 
+       <a href="transcript.html">read the transcript</a>.</p>
+  </video>
+  
+  <figcaption>
+    <h3 id="video-title">Web Development Basics - Introduction</h3>
+    <p id="video-desc">
+      15-minute introductory video covering HTML, CSS, and JavaScript fundamentals.
+      Includes code examples and live demonstrations.
+    </p>
+    <p>
+      <a href="transcript.html">📄 Full Transcript</a> | 
+      <a href="slides.pdf">📊 Slides (PDF)</a> | 
+      <a href="code-examples.zip">💻 Code Examples</a>
+    </p>
+  </figcaption>
+</figure>
+
+<!-- Accessible audio with transcript -->
+<figure>
+  <audio controls preload="metadata" aria-labelledby="audio-title">
+    <source src="podcast.flac" type="audio/flac">
+    <source src="podcast.ogg" type="audio/ogg">
+    <source src="podcast.mp3" type="audio/mpeg">
+    <p>Your browser doesn't support audio. 
+       <a href="podcast.mp3">Download the audio</a> or 
+       <a href="podcast-transcript.html">read the transcript</a>.</p>
+  </audio>
+  
+  <figcaption>
+    <h3 id="audio-title">Developer Interview #42</h3>
+    <p>45-minute discussion about modern web development practices.</p>
+    <details>
+      <summary>Show transcript</summary>
+      <div id="transcript">
+        <p><strong>[0:00]</strong> Host: Welcome to Developer Insights...</p>
+        <p><strong>[0:15]</strong> Guest: Thanks for having me...</p>
+        <!-- Full transcript continues -->
+      </div>
+    </details>
+  </figcaption>
+</figure>
 ```
-</HTMLPreviewWindow>
+<HTMLEditorPreview
+  initialHtml={`<!-- Fully accessible image -->
+<figure role="img" aria-labelledby="chart-title" aria-describedby="chart-desc">
+  <img src="sales-chart.png" alt="" id="chart-image">
+  <figcaption>
+    <h3 id="chart-title">Q2 Sales Performance</h3>
+    <p id="chart-desc">
+      Bar chart showing monthly sales: April $45K, May $52K, June $61K. 
+      Represents 35% growth over Q1. Highest performer was June with 
+      $61K in sales, exceeding target by 18%.
+    </p>
+    <details>
+      <summary>View data table</summary>
+      <table>
+        <caption>Q2 2024 Sales Data</caption>
+        <thead>
+          <tr><th>Month</th><th>Sales</th><th>vs Target</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>April</td><td>$45,000</td><td>+12%</td></tr>
+          <tr><td>May</td><td>$52,000</td><td>+15%</td></tr>
+          <tr><td>June</td><td>$61,000</td><td>+18%</td></tr>
+        </tbody>
+      </table>
+    </details>
+  </figcaption>
+</figure>
+
+<!-- Fully accessible video -->
+<figure>
+  <video controls 
+         preload="metadata"
+         aria-labelledby="video-title" 
+         aria-describedby="video-desc">
+    
+    <!-- Multiple formats for compatibility -->
+    <source src="tutorial.av1.mp4" type="video/mp4; codecs=av01">
+    <source src="tutorial.webm" type="video/webm">
+    <source src="tutorial.mp4" type="video/mp4">
+    
+    <!-- Comprehensive accessibility tracks -->
+    <track kind="captions" 
+           src="tutorial-captions-en.vtt" 
+           srclang="en" 
+           label="English Captions" 
+           default>
+    <track kind="captions" 
+           src="tutorial-captions-es.vtt" 
+           srclang="es" 
+           label="Spanish Captions">
+    <track kind="descriptions" 
+           src="tutorial-descriptions.vtt" 
+           srclang="en" 
+           label="Audio Descriptions">
+    <track kind="chapters" 
+           src="tutorial-chapters.vtt" 
+           srclang="en" 
+           label="Chapters">
+    
+    <!-- Fallback for non-supporting browsers -->
+    <p>Your browser doesn't support video. 
+       <a href="tutorial.mp4">Download the video</a> or 
+       <a href="transcript.html">read the transcript</a>.</p>
+  </video>
+  
+  <figcaption>
+    <h3 id="video-title">Web Development Basics - Introduction</h3>
+    <p id="video-desc">
+      15-minute introductory video covering HTML, CSS, and JavaScript fundamentals.
+      Includes code examples and live demonstrations.
+    </p>
+    <p>
+      <a href="transcript.html">📄 Full Transcript</a> | 
+      <a href="slides.pdf">📊 Slides (PDF)</a> | 
+      <a href="code-examples.zip">💻 Code Examples</a>
+    </p>
+  </figcaption>
+</figure>
+
+<!-- Accessible audio with transcript -->
+<figure>
+  <audio controls preload="metadata" aria-labelledby="audio-title">
+    <source src="podcast.flac" type="audio/flac">
+    <source src="podcast.ogg" type="audio/ogg">
+    <source src="podcast.mp3" type="audio/mpeg">
+    <p>Your browser doesn't support audio. 
+       <a href="podcast.mp3">Download the audio</a> or 
+       <a href="podcast-transcript.html">read the transcript</a>.</p>
+  </audio>
+  
+  <figcaption>
+    <h3 id="audio-title">Developer Interview #42</h3>
+    <p>45-minute discussion about modern web development practices.</p>
+    <details>
+      <summary>Show transcript</summary>
+      <div id="transcript">
+        <p><strong>[0:00]</strong> Host: Welcome to Developer Insights...</p>
+        <p><strong>[0:15]</strong> Guest: Thanks for having me...</p>
+        <!-- Full transcript continues -->
+      </div>
+    </details>
+  </figcaption>
+</figure>`}
+/>
+
+#### WCAG 2.1 Compliance Checklist
+
+**Level A (Minimum):**
+- ✅ All images have appropriate alt text or role="presentation"
+- ✅ Videos have captions for dialogue and important sounds
+- ✅ Audio content has transcripts available
+- ✅ No flashing content that could trigger seizures (< 3 flashes/second)
+- ✅ Media can be paused, stopped, or volume adjusted
+
+**Level AA (Standard):**
+- ✅ Captions are synchronized and accurate
+- ✅ Audio descriptions provided for important visual content
+- ✅ Contrast ratios meet standards (4.5:1 for normal text)
+- ✅ Media doesn't auto-play with sound for more than 3 seconds
+- ✅ All functionality available via keyboard
+
+**Level AAA (Enhanced):**
+- ✅ Sign language interpretation provided
+- ✅ Extended audio descriptions when needed
+- ✅ Live captions for live video content
+- ✅ Context-sensitive help available
 
 ## Canvas and SVG
 
@@ -1640,8 +2086,8 @@ Audio elements work similarly to video but for sound files:
 
 For dynamic graphics and animations:
 
-<HTMLPreviewWindow title="HTML5 Canvas" height="400px">
-```html
+<HTMLEditorPreview title="HTML5 Canvas"
+initialHtml={`
 <!-- Canvas element -->
 <canvas id="myCanvas" width="400" height="200">
     Your browser does not support the HTML5 canvas tag.
@@ -1753,15 +2199,15 @@ For dynamic graphics and animations:
     <li>Consider responsive sizing for mobile devices</li>
   </ul>
 </div>
-```
-</HTMLPreviewWindow>
+`}>
+</HTMLEditorPreview>
 
 ### Inline SVG
 
 For scalable vector graphics:
 
-<HTMLPreviewWindow title="Inline SVG Graphics" height="500px">
-```html
+<HTMLEditorPreview title="Inline SVG Graphics"
+initialHtml={`
 <!-- Simple SVG icon -->
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3" 
@@ -1917,15 +2363,15 @@ For scalable vector graphics:
     <li>Accessible with proper title and desc elements</li>
   </ul>
 </div>
-```
-</HTMLPreviewWindow>
+`}>
+</HTMLEditorPreview>
 
 ## Multimedia Gallery Example
 
 Let's create a complete multimedia gallery:
 
-<HTMLPreviewWindow title="Complete Multimedia Gallery" height="800px">
-```html
+<HTMLEditorPreview title="Complete Multimedia Gallery"
+initialHtml={`
 <section class="multimedia-gallery">
     <h2>Our Portfolio</h2>
     
@@ -2147,29 +2593,137 @@ figcaption {
         </div>
     </div>
 </div>
+`}>
+</HTMLEditorPreview>
+
+## Performance Optimization Deep Dive
+
+Modern websites must balance rich multimedia with fast loading times. Here's how to optimize effectively:
+
+### 1. Advanced Image Optimization
+
+#### Format Selection Strategy
+```html
+<!-- Progressive format fallback for maximum efficiency -->
+<picture>
+  <!-- Next-gen: AVIF (50% smaller than JPEG) -->
+  <source srcset="hero.avif" type="image/avif">
+  <!-- Modern: WebP (25-35% smaller than JPEG) -->
+  <source srcset="hero.webp" type="image/webp">
+  <!-- Fallback: Optimized JPEG -->
+  <img src="hero.jpg" alt="Hero image" loading="lazy">
+</picture>
 ```
-</HTMLPreviewWindow>
 
-## Performance Tips
+#### Compression Guidelines
+- **JPEG**: Use 75-85% quality for photos, 60-75% for thumbnails
+- **WebP**: Use 75-90% quality for lossy, or lossless for transparency
+- **AVIF**: Use 50-70% quality (equivalent to 85-95% JPEG)
+- **PNG**: Use tools like pngquant for 8-bit optimization
 
-### 1. Image Optimization
+#### Responsive Image Optimization
+```html
+<img src="photo-800.jpg"
+     srcset="photo-400.jpg 400w,
+             photo-800.jpg 800w,
+             photo-1200.jpg 1200w,
+             photo-1600.jpg 1600w"
+     sizes="(max-width: 600px) 400px,
+            (max-width: 1000px) 800px,
+            (max-width: 1400px) 1200px,
+            1600px"
+     alt="Responsive optimized photo"
+     loading="lazy">
+```
 
-- **Use appropriate file formats** (WebP/AVIF for modern browsers)
-- **Compress images** without losing quality
-- **Use lazy loading** for images below the fold
-- **Provide multiple sizes** with srcset
+#### Critical Images Strategy
+```html
+<!-- Above-fold hero images: preload -->
+<link rel="preload" as="image" href="hero.webp">
 
-### 2. Video Optimization
+<!-- Above-fold images: eager loading -->
+<img src="logo.svg" alt="Company logo" loading="eager">
 
-- **Use efficient codecs** (H.264 for compatibility, H.265 for efficiency)
-- **Provide multiple formats** for browser compatibility
-- **Use poster images** to show something while loading
-- **Consider preload strategies** carefully
+<!-- Below-fold images: lazy loading -->
+<img src="content.jpg" alt="Content image" loading="lazy">
+```
+
+### 2. Video Performance Mastery
+
+#### Multi-Bitrate Streaming
+```html
+<video controls poster="poster.webp" preload="metadata">
+  <!-- 4K for high-end devices -->
+  <source src="video-4k.av1.mp4" 
+          type="video/mp4; codecs=av01.0.12M.10"
+          media="(min-width: 2560px)">
+  
+  <!-- 1080p for desktop -->
+  <source src="video-1080p.webm" 
+          type="video/webm; codecs=vp9"
+          media="(min-width: 1024px)">
+  
+  <!-- 720p for mobile -->
+  <source src="video-720p.mp4" 
+          type="video/mp4; codecs=avc1.4d002a">
+</video>
+```
+
+#### Smart Preloading Strategy
+```html
+<!-- Critical video: preload metadata -->
+<video preload="metadata" controls>
+  <source src="intro.mp4" type="video/mp4">
+</video>
+
+<!-- Background video: preload none, autoplay muted -->
+<video preload="none" autoplay muted loop playsinline>
+  <source src="background.webm" type="video/webm">
+</video>
+
+<!-- Long-form content: preload none -->
+<video preload="none" controls poster="thumbnail.webp">
+  <source src="documentary.mp4" type="video/mp4">
+</video>
+```
+
+#### Video Optimization Checklist
+- ✅ Use modern codecs (AV1 > VP9 > H.264)
+- ✅ Implement adaptive bitrate streaming for long videos
+- ✅ Generate poster images in next-gen formats
+- ✅ Use media queries for device-specific video sizes
+- ✅ Implement video lazy loading for below-fold content
+
+### 3. Audio Performance
+
+#### Format and Compression Strategy
+```html
+<audio controls preload="metadata">
+  <!-- High quality for music -->
+  <source src="song.flac" type="audio/flac">
+  <source src="song-320.mp3" type="audio/mpeg">
+  
+  <!-- Optimized for speech/podcasts -->
+  <source src="podcast-96k.ogg" type="audio/ogg">
+  <source src="podcast-128k.mp3" type="audio/mpeg">
+</audio>
+```
+
+#### Quality vs. Size Guidelines
+**Music/High Quality:**
+- FLAC: Lossless (large files, perfect quality)
+- MP3 320kbps: Near-transparent quality
+- AAC 192kbps: Excellent quality, smaller files
+
+**Speech/Podcasts:**
+- MP3 96kbps: Good quality, small files
+- AAC 64kbps: Acceptable quality, very small
+- Opus 48kbps: Best compression for speech
 
 ### 3. Loading Strategies
 
-<HTMLPreviewWindow title="Smart Loading Strategies" height="600px">
-```html
+<HTMLEditorPreview title="Smart Loading Strategies"
+initialHtml={`
 <!-- Lazy load images -->
 <img src="placeholder.jpg" 
      data-src="actual-image.jpg" 
@@ -2359,8 +2913,133 @@ lazyImages.forEach(img => imageObserver.observe(img));
     <li><strong>Intersection Observer:</strong> Precise control over loading triggers</li>
   </ul>
 </div>
+`}>
+</HTMLEditorPreview>
+
+## Multimedia Security Considerations
+
+Security is crucial when handling user-uploaded content and external media:
+
+### 1. Content Security Policy (CSP)
+
+Protect against XSS attacks through multimedia:
+
+```html
+<!-- Meta tag CSP for multimedia -->
+<meta http-equiv="Content-Security-Policy" 
+      content="img-src 'self' https://trusted-cdn.com; 
+               media-src 'self' https://trusted-media.com; 
+               object-src 'none';">
 ```
-</HTMLPreviewWindow>
+
+**CSP Headers for multimedia:**
+```
+Content-Security-Policy: 
+  img-src 'self' https://cdn.example.com data:;
+  media-src 'self' https://video.example.com;
+  frame-src 'self' https://youtube.com https://vimeo.com;
+  object-src 'none';
+```
+
+### 2. File Upload Security
+
+When accepting user uploads:
+
+```html
+<!-- Server-side validation required -->
+<form enctype="multipart/form-data" method="POST">
+  <input type="file" 
+         accept="image/jpeg,image/png,image/webp"
+         name="upload">
+</form>
+```
+
+**Security checklist for uploads:**
+- ✅ Validate file extensions AND MIME types
+- ✅ Scan files for malware
+- ✅ Limit file sizes (images: 5MB, videos: 100MB)
+- ✅ Strip EXIF data from images
+- ✅ Store uploads outside web root
+- ✅ Use virus scanning APIs
+- ✅ Implement rate limiting
+
+### 3. Hotlinking Protection
+
+Prevent unauthorized use of your media:
+
+```html
+<!-- Use referrer policy to control referer information -->
+<img src="protected-image.jpg" 
+     alt="Protected content"
+     referrerpolicy="strict-origin-when-cross-origin">
+
+<!-- Server configuration (Apache .htaccess) -->
+<!-- 
+RewriteEngine On
+RewriteCond %{HTTP_REFERER} !^https?://(www\.)?yourdomain\.com [NC]
+RewriteRule \.(jpg|jpeg|png|gif|webp|mp4|webm)$ - [F,L]
+-->
+```
+
+### 4. Privacy Protection
+
+Protect user privacy in multimedia:
+
+```html
+<!-- Remove location data from images -->
+<img src="photo-without-exif.jpg" alt="Privacy-safe photo">
+
+<!-- Use privacy-enhanced embeds -->
+<iframe src="https://www.youtube-nocookie.com/embed/VIDEO_ID"
+        title="Privacy-enhanced YouTube embed"
+        loading="lazy">
+</iframe>
+
+<!-- Implement lazy loading for external content -->
+<div class="external-embed" data-src="https://external-service.com/embed">
+  <button onclick="loadEmbed(this)">
+    Load External Content (Privacy Notice)
+  </button>
+</div>
+```
+
+### 5. Third-Party Content Risks
+
+Safely embed external content:
+
+```html
+<!-- Sandbox external content -->
+<iframe src="https://external-content.com"
+        sandbox="allow-scripts allow-same-origin"
+        referrerpolicy="strict-origin"
+        loading="lazy">
+</iframe>
+
+<!-- Use SRI for external resources -->
+<link rel="preload" 
+      as="image" 
+      href="https://cdn.example.com/image.webp"
+      integrity="sha384-hash-of-the-image"
+      crossorigin="anonymous">
+```
+
+### 6. HTTPS and Mixed Content
+
+Ensure secure media delivery:
+
+```html
+<!-- Always use HTTPS for media -->
+<img src="https://secure-cdn.com/image.jpg" alt="Secure image">
+
+<!-- Avoid mixed content issues -->
+<video controls>
+  <source src="https://secure-video.com/video.mp4" type="video/mp4">
+</video>
+
+<!-- Use protocol-relative URLs cautiously -->
+<!-- Better: Always specify https: -->
+<img src="https://cdn.example.com/image.jpg" alt="Secure image">
+```
 
 ## Common Multimedia Mistakes
 

@@ -1,0 +1,2615 @@
+---
+title: "Modern CSS Features"
+description: "Explore cutting-edge CSS capabilities including Container Queries, Cascade Layers, Subgrid, and the latest layout techniques shaping the future of web design."
+category: "css"
+subcategory: "modern"
+order: 12
+premium: "CRACKED"
+estimatedTime: 100
+quizQuestions: 26
+---
+
+# Modern CSS Features
+
+Welcome to Modern CSS Features! In this final tutorial, you'll explore the cutting-edge CSS capabilities that are shaping the future of web development, including Container Queries, Cascade Layers, CSS Subgrid, and advanced layout techniques.
+
+## CSS Container Queries
+
+Container Queries represent a revolutionary shift in responsive design, allowing elements to respond to their container's size rather than the viewport:
+
+<SeparatedEditorPreview 
+  title="CSS Container Queries in Action"
+  mission="Experience the power of container-based responsive design"
+  instructions="See how elements respond to their container size, not viewport size"
+>
+```html
+<div class="container-queries-demo">
+  <h2>Container Queries Revolution</h2>
+  
+  <div class="layout-grid">
+    <!-- Sidebar with small container -->
+    <aside class="sidebar-container">
+      <h3>Sidebar</h3>
+      <div class="responsive-card">
+        <div class="card-header">
+          <h4 class="card-title">Adaptive Card</h4>
+          <span class="card-meta">Small container</span>
+        </div>
+        <div class="card-content">
+          <p class="card-description">This card adapts to its container width, not the viewport.</p>
+          <div class="card-stats">
+            <div class="stat">
+              <span class="stat-value">24</span>
+              <span class="stat-label">Items</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">95%</span>
+              <span class="stat-label">Success</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="action-btn">View</button>
+          <button class="action-btn primary">Edit</button>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Main content with large container -->
+    <main class="main-container">
+      <h3>Main Content Area</h3>
+      <div class="responsive-card">
+        <div class="card-header">
+          <h4 class="card-title">Same Component, Different Layout</h4>
+          <span class="card-meta">Large container</span>
+        </div>
+        <div class="card-content">
+          <p class="card-description">
+            The exact same component markup automatically adapts to provide 
+            the optimal layout based on available container space.
+          </p>
+          <div class="card-stats">
+            <div class="stat">
+              <span class="stat-value">1,247</span>
+              <span class="stat-label">Total Items</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">98.3%</span>
+              <span class="stat-label">Success Rate</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">42ms</span>
+              <span class="stat-label">Avg Response</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="action-btn">View Details</button>
+          <button class="action-btn primary">Edit Settings</button>
+          <button class="action-btn secondary">Export Data</button>
+        </div>
+      </div>
+    </main>
+    
+    <!-- Widget area with medium container -->
+    <section class="widget-container">
+      <h3>Widget Area</h3>
+      <div class="responsive-card">
+        <div class="card-header">
+          <h4 class="card-title">Widget Card</h4>
+          <span class="card-meta">Medium container</span>
+        </div>
+        <div class="card-content">
+          <p class="card-description">Medium-sized container gets its own optimized layout.</p>
+          <div class="card-stats">
+            <div class="stat">
+              <span class="stat-value">156</span>
+              <span class="stat-label">Active</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">89%</span>
+              <span class="stat-label">Rate</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="action-btn">View</button>
+          <button class="action-btn primary">Configure</button>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <!-- Resizable container demo -->
+  <div class="resizable-demo">
+    <h3>Interactive Container Query Demo</h3>
+    <p>Drag the right edge to resize and watch the card adapt!</p>
+    <div class="resizable-container" id="resizableContainer">
+      <div class="responsive-card">
+        <div class="card-header">
+          <h4 class="card-title">Resizable Container</h4>
+          <span class="card-meta" id="containerSize">Width: 400px</span>
+        </div>
+        <div class="card-content">
+          <p class="card-description">
+            This demonstrates real-time container query responses. 
+            The layout changes as you resize the container.
+          </p>
+          <div class="card-stats">
+            <div class="stat">
+              <span class="stat-value">123</span>
+              <span class="stat-label">Views</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">87%</span>
+              <span class="stat-label">Rate</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="action-btn">Action</button>
+          <button class="action-btn primary">Primary</button>
+        </div>
+      </div>
+      <div class="resize-handle" id="resizeHandle"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Resizable container demo
+const container = document.getElementById('resizableContainer');
+const handle = document.getElementById('resizeHandle');
+const sizeDisplay = document.getElementById('containerSize');
+
+let isResizing = false;
+
+handle.addEventListener('mousedown', (e) => {
+  isResizing = true;
+  document.addEventListener('mousemove', handleResize);
+  document.addEventListener('mouseup', stopResize);
+});
+
+function handleResize(e) {
+  if (!isResizing) return;
+  const rect = container.getBoundingClientRect();
+  const newWidth = Math.max(250, Math.min(800, e.clientX - rect.left));
+  container.style.width = newWidth + 'px';
+  sizeDisplay.textContent = `Width: ${Math.round(newWidth)}px`;
+}
+
+function stopResize() {
+  isResizing = false;
+  document.removeEventListener('mousemove', handleResize);
+  document.removeEventListener('mouseup', stopResize);
+}
+</script>
+```
+
+```css
+/* Container Queries Implementation */
+
+.container-queries-demo {
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-family: system-ui, -apple-system, sans-serif;
+  border-radius: 16px;
+}
+
+.container-queries-demo h2 {
+  text-align: center;
+  margin: 0 0 2rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: 250px 1fr 200px;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.sidebar-container,
+.main-container,
+.widget-container {
+  container-type: inline-size;
+  container-name: card-container;
+}
+
+.sidebar-container,
+.widget-container {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.main-container {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.sidebar-container h3,
+.main-container h3,
+.widget-container h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* Responsive Card - Default (narrow) layout */
+.responsive-card {
+  background: rgba(255, 255, 255, 0.95);
+  color: #2c3e50;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card-header {
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.card-meta {
+  font-size: 0.75rem;
+  color: #7f8c8d;
+  opacity: 0.8;
+}
+
+.card-content {
+  padding: 1rem;
+}
+
+.card-description {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #34495e;
+}
+
+.card-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-value {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #2c3e50;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #7f8c8d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-actions {
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #bdc3c7;
+  background: white;
+  color: #2c3e50;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.action-btn:hover {
+  background: #ecf0f1;
+}
+
+.action-btn.primary {
+  background: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+.action-btn.primary:hover {
+  background: #2980b9;
+}
+
+.action-btn.secondary {
+  background: #95a5a6;
+  color: white;
+  border-color: #95a5a6;
+}
+
+/* Container Query: Medium width (300px+) */
+@container card-container (min-width: 300px) {
+  .card-stats {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+  
+  .stat {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.25rem;
+  }
+  
+  .card-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  
+  .action-btn {
+    flex: 0 0 auto;
+    min-width: 80px;
+  }
+}
+
+/* Container Query: Large width (500px+) */
+@container card-container (min-width: 500px) {
+  .responsive-card {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    grid-template-rows: auto 1fr auto;
+  }
+  
+  .card-header {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .card-content {
+    padding: 1.5rem;
+  }
+  
+  .card-description {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .card-stats {
+    grid-column: 2;
+    grid-row: 2;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.02);
+    margin: 0;
+    gap: 1rem;
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  .stat {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .card-actions {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+}
+
+/* Resizable Demo */
+.resizable-demo {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.resizable-demo h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.resizable-demo p {
+  margin: 0 0 1.5rem 0;
+  opacity: 0.9;
+}
+
+.resizable-container {
+  position: relative;
+  width: 400px;
+  min-width: 250px;
+  max-width: 800px;
+  container-type: inline-size;
+  container-name: resizable;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.resize-handle {
+  position: absolute;
+  top: 0;
+  right: -5px;
+  width: 10px;
+  height: 100%;
+  cursor: ew-resize;
+  background: rgba(255, 255, 255, 0.1);
+  transition: background 0.2s ease;
+}
+
+.resize-handle:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.resize-handle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+}
+
+/* Container queries for resizable demo */
+@container resizable (min-width: 350px) {
+  .card-stats {
+    flex-direction: row;
+  }
+  
+  .card-actions {
+    flex-direction: row;
+  }
+}
+
+@container resizable (min-width: 600px) {
+  .responsive-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+  }
+  
+  .card-content {
+    padding-right: 0;
+  }
+  
+  .card-stats {
+    grid-column: 2;
+    grid-row: 2;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.02);
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    min-width: 150px;
+  }
+}
+
+/* Responsive fallback for older browsers */
+@media (max-width: 768px) {
+  .layout-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  
+  .resizable-container {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .resize-handle {
+    display: none;
+  }
+}
+
+/* Modern CSS features support detection */
+@supports not (container-type: inline-size) {
+  .responsive-card {
+    background: rgba(255, 255, 255, 0.9);
+  }
+  
+  .responsive-card::before {
+    content: 'Container Queries not supported in this browser';
+    display: block;
+    padding: 0.5rem;
+    background: #f39c12;
+    color: white;
+    text-align: center;
+    font-size: 0.75rem;
+  }
+}
+```
+</SeparatedEditorPreview>
+
+## CSS Cascade Layers
+
+Cascade Layers provide explicit control over CSS specificity and cascade ordering:
+
+<SeparatedEditorPreview 
+  title="CSS Cascade Layers Control"
+  mission="Master cascade layers for predictable CSS specificity management"
+  instructions="See how cascade layers create predictable styling hierarchies"
+>
+```html
+<div class="cascade-layers-demo">
+  <h2>CSS Cascade Layers</h2>
+  
+  <div class="layer-explanation">
+    <div class="layer-stack">
+      <div class="layer-item layer-override">
+        <strong>Override Layer</strong>
+        <span>Highest priority - emergency fixes</span>
+      </div>
+      <div class="layer-item layer-components">
+        <strong>Components Layer</strong>
+        <span>Component-specific styles</span>
+      </div>
+      <div class="layer-item layer-base">
+        <strong>Base Layer</strong>
+        <span>Foundation styles and resets</span>
+      </div>
+    </div>
+    
+    <div class="arrow-down">↓</div>
+    
+    <div class="styled-examples">
+      <div class="example-card reset-styles component-styles override-styles">
+        <h3 class="card-title">Styled with Layers</h3>
+        <p class="card-description">
+          This card demonstrates how cascade layers control styling priority 
+          regardless of selector specificity or source order.
+        </p>
+        <div class="card-meta">
+          <span class="tag tag-base">Base</span>
+          <span class="tag tag-component">Component</span>
+          <span class="tag tag-override">Override</span>
+        </div>
+      </div>
+      
+      <div class="example-card traditional-styles">
+        <h3 class="card-title">Traditional CSS</h3>
+        <p class="card-description">
+          This card uses traditional CSS without layers, 
+          relying on specificity and source order.
+        </p>
+        <div class="card-meta">
+          <span class="tag">No layers</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="layer-controls">
+    <h3>Interactive Layer Priority</h3>
+    <p>Toggle layers to see how they affect styling priority:</p>
+    <div class="control-buttons">
+      <button onclick="toggleLayer('base')" class="layer-toggle active" data-layer="base">
+        Base Layer
+      </button>
+      <button onclick="toggleLayer('components')" class="layer-toggle active" data-layer="components">
+        Components Layer
+      </button>
+      <button onclick="toggleLayer('override')" class="layer-toggle active" data-layer="override">
+        Override Layer
+      </button>
+    </div>
+    
+    <div class="test-element" id="testElement">
+      <h4>Layer Test Element</h4>
+      <p>This element's appearance changes based on active layers.</p>
+      <div class="element-info">
+        <span class="active-layers">Active: Base, Components, Override</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="layer-benefits">
+    <h3>Benefits of Cascade Layers</h3>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-icon">🎯</div>
+        <h4>Predictable Specificity</h4>
+        <p>Control cascade order without complex selectors</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">🧩</div>
+        <h4>Better Architecture</h4>
+        <p>Organize styles by purpose and priority</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">🔧</div>
+        <h4>Easier Maintenance</h4>
+        <p>Override styles without specificity wars</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">🚀</div>
+        <h4>Framework Integration</h4>
+        <p>Separate framework and custom styles cleanly</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const activeLayers = new Set(['base', 'components', 'override']);
+
+function toggleLayer(layerName) {
+  const button = document.querySelector(`[data-layer="${layerName}"]`);
+  const testElement = document.getElementById('testElement');
+  
+  if (activeLayers.has(layerName)) {
+    activeLayers.delete(layerName);
+    button.classList.remove('active');
+    testElement.classList.remove(`layer-${layerName}`);
+  } else {
+    activeLayers.add(layerName);
+    button.classList.add('active');
+    testElement.classList.add(`layer-${layerName}`);
+  }
+  
+  updateActiveLayersDisplay();
+}
+
+function updateActiveLayersDisplay() {
+  const display = document.querySelector('.active-layers');
+  const layerNames = Array.from(activeLayers).map(layer => 
+    layer.charAt(0).toUpperCase() + layer.slice(1)
+  );
+  display.textContent = `Active: ${layerNames.join(', ') || 'None'}`;
+}
+
+// Initialize test element with all layer classes
+document.addEventListener('DOMContentLoaded', function() {
+  const testElement = document.getElementById('testElement');
+  testElement.classList.add('layer-base', 'layer-components', 'layer-override');
+});
+</script>
+```
+
+```css
+/* CSS Cascade Layers Implementation */
+
+/* Define the cascade layers order - layers later in the list have higher priority */
+@layer base, components, override;
+
+/* Base layer - foundational styles */
+@layer base {
+  .cascade-layers-demo {
+    padding: 2rem;
+    background: #1a202c;
+    color: #e2e8f0;
+    font-family: system-ui, -apple-system, sans-serif;
+    border-radius: 16px;
+  }
+  
+  .cascade-layers-demo h2 {
+    text-align: center;
+    margin: 0 0 2rem 0;
+    font-size: 2rem;
+    color: #f7fafc;
+  }
+  
+  .example-card {
+    background: #2d3748;
+    border: 1px solid #4a5568;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .card-title {
+    margin: 0 0 1rem 0;
+    color: #f7fafc;
+    font-size: 1.25rem;
+  }
+  
+  .card-description {
+    margin: 0 0 1rem 0;
+    color: #a0aec0;
+    line-height: 1.6;
+  }
+  
+  .test-element {
+    background: #2d3748;
+    border: 2px solid #4a5568;
+    padding: 1.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .layer-base .test-element {
+    background: #2d3748;
+    border-color: #4a5568;
+  }
+}
+
+/* Components layer - component-specific styles */
+@layer components {
+  .reset-styles.component-styles {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+  }
+  
+  .reset-styles.component-styles .card-title {
+    color: white;
+    font-weight: 700;
+  }
+  
+  .reset-styles.component-styles .card-description {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .layer-components .test-element {
+    background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+    border-color: #3182ce;
+    color: white;
+  }
+  
+  .layer-components .test-element h4 {
+    color: white;
+  }
+}
+
+/* Override layer - highest priority emergency overrides */
+@layer override {
+  .reset-styles.component-styles.override-styles {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    box-shadow: 0 10px 25px rgba(72, 187, 120, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .layer-override .test-element {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    border-color: #e53e3e;
+    animation: pulse 2s infinite;
+  }
+}
+
+/* Non-layered styles for comparison */
+.traditional-styles {
+  background: #4a5568 !important;
+  border-color: #718096 !important;
+}
+
+.traditional-styles .card-title {
+  color: #e2e8f0 !important;
+}
+
+.traditional-styles .card-description {
+  color: #cbd5e0 !important;
+}
+
+/* Layout and UI styles (not in layers) */
+.layer-explanation {
+  margin-bottom: 3rem;
+}
+
+.layer-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.layer-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid;
+}
+
+.layer-override {
+  background: rgba(229, 62, 62, 0.1);
+  border-color: #e53e3e;
+}
+
+.layer-components {
+  background: rgba(49, 130, 206, 0.1);
+  border-color: #3182ce;
+}
+
+.layer-base {
+  background: rgba(74, 85, 104, 0.1);
+  border-color: #4a5568;
+}
+
+.layer-item strong {
+  font-weight: 600;
+}
+
+.layer-item span {
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+
+.arrow-down {
+  text-align: center;
+  font-size: 2rem;
+  margin: 1rem 0;
+  color: #a0aec0;
+}
+
+.styled-examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.card-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tag {
+  padding: 0.25rem 0.75rem;
+  background: #4a5568;
+  color: #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.tag-base { background: #4a5568; }
+.tag-component { background: #3182ce; }
+.tag-override { background: #e53e3e; }
+
+/* Layer Controls */
+.layer-controls {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 3rem;
+}
+
+.layer-controls h3 {
+  margin: 0 0 0.5rem 0;
+  color: #f7fafc;
+}
+
+.layer-controls p {
+  margin: 0 0 1.5rem 0;
+  color: #a0aec0;
+}
+
+.control-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.layer-toggle {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #4a5568;
+  background: transparent;
+  color: #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.layer-toggle:hover {
+  border-color: #718096;
+}
+
+.layer-toggle.active {
+  background: #3182ce;
+  border-color: #3182ce;
+  color: white;
+}
+
+.layer-toggle[data-layer="base"].active {
+  background: #4a5568;
+  border-color: #4a5568;
+}
+
+.layer-toggle[data-layer="override"].active {
+  background: #e53e3e;
+  border-color: #e53e3e;
+}
+
+.test-element h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+}
+
+.test-element p {
+  margin: 0 0 1rem 0;
+  opacity: 0.9;
+}
+
+.element-info {
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: 'Courier New', monospace;
+}
+
+.active-layers {
+  color: #fbb6ce;
+}
+
+/* Benefits Section */
+.layer-benefits {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2rem;
+  border-radius: 12px;
+}
+
+.layer-benefits h3 {
+  margin: 0 0 2rem 0;
+  text-align: center;
+  color: #f7fafc;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.benefit-card {
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.benefit-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.benefit-card h4 {
+  margin: 0 0 1rem 0;
+  color: #f7fafc;
+  font-size: 1.125rem;
+}
+
+.benefit-card p {
+  margin: 0;
+  color: #a0aec0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7); 
+  }
+  50% { 
+    box-shadow: 0 0 0 10px rgba(229, 62, 62, 0); 
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cascade-layers-demo {
+    padding: 1rem;
+  }
+  
+  .styled-examples {
+    grid-template-columns: 1fr;
+  }
+  
+  .control-buttons {
+    flex-direction: column;
+  }
+  
+  .benefits-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Browser support fallback */
+@supports not at-rule(@layer) {
+  .cascade-layers-demo::before {
+    content: 'CSS Cascade Layers not supported in this browser. Styles may appear differently.';
+    display: block;
+    padding: 1rem;
+    background: #f39c12;
+    color: white;
+    text-align: center;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+  }
+}
+```
+</SeparatedEditorPreview>
+
+## CSS Subgrid
+
+CSS Subgrid allows nested grids to inherit their parent's grid tracks:
+
+<SeparatedEditorPreview 
+  title="CSS Subgrid Layout System"
+  mission="Create complex layouts with CSS Subgrid inheritance"
+  instructions="See how subgrid creates perfect alignment across nested grid structures"
+>
+```html
+<div class="subgrid-demo">
+  <h2>CSS Subgrid Layout</h2>
+  
+  <div class="layout-explanation">
+    <div class="comparison-grid">
+      <div class="comparison-section">
+        <h3>Without Subgrid</h3>
+        <div class="traditional-grid">
+          <div class="card-container">
+            <div class="product-card">
+              <div class="card-image">📱</div>
+              <div class="card-content">
+                <h4>iPhone 15 Pro Max</h4>
+                <p class="description">Latest flagship with advanced camera system</p>
+                <div class="price">$1,199</div>
+                <button class="buy-btn">Add to Cart</button>
+              </div>
+            </div>
+            
+            <div class="product-card">
+              <div class="card-image">💻</div>
+              <div class="card-content">
+                <h4>MacBook</h4>
+                <p class="description">Powerful laptop</p>
+                <div class="price">$999</div>
+                <button class="buy-btn">Add to Cart</button>
+              </div>
+            </div>
+            
+            <div class="product-card">
+              <div class="card-image">⌚</div>
+              <div class="card-content">
+                <h4>Apple Watch Series 9</h4>
+                <p class="description">Most advanced smartwatch with health monitoring features and ECG</p>
+                <div class="price">$399</div>
+                <button class="buy-btn">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="comparison-section">
+        <h3>With Subgrid</h3>
+        <div class="subgrid-layout">
+          <div class="card-container subgrid-container">
+            <div class="product-card subgrid-card">
+              <div class="card-image">📱</div>
+              <div class="card-content">
+                <h4>iPhone 15 Pro Max</h4>
+                <p class="description">Latest flagship with advanced camera system</p>
+                <div class="price">$1,199</div>
+                <button class="buy-btn">Add to Cart</button>
+              </div>
+            </div>
+            
+            <div class="product-card subgrid-card">
+              <div class="card-image">💻</div>
+              <div class="card-content">
+                <h4>MacBook</h4>
+                <p class="description">Powerful laptop</p>
+                <div class="price">$999</div>
+                <button class="buy-btn">Add to Cart</button>
+              </div>
+            </div>
+            
+            <div class="product-card subgrid-card">
+              <div class="card-image">⌚</div>
+              <div class="card-content">
+                <h4>Apple Watch Series 9</h4>
+                <p class="description">Most advanced smartwatch with health monitoring features and ECG</p>
+                <div class="price">$399</div>
+                <button class="buy-btn">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="advanced-subgrid">
+    <h3>Advanced Subgrid Layout</h3>
+    <div class="dashboard-grid">
+      <header class="dashboard-header">
+        <h4>Dashboard</h4>
+        <div class="header-actions">
+          <button class="action-btn">Settings</button>
+          <button class="action-btn primary">Export</button>
+        </div>
+      </header>
+      
+      <nav class="dashboard-nav">
+        <ul class="nav-list">
+          <li><a href="#" class="nav-link active">Overview</a></li>
+          <li><a href="#" class="nav-link">Analytics</a></li>
+          <li><a href="#" class="nav-link">Reports</a></li>
+          <li><a href="#" class="nav-link">Settings</a></li>
+        </ul>
+      </nav>
+      
+      <main class="dashboard-content">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <h5>Revenue</h5>
+              <span class="trend up">↗️</span>
+            </div>
+            <div class="stat-value">$24,567</div>
+            <div class="stat-change">+12.5%</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <h5>Users</h5>
+              <span class="trend up">↗️</span>
+            </div>
+            <div class="stat-value">1,234</div>
+            <div class="stat-change">+8.2%</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <h5>Conversion Rate</h5>
+              <span class="trend down">↘️</span>
+            </div>
+            <div class="stat-value">3.24%</div>
+            <div class="stat-change">-2.1%</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <h5>Avg. Order Value</h5>
+              <span class="trend up">↗️</span>
+            </div>
+            <div class="stat-value">$89.12</div>
+            <div class="stat-change">+5.8%</div>
+          </div>
+        </div>
+        
+        <div class="chart-section">
+          <h5>Performance Chart</h5>
+          <div class="chart-placeholder">
+            <div class="chart-bars">
+              <div class="bar" style="--height: 60%"></div>
+              <div class="bar" style="--height: 80%"></div>
+              <div class="bar" style="--height: 45%"></div>
+              <div class="bar" style="--height: 90%"></div>
+              <div class="bar" style="--height: 70%"></div>
+              <div class="bar" style="--height: 85%"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+      
+      <aside class="dashboard-sidebar">
+        <div class="widget">
+          <h5>Quick Actions</h5>
+          <ul class="action-list">
+            <li><button class="quick-action">New Report</button></li>
+            <li><button class="quick-action">Export Data</button></li>
+            <li><button class="quick-action">User Settings</button></li>
+          </ul>
+        </div>
+        
+        <div class="widget">
+          <h5>Recent Activity</h5>
+          <div class="activity-list">
+            <div class="activity-item">
+              <span class="activity-time">2m ago</span>
+              <span class="activity-text">New user registered</span>
+            </div>
+            <div class="activity-item">
+              <span class="activity-time">5m ago</span>
+              <span class="activity-text">Order completed</span>
+            </div>
+            <div class="activity-item">
+              <span class="activity-time">12m ago</span>
+              <span class="activity-text">Report generated</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+```
+
+```css
+/* CSS Subgrid Implementation */
+
+.subgrid-demo {
+  padding: 2rem;
+  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  color: #e2e8f0;
+  font-family: system-ui, -apple-system, sans-serif;
+  border-radius: 16px;
+}
+
+.subgrid-demo h2 {
+  text-align: center;
+  margin: 0 0 2rem 0;
+  font-size: 2rem;
+  color: #f7fafc;
+}
+
+/* Layout Explanation */
+.layout-explanation {
+  margin-bottom: 3rem;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.comparison-section {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comparison-section h3 {
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+  color: #f7fafc;
+}
+
+/* Traditional Grid (without subgrid) */
+.traditional-grid .card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.product-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+}
+
+.card-image {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.card-content {
+  padding: 1rem;
+}
+
+.card-content h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f7fafc;
+}
+
+.description {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  color: #a0aec0;
+  line-height: 1.4;
+  min-height: 2.8rem; /* Force alignment issue in traditional */
+}
+
+.price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #48bb78;
+  margin-bottom: 1rem;
+}
+
+.buy-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: #3182ce;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.buy-btn:hover {
+  background: #2c5282;
+}
+
+/* Subgrid Layout */
+.subgrid-layout .subgrid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  /* Create named grid lines for content areas */
+  grid-template-rows: 
+    [image-start] auto [image-end]
+    [title-start] auto [title-end]
+    [desc-start] auto [desc-end]
+    [price-start] auto [price-end]
+    [button-start] auto [button-end];
+}
+
+.subgrid-card {
+  display: grid;
+  /* Inherit the parent's row tracks */
+  grid-template-rows: subgrid;
+  /* Span all 5 rows defined in parent */
+  grid-row: 1 / 6;
+}
+
+.subgrid-card .card-image {
+  grid-row: image;
+}
+
+.subgrid-card .card-content {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: title / button-end;
+  padding: 1rem;
+}
+
+.subgrid-card .card-content h4 {
+  grid-row: title;
+  align-self: center;
+}
+
+.subgrid-card .description {
+  grid-row: desc;
+  min-height: unset; /* Remove forced height */
+}
+
+.subgrid-card .price {
+  grid-row: price;
+  align-self: center;
+}
+
+.subgrid-card .buy-btn {
+  grid-row: button;
+  align-self: end;
+}
+
+/* Advanced Subgrid Dashboard */
+.advanced-subgrid {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.advanced-subgrid h3 {
+  margin: 0 0 2rem 0;
+  text-align: center;
+  color: #f7fafc;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  grid-template-rows: auto 1fr;
+  gap: 1rem;
+  min-height: 500px;
+  /* Named grid areas */
+  grid-template-areas:
+    "header header header"
+    "nav content sidebar";
+}
+
+.dashboard-header {
+  grid-area: header;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-header h4 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #f7fafc;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: #e2e8f0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.action-btn.primary {
+  background: #3182ce;
+  border-color: #3182ce;
+  color: white;
+}
+
+.dashboard-nav {
+  grid-area: nav;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nav-link {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: #a0aec0;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+}
+
+.nav-link.active {
+  background: #3182ce;
+  color: white;
+}
+
+.dashboard-content {
+  grid-area: content;
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: 1 / -1;
+  gap: 1rem;
+}
+
+/* Stats grid using subgrid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  border-radius: 8px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 0.5rem;
+}
+
+.stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-header h5 {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #a0aec0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.trend {
+  font-size: 1.2rem;
+}
+
+.trend.up {
+  color: #48bb78;
+}
+
+.trend.down {
+  color: #f56565;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #f7fafc;
+  align-self: center;
+}
+
+.stat-change {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.stat-change:before {
+  content: '';
+}
+
+/* Chart Section */
+.chart-section {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.chart-section h5 {
+  margin: 0 0 1rem 0;
+  color: #f7fafc;
+}
+
+.chart-placeholder {
+  height: 200px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.chart-bars {
+  display: flex;
+  gap: 0.5rem;
+  align-items: end;
+  height: 100%;
+}
+
+.bar {
+  width: 24px;
+  background: linear-gradient(to top, #3182ce, #63b3ed);
+  border-radius: 2px 2px 0 0;
+  height: var(--height);
+  transition: all 0.3s ease;
+}
+
+.bar:hover {
+  filter: brightness(1.2);
+}
+
+/* Sidebar */
+.dashboard-sidebar {
+  grid-area: sidebar;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.widget {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.widget h5 {
+  margin: 0 0 1rem 0;
+  color: #f7fafc;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.action-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quick-action {
+  width: 100%;
+  padding: 0.5rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e2e8f0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.quick-action:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.activity-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.activity-time {
+  font-size: 0.75rem;
+  color: #718096;
+}
+
+.activity-text {
+  font-size: 0.875rem;
+  color: #e2e8f0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "nav"
+      "content"
+      "sidebar";
+  }
+  
+  .nav-list {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .subgrid-demo {
+    padding: 1rem;
+  }
+  
+  .subgrid-container {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-bars {
+    justify-content: space-around;
+  }
+}
+
+/* Browser support fallback */
+@supports not (grid-template-rows: subgrid) {
+  .subgrid-card {
+    display: block;
+  }
+  
+  .subgrid-demo::before {
+    content: 'CSS Subgrid not supported in this browser. Layout may appear different.';
+    display: block;
+    padding: 1rem;
+    background: #f39c12;
+    color: white;
+    text-align: center;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+  }
+}
+```
+</SeparatedEditorPreview>
+
+## Advanced Modern CSS Features
+
+Let's explore additional cutting-edge CSS features:
+
+<SeparatedEditorPreview 
+  title="Advanced Modern CSS Features Showcase"
+  mission="Discover cutting-edge CSS capabilities and future features"
+  instructions="Explore advanced selectors, color functions, and experimental features"
+>
+```html
+<div class="advanced-features-showcase">
+  <h2>Advanced Modern CSS Features</h2>
+  
+  <!-- CSS :has() Selector -->
+  <section class="feature-section">
+    <h3>CSS :has() Parent Selector</h3>
+    <div class="has-selector-demo">
+      <div class="form-group">
+        <label for="email-input">Email</label>
+        <input type="email" id="email-input" placeholder="Enter email">
+      </div>
+      
+      <div class="form-group">
+        <label for="password-input">Password</label>
+        <input type="password" id="password-input" placeholder="Enter password">
+        <div class="error-message">Password must be at least 8 characters</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="confirm-input">Confirm Password</label>
+        <input type="password" id="confirm-input" placeholder="Confirm password">
+      </div>
+      
+      <div class="card-demo">
+        <div class="card">
+          <img src="#" alt="Product" class="card-image">
+          <h4>Product with Image</h4>
+          <p>This card has an image, so it gets different styling.</p>
+        </div>
+        
+        <div class="card">
+          <h4>Product without Image</h4>
+          <p>This card has no image, so it gets default styling.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Modern Color Functions -->
+  <section class="feature-section">
+    <h3>Modern Color Functions</h3>
+    <div class="color-functions-demo">
+      <div class="color-card" style="--base-color: oklch(0.7 0.15 180)">
+        <h4>OKLCH Colors</h4>
+        <div class="color-variations">
+          <div class="color-swatch" style="background: var(--base-color)">Base</div>
+          <div class="color-swatch" style="background: oklch(from var(--base-color) calc(l + 0.1) c h)">Lighter</div>
+          <div class="color-swatch" style="background: oklch(from var(--base-color) calc(l - 0.1) c h)">Darker</div>
+          <div class="color-swatch" style="background: oklch(from var(--base-color) l c calc(h + 120))">Shifted Hue</div>
+        </div>
+      </div>
+      
+      <div class="color-card" style="--theme-color: #3b82f6">
+        <h4>Color-Mix Function</h4>
+        <div class="color-variations">
+          <div class="color-swatch" style="background: var(--theme-color)">Original</div>
+          <div class="color-swatch" style="background: color-mix(in srgb, var(--theme-color) 80%, white)">Mixed Light</div>
+          <div class="color-swatch" style="background: color-mix(in srgb, var(--theme-color) 80%, black)">Mixed Dark</div>
+          <div class="color-swatch" style="background: color-mix(in srgb, var(--theme-color) 50%, #ff6b6b)">Mixed Red</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CSS Nesting -->
+  <section class="feature-section">
+    <h3>CSS Nesting</h3>
+    <div class="nesting-demo">
+      <nav class="nested-nav">
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a href="#" class="nav-link">Home</a>
+          </li>
+          <li class="nav-item has-dropdown">
+            <a href="#" class="nav-link">Products</a>
+            <ul class="dropdown-menu">
+              <li><a href="#" class="dropdown-link">Web Design</a></li>
+              <li><a href="#" class="dropdown-link">Development</a></li>
+              <li><a href="#" class="dropdown-link">Consulting</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">About</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+  
+  <!-- View Transitions API -->
+  <section class="feature-section">
+    <h3>View Transitions (Experimental)</h3>
+    <div class="view-transitions-demo">
+      <div class="transition-container" id="transitionContainer">
+        <div class="page page-1 active" id="page1">
+          <h4>Page 1</h4>
+          <p>This demonstrates smooth view transitions between different states.</p>
+          <button onclick="switchToPage(2)" class="transition-btn">Go to Page 2</button>
+        </div>
+        
+        <div class="page page-2" id="page2">
+          <h4>Page 2</h4>
+          <p>View Transitions API provides smooth animations between page states.</p>
+          <button onclick="switchToPage(3)" class="transition-btn">Go to Page 3</button>
+        </div>
+        
+        <div class="page page-3" id="page3">
+          <h4>Page 3</h4>
+          <p>Future of web animations with native browser support.</p>
+          <button onclick="switchToPage(1)" class="transition-btn">Back to Page 1</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CSS Anchor Positioning -->
+  <section class="feature-section">
+    <h3>CSS Anchor Positioning (Future)</h3>
+    <div class="anchor-positioning-demo">
+      <div class="anchor-example">
+        <button class="anchor-btn" id="anchorBtn">Hover for Tooltip</button>
+        <div class="tooltip" id="tooltip">
+          This tooltip is positioned relative to the button using CSS anchor positioning.
+        </div>
+      </div>
+      
+      <div class="connected-elements">
+        <div class="source-element" id="source">Source</div>
+        <div class="connected-line"></div>
+        <div class="target-element" id="target">Target</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+// View Transitions Demo
+let currentPage = 1;
+
+function switchToPage(pageNumber) {
+  if (!document.startViewTransition) {
+    // Fallback for browsers without View Transitions API
+    switchPageFallback(pageNumber);
+    return;
+  }
+  
+  document.startViewTransition(() => {
+    switchPageFallback(pageNumber);
+  });
+}
+
+function switchPageFallback(pageNumber) {
+  // Hide current page
+  document.querySelector('.page.active').classList.remove('active');
+  
+  // Show target page
+  document.getElementById(`page${pageNumber}`).classList.add('active');
+  
+  currentPage = pageNumber;
+}
+
+// Form validation demo for :has() selector
+document.addEventListener('DOMContentLoaded', function() {
+  const inputs = document.querySelectorAll('input[type="email"], input[type="password"]');
+  
+  inputs.forEach(input => {
+    input.addEventListener('input', function() {
+      if (this.value.length > 0) {
+        this.setAttribute('data-has-value', 'true');
+      } else {
+        this.removeAttribute('data-has-value');
+      }
+      
+      // Validation example
+      if (this.type === 'password' && this.value.length > 0 && this.value.length < 8) {
+        this.setAttribute('data-invalid', 'true');
+      } else {
+        this.removeAttribute('data-invalid');
+      }
+    });
+  });
+});
+</script>
+```
+
+```css
+/* Advanced Modern CSS Features */
+
+.advanced-features-showcase {
+  padding: 2rem;
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  color: #e2e8f0;
+  font-family: system-ui, -apple-system, sans-serif;
+  border-radius: 16px;
+  min-height: 100vh;
+}
+
+.advanced-features-showcase h2 {
+  text-align: center;
+  margin: 0 0 3rem 0;
+  font-size: 2.5rem;
+  background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.feature-section {
+  margin-bottom: 4rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.feature-section h3 {
+  margin: 0 0 2rem 0;
+  font-size: 1.5rem;
+  color: #f7fafc;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 0.5rem;
+}
+
+/* CSS :has() Selector Demo */
+.has-selector-demo {
+  display: grid;
+  gap: 2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+  padding: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+/* :has() selector - style form group based on input state */
+.form-group:has(input:focus) {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.form-group:has(input[data-has-value]) {
+  border-color: #48bb78;
+}
+
+.form-group:has(input[data-invalid]) {
+  border-color: #f56565;
+}
+
+.form-group:has(.error-message) {
+  padding-bottom: 2.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #a0aec0;
+  transition: color 0.3s ease;
+}
+
+.form-group:has(input:focus) label {
+  color: #667eea;
+}
+
+.form-group input {
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #667eea;
+}
+
+.error-message {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 1rem;
+  font-size: 0.75rem;
+  color: #f56565;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.form-group:has(input[data-invalid]) .error-message {
+  opacity: 1;
+}
+
+/* Card demo with :has() */
+.card-demo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+/* Different styles for cards with images */
+.card:has(img) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.card:has(img)::before {
+  content: '🖼️ ';
+  font-size: 1.2rem;
+}
+
+.card-image {
+  width: 100%;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-image::after {
+  content: '📷 Image';
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.card h4 {
+  margin: 0 0 1rem 0;
+  color: inherit;
+}
+
+.card p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* Modern Color Functions */
+.color-functions-demo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.color-card {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.color-card h4 {
+  margin: 0 0 1rem 0;
+  color: #f7fafc;
+}
+
+.color-variations {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.color-swatch {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* CSS Nesting Demo */
+.nested-nav {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+
+  .nav-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 2rem;
+
+    .nav-item {
+      position: relative;
+
+      .nav-link {
+        display: block;
+        padding: 0.75rem 1rem;
+        color: #a0aec0;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: #e2e8f0;
+        }
+      }
+
+      &.has-dropdown {
+        &:hover .dropdown-menu {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0);
+        }
+
+        .dropdown-menu {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background: rgba(0, 0, 0, 0.9);
+          border-radius: 4px;
+          padding: 0.5rem 0;
+          min-width: 160px;
+          opacity: 0;
+          visibility: hidden;
+          transform: translateY(-10px);
+          transition: all 0.3s ease;
+          list-style: none;
+          margin: 0.5rem 0 0 0;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+
+          .dropdown-link {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #a0aec0;
+            text-decoration: none;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: rgba(255, 255, 255, 0.1);
+              color: #e2e8f0;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* View Transitions Demo */
+.view-transitions-demo {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.transition-container {
+  position: relative;
+  min-height: 200px;
+}
+
+.page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 2rem;
+  opacity: 0;
+  transform: translateX(100px);
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: none;
+}
+
+.page.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: all;
+}
+
+.page h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  color: #f7fafc;
+}
+
+.page p {
+  margin: 0 0 1.5rem 0;
+  color: #a0aec0;
+  line-height: 1.6;
+}
+
+.transition-btn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.transition-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* View Transitions API styles */
+@supports (view-transition-name: auto) {
+  .page {
+    view-transition-name: auto;
+  }
+  
+  ::view-transition-old(auto) {
+    animation: slideOut 0.3s ease-out;
+  }
+  
+  ::view-transition-new(auto) {
+    animation: slideIn 0.3s ease-in;
+  }
+}
+
+@keyframes slideOut {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100px); opacity: 0; }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* CSS Anchor Positioning Demo (Future) */
+.anchor-positioning-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.anchor-example {
+  position: relative;
+  text-align: center;
+  padding: 2rem;
+}
+
+.anchor-btn {
+  padding: 1rem 2rem;
+  background: #3182ce;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  /* Future: anchor-name: --btn; */
+}
+
+.anchor-btn:hover {
+  background: #2c5282;
+}
+
+.tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  /* Future anchor positioning properties:
+  position-anchor: --btn;
+  inset-area: top;
+  position-try-fallbacks: bottom, left, right; */
+  
+  /* Fallback positioning */
+  top: -3rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.anchor-btn:hover + .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.9);
+}
+
+.connected-elements {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.source-element,
+.target-element {
+  padding: 1rem 1.5rem;
+  background: #667eea;
+  color: white;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.connected-line {
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  position: relative;
+}
+
+.connected-line::after {
+  content: '→';
+  position: absolute;
+  right: -8px;
+  top: -8px;
+  color: #764ba2;
+  font-size: 1.2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .advanced-features-showcase {
+    padding: 1rem;
+  }
+  
+  .color-functions-demo {
+    grid-template-columns: 1fr;
+  }
+  
+  .color-variations {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .nested-nav .nav-menu {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .connected-elements {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  
+  .connected-line {
+    width: 2px;
+    height: 50px;
+  }
+  
+  .connected-line::after {
+    content: '↓';
+    right: -8px;
+    top: auto;
+    bottom: -15px;
+  }
+}
+
+/* Feature Support Detection */
+@supports not selector(:has(*)) {
+  .has-selector-demo::before {
+    content: ':has() selector not supported in this browser';
+    display: block;
+    padding: 1rem;
+    background: #f39c12;
+    color: white;
+    text-align: center;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+}
+
+@supports not (color: color-mix(in srgb, red, blue)) {
+  .color-functions-demo::before {
+    content: 'Advanced color functions not supported in this browser';
+    display: block;
+    padding: 1rem;
+    background: #f39c12;
+    color: white;
+    text-align: center;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    grid-column: 1 / -1;
+  }
+}
+```
+</SeparatedEditorPreview>
+
+## Browser Support and Progressive Enhancement
+
+### Feature Detection and Fallbacks
+
+```css
+/* Progressive enhancement with @supports */
+.modern-layout {
+  display: block; /* fallback */
+}
+
+@supports (display: grid) {
+  .modern-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+
+@supports (container-type: inline-size) {
+  .responsive-component {
+    container-type: inline-size;
+  }
+}
+
+/* Feature queries for cutting-edge features */
+@supports selector(:has(*)) {
+  .form:has(.error) {
+    border-color: red;
+  }
+}
+
+@supports (color: oklch(0.5 0.2 180)) {
+  .modern-colors {
+    background: oklch(0.7 0.15 240);
+  }
+}
+```
+
+### Polyfills and Fallback Strategies
+
+1. **Container Queries**: Use `@container` polyfill for older browsers
+2. **CSS Nesting**: PostCSS plugin for compilation
+3. **View Transitions**: Fallback to CSS transitions
+4. **Cascade Layers**: Organize CSS with naming conventions
+
+## Future CSS Features
+
+### CSS Mixins and Functions (Proposed)
+
+```css
+/* Future CSS Mixins (Proposed) */
+@mixin button-style {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.button {
+  @apply button-style;
+  background: blue;
+  color: white;
+}
+```
+
+### Advanced Layout Features
+
+1. **CSS Masonry**: Pinterest-style layouts
+2. **CSS Regions**: Content flowing through shapes
+3. **CSS Exclusions**: Text wrapping around shapes
+4. **Advanced Grid**: More powerful grid capabilities
+
+## Performance Implications
+
+### Modern CSS Performance Tips
+
+1. **Use CSS Containment**: `contain: layout style paint`
+2. **Optimize Container Queries**: Limit query complexity
+3. **Layer Management**: Keep layers organized and minimal
+4. **Color Function Optimization**: Use efficient color spaces
+
+### Measurement and Monitoring
+
+```javascript
+// Performance API for CSS features
+const observer = new PerformanceObserver((list) => {
+  list.getEntries().forEach((entry) => {
+    if (entry.entryType === 'measure') {
+      console.log(`${entry.name}: ${entry.duration}ms`);
+    }
+  });
+});
+
+observer.observe({entryTypes: ['measure']});
+
+// Measure container query performance
+performance.mark('container-query-start');
+// ... container query evaluation
+performance.mark('container-query-end');
+performance.measure('container-query', 'container-query-start', 'container-query-end');
+```
+
+## Conclusion
+
+You've mastered Modern CSS Features! You can now:
+
+- Implement Container Queries for component-based responsive design
+- Use Cascade Layers for predictable CSS architecture
+- Apply CSS Subgrid for complex aligned layouts
+- Leverage advanced selectors like `:has()` for dynamic styling
+- Use modern color functions for sophisticated color manipulation
+- Apply CSS Nesting for better code organization
+- Implement progressive enhancement with feature detection
+- Plan for future CSS capabilities
+
+These modern features represent the cutting edge of CSS development, enabling more powerful, maintainable, and performant web experiences.
+
+## The Future of CSS
+
+CSS continues to evolve rapidly with new features in development:
+
+- **CSS Mixins**: Reusable style patterns
+- **Advanced Typography**: Better font loading and styling
+- **3D Transforms**: Enhanced 3D capabilities  
+- **Better Animation APIs**: More powerful animation control
+- **Improved Accessibility**: Built-in accessibility features
+
+Stay updated with the latest CSS developments through the CSS Working Group, MDN documentation, and browser implementation status.
+
+**Congratulations!** You've completed the comprehensive CSS tutorial series and are now equipped with both fundamental and cutting-edge CSS knowledge to build amazing web experiences.

@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
 import { Check, ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
+import getMoodColors from "@/lib/getMoodColors";
 
 function PaymentSuccessContent() {
   const { data: session } = useSession();
@@ -51,36 +52,7 @@ function PaymentSuccessContent() {
     }
   }, [session, success, sessionId]);
 
-  const getMoodColors = () => {
-    switch (currentMood.id) {
-      case "rush":
-        return {
-          gradient:
-            "from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20",
-          accent: "text-orange-600 dark:text-orange-400",
-          button: "bg-orange-500 hover:bg-orange-600",
-          border: "border-orange-500",
-        };
-      case "grind":
-        return {
-          gradient:
-            "from-gray-50 via-slate-50 to-blue-50 dark:from-gray-900/20 dark:via-slate-900/20 dark:to-blue-900/20",
-          accent: "text-blue-600 dark:text-blue-400",
-          button: "bg-blue-500 hover:bg-blue-600",
-          border: "border-blue-500",
-        };
-      default: // chill
-        return {
-          gradient:
-            "from-purple-50 via-pink-50 to-indigo-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-indigo-900/20",
-          accent: "text-purple-600 dark:text-purple-400",
-          button: "bg-purple-500 hover:bg-purple-600",
-          border: "border-purple-500",
-        };
-    }
-  };
-
-  const moodColors = getMoodColors();
+  const moodColors = getMoodColors(currentMood.id);
 
   if (isLoading) {
     return (

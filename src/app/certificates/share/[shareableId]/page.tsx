@@ -7,6 +7,7 @@ import { Certificate } from "@prisma/client";
 import { Award, ExternalLink, Share } from "lucide-react";
 import CertificateCard from "@/components/ui/CertificateCard";
 import { useMood } from "@/components/providers/MoodProvider";
+import getMoodColors from "@/lib/getMoodColors";
 
 interface CertificateWithUser extends Certificate {
   user: {
@@ -20,7 +21,9 @@ interface CertificateWithUser extends Certificate {
 export default function ShareableCertificatePage() {
   const params = useParams();
   const { currentMood } = useMood();
-  const [certificate, setCertificate] = useState<CertificateWithUser | null>(null);
+  const [certificate, setCertificate] = useState<CertificateWithUser | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +39,7 @@ export default function ShareableCertificatePage() {
     try {
       const response = await fetch(`/api/certificates/share/${shareableId}`);
       const data = await response.json();
-      
+
       if (data.success) {
         setCertificate(data.data);
       } else {
@@ -50,47 +53,33 @@ export default function ShareableCertificatePage() {
     }
   };
 
-  const getMoodColors = () => {
-    switch (currentMood.id) {
-      case "rush":
-        return {
-          bg: "from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/20 dark:via-orange-900/20 dark:to-yellow-900/20",
-          accent: "bg-red-600 dark:bg-red-500",
-        };
-      case "grind":
-        return {
-          bg: "from-gray-50 via-slate-50 to-blue-50 dark:from-gray-900/20 dark:via-slate-900/20 dark:to-blue-900/20",
-          accent: "bg-blue-600 dark:bg-blue-500",
-        };
-      default: // chill
-        return {
-          bg: "from-purple-50 via-pink-50 to-indigo-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-indigo-900/20",
-          accent: "bg-purple-600 dark:bg-purple-500",
-        };
-    }
-  };
-
-  const moodColors = getMoodColors();
+  const moodColors = getMoodColors(currentMood.id);
 
   const shareOnSocial = (platform: string) => {
     if (!certificate) return;
-    
+
     const text = `I just earned a certificate for completing "${certificate.entityTitle}" on Vibed to Cracked!`;
     const url = window.location.href;
-    
+
     let shareUrl = "";
     switch (platform) {
       case "twitter":
-        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          text
+        )}&url=${encodeURIComponent(url)}`;
         break;
       case "linkedin":
-        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+          url
+        )}`;
         break;
       case "facebook":
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+          url
+        )}`;
         break;
     }
-    
+
     if (shareUrl) {
       window.open(shareUrl, "_blank", "width=600,height=400");
     }
@@ -98,10 +87,14 @@ export default function ShareableCertificatePage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen bg-gradient-to-br ${moodColors.bg} flex items-center justify-center`}>
+      <div
+        className={`min-h-screen bg-gradient-to-br ${moodColors.gradient} flex items-center justify-center`}
+      >
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading certificate...</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Loading certificate...
+          </p>
         </div>
       </div>
     );
@@ -109,7 +102,9 @@ export default function ShareableCertificatePage() {
 
   if (error || !certificate) {
     return (
-      <div className={`min-h-screen bg-gradient-to-br ${moodColors.bg} flex items-center justify-center`}>
+      <div
+        className={`min-h-screen bg-gradient-to-br ${moodColors.gradient} flex items-center justify-center`}
+      >
         <div className="text-center max-w-md mx-auto p-6">
           <Award className="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
@@ -124,7 +119,9 @@ export default function ShareableCertificatePage() {
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${moodColors.bg} p-4`}>
+    <div
+      className={`min-h-screen bg-gradient-to-br ${moodColors.gradient} p-4`}
+    >
       <div className="container mx-auto max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">
@@ -137,7 +134,8 @@ export default function ShareableCertificatePage() {
             Certificate of Completion
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
-            Earned by {certificate.user.name || certificate.user.username || "Anonymous"}
+            Earned by{" "}
+            {certificate.user.name || certificate.user.username || "Anonymous"}
           </p>
         </div>
 
@@ -181,7 +179,10 @@ export default function ShareableCertificatePage() {
         <div className="text-center mt-8 text-gray-500 dark:text-gray-400">
           <p>
             Want to earn your own certificates?{" "}
-            <Link href="/" className="text-blue-600 dark:text-blue-400 hover:underline">
+            <Link
+              href="/"
+              className="text-blue-600 dark:text-blue-400 hover:underline"
+            >
               Start learning on Vibed to Cracked
             </Link>
           </p>

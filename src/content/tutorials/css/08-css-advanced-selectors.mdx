@@ -1,0 +1,1624 @@
+---
+title: "Advanced CSS Selectors"
+description: "Master powerful CSS selectors including pseudo-classes, pseudo-elements, attribute selectors, and combinators for precise element targeting."
+category: "css"
+subcategory: "selectors"
+order: 8
+premium: false
+estimatedTime: 75
+quizQuestions: 18
+---
+
+# Advanced CSS Selectors
+
+Welcome to Advanced CSS Selectors! In this tutorial, you'll learn powerful techniques to target specific elements with precision, create dynamic styles, and build more maintainable CSS.
+
+## Understanding CSS Selector Specificity
+
+Before diving into advanced selectors, it's crucial to understand how CSS calculates specificity:
+
+- **Inline styles**: 1000 points
+- **IDs**: 100 points
+- **Classes, attributes, pseudo-classes**: 10 points
+- **Elements and pseudo-elements**: 1 point
+
+<SeparatedEditorPreview 
+  title="CSS Specificity Demo"
+  mission="Understand how CSS specificity affects styling"
+  instructions="See which styles take precedence based on selector specificity"
+initialHtml={`
+<div class="specificity-demo">
+  <p id="specific-paragraph" class="blue-text">
+    This paragraph demonstrates CSS specificity rules.
+  </p>
+  <p class="blue-text special-text">
+    This paragraph shows class combination effects.
+  </p>
+  <p class="blue-text">
+    This paragraph uses only one class.
+  </p>
+</div>
+`}
+
+initialCss={`
+/* Specificity: 1 (element) */
+p {
+  color: black;
+  font-size: 16px;
+  padding: 15px;
+  background: #f8f9fa;
+  margin: 10px 0;
+  border-radius: 6px;
+}
+
+/* Specificity: 10 (class) */
+.blue-text {
+  color: #3498db;
+  font-weight: bold;
+}
+
+/* Specificity: 20 (two classes) */
+.blue-text.special-text {
+  color: #e74c3c;
+  background: #fff5f5;
+  border: 2px solid #e74c3c;
+}
+
+/* Specificity: 110 (ID + class) */
+#specific-paragraph.blue-text {
+  color: #27ae60;
+  background: #f0fff4;
+  border: 2px solid #27ae60;
+  font-style: italic;
+}
+
+.specificity-demo {
+  padding: 20px;
+  background: #ecf0f1;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+}
+`}/>
+
+📚 **How This Demo Works:**
+This example demonstrates CSS specificity hierarchy and how the browser determines which styles to apply when multiple selectors target the same element:
+
+- **Element selector `p`** (specificity: 1) - Base styling applied to all paragraphs
+- **Class selector `.blue-text`** (specificity: 10) - Overrides element styles, makes text blue  
+- **Two classes `.blue-text.special-text`** (specificity: 20) - Higher specificity, makes text red
+- **ID + class `#specific-paragraph.blue-text`** (specificity: 110) - Highest specificity, makes text green
+
+The **specificity calculation** adds up points: IDs (100) + Classes (10) + Elements (1). Higher totals win!
+
+🎯 **Try This Challenge:**
+1. In **`.blue-text.special-text`**, change the color from `color: #e74c3c;` to `color: #f39c12;` 
+2. Add a new rule `p.blue-text` with `color: #9b59b6;` and see which elements it affects
+3. Create an even higher specificity rule like `#specific-paragraph.blue-text.special-text` with `color: #1abc9c;` and observe the cascade
+
+## Pseudo-Classes
+
+Pseudo-classes select elements based on their state or position:
+
+### Structural Pseudo-Classes
+
+<SeparatedEditorPreview 
+  title="Structural Pseudo-Classes"
+  mission="Use structural pseudo-classes to style elements based on their position"
+  instructions="Target first, last, nth child elements with different styles"
+initialHtml={`
+<div class="structural-demo">
+  <h3>Product List</h3>
+  <div class="product-list">
+    <div class="product">Product 1</div>
+    <div class="product">Product 2</div>
+    <div class="product">Product 3</div>
+    <div class="product">Product 4</div>
+    <div class="product">Product 5</div>
+    <div class="product">Product 6</div>
+    <div class="product">Product 7</div>
+    <div class="product">Product 8</div>
+  </div>
+</div>
+`}
+
+initialCss={`
+.structural-demo {
+  padding: 20px;
+  background: #2c3e50;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.product-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.product {
+  padding: 20px;
+  background: #34495e;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+/* First child gets special styling */
+.product:first-child {
+  background: #e74c3c;
+  transform: scale(1.05);
+}
+
+/* Last child gets different styling */
+.product:last-child {
+  background: #27ae60;
+  transform: scale(1.05);
+}
+
+/* Every odd child (1st, 3rd, 5th, etc.) */
+.product:nth-child(odd) {
+  border-left: 4px solid #3498db;
+}
+
+/* Every even child (2nd, 4th, 6th, etc.) */
+.product:nth-child(even) {
+  border-left: 4px solid #f39c12;
+}
+
+/* Every third child (3rd, 6th, 9th, etc.) */
+.product:nth-child(3n) {
+  background: #9b59b6;
+  color: white;
+}
+
+/* Second child specifically */
+.product:nth-child(2) {
+  background: #1abc9c;
+}
+
+/* Only child (if there's only one) */
+.product:only-child {
+  background: #e67e22;
+  grid-column: 1 / -1;
+  font-size: 18px;
+}
+`}/>
+
+📚 **How This Demo Works:**
+This demo showcases powerful structural pseudo-classes that select elements based on their position within the DOM tree:
+
+- **`:first-child`** - Targets the first product (red background with scale transform)
+- **`:last-child`** - Targets the last product (green background with scale transform)  
+- **`:nth-child(odd)`** - Every 1st, 3rd, 5th element gets blue left border
+- **`:nth-child(even)`** - Every 2nd, 4th, 6th element gets orange left border
+- **`:nth-child(3n)`** - Every 3rd element (3, 6, 9...) gets purple background
+- **`:nth-child(2)`** - Specifically targets the 2nd element with teal background
+
+The **CSS Grid** layout automatically adjusts columns based on available space using `repeat(auto-fit, minmax(200px, 1fr))`.
+
+🎯 **Try This Challenge:**
+1. In **`.product:nth-child(3n)`**, change the background from `background: #9b59b6;` to `background: #e67e22;`
+2. Add a new rule **`.product:nth-child(4n+1)`** that gives elements 1, 5, 9, etc. a `border: 3px solid #f1c40f;`
+3. Change **`:first-child`** transform from `transform: scale(1.05);` to `transform: scale(1.1) rotate(2deg);`
+
+### Dynamic Pseudo-Classes
+
+<SeparatedEditorPreview 
+  title="Dynamic Pseudo-Classes"
+  mission="Create interactive elements using dynamic pseudo-classes"
+  instructions="Use hover, focus, active, and other states for better user interaction"
+initialHtml={`
+<div class="dynamic-demo">
+  <h3>Interactive Elements</h3>
+  
+  <div class="button-group">
+    <button class="interactive-btn">Hover Me</button>
+    <button class="interactive-btn active">Active Button</button>
+    <button class="interactive-btn" disabled>Disabled</button>
+  </div>
+  
+  <form class="demo-form">
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input type="email" id="email" placeholder="Enter your email" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="message">Message:</label>
+      <textarea id="message" placeholder="Your message here..."></textarea>
+    </div>
+    
+    <div class="checkbox-group">
+      <input type="checkbox" id="newsletter">
+      <label for="newsletter">Subscribe to newsletter</label>
+    </div>
+  </form>
+</div>
+`}
+
+initialCss={`
+.dynamic-demo {
+  padding: 25px;
+  background: #f8f9fa;
+  font-family: Arial, sans-serif;
+  border-radius: 12px;
+}
+
+.button-group {
+  display: flex;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.interactive-btn {
+  padding: 12px 24px;
+  border: 2px solid #3498db;
+  background: white;
+  color: #3498db;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover state */
+.interactive-btn:hover {
+  background: #3498db;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+/* Active state (when being clicked) */
+.interactive-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+}
+
+/* Focus state (keyboard navigation) */
+.interactive-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+/* Disabled state */
+.interactive-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #bdc3c7;
+  color: #7f8c8d;
+  border-color: #bdc3c7;
+}
+
+.interactive-btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Active class (manually applied) */
+.interactive-btn.active {
+  background: #27ae60;
+  border-color: #27ae60;
+  color: white;
+}
+
+/* Form styling */
+.demo-form {
+  margin-top: 25px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #bdc3c7;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+/* Focus state for form inputs */
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+/* Valid state */
+.form-group input:valid {
+  border-color: #27ae60;
+}
+
+/* Invalid state */
+.form-group input:invalid:not(:placeholder-shown) {
+  border-color: #e74c3c;
+}
+
+/* Checkbox styling */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: auto;
+  transform: scale(1.2);
+}
+
+.checkbox-group input[type="checkbox"]:checked {
+  accent-color: #3498db;
+}
+`}/>
+
+📚 **How This Demo Works:**
+This demo demonstrates dynamic pseudo-classes that respond to user interaction and element states:
+
+**Button States:**
+- **`:hover`** - Changes background, adds shadow, and lifts button with `translateY(-2px)` 
+- **`:active`** - Pressed state with reduced transform and shadow
+- **`:focus`** - Keyboard navigation accessibility with focus ring
+- **`:disabled`** - Grayed out, cursor changed to `not-allowed`, hover effects disabled
+
+**Form Input States:**
+- **`:focus`** - Blue border and subtle box-shadow for better UX
+- **`:valid`** - Green border for properly formatted inputs
+- **`:invalid:not(:placeholder-shown)`** - Red border only after user starts typing
+- **`:checked`** - Custom checkbox styling with `accent-color`
+
+The **`.active`** class shows manual state management vs automatic pseudo-class states.
+
+🎯 **Try This Challenge:**
+1. In **`.interactive-btn:hover`**, change the transform from `translateY(-2px)` to `scale(1.05)`
+2. Add a **`:focus-visible`** rule for **`.interactive-btn`** with `box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.3);`
+3. In **`.form-group input:invalid:not(:placeholder-shown)`**, add `background: rgba(231, 76, 60, 0.1);`
+
+## Pseudo-Elements
+
+Pseudo-elements create virtual elements for styling:
+
+<SeparatedEditorPreview 
+  title="Creative Pseudo-Elements"
+  mission="Use pseudo-elements to create decorative and functional design elements"
+  instructions="See how ::before and ::after can add content and visual elements"
+initialHtml={`
+<div class="pseudo-elements-demo">
+  <h3 class="decorated-heading">Beautiful Headings</h3>
+  
+  <blockquote class="styled-quote">
+    "Design is not just what it looks like and feels like. Design is how it works."
+    <cite>Steve Jobs</cite>
+  </blockquote>
+  
+  <div class="tooltip-container">
+    <span class="tooltip-trigger">Hover for tooltip</span>
+    <span class="tooltip-text">This is a CSS-only tooltip!</span>
+  </div>
+  
+  <div class="card-with-ribbon">
+    <div class="ribbon">New</div>
+    <h4>Special Offer</h4>
+    <p>This card has a decorative ribbon created with pseudo-elements.</p>
+  </div>
+  
+  <div class="loading-dots">Loading</div>
+</div>
+`}
+
+initialCss={`
+.pseudo-elements-demo {
+  padding: 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-family: Arial, sans-serif;
+  border-radius: 12px;
+  space-y: 30px;
+}
+
+/* Decorated heading with pseudo-elements */
+.decorated-heading {
+  text-align: center;
+  position: relative;
+  margin: 0 0 30px 0;
+  font-size: 28px;
+}
+
+.decorated-heading::before,
+.decorated-heading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 50px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.decorated-heading::before {
+  left: 0;
+}
+
+.decorated-heading::after {
+  right: 0;
+}
+
+/* Stylized blockquote */
+.styled-quote {
+  position: relative;
+  padding: 25px;
+  margin: 30px 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-style: italic;
+  border-left: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+.styled-quote::before {
+  content: '"';
+  font-size: 60px;
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: Georgia, serif;
+}
+
+.styled-quote cite {
+  display: block;
+  text-align: right;
+  margin-top: 15px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.styled-quote cite::before {
+  content: '— ';
+}
+
+/* CSS-only tooltip */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  margin: 30px 0;
+}
+
+.tooltip-trigger {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: help;
+  transition: background 0.3s ease;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2c3e50;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.tooltip-text::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #2c3e50;
+}
+
+.tooltip-trigger:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Card with ribbon */
+.card-with-ribbon {
+  position: relative;
+  background: white;
+  color: #2c3e50;
+  padding: 25px;
+  border-radius: 8px;
+  margin: 30px 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.ribbon {
+  position: absolute;
+  top: 15px;
+  right: -30px;
+  background: #e74c3c;
+  color: white;
+  padding: 5px 35px;
+  font-size: 12px;
+  font-weight: bold;
+  transform: rotate(45deg);
+}
+
+.card-with-ribbon h4 {
+  margin: 0 0 15px 0;
+  color: #2c3e50;
+}
+
+.card-with-ribbon p {
+  margin: 0;
+  color: #7f8c8d;
+  line-height: 1.6;
+}
+
+/* Animated loading dots */
+.loading-dots {
+  display: inline-block;
+  position: relative;
+  padding-right: 40px;
+  font-size: 18px;
+}
+
+.loading-dots::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+  border-radius: 50%;
+  animation: loadingDots 1.5s infinite;
+  box-shadow: 
+    10px 0 0 currentColor,
+    20px 0 0 currentColor;
+}
+
+@keyframes loadingDots {
+  0%, 60%, 100% {
+    box-shadow: 
+      10px 0 0 rgba(255, 255, 255, 0.2),
+      20px 0 0 rgba(255, 255, 255, 0.2);
+  }
+  20% {
+    box-shadow: 
+      10px 0 0 currentColor,
+      20px 0 0 rgba(255, 255, 255, 0.2);
+  }
+  40% {
+    box-shadow: 
+      10px 0 0 currentColor,
+      20px 0 0 currentColor;
+  }
+}
+`}/>
+
+📚 **How This Demo Works:**
+This demo showcases creative uses of pseudo-elements (`::before` and `::after`) to add decorative and functional content:
+
+**Decorated Heading:**
+- **`::before`** and **`::after`** create decorative lines on both sides using `content: '';`
+- Positioned absolutely at 50% height with specific left/right positioning
+
+**Stylized Blockquote:**
+- **`::before`** adds a large decorative quotation mark using `content: '"';`
+- **`cite::before`** adds an em dash automatically with `content: '— ';`
+
+**CSS-Only Tooltip:**
+- **`.tooltip-text`** positioned absolutely with `visibility: hidden` initially
+- **`::after`** creates arrow using CSS borders: `border-top-color: #2c3e50;`
+- **`:hover`** triggers visibility with smooth opacity transition
+
+**Animated Loading Dots:**
+- **`::after`** creates dots using `box-shadow` to duplicate the base dot
+- **Animation** cycles through different opacity states to create wave effect
+
+🎯 **Try This Challenge:**
+1. In **`.decorated-heading::before`**, change the width from `width: 50px;` to `width: 80px;`
+2. In **`.styled-quote::before`**, change the quote content from `content: '"';` to `content: '❝';`
+3. Add a new **`.loading-dots::before`** rule that creates a spinning circle with `content: '⟳'; animation: spin 1s linear infinite;`
+
+## Attribute Selectors
+
+Target elements based on their attributes:
+
+<SeparatedEditorPreview 
+  title="Attribute Selectors Mastery"
+  mission="Use attribute selectors to style elements based on their attributes"
+  instructions="Target elements with specific attributes, values, and patterns"
+initialHtml={`
+<div class="attribute-demo">
+  <h3>Attribute Selector Examples</h3>
+  
+  <div class="form-section">
+    <input type="text" placeholder="Text input">
+    <input type="email" placeholder="Email input" required>
+    <input type="password" placeholder="Password input">
+    <input type="search" placeholder="Search input">
+    <input type="url" placeholder="URL input">
+  </div>
+  
+  <div class="link-section">
+    <a href="https://example.com" target="_blank">External link</a>
+    <a href="/internal" target="_self">Internal link</a>
+    <a href="mailto:test@example.com">Email link</a>
+    <a href="tel:+1234567890">Phone link</a>
+    <a href="#section">Anchor link</a>
+  </div>
+  
+  <div class="data-section">
+    <div data-status="success" class="status-item">Success message</div>
+    <div data-status="warning" class="status-item">Warning message</div>
+    <div data-status="error" class="status-item">Error message</div>
+    <div data-priority="high" class="priority-item">High priority</div>
+    <div data-priority="medium" class="priority-item">Medium priority</div>
+    <div data-priority="low" class="priority-item">Low priority</div>
+  </div>
+  
+  <div class="language-section">
+    <span lang="en">English text</span>
+    <span lang="fr">Texte français</span>
+    <span lang="es">Texto español</span>
+    <span lang="de">Deutscher Text</span>
+  </div>
+</div>
+`}
+
+initialCss={`
+.attribute-demo {
+  padding: 25px;
+  background: #f8f9fa;
+  font-family: Arial, sans-serif;
+  border-radius: 12px;
+}
+
+.form-section,
+.link-section,
+.data-section,
+.language-section {
+  margin: 25px 0;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Attribute existence selector [attr] */
+input[required] {
+  border: 2px solid #e74c3c;
+  background: #fff5f5;
+}
+
+input[required]::after {
+  content: '*';
+  color: #e74c3c;
+}
+
+/* Attribute value selector [attr="value"] */
+input[type="email"] {
+  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23888" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+
+input[type="search"] {
+  border-radius: 20px;
+  padding-left: 20px;
+  background: #f0f0f0;
+}
+
+input[type="password"] {
+  font-family: monospace;
+  letter-spacing: 2px;
+}
+
+/* Attribute begins with selector [attr^="value"] */
+a[href^="https://"] {
+  color: #27ae60;
+  padding-left: 20px;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%2327ae60" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>');
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 16px;
+}
+
+a[href^="mailto:"] {
+  color: #3498db;
+  text-decoration: none;
+  padding: 5px 10px;
+  background: #e8f4f8;
+  border-radius: 4px;
+}
+
+a[href^="tel:"] {
+  color: #9b59b6;
+  font-weight: bold;
+}
+
+/* Attribute ends with selector [attr$="value"] */
+a[href$=".pdf"] {
+  color: #e74c3c;
+  padding-left: 18px;
+  background: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23e74c3c"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>') no-repeat left center;
+  background-size: 14px;
+}
+
+/* Attribute contains selector [attr*="value"] */
+a[href*="example"] {
+  border: 2px dashed #f39c12;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+/* Attribute contains word selector [attr~="value"] */
+/* This would match class="item special" when looking for [class~="special"] */
+
+/* Data attribute selectors */
+.status-item {
+  padding: 10px 15px;
+  margin: 8px 0;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+[data-status="success"] {
+  background: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+}
+
+[data-status="warning"] {
+  background: #fff3cd;
+  color: #856404;
+  border-left: 4px solid #ffc107;
+}
+
+[data-status="error"] {
+  background: #f8d7da;
+  color: #721c24;
+  border-left: 4px solid #dc3545;
+}
+
+.priority-item {
+  display: inline-block;
+  padding: 5px 12px;
+  margin: 5px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+[data-priority="high"] {
+  background: #e74c3c;
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+[data-priority="medium"] {
+  background: #f39c12;
+  color: white;
+}
+
+[data-priority="low"] {
+  background: #95a5a6;
+  color: white;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Language attribute selectors */
+.language-section span {
+  display: inline-block;
+  padding: 8px 12px;
+  margin: 5px;
+  border-radius: 4px;
+  background: #ecf0f1;
+  transition: all 0.3s ease;
+}
+
+[lang="en"] {
+  border-left: 4px solid #e74c3c;
+}
+
+[lang="fr"] {
+  border-left: 4px solid #3498db;
+}
+
+[lang="es"] {
+  border-left: 4px solid #f39c12;
+}
+
+[lang="de"] {
+  border-left: 4px solid #2c3e50;
+}
+
+/* Case-insensitive attribute selector (modern browsers) */
+[data-status="SUCCESS" i] {
+  /* This would match "success", "SUCCESS", "Success", etc. */
+}
+
+/* Common input styling */
+input {
+  padding: 10px 12px;
+  margin: 8px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Link styling */
+a {
+  display: inline-block;
+  margin: 8px;
+  padding: 8px 12px;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+a:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+`}/>
+
+📚 **How This Demo Works:**
+This demo demonstrates powerful attribute selectors that target elements based on their HTML attributes and values:
+
+**Attribute Existence:** `[required]`
+- **`input[required]`** - Targets inputs with required attribute, adds red styling
+
+**Exact Value Match:** `[attr="value"]`
+- **`input[type="email"]`** - Email inputs get envelope icon via background SVG
+- **`input[type="search"]`** - Search inputs get rounded styling
+
+**Starts With:** `[attr^="value"]`
+- **`a[href^="https://"]`** - External HTTPS links get green color + external icon
+- **`a[href^="mailto:"]`** - Email links get blue background styling
+
+**Ends With:** `[attr$="value"]`  
+- **`a[href$=".pdf"]`** - PDF links get red color + document icon
+
+**Contains:** `[attr*="value"]`
+- **`a[href*="example"]`** - Links containing "example" get dashed orange border
+
+**Data Attributes:**
+- **`[data-status="success"]`** - Green styling for success messages
+- **`[data-priority="high"]`** - Red background with pulsing animation
+- **`[lang="en"]`** - Language-specific left border colors
+
+🎯 **Try This Challenge:**
+1. In **`input[type="search"]`**, add `background-image: url('data:...');` with a search icon SVG
+2. Add a new rule **`a[href^="tel:"]`** with `background: #9b59b6; color: white; border-radius: 20px;`
+3. In **`[data-priority="high"]`**, change the animation from `pulse 2s infinite` to `pulse 1s infinite`
+
+## CSS Combinators
+
+Combine selectors to target elements based on their relationships:
+
+<SeparatedEditorPreview 
+  title="CSS Combinators in Action"
+  mission="Use different combinators to target elements based on their relationships"
+  instructions="Understand descendant, child, sibling, and adjacent combinators"
+initialHtml={`
+<div class="combinators-demo">
+  <h3>CSS Combinators Demo</h3>
+  
+  <nav class="main-navigation">
+    <ul class="nav-list">
+      <li><a href="#">Home</a></li>
+      <li>
+        <a href="#">Products</a>
+        <ul class="sub-menu">
+          <li><a href="#">Web Design</a></li>
+          <li><a href="#">Mobile Apps</a></li>
+          <li><a href="#">SEO Services</a></li>
+        </ul>
+      </li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </nav>
+  
+  <article class="content-section">
+    <header class="article-header">
+      <h2>Article Title</h2>
+      <p class="meta">Published on March 15, 2024</p>
+    </header>
+    
+    <div class="article-content">
+      <p class="intro">This is the introduction paragraph.</p>
+      <p>This is a regular paragraph.</p>
+      <p>Another regular paragraph.</p>
+      
+      <div class="highlight-box">
+        <p>This paragraph is inside a highlight box.</p>
+        <p>Another paragraph in the highlight box.</p>
+      </div>
+      
+      <p>Paragraph after the highlight box.</p>
+      
+      <ul class="feature-list">
+        <li>First feature</li>
+        <li>Second feature</li>
+        <li class="premium">Premium feature</li>
+        <li>Fourth feature</li>
+      </ul>
+    </div>
+  </article>
+</div>
+`}
+
+initialCss={`
+.combinators-demo {
+  padding: 25px;
+  background: #2c3e50;
+  color: white;
+  font-family: Arial, sans-serif;
+  border-radius: 12px;
+}
+
+/* Descendant combinator (space) - selects all descendants */
+.main-navigation a {
+  color: #ecf0f1;
+  text-decoration: none;
+  padding: 8px 15px;
+  display: block;
+  transition: all 0.3s ease;
+}
+
+.main-navigation a:hover {
+  background: rgba(52, 152, 219, 0.3);
+  color: #3498db;
+}
+
+/* Child combinator (>) - selects direct children only */
+.nav-list > li {
+  position: relative;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+/* Direct child paragraphs of article-content get different styling */
+.article-content > p {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 15px 0;
+  padding-left: 10px;
+  border-left: 3px solid transparent;
+}
+
+/* But nested paragraphs (not direct children) look different */
+.highlight-box p {
+  font-size: 14px;
+  color: #2c3e50;
+  border-left: none;
+  padding-left: 0;
+}
+
+/* Adjacent sibling combinator (+) - selects immediate next sibling */
+h2 + .meta {
+  color: #bdc3c7;
+  font-style: italic;
+  font-size: 14px;
+  margin-top: -10px;
+  margin-bottom: 20px;
+}
+
+/* Paragraph immediately after highlight-box */
+.highlight-box + p {
+  background: rgba(39, 174, 96, 0.2);
+  padding: 15px;
+  border-radius: 6px;
+  border-left: 4px solid #27ae60;
+}
+
+/* General sibling combinator (~) - selects all following siblings */
+.intro ~ p {
+  opacity: 0.9;
+  border-left-color: #3498db;
+}
+
+/* But the intro paragraph itself gets special styling */
+.intro {
+  font-size: 18px;
+  font-weight: bold;
+  color: #f39c12;
+  border-left-color: #f39c12 !important;
+}
+
+/* Complex combinations */
+/* List items that are siblings of premium items */
+.premium ~ li {
+  opacity: 0.7;
+  position: relative;
+}
+
+.premium ~ li::before {
+  content: "🔒 ";
+  opacity: 0.5;
+}
+
+/* Navigation structure */
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.nav-list li {
+  position: relative;
+}
+
+/* Sub-menu styling (descendant combinator) */
+.nav-list .sub-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #34495e;
+  border-radius: 6px;
+  padding: 10px 0;
+  min-width: 180px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+/* Show sub-menu on hover (child combinator) */
+.nav-list > li:hover .sub-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.sub-menu li {
+  display: block;
+  margin: 0;
+}
+
+.sub-menu a {
+  padding: 8px 20px;
+  border-radius: 0;
+}
+
+/* Article content styling */
+.content-section {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 25px;
+  border-radius: 8px;
+  margin-top: 25px;
+}
+
+.article-header {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.highlight-box {
+  background: #f39c12;
+  color: #2c3e50;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 25px 0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.feature-list {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: 6px;
+  margin: 20px 0;
+}
+
+.feature-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.feature-list li:last-child {
+  border-bottom: none;
+}
+
+.premium {
+  color: #f1c40f;
+  font-weight: bold;
+  position: relative;
+}
+
+.premium::before {
+  content: "⭐ ";
+}
+`}/>
+
+📚 **How This Demo Works:**
+This demo demonstrates CSS combinators that target elements based on their relationships to other elements:
+
+**Descendant Combinator (space):** `.main-navigation a`
+- Targets ALL anchor tags anywhere inside **`.main-navigation`** (any nesting level)
+
+**Child Combinator (>):** `.nav-list > li`
+- Targets ONLY direct `<li>` children of **`.nav-list`**, not nested ones
+- **`.article-content > p`** styles direct paragraph children differently from nested ones
+
+**Adjacent Sibling (+):** `h2 + .meta`
+- Targets **`.meta`** elements that immediately follow an `<h2>`
+- **`.highlight-box + p`** styles the paragraph immediately after highlight box
+
+**General Sibling (~):** `.intro ~ p`
+- Targets ALL paragraph siblings that come after **`.intro`**, not just the next one
+- **`.premium ~ li`** affects all list items that follow a premium item
+
+**Complex Combinations:**
+- **`.nav-list > li:hover .sub-menu`** - Shows submenu on parent hover
+- **`.premium ~ li::before`** - Adds lock icons to items after premium features
+
+The demo shows a navigation with dropdowns and an article with various paragraph relationships.
+
+🎯 **Try This Challenge:**
+1. In **`.highlight-box + p`**, change the background from `rgba(39, 174, 96, 0.2)` to `rgba(231, 76, 60, 0.2)`
+2. Add a rule **`.intro ~ p:nth-child(even)`** with `border-left-color: #f39c12;`
+3. Change **`.premium ~ li::before`** content from `content: "🔒 ";` to `content: "💎 ";`
+
+## Advanced Selector Patterns
+
+Combine multiple techniques for powerful targeting:
+
+<SeparatedEditorPreview 
+  title="Advanced Selector Patterns"
+  mission="Master complex selector patterns for sophisticated styling"
+  instructions="See how combining selectors creates powerful and specific targeting"
+initialHtml={`
+<div class="advanced-patterns">
+  <h3>Advanced Selector Patterns</h3>
+  
+  <form class="complex-form">
+    <fieldset class="form-section">
+      <legend>Personal Information</legend>
+      <div class="form-row">
+        <input type="text" name="firstName" placeholder="First Name" required>
+        <input type="text" name="lastName" placeholder="Last Name" required>
+      </div>
+      <div class="form-row">
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="tel" name="phone" placeholder="Phone">
+      </div>
+    </fieldset>
+    
+    <fieldset class="form-section" disabled>
+      <legend>Premium Features (Disabled)</legend>
+      <div class="form-row">
+        <input type="text" name="company" placeholder="Company">
+        <select name="plan">
+          <option>Basic</option>
+          <option>Premium</option>
+          <option>Enterprise</option>
+        </select>
+      </div>
+    </fieldset>
+    
+    <div class="button-group">
+      <button type="button" class="btn secondary">Cancel</button>
+      <button type="submit" class="btn primary">Submit</button>
+      <button type="button" class="btn danger" disabled>Delete</button>
+    </div>
+  </form>
+  
+  <section class="data-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Priority</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-row-type="user" data-status="active">
+          <td>John Doe</td>
+          <td>Active</td>
+          <td data-priority="high">High</td>
+          <td><button class="action-btn">Edit</button></td>
+        </tr>
+        <tr data-row-type="user" data-status="inactive">
+          <td>Jane Smith</td>
+          <td>Inactive</td>
+          <td data-priority="medium">Medium</td>
+          <td><button class="action-btn">Edit</button></td>
+        </tr>
+        <tr data-row-type="admin" data-status="active">
+          <td>Admin User</td>
+          <td>Active</td>
+          <td data-priority="high">High</td>
+          <td><button class="action-btn danger">Delete</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+`}
+
+initialCss={`
+.advanced-patterns {
+  padding: 30px;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+  font-family: Arial, sans-serif;
+  border-radius: 12px;
+}
+
+/* Complex form selectors */
+.complex-form {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 25px;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+/* Target required inputs that are not disabled and in enabled fieldsets */
+fieldset:not([disabled]) input[required]:not([disabled]) {
+  border-left: 4px solid #e74c3c;
+}
+
+/* Valid required inputs get green border */
+fieldset:not([disabled]) input[required]:valid {
+  border-left-color: #27ae60;
+}
+
+/* First input in each form row gets rounded left corners */
+.form-row input:first-child,
+.form-row select:first-child {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  border-right: none;
+}
+
+/* Last input in each form row gets rounded right corners */
+.form-row input:last-child,
+.form-row select:last-child {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  border-left: none;
+}
+
+/* Disabled fieldset styling affects all children */
+fieldset[disabled] {
+  opacity: 0.5;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+fieldset[disabled] input,
+fieldset[disabled] select {
+  cursor: not-allowed;
+  background: #2c3e50;
+}
+
+/* Button group - style differently based on type and state */
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+/* Primary buttons that are not disabled */
+.btn.primary:not([disabled]) {
+  background: #3498db;
+  color: white;
+  border: 2px solid #3498db;
+}
+
+.btn.primary:not([disabled]):hover {
+  background: #2980b9;
+  border-color: #2980b9;
+  transform: translateY(-1px);
+}
+
+/* Secondary buttons */
+.btn.secondary {
+  background: transparent;
+  color: #bdc3c7;
+  border: 2px solid #bdc3c7;
+}
+
+.btn.secondary:hover:not([disabled]) {
+  color: white;
+  border-color: white;
+}
+
+/* Danger buttons */
+.btn.danger:not([disabled]) {
+  background: #e74c3c;
+  border-color: #e74c3c;
+  color: white;
+}
+
+.btn.danger[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Complex table selectors */
+.data-table {
+  margin-top: 30px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Header styling */
+thead th {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  text-align: left;
+  font-weight: bold;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Row styling based on data attributes */
+tbody tr[data-status="active"] {
+  background: rgba(39, 174, 96, 0.1);
+  border-left: 4px solid #27ae60;
+}
+
+tbody tr[data-status="inactive"] {
+  background: rgba(149, 165, 166, 0.1);
+  border-left: 4px solid #95a5a6;
+}
+
+/* Admin rows get special styling */
+tbody tr[data-row-type="admin"] {
+  background: rgba(155, 89, 182, 0.1) !important;
+  border-left-color: #9b59b6 !important;
+}
+
+tbody tr[data-row-type="admin"] td:first-child::before {
+  content: "👑 ";
+  color: #f1c40f;
+}
+
+/* High priority items pulse */
+td[data-priority="high"] {
+  color: #e74c3c;
+  font-weight: bold;
+  animation: priorityPulse 2s infinite;
+}
+
+@keyframes priorityPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Medium priority items */
+td[data-priority="medium"] {
+  color: #f39c12;
+  font-weight: bold;
+}
+
+/* Action buttons in admin rows */
+tr[data-row-type="admin"] .action-btn.danger {
+  background: #c0392b;
+  color: white;
+  border: none;
+}
+
+/* Hover effects for active rows only */
+tbody tr[data-status="active"]:hover {
+  background: rgba(39, 174, 96, 0.2);
+  cursor: pointer;
+}
+
+/* Every odd row in active status */
+tbody tr[data-status="active"]:nth-child(odd) {
+  background: rgba(39, 174, 96, 0.15);
+}
+
+/* General styling */
+.form-section {
+  margin: 20px 0;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+}
+
+.form-section legend {
+  padding: 0 10px;
+  font-weight: bold;
+  color: #f39c12;
+}
+
+.form-row {
+  display: flex;
+  margin: 10px 0;
+}
+
+input, select, .btn {
+  padding: 10px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.btn {
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+td {
+  padding: 12px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.action-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  background: #34495e;
+  border: 1px solid #34495e;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+`}/>
+
+📚 **How This Demo Works:**
+This demo showcases advanced selector patterns combining multiple techniques for sophisticated targeting:
+
+**Complex Negation:** `fieldset:not([disabled]) input[required]:not([disabled])`
+- Targets required inputs that are NOT disabled within fieldsets that are NOT disabled
+- Shows how **`:not()`** pseudo-class works with attribute selectors
+
+**Chained Pseudo-Classes:** `.btn.primary:not([disabled]):hover`
+- Combines class, pseudo-class, negation, and state selectors
+- Only applies hover effects to enabled primary buttons
+
+**Positional + Attribute:** `.form-row input:first-child`
+- Combines structural pseudo-classes with descendant selectors
+- Creates rounded corners only on appropriate inputs
+
+**Data Attribute Combinations:** `tr[data-row-type="admin"][data-status="active"]`
+- Multiple attribute selectors on same element
+- **`tbody tr[data-status="active"]:nth-child(odd)`** combines attributes with structural selectors
+
+**State-Based Styling:**
+- **`fieldset[disabled]`** affects all children through cascade
+- **`.btn.danger[disabled]`** shows specific disabled styling
+- **`tr[data-row-type="admin"] .action-btn.danger`** - nested selector with multiple classes
+
+The form shows progressive enhancement and the table demonstrates data-driven styling.
+
+🎯 **Try This Challenge:**
+1. In **`.btn.primary:not([disabled]):hover`**, add `box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);`
+2. Add a rule **`tr[data-status="active"]:hover td:first-child::before`** with `content: "→ ";`
+3. Create a complex selector **`fieldset:not([disabled]) .form-row:last-child input:valid`** with green glow effect
+
+## Performance and Best Practices
+
+### Selector Performance Tips
+
+1. **Avoid Universal Selectors**: `* {}` can be slow on large DOMs
+2. **Be Specific**: Use classes instead of complex descendant selectors
+3. **Minimize Nesting**: Deep nesting impacts performance
+4. **Use Modern Selectors**: `:is()` and `:where()` are more performant
+
+```css
+/* Slower */
+div > ul > li > a:hover {}
+
+/* Faster */
+.nav-link:hover {}
+```
+
+### Maintainable Selector Strategies
+
+1. **Use BEM Methodology**: Block, Element, Modifier naming
+2. **Avoid !important**: Use specificity properly instead
+3. **Group Related Selectors**: Keep similar styles together
+4. **Document Complex Selectors**: Add comments for complex logic
+
+## Modern CSS Selector Features
+
+### :is() and :where() Pseudo-Classes
+
+```css
+/* Instead of writing */
+h1, h2, h3, h4, h5, h6 {
+  font-family: sans-serif;
+}
+
+/* You can write */
+:is(h1, h2, h3, h4, h5, h6) {
+  font-family: sans-serif;
+}
+
+/* :where() has 0 specificity */
+:where(.btn, .link, .action) {
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+```
+
+### :has() Relational Pseudo-Class
+
+```css
+/* Style cards that contain images */
+.card:has(img) {
+  padding: 0;
+}
+
+/* Style form sections with errors */
+.form-section:has(.error) {
+  border-color: red;
+}
+```
+
+## Conclusion
+
+You've mastered advanced CSS selectors! You can now:
+
+- Use specificity strategically
+- Target elements with pseudo-classes and pseudo-elements
+- Create powerful attribute selectors
+- Combine selectors with various combinators
+- Build complex selector patterns
+- Apply performance best practices
+- Use modern selector features
+
+Advanced selectors give you precise control over styling and help create maintainable, efficient CSS.
+
+## What's Next?
+
+In the next tutorial, we'll explore **CSS Variables (Custom Properties)**, where you'll learn to create dynamic, maintainable stylesheets with reusable values and themes.

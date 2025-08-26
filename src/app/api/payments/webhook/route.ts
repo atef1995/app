@@ -11,8 +11,6 @@ const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("🚀 Webhook endpoint called");
-    
     const body = await request.text();
     const headersList = await headers();
     const sig = headersList.get("stripe-signature");
@@ -21,7 +19,7 @@ export async function POST(request: NextRequest) {
       bodyLength: body.length,
       hasSignature: !!sig,
       endpointSecretSet: !!endpointSecret,
-      stripeKeySet: !!process.env.STRIPE_SECRET_KEY
+      stripeKeySet: !!process.env.STRIPE_SECRET_KEY,
     });
 
     let event: Stripe.Event;
@@ -36,8 +34,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    console.log(`🎯 Processing webhook event: ${event.type}`);
 
     // Handle the event
     switch (event.type) {
@@ -72,7 +68,9 @@ export async function POST(request: NextRequest) {
         break;
 
       case "invoice.payment_failed":
-        await WebhookService.handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
+        await WebhookService.handleInvoicePaymentFailed(
+          event.data.object as Stripe.Invoice
+        );
         break;
 
       default:
