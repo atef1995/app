@@ -600,7 +600,8 @@ async function seedCssTutorials() {
         title: "CSS Transforms & Transitions Quiz",
         questions: [
           {
-            question: "Which CSS transform function rotates an element around its center?",
+            question:
+              "Which CSS transform function rotates an element around its center?",
             options: ["rotate()", "spin()", "turn()", "revolve()"],
             correct: 0,
             explanation:
@@ -619,7 +620,8 @@ async function seedCssTutorials() {
               "translate(x, y) moves an element 50px to the right (positive X) and 20px up (negative Y) from its original position without affecting document flow.",
           },
           {
-            question: "Which property controls how fast a transition accelerates and decelerates?",
+            question:
+              "Which property controls how fast a transition accelerates and decelerates?",
             options: [
               "transition-speed",
               "transition-duration",
@@ -643,21 +645,24 @@ async function seedCssTutorials() {
               "transform-origin sets the pivot point around which transformations are applied. 'top left' makes the element rotate and scale from its top-left corner.",
           },
           {
-            question: "Which transform function changes the size of an element?",
+            question:
+              "Which transform function changes the size of an element?",
             options: ["size()", "scale()", "resize()", "grow()"],
             correct: 1,
             explanation:
               "The scale() function changes the size of an element. scale(1.5) makes it 50% larger, scale(0.5) makes it half the size.",
           },
           {
-            question: "What's the best duration for most UI transition interactions?",
+            question:
+              "What's the best duration for most UI transition interactions?",
             options: ["0.1s", "0.3s", "1s", "2s"],
             correct: 1,
             explanation:
               "0.3s (300ms) is the sweet spot for UI transitions - fast enough to feel responsive but slow enough to be noticeable and smooth.",
           },
           {
-            question: "Which timing function creates the most natural-feeling animation?",
+            question:
+              "Which timing function creates the most natural-feeling animation?",
             options: ["linear", "ease", "ease-in", "steps()"],
             correct: 1,
             explanation:
@@ -676,7 +681,8 @@ async function seedCssTutorials() {
               "skew() tilts an element along the X and Y axes, creating a parallelogram effect. 15deg tilts horizontally, 5deg tilts vertically.",
           },
           {
-            question: "Which properties are GPU-accelerated for smooth animations?",
+            question:
+              "Which properties are GPU-accelerated for smooth animations?",
             options: [
               "width, height, margin",
               "transform, opacity",
@@ -688,7 +694,8 @@ async function seedCssTutorials() {
               "Transform and opacity are GPU-accelerated properties that don't trigger layout recalculation, resulting in smooth 60fps animations.",
           },
           {
-            question: "What happens when you combine multiple transforms like 'rotate(45deg) scale(1.2)'?",
+            question:
+              "What happens when you combine multiple transforms like 'rotate(45deg) scale(1.2)'?",
             options: [
               "Only the first transform applies",
               "They apply in order: rotate then scale",
@@ -700,7 +707,8 @@ async function seedCssTutorials() {
               "Multiple transforms apply in order from left to right. The element rotates 45 degrees first, then scales up by 20% around the rotated coordinate system.",
           },
           {
-            question: "For 3D transforms to work properly, what must the parent element have?",
+            question:
+              "For 3D transforms to work properly, what must the parent element have?",
             options: [
               "position: relative",
               "display: flex",
@@ -712,7 +720,8 @@ async function seedCssTutorials() {
               "3D transforms require a perspective property on the parent element to define the 3D viewing distance and make the 3D effect visible.",
           },
           {
-            question: "What does 'backface-visibility: hidden' do in 3D transforms?",
+            question:
+              "What does 'backface-visibility: hidden' do in 3D transforms?",
             options: [
               "Hides the element completely",
               "Prevents seeing the back of rotated elements",
@@ -748,7 +757,8 @@ async function seedCssTutorials() {
               "translateY(-10px) moves the element up by 10 pixels (negative Y is up), creating a lifting effect that's GPU-accelerated and smooth.",
           },
           {
-            question: "How do you create a perfect center position using transforms?",
+            question:
+              "How do you create a perfect center position using transforms?",
             options: [
               "transform: translate(50%, 50%)",
               "transform: translate(-50%, -50%)",
@@ -760,7 +770,8 @@ async function seedCssTutorials() {
               "Combined with position: absolute; top: 50%; left: 50%, transform: translate(-50%, -50%) perfectly centers an element by moving it back by half its own width and height.",
           },
           {
-            question: "What performance problem do layout-triggering animations cause?",
+            question:
+              "What performance problem do layout-triggering animations cause?",
             options: [
               "They use too much memory",
               "They cause layout thrashing and jank",
@@ -784,7 +795,8 @@ async function seedCssTutorials() {
               "cubic-bezier(0.68, -0.55, 0.265, 1.55) creates a bounce effect because the negative and >1 values cause overshoot beyond the target.",
           },
           {
-            question: "What's the key advantage of CSS transforms over changing layout properties?",
+            question:
+              "What's the key advantage of CSS transforms over changing layout properties?",
             options: [
               "They look better visually",
               "They're easier to write",
@@ -794,7 +806,7 @@ async function seedCssTutorials() {
             correct: 2,
             explanation:
               "CSS transforms run on the GPU compositor layer and don't trigger layout or paint recalculation, making them much more performant than layout-changing properties.",
-          }
+          },
         ],
         isPremium: false,
         requiredPlan: "FREE",
@@ -873,26 +885,30 @@ async function seedCssTutorials() {
         title: "Typography & Web Fonts Quiz",
         questions: [
           {
-            question: "What is the main difference between a typeface and a font?",
+            question:
+              "What is the main difference between a typeface and a font?",
             options: [
               "There is no difference, they're the same thing",
               "Typeface is the design, font is the file that contains the typeface",
               "Font is the design, typeface is the file",
-              "Typeface is for print, font is for web"
+              "Typeface is for print, font is for web",
             ],
             correct: 1,
-            explanation: "A typeface is the overall design (like Helvetica), while a font is the specific file that implements that design (like Helvetica-Bold.woff2)."
+            explanation:
+              "A typeface is the overall design (like Helvetica), while a font is the specific file that implements that design (like Helvetica-Bold.woff2).",
           },
           {
-            question: "Which CSS property controls the space between lines of text?",
+            question:
+              "Which CSS property controls the space between lines of text?",
             options: [
               "letter-spacing",
-              "word-spacing", 
+              "word-spacing",
               "line-height",
-              "text-spacing"
+              "text-spacing",
             ],
             correct: 2,
-            explanation: "line-height controls the vertical space between lines of text. A value of 1.5 means 1.5 times the font size."
+            explanation:
+              "line-height controls the vertical space between lines of text. A value of 1.5 means 1.5 times the font size.",
           },
           {
             question: "What does 'font-display: swap' do?",
@@ -900,54 +916,58 @@ async function seedCssTutorials() {
               "Swaps between different fonts randomly",
               "Shows fallback text immediately, then swaps to custom font when loaded",
               "Prevents custom fonts from loading",
-              "Only works with variable fonts"
+              "Only works with variable fonts",
             ],
             correct: 1,
-            explanation: "font-display: swap shows the fallback font immediately for fast text rendering, then swaps to the custom font once it loads."
+            explanation:
+              "font-display: swap shows the fallback font immediately for fast text rendering, then swaps to the custom font once it loads.",
           },
           {
-            question: "Which font loading strategy prevents invisible text (FOIT)?",
+            question:
+              "Which font loading strategy prevents invisible text (FOIT)?",
             options: [
               "font-display: block",
               "font-display: auto",
               "font-display: swap",
-              "font-display: fallback"
+              "font-display: fallback",
             ],
             correct: 2,
-            explanation: "font-display: swap prevents FOIT (Flash of Invisible Text) by immediately showing fallback fonts instead of waiting for custom fonts."
+            explanation:
+              "font-display: swap prevents FOIT (Flash of Invisible Text) by immediately showing fallback fonts instead of waiting for custom fonts.",
           },
           {
-            question: "What is the recommended line-height for optimal body text readability?",
-            options: [
-              "1.0 - 1.2",
-              "1.4 - 1.6", 
-              "2.0 - 2.5",
-              "0.8 - 1.0"
-            ],
+            question:
+              "What is the recommended line-height for optimal body text readability?",
+            options: ["1.0 - 1.2", "1.4 - 1.6", "2.0 - 2.5", "0.8 - 1.0"],
             correct: 1,
-            explanation: "Line-height between 1.4-1.6 provides optimal readability for body text, giving enough space between lines without feeling too loose."
+            explanation:
+              "Line-height between 1.4-1.6 provides optimal readability for body text, giving enough space between lines without feeling too loose.",
           },
           {
-            question: "Which CSS property creates a typography scale using mathematical ratios?",
+            question:
+              "Which CSS property creates a typography scale using mathematical ratios?",
             options: [
               "font-scale",
               "CSS custom properties with calculated ratios",
               "typography-ratio",
-              "font-progression"
+              "font-progression",
             ],
             correct: 1,
-            explanation: "CSS custom properties (variables) with calculated ratios like --font-size-lg: calc(var(--font-size-base) * 1.333) create consistent typography scales."
+            explanation:
+              "CSS custom properties (variables) with calculated ratios like --font-size-lg: calc(var(--font-size-base) * 1.333) create consistent typography scales.",
           },
           {
-            question: "What does 'font-variation-settings' control in variable fonts?",
+            question:
+              "What does 'font-variation-settings' control in variable fonts?",
             options: [
               "Font loading behavior",
               "Multiple font variations like weight, width, and slant",
               "Font fallback order",
-              "Typography hierarchy"
+              "Typography hierarchy",
             ],
             correct: 1,
-            explanation: "font-variation-settings allows fine control over variable font axes like weight ('wght'), width ('wdth'), and other custom variations."
+            explanation:
+              "font-variation-settings allows fine control over variable font axes like weight ('wght'), width ('wdth'), and other custom variations.",
           },
           {
             question: "Which text shadow creates a realistic 3D effect?",
@@ -955,10 +975,11 @@ async function seedCssTutorials() {
               "text-shadow: 0 0 10px black",
               "text-shadow: 1px 1px 0 #333, 2px 2px 0 #333, 3px 3px 5px rgba(0,0,0,0.3)",
               "text-shadow: 5px 5px blue",
-              "text-shadow: inset 0 0 10px black"
+              "text-shadow: inset 0 0 10px black",
             ],
             correct: 1,
-            explanation: "Multiple layered text-shadows with increasing offsets and a final blur create realistic 3D depth effects."
+            explanation:
+              "Multiple layered text-shadows with increasing offsets and a final blur create realistic 3D depth effects.",
           },
           {
             question: "What creates gradient text effects in CSS?",
@@ -966,10 +987,11 @@ async function seedCssTutorials() {
               "color: gradient(red, blue)",
               "background: linear-gradient(...) + background-clip: text + color: transparent",
               "text-gradient: linear-gradient(...)",
-              "font-color: gradient(...)"
+              "font-color: gradient(...)",
             ],
             correct: 1,
-            explanation: "Gradient text uses background gradients with background-clip: text and transparent color to show the gradient through the text shape."
+            explanation:
+              "Gradient text uses background gradients with background-clip: text and transparent color to show the gradient through the text shape.",
           },
           {
             question: "Which property makes text stroke/outline effects?",
@@ -977,32 +999,37 @@ async function seedCssTutorials() {
               "text-outline",
               "border: 2px solid color",
               "-webkit-text-stroke",
-              "outline: 2px solid color"
+              "outline: 2px solid color",
             ],
             correct: 2,
-            explanation: "-webkit-text-stroke creates outline effects around text characters, often combined with transparent fill for hollow text."
+            explanation:
+              "-webkit-text-stroke creates outline effects around text characters, often combined with transparent fill for hollow text.",
           },
           {
-            question: "What is the optimal line length for reading comprehension?",
+            question:
+              "What is the optimal line length for reading comprehension?",
             options: [
               "20-30 characters per line",
               "45-75 characters per line",
-              "100-120 characters per line", 
-              "No limit, longer is better"
+              "100-120 characters per line",
+              "No limit, longer is better",
             ],
             correct: 1,
-            explanation: "45-75 characters per line (including spaces) is optimal for reading speed and comprehension. Use CSS max-width: 65ch to achieve this."
+            explanation:
+              "45-75 characters per line (including spaces) is optimal for reading speed and comprehension. Use CSS max-width: 65ch to achieve this.",
           },
           {
-            question: "Which CSS unit is best for creating scalable, accessible typography?",
+            question:
+              "Which CSS unit is best for creating scalable, accessible typography?",
             options: [
               "px (pixels)",
               "pt (points)",
               "rem (root em)",
-              "cm (centimeters)"
+              "cm (centimeters)",
             ],
             correct: 2,
-            explanation: "rem units scale with the user's browser font size settings, making typography more accessible for users who need larger text."
+            explanation:
+              "rem units scale with the user's browser font size settings, making typography more accessible for users who need larger text.",
           },
           {
             question: "What does 'font-feature-settings: \"liga\"' enable?",
@@ -1010,10 +1037,11 @@ async function seedCssTutorials() {
               "Font ligatures (combined characters like fi, fl)",
               "Line spacing adjustments",
               "Letter spacing controls",
-              "Font loading optimizations"
+              "Font loading optimizations",
             ],
             correct: 0,
-            explanation: "Font ligatures automatically combine certain character pairs (like fi, fl, ff) into single, more attractive glyphs when supported by the font."
+            explanation:
+              "Font ligatures automatically combine certain character pairs (like fi, fl, ff) into single, more attractive glyphs when supported by the font.",
           },
           {
             question: "Which technique creates the smoothest text animations?",
@@ -1021,10 +1049,11 @@ async function seedCssTutorials() {
               "Animating font-size directly",
               "Animating with transform: scale()",
               "Animating letter-spacing",
-              "Animating line-height"
+              "Animating line-height",
             ],
             correct: 1,
-            explanation: "transform: scale() is GPU-accelerated and doesn't trigger layout recalculation, creating much smoother text scaling animations than font-size."
+            explanation:
+              "transform: scale() is GPU-accelerated and doesn't trigger layout recalculation, creating much smoother text scaling animations than font-size.",
           },
           {
             question: "What creates a typewriter animation effect?",
@@ -1032,32 +1061,32 @@ async function seedCssTutorials() {
               "Animating opacity from 0 to 1",
               "Animating width with overflow: hidden + border-right caret",
               "Animating transform: translateX()",
-              "Animating letter-spacing"
+              "Animating letter-spacing",
             ],
             correct: 1,
-            explanation: "Typewriter effects animate width from 0 to 100% with overflow: hidden, often adding a blinking border-right as a cursor."
+            explanation:
+              "Typewriter effects animate width from 0 to 100% with overflow: hidden, often adding a blinking border-right as a cursor.",
           },
           {
-            question: "Which contrast ratio meets WCAG AA standards for normal text?",
-            options: [
-              "3:1",
-              "4.5:1",
-              "7:1", 
-              "21:1"
-            ],
+            question:
+              "Which contrast ratio meets WCAG AA standards for normal text?",
+            options: ["3:1", "4.5:1", "7:1", "21:1"],
             correct: 1,
-            explanation: "WCAG AA requires a minimum 4.5:1 contrast ratio for normal text and 3:1 for large text (18pt+ or 14pt+ bold)."
+            explanation:
+              "WCAG AA requires a minimum 4.5:1 contrast ratio for normal text and 3:1 for large text (18pt+ or 14pt+ bold).",
           },
           {
-            question: "What does 'clamp(1rem, 4vw, 2rem)' create for typography?",
+            question:
+              "What does 'clamp(1rem, 4vw, 2rem)' create for typography?",
             options: [
               "Fixed 4vw font size",
               "Responsive typography that scales between 1rem and 2rem",
               "Only works on mobile devices",
-              "Creates an error in older browsers"
+              "Creates an error in older browsers",
             ],
             correct: 1,
-            explanation: "clamp() creates fluid typography that starts at 1rem minimum, scales at 4% of viewport width, and caps at 2rem maximum."
+            explanation:
+              "clamp() creates fluid typography that starts at 1rem minimum, scales at 4% of viewport width, and caps at 2rem maximum.",
           },
           {
             question: "Which approach optimizes web font loading performance?",
@@ -1065,10 +1094,11 @@ async function seedCssTutorials() {
               "Load all font weights and styles at once",
               "Use font-display: swap + preload critical fonts + subset fonts",
               "Only use system fonts",
-              "Load fonts with JavaScript after page load"
+              "Load fonts with JavaScript after page load",
             ],
             correct: 1,
-            explanation: "Combining font-display: swap, preloading critical fonts, and using font subsets (unicode-range) provides the best performance and user experience."
+            explanation:
+              "Combining font-display: swap, preloading critical fonts, and using font subsets (unicode-range) provides the best performance and user experience.",
           },
           {
             question: "What creates a text reveal animation on scroll?",
@@ -1076,22 +1106,25 @@ async function seedCssTutorials() {
               "CSS only with :hover",
               "Intersection Observer API + CSS transforms/opacity",
               "Media queries",
-              "Font loading events"
+              "Font loading events",
             ],
             correct: 1,
-            explanation: "Scroll-triggered text reveals use Intersection Observer to detect when elements enter the viewport, then apply CSS classes for transform/opacity animations."
+            explanation:
+              "Scroll-triggered text reveals use Intersection Observer to detect when elements enter the viewport, then apply CSS classes for transform/opacity animations.",
           },
           {
-            question: "Which typography system creates the most harmonious font size relationships?",
+            question:
+              "Which typography system creates the most harmonious font size relationships?",
             options: [
               "Random size increases",
               "Mathematical ratios like Perfect Fourth (1.333) or Golden Ratio (1.618)",
               "Always doubling the previous size",
-              "Using only even numbers"
+              "Using only even numbers",
             ],
             correct: 1,
-            explanation: "Mathematical ratios create visually harmonious relationships between font sizes. Common ratios include Perfect Fourth (1.333), Major Third (1.25), and Golden Ratio (1.618)."
-          }
+            explanation:
+              "Mathematical ratios create visually harmonious relationships between font sizes. Common ratios include Perfect Fourth (1.333), Major Third (1.25), and Golden Ratio (1.618).",
+          },
         ],
         isPremium: false,
         requiredPlan: "FREE",
@@ -1110,15 +1143,17 @@ async function seedCssTutorials() {
         title: "CSS Animations Quiz",
         questions: [
           {
-            question: "What is the main difference between CSS transitions and animations?",
+            question:
+              "What is the main difference between CSS transitions and animations?",
             options: [
               "Transitions are faster than animations",
               "Transitions animate between two states, animations can have multiple keyframes",
               "Animations only work with transforms",
-              "There is no difference"
+              "There is no difference",
             ],
             correct: 1,
-            explanation: "Transitions animate between two states (A → B), while animations can have multiple keyframes for complex sequences (A → B → C → D)."
+            explanation:
+              "Transitions animate between two states (A → B), while animations can have multiple keyframes for complex sequences (A → B → C → D).",
           },
           {
             question: "How do you define an animation sequence in CSS?",
@@ -1126,10 +1161,11 @@ async function seedCssTutorials() {
               "@animation myAnimation { }",
               "@keyframes myAnimation { }",
               "@sequence myAnimation { }",
-              "@animate myAnimation { }"
+              "@animate myAnimation { }",
             ],
             correct: 1,
-            explanation: "The @keyframes rule is used to define animation sequences with multiple steps."
+            explanation:
+              "The @keyframes rule is used to define animation sequences with multiple steps.",
           },
           {
             question: "What does 'animation-iteration-count: infinite' do?",
@@ -1137,10 +1173,11 @@ async function seedCssTutorials() {
               "Makes the animation very long",
               "Makes the animation repeat forever",
               "Creates an error",
-              "Makes the animation run once"
+              "Makes the animation run once",
             ],
             correct: 1,
-            explanation: "The 'infinite' value makes the animation repeat continuously without stopping."
+            explanation:
+              "The 'infinite' value makes the animation repeat continuously without stopping.",
           },
           {
             question: "In keyframes, what does '50%' represent?",
@@ -1148,21 +1185,19 @@ async function seedCssTutorials() {
               "Half the element's size",
               "50 pixels",
               "The halfway point of the animation duration",
-              "50 degrees of rotation"
+              "50 degrees of rotation",
             ],
             correct: 2,
-            explanation: "Percentage keyframes represent timing within the animation duration - 50% is the halfway point."
+            explanation:
+              "Percentage keyframes represent timing within the animation duration - 50% is the halfway point.",
           },
           {
-            question: "Which timing function creates the most natural-feeling animation?",
-            options: [
-              "linear",
-              "ease",
-              "steps()",
-              "cubic-bezier(1,1,1,1)"
-            ],
+            question:
+              "Which timing function creates the most natural-feeling animation?",
+            options: ["linear", "ease", "steps()", "cubic-bezier(1,1,1,1)"],
             correct: 1,
-            explanation: "The 'ease' timing function mimics natural motion with slow start, fast middle, and slow end."
+            explanation:
+              "The 'ease' timing function mimics natural motion with slow start, fast middle, and slow end.",
           },
           {
             question: "What does 'animation-delay: -0.5s' do?",
@@ -1170,21 +1205,24 @@ async function seedCssTutorials() {
               "Delays the animation by 0.5 seconds",
               "Starts the animation 0.5 seconds earlier in its cycle",
               "Makes the animation 0.5 seconds shorter",
-              "Creates an error"
+              "Creates an error",
             ],
             correct: 1,
-            explanation: "Negative delays make animations start partway through their cycle, useful for creating wave effects."
+            explanation:
+              "Negative delays make animations start partway through their cycle, useful for creating wave effects.",
           },
           {
-            question: "Which properties are GPU-accelerated for best animation performance?",
+            question:
+              "Which properties are GPU-accelerated for best animation performance?",
             options: [
               "width, height, margin",
               "transform, opacity",
               "color, background-color",
-              "top, left, bottom, right"
+              "top, left, bottom, right",
             ],
             correct: 1,
-            explanation: "Transform and opacity are GPU-accelerated properties that don't trigger layout recalculation."
+            explanation:
+              "Transform and opacity are GPU-accelerated properties that don't trigger layout recalculation.",
           },
           {
             question: "What does 'animation-direction: alternate' do?",
@@ -1192,10 +1230,11 @@ async function seedCssTutorials() {
               "Plays the animation backwards",
               "Plays the animation forward then backward repeatedly",
               "Alternates between different animations",
-              "Chooses a random direction"
+              "Chooses a random direction",
             ],
             correct: 1,
-            explanation: "The 'alternate' direction makes animations go forward, then backward, then forward again."
+            explanation:
+              "The 'alternate' direction makes animations go forward, then backward, then forward again.",
           },
           {
             question: "How do you create a bouncing ball animation?",
@@ -1203,10 +1242,11 @@ async function seedCssTutorials() {
               "Use rotate() function",
               "Use translateY() with alternate direction",
               "Use scale() only",
-              "Use color changes"
+              "Use color changes",
             ],
             correct: 1,
-            explanation: "A bouncing ball uses translateY() to move up and down, typically with alternate direction for continuous bouncing."
+            explanation:
+              "A bouncing ball uses translateY() to move up and down, typically with alternate direction for continuous bouncing.",
           },
           {
             question: "What is the purpose of 'animation-fill-mode: forwards'?",
@@ -1214,10 +1254,11 @@ async function seedCssTutorials() {
               "Makes the animation play forward",
               "Keeps the final animation state after completion",
               "Makes the animation faster",
-              "Fills the element with color"
+              "Fills the element with color",
             ],
             correct: 1,
-            explanation: "fill-mode: forwards keeps the element in the final keyframe state after the animation completes."
+            explanation:
+              "fill-mode: forwards keeps the element in the final keyframe state after the animation completes.",
           },
           {
             question: "Which is the correct animation shorthand syntax?",
@@ -1225,10 +1266,11 @@ async function seedCssTutorials() {
               "animation: 2s ease myAnimation infinite",
               "animation: myAnimation 2s ease infinite",
               "animation: infinite myAnimation 2s ease",
-              "animation: ease 2s myAnimation infinite"
+              "animation: ease 2s myAnimation infinite",
             ],
             correct: 1,
-            explanation: "The correct order is: name, duration, timing-function, delay, iteration-count, direction, fill-mode."
+            explanation:
+              "The correct order is: name, duration, timing-function, delay, iteration-count, direction, fill-mode.",
           },
           {
             question: "What creates a wave effect in loading animations?",
@@ -1236,10 +1278,11 @@ async function seedCssTutorials() {
               "Different colors",
               "Different animation delays",
               "Different sizes",
-              "Different positions only"
+              "Different positions only",
             ],
             correct: 1,
-            explanation: "Staggered animation delays on similar elements create wave effects, like in loading spinners."
+            explanation:
+              "Staggered animation delays on similar elements create wave effects, like in loading spinners.",
           },
           {
             question: "How do you pause an animation with CSS?",
@@ -1247,10 +1290,11 @@ async function seedCssTutorials() {
               "animation-pause: true",
               "animation-play-state: paused",
               "animation-stop: pause",
-              "animation: none"
+              "animation: none",
             ],
             correct: 1,
-            explanation: "The animation-play-state property with value 'paused' stops the animation at its current position."
+            explanation:
+              "The animation-play-state property with value 'paused' stops the animation at its current position.",
           },
           {
             question: "What does 'linear' timing function create?",
@@ -1258,10 +1302,11 @@ async function seedCssTutorials() {
               "Natural acceleration and deceleration",
               "Constant speed throughout the animation",
               "Very fast animation",
-              "Bouncing effect"
+              "Bouncing effect",
             ],
             correct: 1,
-            explanation: "Linear timing creates constant speed with no acceleration or deceleration, feeling mechanical."
+            explanation:
+              "Linear timing creates constant speed with no acceleration or deceleration, feeling mechanical.",
           },
           {
             question: "Which keyframe setup creates a pulsing effect?",
@@ -1269,21 +1314,19 @@ async function seedCssTutorials() {
               "0% { scale(1) } 100% { scale(2) }",
               "0%, 100% { scale(1) } 50% { scale(1.2) }",
               "0% { opacity: 0 } 100% { opacity: 1 }",
-              "0% { rotate(0deg) } 100% { rotate(360deg) }"
+              "0% { rotate(0deg) } 100% { rotate(360deg) }",
             ],
             correct: 1,
-            explanation: "A pulsing effect scales up at 50% and returns to normal size at start and end (0%, 100%)."
+            explanation:
+              "A pulsing effect scales up at 50% and returns to normal size at start and end (0%, 100%).",
           },
           {
-            question: "What property should you avoid animating for best performance?",
-            options: [
-              "transform",
-              "opacity",
-              "width and height",
-              "rotate"
-            ],
+            question:
+              "What property should you avoid animating for best performance?",
+            options: ["transform", "opacity", "width and height", "rotate"],
             correct: 2,
-            explanation: "Animating layout properties like width and height triggers expensive layout recalculations."
+            explanation:
+              "Animating layout properties like width and height triggers expensive layout recalculations.",
           },
           {
             question: "How do you create a spinning loader animation?",
@@ -1291,21 +1334,24 @@ async function seedCssTutorials() {
               "Use translate() function",
               "Use rotate(360deg) with linear timing",
               "Use scale() function",
-              "Use skew() function"
+              "Use skew() function",
             ],
             correct: 1,
-            explanation: "A spinning loader uses rotate(360deg) from 0deg to 360deg with linear timing for constant rotation."
+            explanation:
+              "A spinning loader uses rotate(360deg) from 0deg to 360deg with linear timing for constant rotation.",
           },
           {
-            question: "What does 'cubic-bezier(0.68, -0.55, 0.265, 1.55)' create?",
+            question:
+              "What does 'cubic-bezier(0.68, -0.55, 0.265, 1.55)' create?",
             options: [
               "Linear motion",
               "A bouncy, overshoot effect",
               "Very slow motion",
-              "No animation"
+              "No animation",
             ],
             correct: 1,
-            explanation: "This cubic-bezier curve creates a bounce effect with overshoot beyond the target value."
+            explanation:
+              "This cubic-bezier curve creates a bounce effect with overshoot beyond the target value.",
           },
           {
             question: "Which technique creates the best slide-in animation?",
@@ -1313,10 +1359,11 @@ async function seedCssTutorials() {
               "Changing the left property",
               "Using translateX() with transforms",
               "Changing margin-left",
-              "Using width changes"
+              "Using width changes",
             ],
             correct: 1,
-            explanation: "translateX() with transforms is GPU-accelerated and provides the smoothest slide-in effects."
+            explanation:
+              "translateX() with transforms is GPU-accelerated and provides the smoothest slide-in effects.",
           },
           {
             question: "What's the key to professional loading animations?",
@@ -1324,11 +1371,12 @@ async function seedCssTutorials() {
               "Very bright colors",
               "Strategic positioning and animation delays",
               "Very fast animations",
-              "Complex shapes"
+              "Complex shapes",
             ],
             correct: 1,
-            explanation: "Professional loading animations use strategic positioning and staggered delays to create smooth, wave-like effects."
-          }
+            explanation:
+              "Professional loading animations use strategic positioning and staggered delays to create smooth, wave-like effects.",
+          },
         ],
         isPremium: false,
         requiredPlan: "FREE",
@@ -1347,37 +1395,43 @@ async function seedCssTutorials() {
         title: "Responsive Design & Media Queries Quiz",
         questions: [
           {
-            question: "What is the primary principle of mobile-first responsive design?",
+            question:
+              "What is the primary principle of mobile-first responsive design?",
             options: [
               "Design for desktop first, then adapt for mobile",
               "Design for mobile first, then enhance for larger screens",
               "Use the same design for all devices",
-              "Focus only on tablet layouts"
+              "Focus only on tablet layouts",
             ],
             correct: 1,
-            explanation: "Mobile-first design starts with mobile styles as the base, then progressively enhances the experience for larger screens using min-width media queries."
+            explanation:
+              "Mobile-first design starts with mobile styles as the base, then progressively enhances the experience for larger screens using min-width media queries.",
           },
           {
-            question: "What does the viewport meta tag 'width=device-width' do?",
+            question:
+              "What does the viewport meta tag 'width=device-width' do?",
             options: [
               "Sets a fixed width for all devices",
               "Makes the viewport width match the device's screen width",
               "Enables responsive images",
-              "Creates media queries automatically"
+              "Creates media queries automatically",
             ],
             correct: 1,
-            explanation: "width=device-width makes the viewport width equal to the device's screen width, ensuring proper responsive behavior."
+            explanation:
+              "width=device-width makes the viewport width equal to the device's screen width, ensuring proper responsive behavior.",
           },
           {
-            question: "Which media query targets tablets in portrait orientation?",
+            question:
+              "Which media query targets tablets in portrait orientation?",
             options: [
               "@media (min-width: 480px)",
               "@media (min-width: 768px)",
               "@media (max-width: 767px)",
-              "@media (min-width: 1024px)"
+              "@media (min-width: 1024px)",
             ],
             correct: 1,
-            explanation: "768px is the standard breakpoint for tablets in portrait orientation, targeting screens from tablet size and up."
+            explanation:
+              "768px is the standard breakpoint for tablets in portrait orientation, targeting screens from tablet size and up.",
           },
           {
             question: "What does 'clamp(1rem, 4vw, 2rem)' do for typography?",
@@ -1385,10 +1439,11 @@ async function seedCssTutorials() {
               "Sets font size to exactly 4vw",
               "Creates responsive text that scales between 1rem and 2rem",
               "Makes text 1rem on mobile, 2rem on desktop",
-              "Only works on desktop screens"
+              "Only works on desktop screens",
             ],
             correct: 1,
-            explanation: "clamp() creates fluid typography that starts at 1rem minimum, scales at 4% of viewport width, and caps at 2rem maximum."
+            explanation:
+              "clamp() creates fluid typography that starts at 1rem minimum, scales at 4% of viewport width, and caps at 2rem maximum.",
           },
           {
             question: "Which CSS technique makes images responsive?",
@@ -1396,32 +1451,31 @@ async function seedCssTutorials() {
               "width: 100%; height: auto;",
               "max-width: 100%; height: auto;",
               "width: auto; height: 100%;",
-              "width: 100vw; height: 100vh;"
+              "width: 100vw; height: 100vh;",
             ],
             correct: 1,
-            explanation: "max-width: 100% and height: auto make images scale down to fit their container while maintaining aspect ratio."
+            explanation:
+              "max-width: 100% and height: auto make images scale down to fit their container while maintaining aspect ratio.",
           },
           {
-            question: "What is the main advantage of CSS Grid's 'repeat(auto-fit, minmax(250px, 1fr))'?",
+            question:
+              "What is the main advantage of CSS Grid's 'repeat(auto-fit, minmax(250px, 1fr))'?",
             options: [
               "Creates exactly 4 columns",
               "Creates responsive columns that automatically fit the container",
               "Only works on desktop",
-              "Makes all columns exactly 250px wide"
+              "Makes all columns exactly 250px wide",
             ],
             correct: 1,
-            explanation: "auto-fit with minmax creates responsive columns that automatically adjust count based on available space, with minimum 250px width."
+            explanation:
+              "auto-fit with minmax creates responsive columns that automatically adjust count based on available space, with minimum 250px width.",
           },
           {
             question: "Which breakpoint typically represents desktop screens?",
-            options: [
-              "480px",
-              "768px",
-              "1024px",
-              "1440px"
-            ],
+            options: ["480px", "768px", "1024px", "1440px"],
             correct: 2,
-            explanation: "1024px is the standard breakpoint for desktop screens, representing the transition from tablet to desktop layouts."
+            explanation:
+              "1024px is the standard breakpoint for desktop screens, representing the transition from tablet to desktop layouts.",
           },
           {
             question: "What does '@media (prefers-color-scheme: dark)' detect?",
@@ -1429,10 +1483,11 @@ async function seedCssTutorials() {
               "Dark colored websites",
               "User's operating system dark mode preference",
               "Time of day",
-              "Device brightness settings"
+              "Device brightness settings",
             ],
             correct: 1,
-            explanation: "This media query detects when the user has set their operating system to prefer dark mode interfaces."
+            explanation:
+              "This media query detects when the user has set their operating system to prefer dark mode interfaces.",
           },
           {
             question: "Which container query establishes a query container?",
@@ -1440,10 +1495,11 @@ async function seedCssTutorials() {
               "container: inline-size;",
               "container-type: inline-size;",
               "query-container: true;",
-              "container-query: enabled;"
+              "container-query: enabled;",
             ],
             correct: 1,
-            explanation: "container-type: inline-size establishes an element as a containment context for size-based container queries."
+            explanation:
+              "container-type: inline-size establishes an element as a containment context for size-based container queries.",
           },
           {
             question: "What does '@media (hover: hover)' target?",
@@ -1451,21 +1507,24 @@ async function seedCssTutorials() {
               "All devices with hover capability",
               "Devices where hover is the primary interaction method",
               "Touch devices only",
-              "Desktop computers only"
+              "Desktop computers only",
             ],
             correct: 1,
-            explanation: "@media (hover: hover) targets devices where hovering is the primary interaction method, typically desktop with mouse."
+            explanation:
+              "@media (hover: hover) targets devices where hovering is the primary interaction method, typically desktop with mouse.",
           },
           {
-            question: "In mobile navigation, what triggers the hamburger menu to open?",
+            question:
+              "In mobile navigation, what triggers the hamburger menu to open?",
             options: [
               "CSS only",
               "JavaScript event handler",
               "Media query",
-              "Automatic on small screens"
+              "Automatic on small screens",
             ],
             correct: 1,
-            explanation: "Hamburger menus require JavaScript event handlers to toggle the active class that shows/hides the navigation menu."
+            explanation:
+              "Hamburger menus require JavaScript event handlers to toggle the active class that shows/hides the navigation menu.",
           },
           {
             question: "Which media query targets high-DPI (retina) displays?",
@@ -1473,21 +1532,24 @@ async function seedCssTutorials() {
               "@media (resolution: high)",
               "@media (min-resolution: 192dpi)",
               "@media (pixel-ratio: 2)",
-              "@media (retina: true)"
+              "@media (retina: true)",
             ],
             correct: 1,
-            explanation: "@media (min-resolution: 192dpi) or (-webkit-min-device-pixel-ratio: 2) targets high-DPI displays like retina screens."
+            explanation:
+              "@media (min-resolution: 192dpi) or (-webkit-min-device-pixel-ratio: 2) targets high-DPI displays like retina screens.",
           },
           {
-            question: "What does 'flex-wrap: wrap' enable in responsive design?",
+            question:
+              "What does 'flex-wrap: wrap' enable in responsive design?",
             options: [
               "Makes flex items smaller",
               "Allows flex items to wrap to new lines when space is limited",
               "Wraps text inside flex items",
-              "Creates vertical flex layouts"
+              "Creates vertical flex layouts",
             ],
             correct: 1,
-            explanation: "flex-wrap: wrap allows flex items to wrap onto new lines when there isn't enough horizontal space, enabling responsive layouts."
+            explanation:
+              "flex-wrap: wrap allows flex items to wrap onto new lines when there isn't enough horizontal space, enabling responsive layouts.",
           },
           {
             question: "Which unit is best for responsive margins and padding?",
@@ -1495,10 +1557,11 @@ async function seedCssTutorials() {
               "px (pixels)",
               "rem (root em)",
               "pt (points)",
-              "cm (centimeters)"
+              "cm (centimeters)",
             ],
             correct: 1,
-            explanation: "rem units are relative to the root font size, making them scalable and accessible for responsive design."
+            explanation:
+              "rem units are relative to the root font size, making them scalable and accessible for responsive design.",
           },
           {
             question: "What does '@media print' optimize for?",
@@ -1506,88 +1569,103 @@ async function seedCssTutorials() {
               "E-reader devices",
               "Printing web pages",
               "Black and white monitors",
-              "High contrast mode"
+              "High contrast mode",
             ],
             correct: 1,
-            explanation: "@media print applies styles specifically when the page is being printed, typically removing colors, shadows, and optimizing layout."
+            explanation:
+              "@media print applies styles specifically when the page is being printed, typically removing colors, shadows, and optimizing layout.",
           },
           {
-            question: "Which technique creates aspect-ratio containers before aspect-ratio property?",
+            question:
+              "Which technique creates aspect-ratio containers before aspect-ratio property?",
             options: [
               "height: 0; padding-bottom: percentage;",
               "width: 100%; height: 100%;",
               "position: absolute; top: 0;",
-              "display: flex; align-items: center;"
+              "display: flex; align-items: center;",
             ],
             correct: 0,
-            explanation: "The padding-bottom percentage technique creates aspect ratios: height: 0; padding-bottom: 56.25% creates 16:9 ratio."
+            explanation:
+              "The padding-bottom percentage technique creates aspect ratios: height: 0; padding-bottom: 56.25% creates 16:9 ratio.",
           },
           {
-            question: "What is the purpose of '@media (prefers-reduced-motion: reduce)'?",
+            question:
+              "What is the purpose of '@media (prefers-reduced-motion: reduce)'?",
             options: [
               "Slows down all animations",
               "Removes animations for users who prefer reduced motion",
               "Makes animations smaller",
-              "Only affects CSS transitions"
+              "Only affects CSS transitions",
             ],
             correct: 1,
-            explanation: "This accessibility feature removes or reduces animations for users who have set reduced motion preferences in their OS."
+            explanation:
+              "This accessibility feature removes or reduces animations for users who have set reduced motion preferences in their OS.",
           },
           {
-            question: "Which approach creates the most performant responsive images?",
+            question:
+              "Which approach creates the most performant responsive images?",
             options: [
               "Multiple img tags with different sources",
               "CSS background images with media queries",
               "The picture element with source sets",
-              "JavaScript to swap image sources"
+              "JavaScript to swap image sources",
             ],
             correct: 2,
-            explanation: "The picture element with responsive source sets allows browsers to choose the most appropriate image for the device and connection."
+            explanation:
+              "The picture element with responsive source sets allows browsers to choose the most appropriate image for the device and connection.",
           },
           {
-            question: "What does 'grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))' create?",
+            question:
+              "What does 'grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))' create?",
             options: [
               "Exactly 200px wide columns",
               "Responsive columns that automatically adjust count based on available space",
               "5 columns on all screen sizes",
-              "Columns that only work on desktop"
+              "Columns that only work on desktop",
             ],
             correct: 1,
-            explanation: "This creates responsive columns that automatically fit the container, with minimum 200px width and growing to fill available space."
+            explanation:
+              "This creates responsive columns that automatically fit the container, with minimum 200px width and growing to fill available space.",
           },
           {
-            question: "Which CSS feature is most important for touch-friendly design?",
+            question:
+              "Which CSS feature is most important for touch-friendly design?",
             options: [
               "Large font sizes",
               "Minimum 44px touch targets",
               "Bright colors",
-              "Rounded corners"
+              "Rounded corners",
             ],
             correct: 1,
-            explanation: "Touch targets should be at least 44px square to ensure they're large enough for finger taps on mobile devices."
+            explanation:
+              "Touch targets should be at least 44px square to ensure they're large enough for finger taps on mobile devices.",
           },
           {
-            question: "What makes container queries revolutionary compared to media queries?",
+            question:
+              "What makes container queries revolutionary compared to media queries?",
             options: [
               "They're faster than media queries",
               "They respond to element size instead of viewport size",
               "They work better on mobile",
-              "They don't need CSS"
+              "They don't need CSS",
             ],
             correct: 1,
-            explanation: "Container queries respond to the size of a specific container element, not the viewport, enabling truly modular responsive components."
+            explanation:
+              "Container queries respond to the size of a specific container element, not the viewport, enabling truly modular responsive components.",
           },
           {
-            question: "Which combination creates the best responsive layout foundation?",
+            question:
+              "Which combination creates the best responsive layout foundation?",
             options: [
               "Fixed pixels for everything",
               "CSS Grid + Flexbox + relative units + media queries",
               "Only media queries",
-              "JavaScript-based layouts"
+              "JavaScript-based layouts",
             ],
             correct: 1,
-            explanation: "Modern responsive design combines CSS Grid for page layout, Flexbox for component layout, relative units for scalability, and media queries for breakpoints."
-          }
+            explanation:
+              "Modern responsive design combines CSS Grid for page layout, Flexbox for component layout, relative units for scalability, and media queries for breakpoints.",
+          },
         ],
         isPremium: false,
         requiredPlan: "FREE",
@@ -1611,10 +1689,11 @@ async function seedCssTutorials() {
               "Element selector (div)",
               "Class selector (.highlight)",
               "ID selector (#header)",
-              "Inline style (style=\"color: red\")"
+              'Inline style (style="color: red")',
             ],
             correct: 3,
-            explanation: "Inline styles have the highest specificity (1000), followed by IDs (100), classes (10), and elements (1)."
+            explanation:
+              "Inline styles have the highest specificity (1000), followed by IDs (100), classes (10), and elements (1).",
           },
           {
             question: "What does the ':nth-child(2n+1)' selector target?",
@@ -1622,21 +1701,24 @@ async function seedCssTutorials() {
               "Every second element",
               "All odd-positioned elements",
               "All even-positioned elements",
-              "Only the first element"
+              "Only the first element",
             ],
             correct: 1,
-            explanation: "2n+1 selects odd-positioned elements (1st, 3rd, 5th, etc.). The formula starts at 1 and increments by 2."
+            explanation:
+              "2n+1 selects odd-positioned elements (1st, 3rd, 5th, etc.). The formula starts at 1 and increments by 2.",
           },
           {
-            question: "Which pseudo-class targets the first child element of its type?",
+            question:
+              "Which pseudo-class targets the first child element of its type?",
             options: [
               ":first-child",
               ":first-of-type",
               ":nth-child(1)",
-              ":only-child"
+              ":only-child",
             ],
             correct: 1,
-            explanation: ":first-of-type selects the first element of its type among siblings, while :first-child selects the first child regardless of type."
+            explanation:
+              ":first-of-type selects the first element of its type among siblings, while :first-child selects the first child regardless of type.",
           },
           {
             question: "What does the ':not(.active)' selector do?",
@@ -1644,21 +1726,24 @@ async function seedCssTutorials() {
               "Selects elements with the active class",
               "Selects elements without the active class",
               "Creates an error",
-              "Disables the active class"
+              "Disables the active class",
             ],
             correct: 1,
-            explanation: "The :not() pseudo-class selects elements that do NOT match the selector inside parentheses."
+            explanation:
+              "The :not() pseudo-class selects elements that do NOT match the selector inside parentheses.",
           },
           {
-            question: "Which selector targets form inputs that are required and invalid?",
+            question:
+              "Which selector targets form inputs that are required and invalid?",
             options: [
               "input:required:invalid",
               "input[required][invalid]",
               "input.required.invalid",
-              "input:required + :invalid"
+              "input:required + :invalid",
             ],
             correct: 0,
-            explanation: "Chaining pseudo-classes like :required:invalid selects elements that match both conditions simultaneously."
+            explanation:
+              "Chaining pseudo-classes like :required:invalid selects elements that match both conditions simultaneously.",
           },
           {
             question: "What does '::before' create?",
@@ -1666,21 +1751,24 @@ async function seedCssTutorials() {
               "A duplicate of the element",
               "A virtual inline element before the content",
               "A new HTML element",
-              "A CSS variable"
+              "A CSS variable",
             ],
             correct: 1,
-            explanation: "::before creates a virtual inline element as the first child of the selected element, perfect for decorative content."
+            explanation:
+              "::before creates a virtual inline element as the first child of the selected element, perfect for decorative content.",
           },
           {
-            question: "Which attribute selector matches elements where href starts with 'https'?",
+            question:
+              "Which attribute selector matches elements where href starts with 'https'?",
             options: [
               "[href='https']",
               "[href*='https']",
               "[href^='https']",
-              "[href$='https']"
+              "[href$='https']",
             ],
             correct: 2,
-            explanation: "[href^='https'] uses the ^ symbol to match attributes that START WITH the specified value."
+            explanation:
+              "[href^='https'] uses the ^ symbol to match attributes that START WITH the specified value.",
           },
           {
             question: "What does the child combinator '>' do?",
@@ -1688,21 +1776,24 @@ async function seedCssTutorials() {
               "Selects all descendants",
               "Selects only direct children",
               "Selects following siblings",
-              "Selects parent elements"
+              "Selects parent elements",
             ],
             correct: 1,
-            explanation: "The child combinator (>) selects only direct children, not deeper descendants like the descendant combinator (space)."
+            explanation:
+              "The child combinator (>) selects only direct children, not deeper descendants like the descendant combinator (space).",
           },
           {
-            question: "Which selector targets elements that contain the word 'button' in their class?",
+            question:
+              "Which selector targets elements that contain the word 'button' in their class?",
             options: [
               "[class='button']",
               "[class*='button']",
               "[class^='button']",
-              "[class~='button']"
+              "[class~='button']",
             ],
             correct: 3,
-            explanation: "[class~='button'] matches whole words in space-separated values, perfect for targeting specific classes."
+            explanation:
+              "[class~='button'] matches whole words in space-separated values, perfect for targeting specific classes.",
           },
           {
             question: "What does ':hover:focus' select?",
@@ -1710,21 +1801,24 @@ async function seedCssTutorials() {
               "Elements that are hovered OR focused",
               "Elements that are hovered AND focused",
               "Hovered elements that contain focused elements",
-              "Creates a CSS error"
+              "Creates a CSS error",
             ],
             correct: 1,
-            explanation: "Chaining pseudo-classes without spaces means ALL conditions must be true - the element must be both hovered AND focused."
+            explanation:
+              "Chaining pseudo-classes without spaces means ALL conditions must be true - the element must be both hovered AND focused.",
           },
           {
-            question: "Which combinator selects the immediately following sibling?",
+            question:
+              "Which combinator selects the immediately following sibling?",
             options: [
               "~ (general sibling)",
               "+ (adjacent sibling)",
               "> (child)",
-              "  (descendant)"
+              "  (descendant)",
             ],
             correct: 1,
-            explanation: "The adjacent sibling combinator (+) selects the element that immediately follows another element at the same level."
+            explanation:
+              "The adjacent sibling combinator (+) selects the element that immediately follows another element at the same level.",
           },
           {
             question: "What does '[data-category=\"electronics\"]' target?",
@@ -1732,10 +1826,11 @@ async function seedCssTutorials() {
               "Elements with data-category containing 'electronics'",
               "Elements with data-category exactly equal to 'electronics'",
               "Elements with any data attribute",
-              "Elements with class 'electronics'"
+              "Elements with class 'electronics'",
             ],
             correct: 1,
-            explanation: "The equals sign (=) in attribute selectors requires an exact match of the entire attribute value."
+            explanation:
+              "The equals sign (=) in attribute selectors requires an exact match of the entire attribute value.",
           },
           {
             question: "Which pseudo-element is best for creating tooltips?",
@@ -1743,10 +1838,11 @@ async function seedCssTutorials() {
               "::before",
               "::after",
               "Both ::before and ::after",
-              "::tooltip"
+              "::tooltip",
             ],
             correct: 2,
-            explanation: "Tooltips typically use both ::before for the tooltip box and ::after for the arrow/triangle pointer."
+            explanation:
+              "Tooltips typically use both ::before for the tooltip box and ::after for the arrow/triangle pointer.",
           },
           {
             question: "What does ':empty' select?",
@@ -1754,21 +1850,24 @@ async function seedCssTutorials() {
               "Elements with empty content",
               "Elements with no children (including text)",
               "Elements with display: none",
-              "Invisible elements"
+              "Invisible elements",
             ],
             correct: 1,
-            explanation: ":empty selects elements that have no children, including no text content (not even whitespace)."
+            explanation:
+              ":empty selects elements that have no children, including no text content (not even whitespace).",
           },
           {
-            question: "Which selector has higher specificity: '.nav .menu' or '.nav-menu'?",
+            question:
+              "Which selector has higher specificity: '.nav .menu' or '.nav-menu'?",
             options: [
               ".nav .menu (20)",
               ".nav-menu (10)",
               "They have equal specificity",
-              "It depends on the order in CSS"
+              "It depends on the order in CSS",
             ],
             correct: 0,
-            explanation: ".nav .menu has two classes (10 + 10 = 20), while .nav-menu has one class (10). More selectors = higher specificity."
+            explanation:
+              ".nav .menu has two classes (10 + 10 = 20), while .nav-menu has one class (10). More selectors = higher specificity.",
           },
           {
             question: "What does 'input[type=\"email\"]:focus:valid' target?",
@@ -1776,33 +1875,38 @@ async function seedCssTutorials() {
               "All email inputs",
               "Focused email inputs",
               "Valid email inputs",
-              "Focused email inputs that contain valid data"
+              "Focused email inputs that contain valid data",
             ],
             correct: 3,
-            explanation: "This chains three selectors: email type inputs that are currently focused AND contain valid email data."
+            explanation:
+              "This chains three selectors: email type inputs that are currently focused AND contain valid email data.",
           },
           {
-            question: "Which attribute selector matches file extensions ending in '.pdf'?",
+            question:
+              "Which attribute selector matches file extensions ending in '.pdf'?",
             options: [
               "[href*='.pdf']",
               "[href$='.pdf']",
               "[href^='.pdf']",
-              "[href~='.pdf']"
+              "[href~='.pdf']",
             ],
             correct: 1,
-            explanation: "[href$='.pdf'] uses the $ symbol to match attributes that END WITH the specified value."
+            explanation:
+              "[href$='.pdf'] uses the $ symbol to match attributes that END WITH the specified value.",
           },
           {
-            question: "What performance consideration applies to CSS selectors?",
+            question:
+              "What performance consideration applies to CSS selectors?",
             options: [
               "Longer selectors are always faster",
               "ID selectors are slowest",
               "Browsers read selectors from right to left",
-              "Attribute selectors are always fastest"
+              "Attribute selectors are always fastest",
             ],
             correct: 2,
-            explanation: "Browsers parse selectors right-to-left, so the rightmost selector should be as specific as possible for better performance."
-          }
+            explanation:
+              "Browsers parse selectors right-to-left, so the rightmost selector should be as specific as possible for better performance.",
+          },
         ],
         isPremium: false,
         requiredPlan: "FREE",
@@ -1810,6 +1914,597 @@ async function seedCssTutorials() {
     });
 
     console.log(`✅ Quiz: ${cssAdvancedSelectorsQuiz.title}`);
+
+    // CSS Architecture Quiz
+    const cssArchitectureQuiz = await prisma.quiz.upsert({
+      where: { slug: "css-architecture-quiz" },
+      update: {},
+      create: {
+        slug: "css-architecture-quiz",
+        title: "CSS Architecture Mastery",
+        tutorialId: cssArchitectureTutorial.id,
+        questions: [
+          {
+            question:
+              "What is the main problem that CSS architecture methodologies aim to solve?",
+            options: [
+              "Making CSS load faster",
+              "Reducing file size",
+              "Creating maintainable, scalable, and predictable stylesheets",
+              "Adding more visual effects",
+            ],
+            correct: 2,
+            explanation:
+              "CSS architecture methodologies focus on organization, maintainability, and scalability to prevent CSS from becoming unmanageable as projects grow.",
+          },
+          {
+            question: "In BEM methodology, what does the 'B' stand for?",
+            options: ["Button", "Block", "Border", "Base"],
+            correct: 1,
+            explanation:
+              "BEM stands for Block, Element, Modifier. A Block is a standalone component that is meaningful on its own.",
+          },
+          {
+            question:
+              "Which BEM class name follows the correct naming convention?",
+            options: [
+              "card-header-title",
+              "card__header--large",
+              "card.header.title",
+              "CardHeaderTitle",
+            ],
+            correct: 1,
+            explanation:
+              "BEM uses double underscores (__) for elements and double hyphens (--) for modifiers: block__element--modifier.",
+          },
+          {
+            question: "What is a BEM Element?",
+            options: [
+              "An independent component",
+              "A part of a block that has no standalone meaning",
+              "A variation of a block or element",
+              "A CSS property",
+            ],
+            correct: 1,
+            explanation:
+              "An Element is a part of a block that has no standalone meaning and is semantically tied to its block.",
+          },
+          {
+            question:
+              "In the class name 'button--disabled', what does '--disabled' represent?",
+            options: ["An element", "A block", "A modifier", "A variable"],
+            correct: 2,
+            explanation:
+              "The double hyphens (--) indicate a modifier in BEM, which represents a different state, appearance, or behavior.",
+          },
+          {
+            question: "What does SMACSS stand for?",
+            options: [
+              "Simple Modular Architecture for CSS Stylesheets",
+              "Scalable and Modular Architecture for CSS Stylesheets",
+              "Structured Methods and CSS Stylesheets",
+              "Standard Modular Approach to CSS Stylesheets",
+            ],
+            correct: 1,
+            explanation:
+              "SMACSS stands for Scalable and Modular Architecture for CSS Stylesheets, focusing on categorizing CSS rules.",
+          },
+          {
+            question:
+              "How many main categories does SMACSS define for organizing CSS rules?",
+            options: ["3", "4", "5", "6"],
+            correct: 2,
+            explanation:
+              "SMACSS defines 5 categories: Base, Layout, Module, State, and Theme rules.",
+          },
+          {
+            question:
+              "Which SMACSS category would contain styles for '.is-hidden' or '.is-active'?",
+            options: ["Base", "Layout", "Module", "State"],
+            correct: 3,
+            explanation:
+              "State rules define how modules or layouts look in different states, typically prefixed with 'is-' or 'has-'.",
+          },
+          {
+            question:
+              "What is the recommended file organization approach for large CSS projects?",
+            options: [
+              "One large CSS file",
+              "Separate files by component/module",
+              "Files organized by color scheme",
+              "Random organization",
+            ],
+            correct: 1,
+            explanation:
+              "Component-based file organization keeps related styles together, making maintenance easier and improving developer experience.",
+          },
+          {
+            question:
+              "What is the main advantage of using CSS custom properties (variables)?",
+            options: [
+              "Faster loading times",
+              "Better browser support",
+              "Centralized theme management and dynamic updates",
+              "Smaller file sizes",
+            ],
+            correct: 2,
+            explanation:
+              "CSS custom properties enable centralized theme management, dynamic runtime updates, and better maintainability.",
+          },
+          {
+            question: "Which CSS custom property declaration is correct?",
+            options: [
+              "$primary-color: #007bff;",
+              "var primary-color = #007bff;",
+              "--primary-color: #007bff;",
+              "@primary-color: #007bff;",
+            ],
+            correct: 2,
+            explanation:
+              "CSS custom properties are declared with double hyphens (--) prefix: --property-name: value;",
+          },
+          {
+            question: "How do you use a CSS custom property in a declaration?",
+            options: [
+              "color: $primary-color;",
+              "color: var(--primary-color);",
+              "color: @primary-color;",
+              "color: custom(primary-color);",
+            ],
+            correct: 1,
+            explanation:
+              "CSS custom properties are used with the var() function: var(--property-name, optional-fallback).",
+          },
+          {
+            question: "What is the purpose of a CSS reset or normalize?",
+            options: [
+              "To add animations",
+              "To remove all browser default styles",
+              "To provide consistent cross-browser styling foundation",
+              "To improve loading speed",
+            ],
+            correct: 2,
+            explanation:
+              "CSS reset/normalize provides a consistent foundation by handling browser default style inconsistencies.",
+          },
+          {
+            question:
+              "In component-based CSS architecture, what should each component's styles be?",
+            options: [
+              "Global and affecting all elements",
+              "Self-contained and reusable",
+              "Only using inline styles",
+              "Written in separate CSS files for each page",
+            ],
+            correct: 1,
+            explanation:
+              "Component-based CSS emphasizes self-contained, reusable styles that don't leak or depend on external context.",
+          },
+          {
+            question:
+              "What is CSS specificity and why is it important in architecture?",
+            options: [
+              "How fast CSS loads",
+              "The priority system that determines which styles are applied",
+              "The number of CSS rules",
+              "The file size of stylesheets",
+            ],
+            correct: 1,
+            explanation:
+              "CSS specificity determines which styles take precedence. Managing specificity is crucial for predictable and maintainable stylesheets.",
+          },
+          {
+            question:
+              "Which approach helps avoid specificity wars in large CSS codebases?",
+            options: [
+              "Using !important everywhere",
+              "Writing more specific selectors",
+              "Following consistent naming conventions and flat hierarchy",
+              "Using inline styles",
+            ],
+            correct: 2,
+            explanation:
+              "Consistent naming conventions and maintaining a flat specificity hierarchy prevent specificity conflicts.",
+          },
+          {
+            question:
+              "What is the recommended approach for organizing CSS imports?",
+            options: [
+              "Random order",
+              "Alphabetical order only",
+              "Dependencies first, then base styles, components, utilities",
+              "Largest files first",
+            ],
+            correct: 2,
+            explanation:
+              "Organizing imports by dependency order (base → components → utilities) ensures proper cascade and overrides.",
+          },
+          {
+            question: "In CSS architecture, what makes a good utility class?",
+            options: [
+              "It contains many properties",
+              "It does one thing well and is reusable",
+              "It's component-specific",
+              "It uses complex selectors",
+            ],
+            correct: 1,
+            explanation:
+              "Good utility classes are single-purpose, highly reusable, and follow the single responsibility principle.",
+          },
+          {
+            question:
+              "What is the main benefit of using CSS Grid or Flexbox for layout architecture?",
+            options: [
+              "Smaller file sizes",
+              "Better browser support than floats",
+              "Cleaner, more maintainable layout code",
+              "Faster rendering",
+            ],
+            correct: 2,
+            explanation:
+              "Modern layout methods like Grid and Flexbox provide cleaner, more semantic, and maintainable layout solutions.",
+          },
+          {
+            question:
+              "When implementing a CSS architecture, what should be your primary consideration?",
+            options: [
+              "Using the latest CSS features",
+              "Making it look identical across all browsers",
+              "Team understanding and project maintainability",
+              "Minimizing the number of CSS files",
+            ],
+            correct: 2,
+            explanation:
+              "The best CSS architecture is one that your team understands and can maintain effectively over time, regardless of specific methodology.",
+          },
+        ],
+        isPremium: true,
+        requiredPlan: "VIBED",
+      },
+    });
+
+    console.log(`✅ Quiz: ${cssArchitectureQuiz.title}`);
+
+    // CSS Modern Features Quiz
+    const cssModernFeaturesQuiz = await prisma.quiz.upsert({
+      where: { slug: "css-modern-features-quiz" },
+      update: {},
+      create: {
+        slug: "css-modern-features-quiz",
+        title: "Modern CSS Features Mastery",
+        tutorialId: cssModernFeaturesTutorial.id,
+        questions: [
+          {
+            question:
+              "What is the revolutionary advantage of CSS Container Queries over media queries?",
+            options: [
+              "They load faster than media queries",
+              "They respond to the container's size instead of viewport size",
+              "They work better on mobile devices",
+              "They use less CSS code",
+            ],
+            correct: 1,
+            explanation:
+              "Container queries respond to the size of a specific container element, not the viewport, enabling truly modular responsive components that adapt based on their available space.",
+          },
+          {
+            question:
+              "Which property establishes an element as a container query context?",
+            options: [
+              "container: inline-size",
+              "container-type: inline-size",
+              "query-container: size",
+              "container-query: enabled",
+            ],
+            correct: 1,
+            explanation:
+              "container-type: inline-size establishes an element as a containment context for size-based container queries.",
+          },
+          {
+            question: "What does @container (min-width: 400px) target?",
+            options: [
+              "Viewport widths of 400px or more",
+              "Container elements that are 400px wide or more",
+              "All elements inside 400px containers",
+              "Screen resolutions above 400px",
+            ],
+            correct: 1,
+            explanation:
+              "Container queries target the container itself when it meets the specified condition - in this case, when the container is 400px wide or more.",
+          },
+          {
+            question:
+              "How do CSS Cascade Layers change specificity management?",
+            options: [
+              "They eliminate the need for specificity",
+              "They provide explicit control over CSS cascade ordering",
+              "They make all selectors equal priority",
+              "They only work with CSS Grid",
+            ],
+            correct: 1,
+            explanation:
+              "Cascade Layers provide explicit control over CSS specificity and cascade ordering, allowing developers to organize styles by purpose and priority.",
+          },
+          {
+            question: "What is the correct syntax for defining cascade layers?",
+            options: [
+              "@layers base, components, utilities;",
+              "@layer-order base, components, utilities;",
+              "@layer base, components, utilities;",
+              "@cascade base, components, utilities;",
+            ],
+            correct: 2,
+            explanation:
+              "@layer base, components, utilities; defines the cascade layers order - layers later in the list have higher priority.",
+          },
+          {
+            question:
+              "Which layer has the highest priority in '@layer base, components, override;'?",
+            options: [
+              "base",
+              "components",
+              "override",
+              "They all have equal priority",
+            ],
+            correct: 2,
+            explanation:
+              "In cascade layers, the last layer defined has the highest priority. 'override' comes last, so it has the highest priority.",
+          },
+          {
+            question: "What does CSS Subgrid enable for nested grid layouts?",
+            options: [
+              "Faster grid rendering",
+              "Nested grids to inherit their parent's grid tracks",
+              "Automatic grid sizing",
+              "3D grid layouts",
+            ],
+            correct: 1,
+            explanation:
+              "CSS Subgrid allows nested grids to inherit their parent's grid tracks, enabling perfect alignment across nested grid structures.",
+          },
+          {
+            question:
+              "Which property makes a nested grid inherit its parent's row tracks?",
+            options: [
+              "grid-template-rows: inherit",
+              "grid-template-rows: subgrid",
+              "grid-inherit: rows",
+              "subgrid: rows",
+            ],
+            correct: 1,
+            explanation:
+              "grid-template-rows: subgrid makes a nested grid inherit its parent's row tracks, creating perfect alignment.",
+          },
+          {
+            question:
+              "What is the main benefit of CSS Subgrid for card layouts?",
+            options: [
+              "Cards load faster",
+              "Cards automatically align content across different card sizes",
+              "Cards use less memory",
+              "Cards work better on mobile",
+            ],
+            correct: 1,
+            explanation:
+              "Subgrid enables perfect alignment of content across cards of different sizes by inheriting the parent grid's tracks.",
+          },
+          {
+            question: "What does the :has() selector enable in CSS?",
+            options: [
+              "Parent selection based on child elements",
+              "Faster element selection",
+              "Better browser performance",
+              "3D transformations",
+            ],
+            correct: 0,
+            explanation:
+              "The :has() selector enables parent selection based on child elements, allowing you to style elements based on their content.",
+          },
+          {
+            question:
+              "Which selector targets form groups that contain invalid inputs?",
+            options: [
+              ".form-group:invalid",
+              ".form-group:has(input:invalid)",
+              ".form-group > input:invalid",
+              ".form-group input:invalid",
+            ],
+            correct: 1,
+            explanation:
+              ".form-group:has(input:invalid) uses the :has() selector to target form groups that contain invalid inputs.",
+          },
+          {
+            question:
+              "What does 'color-mix(in srgb, blue 60%, red 40%)' create?",
+            options: [
+              "A gradient from blue to red",
+              "A mixed color that's 60% blue and 40% red",
+              "An animation between blue and red",
+              "A color palette with blue and red",
+            ],
+            correct: 1,
+            explanation:
+              "color-mix() creates a single mixed color by blending the specified colors in the given proportions - 60% blue mixed with 40% red.",
+          },
+          {
+            question:
+              "Which color space is recommended for modern color mixing?",
+            options: ["RGB", "HSL", "OKLCH", "HEX"],
+            correct: 2,
+            explanation:
+              "OKLCH is the modern, perceptually uniform color space that provides better color mixing and manipulation results.",
+          },
+          {
+            question:
+              "What does 'oklch(from var(--color) calc(l + 0.1) c h)' do?",
+            options: [
+              "Makes the color darker",
+              "Makes the color lighter by increasing lightness",
+              "Changes the color's hue",
+              "Makes the color more saturated",
+            ],
+            correct: 1,
+            explanation:
+              "This relative color syntax increases the lightness (l) value by 0.1, making the color lighter while preserving chroma and hue.",
+          },
+          {
+            question: "What is the main advantage of CSS Nesting?",
+            options: [
+              "Better performance",
+              "Improved code organization and reduced repetition",
+              "Faster loading times",
+              "Better browser support",
+            ],
+            correct: 1,
+            explanation:
+              "CSS Nesting improves code organization by allowing nested selectors, reducing repetition and making stylesheets more maintainable.",
+          },
+          {
+            question:
+              "Which nesting syntax targets hover state of a nested element?",
+            options: [
+              ".button hover { }",
+              ".button { :hover { } }",
+              ".button { &:hover { } }",
+              ".button { &hover { } }",
+            ],
+            correct: 2,
+            explanation:
+              "The & symbol represents the parent selector, so &:hover applies the hover state to the parent .button element.",
+          },
+          {
+            question: "What does the View Transitions API provide?",
+            options: [
+              "Better CSS animations",
+              "Smooth transitions between different page states or views",
+              "Faster page loading",
+              "Better mobile performance",
+            ],
+            correct: 1,
+            explanation:
+              "The View Transitions API provides smooth, native transitions between different page states or views without JavaScript animation libraries.",
+          },
+          {
+            question: "Which function starts a view transition?",
+            options: [
+              "startTransition()",
+              "viewTransition()",
+              "document.startViewTransition()",
+              "beginTransition()",
+            ],
+            correct: 2,
+            explanation:
+              "document.startViewTransition() is the function that initiates a view transition between different states.",
+          },
+          {
+            question: "What is CSS Anchor Positioning designed for?",
+            options: [
+              "Creating sticky headers",
+              "Positioning elements relative to other elements",
+              "Improving scroll performance",
+              "Creating responsive layouts",
+            ],
+            correct: 1,
+            explanation:
+              "CSS Anchor Positioning allows precise positioning of elements relative to other elements, perfect for tooltips and contextual UI.",
+          },
+          {
+            question:
+              "Which property will define an anchor in CSS Anchor Positioning?",
+            options: [
+              "anchor: --my-anchor",
+              "anchor-name: --my-anchor",
+              "position-anchor: --my-anchor",
+              "anchor-id: --my-anchor",
+            ],
+            correct: 1,
+            explanation:
+              "anchor-name: --my-anchor defines an element as an anchor that other elements can position relative to.",
+          },
+          {
+            question:
+              "What does '@supports (container-type: inline-size)' detect?",
+            options: [
+              "If the browser supports CSS Grid",
+              "If the browser supports container queries",
+              "If the browser supports flexbox",
+              "If the browser supports modern CSS",
+            ],
+            correct: 1,
+            explanation:
+              "@supports (container-type: inline-size) detects if the browser supports container queries feature.",
+          },
+          {
+            question:
+              "Which approach provides the best progressive enhancement for modern CSS?",
+            options: [
+              "Use only modern features",
+              "Avoid modern features completely",
+              "Use @supports with fallbacks for older browsers",
+              "Use JavaScript polyfills for everything",
+            ],
+            correct: 2,
+            explanation:
+              "Using @supports feature queries with fallbacks ensures modern features enhance the experience while maintaining compatibility.",
+          },
+          {
+            question: "What is the benefit of 'contain: layout style paint'?",
+            options: [
+              "Better color rendering",
+              "Improved performance by containing layout calculations",
+              "Better mobile support",
+              "Smaller CSS file size",
+            ],
+            correct: 1,
+            explanation:
+              "CSS containment isolates layout, style, and paint operations, improving performance by limiting the scope of browser calculations.",
+          },
+          {
+            question:
+              "Which modern CSS feature is best for creating component-based responsive design?",
+            options: [
+              "Media queries",
+              "CSS Grid",
+              "Container queries",
+              "Flexbox",
+            ],
+            correct: 2,
+            explanation:
+              "Container queries are ideal for component-based responsive design because they respond to the component's container size, not the viewport.",
+          },
+          {
+            question:
+              "What does 'clamp()' function provide for modern responsive design?",
+            options: [
+              "Fixed sizing",
+              "Fluid sizing with minimum and maximum constraints",
+              "Better browser support",
+              "Faster rendering",
+            ],
+            correct: 1,
+            explanation:
+              "clamp() provides fluid sizing that scales within defined minimum and maximum bounds, perfect for responsive typography and spacing.",
+          },
+          {
+            question:
+              "Which combination represents the future of CSS architecture?",
+            options: [
+              "Only using modern features",
+              "Container queries + Cascade layers + Subgrid + Modern color functions",
+              "Avoiding new CSS features",
+              "Using only JavaScript for styling",
+            ],
+            correct: 1,
+            explanation:
+              "The combination of container queries, cascade layers, subgrid, and modern color functions represents the future of maintainable, scalable CSS architecture.",
+          },
+        ],
+        isPremium: true,
+        requiredPlan: "CRACKED",
+      },
+    });
+
+    console.log(`✅ Quiz: ${cssModernFeaturesQuiz.title}`);
 
     console.log("🎉 CSS tutorials seeded successfully!");
 
@@ -1840,6 +2535,8 @@ async function seedCssTutorials() {
         cssAdvancedSelectorsQuiz,
         cssVariablesQuiz,
         cssTypographyQuiz,
+        cssArchitectureQuiz,
+        cssModernFeaturesQuiz,
       ],
     };
   } catch (error) {

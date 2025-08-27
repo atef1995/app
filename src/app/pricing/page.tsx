@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
-import { Check, ArrowRight, Star } from "lucide-react";
+import { Check, ArrowRight, Star, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import getMoodColors from "@/lib/getMoodColors";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface PlanFeature {
   text: string;
@@ -48,9 +49,14 @@ interface PricingPlan {
 export default function PricingPage() {
   const { data: session } = useSession();
   const { currentMood } = useMood();
+  const { data: subscription } = useSubscription();
   const [isAnnual, setIsAnnual] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [stripePrices, setStripePrices] = useState<StripePrices | null>(null);
+
+  // Check current subscription status
+  const currentPlan = subscription?.plan || "FREE";
+  const isExistingSubscriber = currentPlan !== "FREE";
 
   // Fetch Stripe prices on component mount
   useEffect(() => {
@@ -181,16 +187,25 @@ export default function PricingPage() {
       });
 
       const data = await response.json();
-      if (data.success && data.url) {
-        window.location.href = data.url;
+      
+      if (data.success) {
+        if (data.upgraded) {
+          // Handle successful upgrade (no redirect needed)
+          alert(data.message || `Successfully upgraded to ${planId}!`);
+          // Refresh the page or update subscription state
+          window.location.reload();
+        } else if (data.url) {
+          // Handle new subscription checkout
+          window.location.href = data.url;
+        }
       } else {
         throw new Error(
-          data.error?.message || "Failed to create checkout session"
+          data.error?.message || "Failed to process request"
         );
       }
     } catch (error) {
-      console.error("Error creating checkout:", error);
-      alert("Failed to start checkout process. Please try again.");
+      console.error("Error processing request:", error);
+      alert("Failed to process request. Please try again.");
     } finally {
       setLoading(null);
     }
@@ -210,19 +225,52 @@ export default function PricingPage() {
       <div className="container mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
+          {/* Current Plan Status */}
+          {isExistingSubscriber && (
+            <div className="mb-6 inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 px-4 py-2 rounded-full text-sm font-medium">
+              <TrendingUp className="w-4 h-4" />
+              Currently on {currentPlan} Plan
+            </div>
+          )}
+
           <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            {currentMood.id === "rush" && "🔥 Time to Get Absolutely Cracked!"}
-            {currentMood.id === "grind" && "💪 Invest in Your Coding Journey"}
-            {currentMood.id === "chill" &&
-              "✨ Find Your Vibe, Choose Your Plan"}
+            {isExistingSubscriber ? (
+              <>
+                {currentMood.id === "rush" && "🚀 Ready to Level Up Your Plan?"}
+                {currentMood.id === "grind" && "💪 Upgrade Your Coding Arsenal"}
+                {currentMood.id === "chill" && "✨ Explore Our Premium Plans"}
+              </>
+            ) : (
+              <>
+                {currentMood.id === "rush" &&
+                  "🔥 Time to Get Absolutely Cracked!"}
+                {currentMood.id === "grind" &&
+                  "💪 Invest in Your Coding Journey"}
+                {currentMood.id === "chill" &&
+                  "✨ Find Your Vibe, Choose Your Plan"}
+              </>
+            )}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            {currentMood.id === "rush" &&
-              "Skip the grind and unlock instant access to become a JavaScript legend! 🚀"}
-            {currentMood.id === "grind" &&
-              "Level up your skills with comprehensive resources designed for the serious learner."}
-            {currentMood.id === "chill" &&
-              "Take your time and pick the perfect plan for your learning journey. No pressure! 😊"}
+            {isExistingSubscriber ? (
+              <>
+                {currentMood.id === "rush" &&
+                  "You're already crushing it! Ready to unlock even more advanced features? 🚀"}
+                {currentMood.id === "grind" &&
+                  "Take your learning to the next level with our most comprehensive plan."}
+                {currentMood.id === "chill" &&
+                  "Loving your current plan? See what else we have to offer! 😊"}
+              </>
+            ) : (
+              <>
+                {currentMood.id === "rush" &&
+                  "Skip the grind and unlock instant access to become a JavaScript legend! 🚀"}
+                {currentMood.id === "grind" &&
+                  "Level up your skills with comprehensive resources designed for the serious learner."}
+                {currentMood.id === "chill" &&
+                  "Take your time and pick the perfect plan for your learning journey. No pressure! 😊"}
+              </>
+            )}
           </p>
 
           {/* Loading indicator for prices */}
@@ -242,14 +290,14 @@ export default function PricingPage() {
                 className={`px-4 py-2 rounded-md font-medium transition-colors ${
                   !isAnnual
                     ? `${moodColors.button} text-white`
-                    : "text-gray-600 dark:text-gray-400"
+                    : "text-gray-600 dark:text-gray-400 cursor-pointer"
                 }`}
               >
                 Monthly
               </button>
               <button
                 onClick={() => setIsAnnual(true)}
-                className={`px-4 py-2 rounded-md font-medium transition-colors relative ${
+                className={`px-4 py-2 rounded-md font-medium transition-colors relative cursor-pointer ${
                   isAnnual
                     ? `${moodColors.button} text-white`
                     : "text-gray-600 dark:text-gray-400"
@@ -271,10 +319,19 @@ export default function PricingPage() {
               key={plan.id}
               className={`relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl ${
                 plan.popular ? `ring-2 ${moodColors.border} scale-105` : ""
+              } ${
+                plan.id === currentPlan
+                  ? "ring-2 ring-blue-500 bg-blue-50/50 dark:bg-blue-900/10"
+                  : ""
               }`}
             >
-              {/* Popular badge */}
-              {plan.popular && (
+              {/* Current Plan, Popular, or Upgrade badges */}
+              {plan.id === currentPlan && (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                  <Check className="w-4 h-4" /> Current Plan
+                </div>
+              )}
+              {plan.popular && plan.id !== currentPlan && (
                 <div
                   className={`absolute -top-4 left-1/2 transform -translate-x-1/2 ${moodColors.button} text-white px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1`}
                 >
@@ -359,21 +416,29 @@ export default function PricingPage() {
                 {/* CTA Button */}
                 <button
                   onClick={() => handleUpgrade(plan.id)}
-                  disabled={loading === plan.id}
+                  disabled={loading === plan.id || plan.id === currentPlan}
                   className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
-                    plan.popular || plan.id === "VIBED"
+                    plan.id === currentPlan
+                      ? "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                      : plan.popular || plan.id === "VIBED"
                       ? `${moodColors.button} text-white`
                       : plan.id === "FREE"
                       ? "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                      : "border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      : "border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-400/10 cursor-pointer"
                   }`}
                 >
                   {loading === plan.id ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                   ) : (
                     <>
-                      {plan.cta}
-                      {plan.id !== "FREE" && <ArrowRight className="w-4 h-4" />}
+                      {plan.id === currentPlan
+                        ? "Current Plan"
+                        : currentPlan === "VIBED" && plan.id === "CRACKED"
+                        ? "Upgrade to Cracked"
+                        : plan.cta}
+                      {plan.id !== "FREE" && plan.id !== currentPlan && (
+                        <ArrowRight className="w-4 h-4" />
+                      )}
                     </>
                   )}
                 </button>

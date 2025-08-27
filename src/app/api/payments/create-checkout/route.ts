@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import Stripe from "stripe";
 import { SubscriptionService } from "@/lib/subscriptionService";
 import { StripeHelpers } from "@/lib/stripeHelpers";
+import { StripeError } from "@stripe/stripe-js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-06-30.basil",
@@ -65,7 +66,10 @@ export async function POST(request: NextRequest) {
     );
 
     // Prevent users from purchasing the same plan they already have
-    if (userSubscription.plan === plan && userSubscription.status === "ACTIVE") {
+    if (
+      userSubscription.plan === plan &&
+      userSubscription.status === "ACTIVE"
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -75,6 +79,92 @@ export async function POST(request: NextRequest) {
         },
         { status: 400 }
       );
+    }
+
+    // Check if this is an upgrade from an existing subscription
+    // Include CANCELLED status for users in grace period who want to upgrade
+    const isUpgrade =
+      (userSubscription.status === "ACTIVE" ||
+        userSubscription.status === "CANCELLED") &&
+      userSubscription.stripeSubscriptionId &&
+      userSubscription.plan !== plan &&
+      userSubscription.isActive; // This checks if subscription is still valid (not expired)
+
+    console.log({ isUpgrade, userSubscription, plan });
+
+    // Handle upgrade through subscription modification instead of checkout
+    if (isUpgrade) {
+      try {
+        // Get the existing subscription from Stripe
+        const existingSubscription = (await stripe.subscriptions.retrieve(
+          userSubscription.stripeSubscriptionId as string
+        )) as Stripe.Subscription;
+
+        console.log(
+          `Successfully retrieved subscription: ${existingSubscription.id}, status: ${existingSubscription.status}`
+        );
+
+        // Update the subscription to the new plan with proration
+        const updatedSubscription = (await stripe.subscriptions.update(
+          userSubscription.stripeSubscriptionId as string,
+          {
+            items: [
+              {
+                id: existingSubscription.items.data[0].id,
+                price: priceId,
+              },
+            ],
+            proration_behavior: "create_prorations", // This creates prorated charges
+            metadata: {
+              userId: session.user.id,
+              plan: plan,
+              upgradedFrom: userSubscription.plan,
+              upgradedAt: new Date().toISOString(),
+            },
+          }
+        )) as Stripe.Subscription;
+
+        // Update the subscription in our database
+        // Use the existing subscription's end date since it's just an upgrade
+        const subscriptionItem = existingSubscription.items.data[0];
+        const subscriptionEndDate = new Date(
+          subscriptionItem.current_period_end * 1000
+        );
+        await SubscriptionService.updateUserSubscription(
+          session.user.id,
+          plan as "VIBED" | "CRACKED",
+          "ACTIVE",
+          subscriptionEndDate
+        );
+
+        return NextResponse.json({
+          success: true,
+          upgraded: true,
+          message: `Successfully upgraded to ${plan}! You'll only be charged the prorated difference.`,
+          subscriptionId: updatedSubscription.id,
+        });
+      } catch (stripeError: unknown) {
+        console.error("Error upgrading subscription:", stripeError);
+
+        // If the subscription doesn't exist in Stripe, fall back to normal checkout
+        if (stripeError && typeof stripeError === 'object' && 'code' in stripeError && stripeError.code === "resource_missing") {
+          console.log(
+            "Stripe subscription not found, falling back to checkout flow"
+          );
+          // Don't return here, let it continue to the normal checkout flow below
+        } else {
+          return NextResponse.json(
+            {
+              success: false,
+              error: {
+                message:
+                  "Failed to upgrade subscription. Please try again or contact support.",
+              },
+            },
+            { status: 500 }
+          );
+        }
+      }
     }
 
     // Validate and get/create Stripe customer

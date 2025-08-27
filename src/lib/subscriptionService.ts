@@ -33,6 +33,7 @@ export interface SubscriptionInfo {
   subscriptionEndsAt: Date | null;
   isActive: boolean;
   canAccessPremium: boolean;
+  stripeSubscriptionId?: string | null;
 }
 
 export interface PlanLimits {
@@ -88,6 +89,21 @@ export class SubscriptionService {
         subscription: true,
         subscriptionStatus: true,
         subscriptionEndsAt: true,
+        subscriptions: {
+          where: {
+            status: {
+              in: ["ACTIVE", "TRIAL", "CANCELLED"]
+            }
+          },
+          orderBy: {
+            createdAt: "desc"
+          },
+          take: 1,
+          select: {
+            stripeSubscriptionId: true,
+            status: true,
+          }
+        }
       },
     });
 
@@ -97,8 +113,11 @@ export class SubscriptionService {
 
     const now = new Date();
     const isActive =
-      user.subscriptionStatus === SubscriptionStatus.ACTIVE &&
+      (user.subscriptionStatus === SubscriptionStatus.ACTIVE || 
+       user.subscriptionStatus === SubscriptionStatus.CANCELLED) &&
       (user.subscriptionEndsAt === null || user.subscriptionEndsAt > now);
+
+    const latestSubscription = user.subscriptions[0];
 
     return {
       plan: user.subscription as Plan,
@@ -106,6 +125,7 @@ export class SubscriptionService {
       subscriptionEndsAt: user.subscriptionEndsAt,
       isActive,
       canAccessPremium: isActive && user.subscription !== Plan.FREE,
+      stripeSubscriptionId: latestSubscription?.stripeSubscriptionId,
     };
   }
 

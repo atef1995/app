@@ -12,6 +12,8 @@ interface TutorialMeta {
   topics: string[];
   quizQuestions: number;
   order: number;
+  isPremium?: boolean;
+  requiredPlan?: "FREE" | "VIBED" | "CRACKED";
 }
 
 interface QuizQuestion {
@@ -33,6 +35,7 @@ export interface TutorialData {
   content: string;
   mdxSource: MDXRemoteSerializeResult;
   isPremium: boolean;
+  requiredPlan?: "FREE" | "VIBED" | "CRACKED";
   quiz?: {
     id: string;
     title: string;
@@ -101,6 +104,7 @@ const fetchTutorial = async (slug: string): Promise<TutorialData> => {
     mdxSource,
     quiz: tutorialInfo.quizzes && tutorialInfo.quizzes.length > 0 ? tutorialInfo.quizzes[0] : undefined,
     isPremium: tutorialInfo.isPremium,
+    requiredPlan: tutorialInfo.requiredPlan || (frontmatter as TutorialMeta).requiredPlan,
   };
 };
 

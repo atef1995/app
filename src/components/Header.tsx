@@ -27,64 +27,13 @@ import { useState, useRef, useEffect } from "react";
 export function Header() {
   const { data: session } = useSession();
   const { currentMood } = useMood();
-  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showDropdownMenu, setShowDropdownMenu] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
   const [showMobileNav, setShowMobileNav] = useState(false);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
   const mobileNavRef = useRef<HTMLDivElement>(null);
   const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
-
-  // Handle click outside for user menu
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      const target = event.target as Node;
-      // Check if click is outside the user menu container
-      if (userMenuRef.current && !userMenuRef.current.contains(target)) {
-        setShowUserMenu(false);
-      }
-    }
-
-    if (showUserMenu) {
-      // Add a small delay to prevent immediate closing
-      const timeoutId = setTimeout(() => {
-        document.addEventListener("mousedown", handleClickOutside);
-      }, 100);
-
-      return () => {
-        clearTimeout(timeoutId);
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }
-  }, [showUserMenu]);
-
-  // Handle click outside for mobile navigation
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      const target = event.target as Node;
-      // Check if click is outside both the mobile nav and the toggle button
-      if (
-        mobileNavRef.current &&
-        !mobileNavRef.current.contains(target) &&
-        mobileMenuButtonRef.current &&
-        !mobileMenuButtonRef.current.contains(target)
-      ) {
-        setShowMobileNav(false);
-      }
-    }
-
-    if (showMobileNav) {
-      // Add a small delay to prevent immediate closing
-      const timeoutId = setTimeout(() => {
-        document.addEventListener("mousedown", handleClickOutside);
-      }, 100);
-
-      return () => {
-        clearTimeout(timeoutId);
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }
-  }, [showMobileNav]);
 
   const navigationItems = [
     {
@@ -192,9 +141,20 @@ export function Header() {
       icon: FileText,
       colors: {
         desktop:
-          "text-gray-600 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20",
+          "text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20",
         mobile:
-          "text-gray-600 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20",
+          "text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20",
+      },
+    },
+    {
+      href: "/settings",
+      label: "Settings",
+      icon: Settings,
+      colors: {
+        desktop:
+          "text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20",
+        mobile:
+          "text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20",
       },
     },
   ];
@@ -280,7 +240,7 @@ export function Header() {
             {session ? (
               <div className="relative" ref={userMenuRef}>
                 <button
-                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  onClick={() => setShowDropdownMenu(!showDropdownMenu)}
                   className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
                 >
                   <User className="w-5 h-5" />
@@ -290,8 +250,8 @@ export function Header() {
                 </button>
 
                 {/* User Dropdown */}
-                {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 py-2 z-50">
+                {showDropdownMenu && (
+                  <div className="fixed  mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 py-2">
                     <Link
                       href="/settings"
                       className="flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-slate-600 dark:hover:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors"
@@ -303,7 +263,7 @@ export function Header() {
                       onClick={() => {
                         signOut({ callbackUrl: "/" });
                       }}
-                      className="flex items-center gap-2 w-full px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      className="flex items-center gap-2 w-full px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                     >
                       <LogOut className="w-4 h-4" />
                       Sign Out
@@ -346,6 +306,16 @@ export function Header() {
                     </span>
                   </Link>
                 ))}
+                <button
+                  title="logout"
+                  onClick={() => {
+                    signOut({ callbackUrl: "/" });
+                  }}
+                  className="flex flex-col justify-center items-center text-xs gap-2 text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
               </div>
 
               {/* Mobile Mood Indicator */}

@@ -1,1995 +1,1105 @@
 ---
-title: "CSS Architecture"
-description: "Master methodologies and best practices for organizing and maintaining large-scale CSS codebases using BEM, OOCSS, SMACSS, and modern approaches."
-category: "css"
-subcategory: "architecture"
+title: "CSS Architecture: Building Scalable and Maintainable Stylesheets"
+description: "Learn how to organize and structure your CSS code like a professional. Master methodologies like BEM, SMACSS, and modern CSS architecture patterns."
+difficulty: 4
+estimatedTime: 90
 order: 11
-premium: "VIBED"
-estimatedTime: 95
-quizQuestions: 24
+isPremium: true
+requiredPlan: "VIBED"
+topics: ["CSS", "Architecture", "Organization", "Methodologies", "Scalability"]
+quizQuestions: 20
 ---
 
-# CSS Architecture
+import { HTMLEditorPreview } from "@/components/ui/HTMLEditorPreview";
+import { SeparatedEditorPreview } from "@/components/ui/SeparatedEditorPreview";
 
-Welcome to CSS Architecture! In this tutorial, you'll learn proven methodologies and best practices for organizing and maintaining large-scale CSS codebases. We'll explore BEM, OOCSS, SMACSS, and modern approaches to CSS architecture.
+# CSS Architecture: Building Scalable and Maintainable Stylesheets
 
-## Why CSS Architecture Matters
+Writing CSS is easy. Writing maintainable, scalable CSS that multiple developers can work with? That's an art form. In this tutorial, you'll learn professional CSS architecture patterns that power the world's largest websites.
 
-As applications grow, CSS can become:
-- **Difficult to maintain**: Conflicting styles and specificity wars
-- **Hard to scale**: No clear organization or naming conventions
-- **Prone to bugs**: Unexpected style inheritance and cascading issues
-- **Inefficient**: Bloated stylesheets with duplicate code
+## 🎯 What You'll Master
 
-Good CSS architecture solves these problems through structured approaches.
+By the end of this tutorial, you'll be able to:
+- Organize CSS code like a senior developer
+- Implement popular methodologies like BEM and SMACSS
+- Design component-based CSS architectures
+- Write CSS that scales with your project
+- Avoid common pitfalls that lead to CSS chaos
+- Structure CSS for team collaboration
 
-## CSS Methodologies Overview
+Ready to level up your CSS game? Let's build some professional-grade architecture!
 
-Let's explore the major CSS methodologies and their approaches:
+## The Problem with Unstructured CSS
 
-<SeparatedEditorPreview 
-  title="CSS Methodologies Comparison"
-  mission="Compare different CSS architecture approaches"
-  instructions="See how different methodologies organize and name CSS classes"
->
-```html
-<div class="methodology-comparison">
-  <div class="examples-grid">
-    <!-- BEM Example -->
-    <div class="methodology-card">
-      <h3>BEM (Block Element Modifier)</h3>
-      <div class="card card--featured">
-        <div class="card__header">
-          <h4 class="card__title">Product Card</h4>
-          <span class="card__badge card__badge--new">New</span>
-        </div>
-        <div class="card__content">
-          <p class="card__description">BEM uses block__element--modifier naming</p>
-          <button class="card__button card__button--primary">Buy Now</button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- OOCSS Example -->
-    <div class="methodology-card">
-      <h3>OOCSS (Object-Oriented CSS)</h3>
-      <div class="media media-large">
-        <div class="media-figure">
-          <div class="avatar avatar-md"></div>
-        </div>
-        <div class="media-body">
-          <h4 class="heading heading-h4">OOCSS Approach</h4>
-          <p class="text text-muted">Separates structure from skin, container from content</p>
-          <button class="btn btn-primary btn-sm">Action</button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- SMACSS Example -->
-    <div class="methodology-card">
-      <h3>SMACSS (Scalable & Modular)</h3>
-      <div class="l-sidebar">
-        <nav class="nav">
-          <a href="#" class="nav-link is-active">Home</a>
-          <a href="#" class="nav-link">About</a>
-          <a href="#" class="nav-link">Contact</a>
-        </nav>
-        <main class="content">
-          <div class="module-profile">
-            <h4 class="module-title">SMACSS Categories</h4>
-            <p class="module-text">Base, Layout, Module, State, Theme</p>
-          </div>
-        </main>
-      </div>
-    </div>
-    
-    <!-- Atomic CSS Example -->
-    <div class="methodology-card">
-      <h3>Atomic CSS (Utility-First)</h3>
-      <div class="bg-white p-6 rounded-lg shadow-md">
-        <div class="flex items-center mb-4">
-          <div class="w-12 h-12 bg-blue-500 rounded-full mr-4"></div>
-          <div class="flex-1">
-            <h4 class="text-lg font-semibold text-gray-800">Atomic CSS</h4>
-            <p class="text-sm text-gray-600">Uses utility classes for styling</p>
-          </div>
-        </div>
-        <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-          Learn More
-        </button>
-      </div>
+Before we dive into solutions, let's understand the problems that CSS architecture solves.
+
+### 🚨 The CSS Nightmare Scenario
+
+<SeparatedEditorPreview
+  initialHtml={`<div class="header">
+  <div class="logo">My Website</div>
+  <nav class="navigation">
+    <a href="#" class="link active">Home</a>
+    <a href="#" class="link">About</a>
+    <a href="#" class="link">Contact</a>
+  </nav>
+</div>
+
+<main class="content">
+  <div class="card">
+    <h2 class="title">Welcome!</h2>
+    <p class="text">This is our main content area.</p>
+    <button class="button primary">Get Started</button>
+  </div>
+  
+  <div class="sidebar">
+    <div class="widget">
+      <h3 class="title">Recent Posts</h3>
+      <div class="button">Read More</div>
     </div>
   </div>
-</div>
-```
+</main>`}
+  initialCss={`/* 🚨 BAD CSS: No structure, naming conflicts, specificity wars */
+
+/* Generic names that clash */
+.header { background: #333; padding: 10px; }
+.logo { color: white; font-size: 20px; }
+.navigation { display: flex; gap: 20px; }
+.link { color: white; text-decoration: none; }
+.link.active { color: #ff6b6b; }
+
+/* More generic names - conflicts ahead! */
+.content { display: flex; gap: 30px; padding: 20px; }
+.card { background: white; padding: 20px; border-radius: 8px; }
+.title { color: #333; font-size: 24px; margin-bottom: 10px; }
+.text { color: #666; line-height: 1.6; }
+.button { padding: 10px 20px; border: none; border-radius: 4px; }
+.button.primary { background: #007bff; color: white; }
+
+/* Sidebar with SAME class names - problems! */
+.sidebar { width: 300px; }
+.widget { background: #f8f9fa; padding: 15px; }
+.title { color: #007bff; font-size: 18px; } /* Conflicts with .card .title! */
+.button { background: #28a745; color: white; padding: 8px 16px; } /* Different from main button! */
+
+/* Trying to fix conflicts with specificity */
+.sidebar .title { color: #007bff !important; }
+.sidebar .button { background: #28a745 !important; }
+
+/* CSS grows messy as project scales... */`}
+  title="🚨 The Nightmare: Unstructured CSS"
+  mission="Notice the problems: naming conflicts, !important usage, unclear relationships"
+  instructions="This CSS will become unmaintainable as the project grows. Can you spot the issues?"
+  height={400}
+/>
+
+**🚨 Problems with this approach:**
+- **Naming conflicts**: `.title` and `.button` mean different things in different contexts
+- **Specificity wars**: Using `!important` to override conflicting styles
+- **Unclear relationships**: Hard to tell which styles belong to which components
+- **Maintenance nightmare**: Changing one style might break something elsewhere
+- **Team confusion**: New developers can't understand the structure
+
+## What is CSS Architecture?
+
+**CSS Architecture** is the practice of organizing and structuring your CSS code in a way that makes it:
+- **Scalable**: Easy to grow as your project expands
+- **Maintainable**: Simple to update and modify
+- **Predictable**: Styles behave consistently
+- **Reusable**: Components can be used in multiple contexts
+- **Team-friendly**: Multiple developers can work together effectively
+
+## Core Principles of Good CSS Architecture
+
+### 1. Separation of Concerns
+Keep different types of styles separate:
 
 ```css
-.methodology-comparison {
-  padding: 2rem;
-  background: #f8f9fa;
-  font-family: system-ui, -apple-system, sans-serif;
-  border-radius: 12px;
+/* Layout styles */
+.layout-header { /* positioning, sizing */ }
+
+/* Component styles */  
+.button { /* visual appearance */ }
+
+/* Utility styles */
+.text-center { /* single-purpose helpers */ }
+```
+
+### 2. Single Responsibility
+Each class should have one clear purpose:
+
+```css
+/* ❌ Bad: Too many responsibilities */
+.header-nav-link-active {
+  color: blue;
+  font-weight: bold;
+  background: yellow;
+  padding: 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
 }
 
-.examples-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 2rem;
-}
+/* ✅ Good: Single responsibilities */
+.nav-link { color: blue; text-decoration: none; }
+.nav-link--active { font-weight: bold; }
+.button { padding: 10px; border-radius: 4px; }
+.button--primary { background: blue; color: white; }
+```
 
-.methodology-card {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e9ecef;
-}
+### 3. Predictable Naming
+Use consistent, descriptive names:
 
-.methodology-card h3 {
-  margin: 0 0 1.5rem 0;
-  color: #495057;
-  font-size: 1.1rem;
-  font-weight: 600;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #dee2e6;
-}
+```css
+/* ❌ Bad: Unclear names */
+.btn-1 { background: red; }
+.btn-2 { background: blue; }
+.big { font-size: 24px; }
 
-/* BEM Example Styles */
-.card {
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #dee2e6;
-  overflow: hidden;
-}
+/* ✅ Good: Descriptive names */
+.button--danger { background: red; }
+.button--primary { background: blue; }
+.text--large { font-size: 24px; }
+```
 
-.card--featured {
-  border-color: #007bff;
-  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.15);
-}
+## BEM Methodology: Block, Element, Modifier
 
-.card__header {
+**BEM** is one of the most popular CSS naming conventions. It stands for Block, Element, Modifier.
+
+### BEM Structure
+```css
+.block { /* Independent component */ }
+.block__element { /* Part of a block */ }
+.block--modifier { /* Variation of a block */ }
+.block__element--modifier { /* Variation of an element */ }
+```
+
+### 🎮 Interactive BEM Demo
+
+Let's rebuild our previous example using proper BEM methodology:
+
+<SeparatedEditorPreview
+  initialHtml={`<header class="site-header">
+  <div class="site-header__logo">My Website</div>
+  <nav class="site-header__nav">
+    <a href="#" class="nav__link nav__link--active">Home</a>
+    <a href="#" class="nav__link">About</a>
+    <a href="#" class="nav__link">Contact</a>
+  </nav>
+</header>
+
+<main class="main-content">
+  <article class="card">
+    <h2 class="card__title">Welcome!</h2>
+    <p class="card__text">This is our main content area with proper BEM naming.</p>
+    <button class="button button--primary card__button">Get Started</button>
+  </article>
+  
+  <aside class="sidebar">
+    <div class="widget">
+      <h3 class="widget__title">Recent Posts</h3>
+      <button class="button button--secondary widget__action">Read More</button>
+    </div>
+  </aside>
+</main>`}
+  initialCss={`/* ✅ GOOD CSS: Proper BEM architecture */
+
+/* Block: site-header */
+.site-header {
+  background: #333;
   padding: 1rem;
-  background: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.card__title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #495057;
-}
-
-.card__badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.card__badge--new {
-  background: #28a745;
+/* Element: site-header__logo */
+.site-header__logo {
   color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
-.card__content {
-  padding: 1rem;
-}
-
-.card__description {
-  margin: 0 0 1rem 0;
-  color: #6c757d;
-  font-size: 0.9rem;
-}
-
-.card__button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.card__button--primary {
-  background: #007bff;
-  color: white;
-}
-
-.card__button--primary:hover {
-  background: #0056b3;
-}
-
-/* OOCSS Example Styles */
-.media {
+/* Element: site-header__nav */
+.site-header__nav {
   display: flex;
-  align-items: flex-start;
+  gap: 2rem;
 }
 
-.media-large {
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
+/* Block: nav (can be reused anywhere) */
+.nav__link {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s ease;
 }
 
-.media-figure {
-  flex-shrink: 0;
-  margin-right: 1rem;
+/* Modifier: nav__link--active */
+.nav__link--active {
+  color: #ff6b6b;
+  font-weight: bold;
 }
 
-.media-body {
+.nav__link:hover {
+  color: #ccc;
+}
+
+/* Block: main-content */
+.main-content {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Block: card */
+.card {
   flex: 1;
-  min-width: 0;
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.avatar {
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+/* Element: card__title */
+.card__title {
+  color: #333;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
 }
 
-.avatar-md {
-  width: 3rem;
-  height: 3rem;
+/* Element: card__text */
+.card__text {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
 }
 
-.heading {
-  margin: 0 0 0.5rem 0;
-  font-weight: 600;
+/* Element: card__button */
+.card__button {
+  margin-top: 1rem;
 }
 
-.heading-h4 {
-  font-size: 1rem;
-  color: #495057;
-}
-
-.text {
-  margin: 0 0 1rem 0;
-  line-height: 1.5;
-}
-
-.text-muted {
-  color: #6c757d;
-  font-size: 0.9rem;
-}
-
-.btn {
-  display: inline-block;
-  padding: 0.5rem 1rem;
+/* Block: button (reusable component) */
+.button {
+  padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 4px;
-  text-decoration: none;
-  cursor: pointer;
   font-weight: 500;
-  transition: all 0.2s ease;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
   text-align: center;
 }
 
-.btn-primary {
-  background: #28a745;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #218838;
-}
-
-.btn-sm {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
-}
-
-/* SMACSS Example Styles */
-/* Layout (l-) */
-.l-sidebar {
-  display: flex;
-  background: #f8f9fa;
-  border-radius: 8px;
-  overflow: hidden;
-  min-height: 200px;
-}
-
-/* Module */
-.nav {
-  width: 120px;
-  background: #343a40;
-  padding: 1rem 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.nav-link {
-  display: block;
-  padding: 0.75rem 1rem;
-  color: #adb5bd;
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
-
-.nav-link:hover {
-  background: #495057;
-  color: white;
-}
-
-/* State */
-.nav-link.is-active {
+/* Modifier: button--primary */
+.button--primary {
   background: #007bff;
   color: white;
 }
 
-.content {
-  flex: 1;
-  padding: 1rem;
+.button--primary:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
 }
 
-.module-profile {
+/* Modifier: button--secondary */
+.button--secondary {
+  background: #28a745;
+  color: white;
+}
+
+.button--secondary:hover {
+  background: #1e7e34;
+}
+
+/* Block: sidebar */
+.sidebar {
+  width: 300px;
+}
+
+/* Block: widget */
+.widget {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+}
+
+/* Element: widget__title */
+.widget__title {
+  color: #333;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 0.5rem;
+}
+
+/* Element: widget__action */
+.widget__action {
+  width: 100%;
+}`}
+  title="✅ Perfect BEM Architecture"
+  mission="Compare this to the previous example - see how much clearer it is?"
+  instructions="Notice: No naming conflicts, clear relationships, reusable components!"
+  height={450}
+/>
+
+**🎯 Key BEM Benefits:**
+- **No naming conflicts**: Each class has a unique, descriptive name
+- **Clear relationships**: You know `.card__title` belongs to `.card`
+- **Modular**: Components can be moved anywhere without breaking
+- **Reusable**: `.button` can be used throughout the site
+- **Maintainable**: Easy to find and modify specific styles
+
+### BEM Naming Rules
+
+**Blocks (Components):**
+```css
+.header { }
+.navigation { }
+.card { }
+.button { }
+.modal { }
+```
+
+**Elements (Parts of blocks):**
+```css
+.card__title { }
+.card__image { }
+.card__content { }
+.navigation__link { }
+.modal__close-button { }
+```
+
+**Modifiers (Variations):**
+```css
+.button--primary { }
+.button--large { }
+.card--featured { }
+.navigation--mobile { }
+.modal--fullscreen { }
+```
+
+### 🎮 BEM Challenge: Build a Product Card
+
+Practice BEM by building a complete product card component:
+
+<SeparatedEditorPreview
+  initialHtml={`<!-- Your task: Apply proper BEM naming to this product card -->
+<div class="product-card">
+  <div class="product-card__header">
+    <img src="https://via.placeholder.com/300x200" alt="Product" class="product-card__image">
+    <span class="badge badge--sale">Sale!</span>
+  </div>
+  
+  <div class="product-card__content">
+    <h3 class="product-card__title">Amazing Product</h3>
+    <p class="product-card__description">This is an amazing product that will solve all your problems and make you happy!</p>
+    
+    <div class="price-group">
+      <span class="price price--original">$99.99</span>
+      <span class="price price--current">$79.99</span>
+    </div>
+    
+    <div class="product-card__actions">
+      <button class="button button--primary button--large">Add to Cart</button>
+      <button class="button button--secondary">♡ Wishlist</button>
+    </div>
+  </div>
+</div>
+
+<!-- Challenge: Add a second product card with different modifiers -->
+<div class="product-card product-card--featured">
+  <div class="product-card__header">
+    <img src="https://via.placeholder.com/300x200" alt="Featured Product" class="product-card__image">
+    <span class="badge badge--new">New!</span>
+  </div>
+  
+  <div class="product-card__content">
+    <h3 class="product-card__title">Featured Product</h3>
+    <p class="product-card__description">Our top-rated product with premium features!</p>
+    
+    <div class="price-group">
+      <span class="price price--current">$149.99</span>
+    </div>
+    
+    <div class="product-card__actions">
+      <button class="button button--primary button--large">Buy Now</button>
+      <button class="button button--secondary">Details</button>
+    </div>
+  </div>
+</div>`}
+  initialCss={`/* Your challenge: Complete the BEM architecture for this product card */
+
+/* Block: product-card */
+.product-card {
   background: white;
-  padding: 1rem;
-  border-radius: 6px;
-  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 2rem;
+  max-width: 350px;
 }
 
-.module-title {
-  margin: 0 0 0.5rem 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #495057;
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
-.module-text {
-  margin: 0;
-  color: #6c757d;
+/* Modifier: product-card--featured */
+.product-card--featured {
+  border: 2px solid #007bff;
+  box-shadow: 0 6px 20px rgba(0,123,255,0.2);
+}
+
+/* Element: product-card__header */
+.product-card__header {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Element: product-card__image */
+.product-card__image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-card__image {
+  transform: scale(1.05);
+}
+
+/* Element: product-card__content */
+.product-card__content {
+  padding: 1.5rem;
+}
+
+/* Element: product-card__title */
+.product-card__title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+/* Element: product-card__description */
+.product-card__description {
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+/* Element: product-card__actions */
+.product-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+/* Block: badge */
+.badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Modifier: badge--sale */
+.badge--sale {
+  background: #dc3545;
+  color: white;
+}
+
+/* Modifier: badge--new */
+.badge--new {
+  background: #28a745;
+  color: white;
+}
+
+/* Block: price-group */
+.price-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Block: price */
+.price {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* Modifier: price--original */
+.price--original {
+  text-decoration: line-through;
+  color: #999;
   font-size: 0.9rem;
 }
 
-/* Atomic/Utility CSS Example */
-.bg-white { background-color: white; }
-.bg-blue-500 { background-color: #3b82f6; }
-.bg-blue-600 { background-color: #2563eb; }
-.p-6 { padding: 1.5rem; }
-.px-4 { padding-left: 1rem; padding-right: 1rem; }
-.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-.rounded-lg { border-radius: 0.5rem; }
-.rounded { border-radius: 0.25rem; }
-.rounded-full { border-radius: 9999px; }
-.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-.flex { display: flex; }
-.items-center { align-items: center; }
-.mb-4 { margin-bottom: 1rem; }
-.mr-4 { margin-right: 1rem; }
-.w-12 { width: 3rem; }
-.h-12 { height: 3rem; }
-.flex-1 { flex: 1 1 0%; }
-.text-lg { font-size: 1.125rem; }
-.text-sm { font-size: 0.875rem; }
-.font-semibold { font-weight: 600; }
-.text-gray-800 { color: #1f2937; }
-.text-gray-600 { color: #4b5563; }
-.text-white { color: white; }
-.hover\:bg-blue-600:hover { background-color: #2563eb; }
-
-/* Responsive */
-@media (max-width: 768px) {
-  .examples-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .l-sidebar {
-    flex-direction: column;
-  }
-  
-  .nav {
-    width: 100%;
-    flex-direction: row;
-    overflow-x: auto;
-  }
+/* Modifier: price--current */
+.price--current {
+  color: #007bff;
+  font-size: 1.25rem;
 }
-```
-</SeparatedEditorPreview>
 
-## BEM (Block Element Modifier) in Detail
+/* Block: button (reusable) */
+.button {
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
 
-BEM is one of the most popular CSS methodologies for component-based development:
+/* Modifier: button--primary */
+.button--primary {
+  background: #007bff;
+  color: white;
+}
 
-<SeparatedEditorPreview 
-  title="BEM Methodology Deep Dive"
-  mission="Master BEM naming conventions and structure"
-  instructions="Learn how to properly structure CSS using Block, Element, and Modifier patterns"
->
-```html
-<div class="bem-showcase">
-  <!-- Navigation Block -->
-  <nav class="navigation navigation--primary">
-    <div class="navigation__container">
-      <div class="navigation__brand">
-        <img class="navigation__logo" src="#" alt="Logo">
-        <span class="navigation__title">Brand</span>
-      </div>
-      
-      <ul class="navigation__menu">
-        <li class="navigation__item">
-          <a class="navigation__link navigation__link--active" href="#">Home</a>
-        </li>
-        <li class="navigation__item">
-          <a class="navigation__link" href="#">About</a>
-        </li>
-        <li class="navigation__item navigation__item--dropdown">
-          <a class="navigation__link" href="#">Services</a>
-          <ul class="navigation__dropdown">
-            <li class="navigation__dropdown-item">
-              <a class="navigation__dropdown-link" href="#">Web Design</a>
-            </li>
-            <li class="navigation__dropdown-item">
-              <a class="navigation__dropdown-link" href="#">Development</a>
-            </li>
-          </ul>
-        </li>
-      </ul>
-      
-      <button class="navigation__toggle navigation__toggle--mobile" type="button">
-        <span class="navigation__toggle-line"></span>
-        <span class="navigation__toggle-line"></span>
-        <span class="navigation__toggle-line"></span>
-      </button>
-    </div>
-  </nav>
-  
-  <!-- Card Block -->
-  <div class="card-grid">
-    <article class="product-card product-card--featured">
-      <div class="product-card__image-container">
-        <div class="product-card__image product-card__image--placeholder"></div>
-        <span class="product-card__badge product-card__badge--sale">Sale</span>
-      </div>
-      
-      <div class="product-card__content">
-        <h3 class="product-card__title">Premium Product</h3>
-        <p class="product-card__description">
-          High-quality product with excellent features and great value.
-        </p>
-        
-        <div class="product-card__price">
-          <span class="product-card__price-current">$99</span>
-          <span class="product-card__price-original product-card__price-original--crossed">$149</span>
-        </div>
-        
-        <div class="product-card__actions">
-          <button class="product-card__button product-card__button--primary">
-            Add to Cart
-          </button>
-          <button class="product-card__button product-card__button--secondary product-card__button--icon">
-            ♡
-          </button>
-        </div>
-      </div>
-    </article>
-    
-    <article class="product-card">
-      <div class="product-card__image-container">
-        <div class="product-card__image product-card__image--placeholder"></div>
-      </div>
-      
-      <div class="product-card__content">
-        <h3 class="product-card__title">Standard Product</h3>
-        <p class="product-card__description">
-          Reliable product with good features at an affordable price.
-        </p>
-        
-        <div class="product-card__price">
-          <span class="product-card__price-current">$59</span>
-        </div>
-        
-        <div class="product-card__actions">
-          <button class="product-card__button product-card__button--primary">
-            Add to Cart
-          </button>
-          <button class="product-card__button product-card__button--secondary product-card__button--icon">
-            ♡
-          </button>
-        </div>
-      </div>
-    </article>
-  </div>
-</div>
-```
+.button--primary:hover {
+  background: #0056b3;
+}
+
+/* Modifier: button--secondary */
+.button--secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.button--secondary:hover {
+  background: #545b62;
+}
+
+/* Modifier: button--large */
+.button--large {
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+}`}
+  title="🎯 BEM Challenge: Product Card Component"
+  mission="Complete the BEM architecture and add your own modifiers!"
+  instructions="Try adding new modifiers like .product-card--compact or .button--outline"
+  height={600}
+/>
+
+**🎯 Challenge Tasks:**
+1. **Understand the structure**: Notice how each class follows BEM naming
+2. **Add new modifiers**: Create `.button--outline` with transparent background
+3. **Extend functionality**: Add `.product-card--compact` for smaller cards
+4. **Experiment**: Try different badge colors and button styles
+
+**💡 BEM Best Practices:**
+- Use **single hyphens** for compound words: `.site-header` not `.siteheader`
+- Use **double underscores** for elements: `.block__element`
+- Use **double hyphens** for modifiers: `.block--modifier`
+- Keep nesting shallow (avoid `.block__element__subelement`)
+
+## SMACSS Methodology
+
+**SMACSS** (Scalable and Modular Architecture for CSS) organizes CSS into five categories:
+
+### 1. Base Rules
+Default styles for HTML elements:
 
 ```css
-/* BEM Methodology Implementation */
+/* Base styles - no classes needed */
+html {
+  box-sizing: border-box;
+  font-size: 16px;
+}
 
-/* Navigation Block */
-.navigation {
-  background: #fff;
-  border-bottom: 1px solid #e9ecef;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  line-height: 1.2;
+}
+
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+```
+
+### 2. Layout Rules
+Major structural elements:
+
+```css
+/* Layout prefixed with 'l-' */
+.l-header {
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
-/* Navigation Modifier */
-.navigation--primary {
-  background: #343a40;
-}
-
-.navigation--primary .navigation__link {
-  color: #fff;
-}
-
-/* Navigation Elements */
-.navigation__container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
+.l-main {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 60px;
+  min-height: calc(100vh - 120px);
 }
 
-.navigation__brand {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+.l-sidebar {
+  width: 250px;
+  flex-shrink: 0;
 }
 
-.navigation__logo {
-  width: 32px;
-  height: 32px;
-  background: #007bff;
-  border-radius: 4px;
-}
-
-.navigation__title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.navigation__menu {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  gap: 2rem;
-}
-
-.navigation__item {
-  position: relative;
-}
-
-/* Navigation Item Modifier */
-.navigation__item--dropdown:hover .navigation__dropdown {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.navigation__link {
-  display: block;
-  padding: 1rem 0;
-  color: #495057;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-.navigation__link:hover {
-  color: #007bff;
-}
-
-/* Navigation Link Modifier */
-.navigation__link--active {
-  color: #007bff !important;
-  position: relative;
-}
-
-.navigation__link--active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #007bff;
-}
-
-.navigation__dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: #fff;
-  border: 1px solid #e9ecef;
-  border-radius: 4px;
-  min-width: 200px;
-  padding: 0.5rem 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-10px);
-  transition: all 0.2s ease;
-  z-index: 1000;
-}
-
-.navigation__dropdown-item {
-  list-style: none;
-}
-
-.navigation__dropdown-link {
-  display: block;
-  padding: 0.5rem 1rem;
-  color: #495057;
-  text-decoration: none;
-  transition: background-color 0.2s ease;
-}
-
-.navigation__dropdown-link:hover {
-  background: #f8f9fa;
-  color: #007bff;
-}
-
-.navigation__toggle {
-  display: none;
-  flex-direction: column;
-  gap: 4px;
-  background: none;
-  border: none;
-  padding: 0.5rem;
-  cursor: pointer;
-}
-
-/* Navigation Toggle Modifier */
-.navigation__toggle--mobile {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
-
-.navigation__toggle-line {
-  width: 24px;
-  height: 2px;
-  background: #fff;
-  transition: all 0.2s ease;
-}
-
-/* Product Card Block */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+.l-content {
+  flex: 1;
   padding: 2rem;
-  background: #f8f9fa;
 }
 
-.product-card {
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+.l-footer {
+  margin-top: auto;
 }
+```
 
-.product-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
+### 3. Module Rules
+Reusable components:
 
-/* Product Card Modifier */
-.product-card--featured {
-  border: 2px solid #007bff;
-  position: relative;
-}
-
-.product-card--featured::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #007bff, #0056b3);
-}
-
-/* Product Card Elements */
-.product-card__image-container {
-  position: relative;
-  overflow: hidden;
-}
-
-.product-card__image {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-}
-
-/* Product Card Image Modifier */
-.product-card__image--placeholder {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 600;
-}
-
-.product-card__image--placeholder::after {
-  content: '📸 Image';
-}
-
-.product-card__badge {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-/* Product Card Badge Modifier */
-.product-card__badge--sale {
-  background: #dc3545;
-  color: #fff;
-}
-
-.product-card__content {
+```css
+/* Modules - the bulk of your CSS */
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   padding: 1.5rem;
 }
 
-.product-card__title {
-  margin: 0 0 0.75rem 0;
+.card-title {
   font-size: 1.25rem;
-  font-weight: 600;
-  color: #495057;
+  font-weight: bold;
+  margin-bottom: 1rem;
 }
 
-.product-card__description {
-  margin: 0 0 1rem 0;
-  color: #6c757d;
-  line-height: 1.5;
-  font-size: 0.9rem;
+.button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-.product-card__price {
+.navigation {
+  display: flex;
+  list-style: none;
+  gap: 1rem;
+}
+
+.navigation-item {
+  position: relative;
+}
+
+.navigation-link {
+  color: inherit;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+}
+```
+
+### 4. State Rules
+Describe how modules look in different states:
+
+```css
+/* State prefixed with 'is-' or 'has-' */
+.is-hidden {
+  display: none;
+}
+
+.is-loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.is-active {
+  background: #007bff;
+  color: white;
+}
+
+.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.has-error {
+  border-color: #dc3545;
+}
+
+.has-success {
+  border-color: #28a745;
+}
+```
+
+### 5. Theme Rules
+Colors, fonts, and visual treatments:
+
+```css
+/* Theme styles */
+.theme-dark {
+  background: #1a1a1a;
+  color: #f0f0f0;
+}
+
+.theme-dark .card {
+  background: #2d2d2d;
+}
+
+.theme-dark .button-primary {
+  background: #0d6efd;
+}
+```
+
+## Component-Based Architecture
+
+Modern CSS architecture focuses on components - self-contained, reusable pieces of UI.
+
+### 🎮 Building a Modal Component
+
+Let's build a complete modal component using architectural principles:
+
+<SeparatedEditorPreview
+  initialHtml={`<!-- Modal Component with proper architecture -->
+<div class="modal-overlay is-hidden" id="modal-overlay">
+  <div class="modal">
+    <div class="modal__header">
+      <h2 class="modal__title">Confirm Action</h2>
+      <button class="modal__close" onclick="toggleModal()">&times;</button>
+    </div>
+    
+    <div class="modal__content">
+      <p class="modal__text">Are you sure you want to delete this item? This action cannot be undone.</p>
+    </div>
+    
+    <div class="modal__footer">
+      <button class="button button--secondary" onclick="toggleModal()">Cancel</button>
+      <button class="button button--danger">Delete Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- Trigger button -->
+<button class="button button--primary" onclick="toggleModal()">Open Modal</button>
+
+<div class="demo-content">
+  <h3>Page Content</h3>
+  <p>This content will be behind the modal when it opens.</p>
+</div>
+
+<script>
+  function toggleModal() {
+    const overlay = document.getElementById('modal-overlay');
+    overlay.classList.toggle('is-hidden');
+    document.body.classList.toggle('modal-open');
+  }
+</script>`}
+  initialCss={`/* Modal Component Architecture */
+
+/* Base modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 1;
+  visibility: visible;
+  transition: all 0.3s ease;
 }
 
-.product-card__price-current {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #28a745;
+/* State: hidden */
+.modal-overlay.is-hidden {
+  opacity: 0;
+  visibility: hidden;
 }
 
-.product-card__price-original {
-  font-size: 1rem;
-  color: #6c757d;
+/* Block: modal */
+.modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
+  transform: scale(1);
+  transition: transform 0.3s ease;
 }
 
-/* Product Card Price Modifier */
-.product-card__price-original--crossed {
-  text-decoration: line-through;
+/* Animation when hidden */
+.is-hidden .modal {
+  transform: scale(0.8);
 }
 
-.product-card__actions {
+/* Element: modal__header */
+.modal__header {
   display: flex;
-  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  background: #f8f9fa;
 }
 
-.product-card__button {
+/* Element: modal__title */
+.modal__title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+  font-weight: 600;
+}
+
+/* Element: modal__close */
+.modal__close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modal__close:hover {
+  background: #e9ecef;
+  color: #333;
+}
+
+/* Element: modal__content */
+.modal__content {
+  padding: 1.5rem;
+}
+
+/* Element: modal__text */
+.modal__text {
+  margin: 0;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Element: modal__footer */
+.modal__footer {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding: 1.5rem;
+  border-top: 1px solid #e9ecef;
+  background: #f8f9fa;
+}
+
+/* Block: button (reusable component) */
+.button {
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  text-align: center;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 0.95rem;
 }
 
-/* Product Card Button Modifiers */
-.product-card__button--primary {
-  background: #007bff;
-  color: #fff;
-  flex: 1;
-}
-
-.product-card__button--primary:hover {
-  background: #0056b3;
-}
-
-.product-card__button--secondary {
-  background: #f8f9fa;
-  color: #6c757d;
-  border: 1px solid #dee2e6;
-}
-
-.product-card__button--secondary:hover {
-  background: #e9ecef;
-  color: #495057;
-}
-
-.product-card__button--icon {
-  width: 44px;
-  padding: 0.75rem;
-  flex: 0 0 auto;
-}
-
-/* Showcase Container */
-.bem-showcase {
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .navigation__menu {
-    display: none;
-  }
-  
-  .navigation__toggle {
-    display: flex;
-  }
-  
-  .card-grid {
-    grid-template-columns: 1fr;
-    padding: 1rem;
-    gap: 1rem;
-  }
-  
-  .product-card__actions {
-    flex-direction: column;
-  }
-  
-  .product-card__button--icon {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .navigation__container {
-    padding: 0 0.5rem;
-  }
-  
-  .product-card__content {
-    padding: 1rem;
-  }
-}
-```
-</SeparatedEditorPreview>
-
-## OOCSS (Object-Oriented CSS)
-
-OOCSS focuses on separating structure from skin and container from content:
-
-<SeparatedEditorPreview 
-  title="OOCSS Principles in Practice"
-  mission="Apply Object-Oriented CSS principles for reusable components"
-  instructions="See how OOCSS separates structure from presentation for maximum reusability"
->
-```html
-<div class="oocss-demo">
-  <h2>OOCSS: Object-Oriented CSS</h2>
-  
-  <!-- Media Object Pattern -->
-  <section class="section">
-    <h3>Media Object Pattern</h3>
-    <div class="examples-grid">
-      <div class="media">
-        <div class="media-figure">
-          <img class="avatar avatar-sm" src="#" alt="User">
-        </div>
-        <div class="media-body">
-          <h4 class="heading heading-h5">Small Media Object</h4>
-          <p class="text text-muted">Compact version for lists and notifications.</p>
-        </div>
-      </div>
-      
-      <div class="media media-reverse">
-        <div class="media-body">
-          <h4 class="heading heading-h4">Reverse Media Object</h4>
-          <p class="text text-muted">Media figure appears on the right side.</p>
-        </div>
-        <div class="media-figure">
-          <img class="avatar avatar-md" src="#" alt="User">
-        </div>
-      </div>
-      
-      <div class="media media-stacked">
-        <div class="media-figure">
-          <img class="avatar avatar-lg" src="#" alt="User">
-        </div>
-        <div class="media-body">
-          <h4 class="heading heading-h3">Stacked Media Object</h4>
-          <p class="text">Large format for featured content and profiles.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-  
-  <!-- Button System -->
-  <section class="section">
-    <h3>Reusable Button System</h3>
-    <div class="button-showcase">
-      <!-- Base button structure -->
-      <button class="btn">Base Button</button>
-      
-      <!-- Different skins -->
-      <button class="btn btn-primary">Primary</button>
-      <button class="btn btn-secondary">Secondary</button>
-      <button class="btn btn-success">Success</button>
-      <button class="btn btn-danger">Danger</button>
-      
-      <!-- Different sizes -->
-      <button class="btn btn-primary btn-xs">Extra Small</button>
-      <button class="btn btn-primary btn-sm">Small</button>
-      <button class="btn btn-primary btn-lg">Large</button>
-      <button class="btn btn-primary btn-xl">Extra Large</button>
-      
-      <!-- Different states -->
-      <button class="btn btn-primary btn-block">Block Button</button>
-      <button class="btn btn-outline btn-outline-primary">Outline</button>
-      <button class="btn btn-ghost btn-ghost-primary">Ghost</button>
-    </div>
-  </section>
-  
-  <!-- Layout Objects -->
-  <section class="section">
-    <h3>Layout Objects</h3>
-    <div class="layout-examples">
-      <!-- Flag Object -->
-      <div class="flag flag-reverse">
-        <div class="flag-figure">
-          <div class="icon icon-lg icon-info">i</div>
-        </div>
-        <div class="flag-body">
-          <h4 class="heading heading-h5">Flag Object</h4>
-          <p class="text text-sm">Perfect for notifications and alerts with icons.</p>
-        </div>
-      </div>
-      
-      <!-- Grid Object -->
-      <div class="grid grid-2 grid-gap-md">
-        <div class="grid-item">
-          <div class="box box-bordered box-padded">
-            <h5 class="heading heading-h6">Grid Item 1</h5>
-            <p class="text text-xs">Content in grid layout.</p>
-          </div>
-        </div>
-        <div class="grid-item">
-          <div class="box box-shaded box-padded">
-            <h5 class="heading heading-h6">Grid Item 2</h5>
-            <p class="text text-xs">Another grid item.</p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Stack Object -->
-      <div class="stack stack-sm">
-        <div class="box box-light box-padded">Item 1</div>
-        <div class="box box-light box-padded">Item 2</div>
-        <div class="box box-light box-padded">Item 3</div>
-      </div>
-    </div>
-  </section>
-</div>
-```
-
-```css
-/* OOCSS Implementation */
-
-.oocss-demo {
-  padding: 2rem;
-  background: #fff;
-  font-family: system-ui, -apple-system, sans-serif;
-  border-radius: 12px;
-}
-
-.oocss-demo h2 {
-  margin: 0 0 2rem 0;
-  color: #495057;
-  text-align: center;
-}
-
-.section {
-  margin-bottom: 3rem;
-}
-
-.section h3 {
-  margin: 0 0 1.5rem 0;
-  color: #495057;
-  font-size: 1.25rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e9ecef;
-}
-
-/* Media Object - Structure separated from skin */
-.media {
-  display: flex;
-  align-items: flex-start;
-}
-
-.media-reverse {
-  flex-direction: row-reverse;
-}
-
-.media-reverse .media-figure {
-  margin-left: 1rem;
-  margin-right: 0;
-}
-
-.media-stacked {
-  flex-direction: column;
-  text-align: center;
-}
-
-.media-stacked .media-figure {
-  margin-right: 0;
-  margin-bottom: 1rem;
-}
-
-.media-figure {
-  flex-shrink: 0;
-  margin-right: 1rem;
-}
-
-.media-body {
-  flex: 1;
-  min-width: 0;
-}
-
-/* Avatar Object - Container separated from content */
-.avatar {
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-}
-
-/* Avatar sizes - different skins for same object */
-.avatar-xs { width: 1.5rem; height: 1.5rem; font-size: 0.6rem; }
-.avatar-sm { width: 2rem; height: 2rem; font-size: 0.7rem; }
-.avatar-md { width: 3rem; height: 3rem; font-size: 0.9rem; }
-.avatar-lg { width: 4rem; height: 4rem; font-size: 1.1rem; }
-.avatar-xl { width: 5rem; height: 5rem; font-size: 1.3rem; }
-
-.avatar::after {
-  content: '👤';
-}
-
-/* Button Object - Base structure */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1rem;
-  border: 1px solid transparent;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: #f8f9fa;
-  color: #495057;
-}
-
-.btn:hover {
-  background: #e9ecef;
-}
-
-.btn:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-}
-
-/* Button Skins - Different appearances */
-.btn-primary {
+/* Modifier: button--primary */
+.button--primary {
   background: #007bff;
   color: white;
-  border-color: #007bff;
 }
 
-.btn-primary:hover {
+.button--primary:hover {
   background: #0056b3;
-  border-color: #0056b3;
+  transform: translateY(-1px);
 }
 
-.btn-secondary {
+/* Modifier: button--secondary */
+.button--secondary {
   background: #6c757d;
   color: white;
-  border-color: #6c757d;
 }
 
-.btn-secondary:hover {
+.button--secondary:hover {
   background: #545b62;
-  border-color: #545b62;
 }
 
-.btn-success {
-  background: #28a745;
-  color: white;
-  border-color: #28a745;
-}
-
-.btn-success:hover {
-  background: #1e7e34;
-  border-color: #1e7e34;
-}
-
-.btn-danger {
+/* Modifier: button--danger */
+.button--danger {
   background: #dc3545;
   color: white;
-  border-color: #dc3545;
 }
 
-.btn-danger:hover {
+.button--danger:hover {
   background: #c82333;
-  border-color: #c82333;
 }
 
-/* Button Sizes - Different scales */
-.btn-xs {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
+/* State: modal-open on body */
+body.modal-open {
+  overflow: hidden;
 }
 
-.btn-sm {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.8125rem;
-}
-
-.btn-lg {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-}
-
-.btn-xl {
-  padding: 1rem 2rem;
-  font-size: 1.125rem;
-}
-
-/* Button Variants */
-.btn-block {
-  display: flex;
-  width: 100%;
-}
-
-.btn-outline {
-  background: transparent;
-}
-
-.btn-outline-primary {
-  color: #007bff;
-  border-color: #007bff;
-}
-
-.btn-outline-primary:hover {
-  background: #007bff;
-  color: white;
-}
-
-.btn-ghost {
-  background: transparent;
-  border-color: transparent;
-}
-
-.btn-ghost-primary {
-  color: #007bff;
-}
-
-.btn-ghost-primary:hover {
-  background: rgba(0, 123, 255, 0.1);
-}
-
-/* Text Object - Reusable text styles */
-.text {
-  margin: 0 0 1rem 0;
-  line-height: 1.5;
-}
-
-.text-muted { color: #6c757d; }
-.text-primary { color: #007bff; }
-.text-success { color: #28a745; }
-.text-danger { color: #dc3545; }
-
-.text-xs { font-size: 0.75rem; }
-.text-sm { font-size: 0.875rem; }
-.text-lg { font-size: 1.125rem; }
-.text-xl { font-size: 1.25rem; }
-
-/* Heading Object */
-.heading {
-  margin: 0 0 0.5rem 0;
-  font-weight: 600;
-  color: #495057;
-}
-
-.heading-h1 { font-size: 2rem; }
-.heading-h2 { font-size: 1.75rem; }
-.heading-h3 { font-size: 1.5rem; }
-.heading-h4 { font-size: 1.25rem; }
-.heading-h5 { font-size: 1.125rem; }
-.heading-h6 { font-size: 1rem; }
-
-/* Icon Object */
-.icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  font-weight: bold;
-}
-
-.icon-xs { width: 1rem; height: 1rem; font-size: 0.6rem; }
-.icon-sm { width: 1.5rem; height: 1.5rem; font-size: 0.7rem; }
-.icon-md { width: 2rem; height: 2rem; font-size: 0.8rem; }
-.icon-lg { width: 2.5rem; height: 2.5rem; font-size: 1rem; }
-
-.icon-info {
-  background: #17a2b8;
-  color: white;
-}
-
-.icon-success {
-  background: #28a745;
-  color: white;
-}
-
-.icon-warning {
-  background: #ffc107;
-  color: #212529;
-}
-
-.icon-danger {
-  background: #dc3545;
-  color: white;
-}
-
-/* Flag Object */
-.flag {
-  display: flex;
-  align-items: flex-start;
-}
-
-.flag-reverse {
-  flex-direction: row-reverse;
-}
-
-.flag-reverse .flag-figure {
-  margin-left: 1rem;
-  margin-right: 0;
-}
-
-.flag-figure {
-  flex-shrink: 0;
-  margin-right: 1rem;
-}
-
-.flag-body {
-  flex: 1;
-  min-width: 0;
-}
-
-/* Grid Object */
-.grid {
-  display: grid;
-}
-
-.grid-1 { grid-template-columns: 1fr; }
-.grid-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-4 { grid-template-columns: repeat(4, 1fr); }
-
-.grid-gap-xs { gap: 0.5rem; }
-.grid-gap-sm { gap: 0.75rem; }
-.grid-gap-md { gap: 1rem; }
-.grid-gap-lg { gap: 1.5rem; }
-
-/* Stack Object */
-.stack {
-  display: flex;
-  flex-direction: column;
-}
-
-.stack-xs > * + * { margin-top: 0.5rem; }
-.stack-sm > * + * { margin-top: 0.75rem; }
-.stack-md > * + * { margin-top: 1rem; }
-.stack-lg > * + * { margin-top: 1.5rem; }
-
-/* Box Object - Reusable container */
-.box {
-  border-radius: 0.375rem;
-}
-
-.box-padded {
-  padding: 1rem;
-}
-
-.box-bordered {
-  border: 1px solid #dee2e6;
-}
-
-.box-shaded {
+/* Demo content styling */
+.demo-content {
+  margin: 2rem 0;
+  padding: 2rem;
   background: #f8f9fa;
+  border-radius: 8px;
 }
 
-.box-light {
-  background: #ffffff;
-  border: 1px solid #e9ecef;
+.demo-content h3 {
+  margin-top: 0;
+  color: #333;
 }
 
-/* Layout helpers */
-.examples-grid {
-  display: grid;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
+.demo-content p {
+  color: #666;
+  margin-bottom: 0;
+}`}
+  title="🎯 Component Architecture: Modal Example"
+  mission="Click the button to open the modal and see the complete component in action!"
+  instructions="Notice the clear component structure, reusable button styles, and proper state management."
+  height={450}
+/>
 
-.button-showcase {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
+**🎯 Architecture Features:**
+- **Block**: `.modal` is the main component
+- **Elements**: `.modal__header`, `.modal__content`, `.modal__footer`
+- **Modifiers**: `.button--primary`, `.button--danger`
+- **States**: `.is-hidden`, `.modal-open`
+- **Reusable**: Button component works anywhere
 
-.layout-examples {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
+## File Organization Strategies
 
-/* Responsive */
-@media (max-width: 768px) {
-  .oocss-demo {
-    padding: 1rem;
-  }
-  
-  .examples-grid {
-    gap: 1rem;
-  }
-  
-  .button-showcase {
-    gap: 0.5rem;
-  }
-  
-  .media-stacked {
-    flex-direction: column;
-  }
-  
-  .grid-2 {
-    grid-template-columns: 1fr;
-  }
-}
+### Strategy 1: SMACSS-based Structure
 ```
-</SeparatedEditorPreview>
-
-## Modern CSS Architecture
-
-Modern approaches combine traditional methodologies with new tools and techniques:
-
-<SeparatedEditorPreview 
-  title="Modern CSS Architecture Patterns"
-  mission="Explore contemporary CSS organization patterns and tooling"
-  instructions="Learn modern approaches including CSS-in-JS concepts, utility-first, and component-based architecture"
->
-```html
-<div class="modern-architecture">
-  <!-- Design System Tokens -->
-  <section class="demo-section">
-    <h3>Design System with CSS Custom Properties</h3>
-    <div class="token-showcase">
-      <div class="token-card" data-theme="light">
-        <h4>Light Theme</h4>
-        <div class="color-swatches">
-          <div class="swatch" style="--color: var(--color-primary)"></div>
-          <div class="swatch" style="--color: var(--color-secondary)"></div>
-          <div class="swatch" style="--color: var(--color-success)"></div>
-        </div>
-        <p class="sample-text">Sample text in light theme</p>
-      </div>
-      
-      <div class="token-card" data-theme="dark">
-        <h4>Dark Theme</h4>
-        <div class="color-swatches">
-          <div class="swatch" style="--color: var(--color-primary)"></div>
-          <div class="swatch" style="--color: var(--color-secondary)"></div>
-          <div class="swatch" style="--color: var(--color-success)"></div>
-        </div>
-        <p class="sample-text">Sample text in dark theme</p>
-      </div>
-    </div>
-  </section>
-  
-  <!-- Component-based Architecture -->
-  <section class="demo-section">
-    <h3>Component-Based Architecture</h3>
-    <div class="component-library">
-      <!-- Button Component -->
-      <div class="component-demo">
-        <h5>Button Component</h5>
-        <div class="component-variations">
-          <button class="c-button">Default</button>
-          <button class="c-button c-button--primary">Primary</button>
-          <button class="c-button c-button--secondary">Secondary</button>
-          <button class="c-button c-button--small">Small</button>
-          <button class="c-button c-button--large">Large</button>
-        </div>
-      </div>
-      
-      <!-- Card Component -->
-      <div class="component-demo">
-        <h5>Card Component</h5>
-        <div class="c-card">
-          <div class="c-card__header">
-            <h6 class="c-card__title">Card Title</h6>
-            <span class="c-card__meta">Meta info</span>
-          </div>
-          <div class="c-card__body">
-            <p class="c-card__text">Card content with consistent spacing and typography.</p>
-          </div>
-          <div class="c-card__footer">
-            <button class="c-button c-button--primary c-button--small">Action</button>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Form Component -->
-      <div class="component-demo">
-        <h5>Form Components</h5>
-        <form class="c-form">
-          <div class="c-form-group">
-            <label class="c-label" for="email">Email</label>
-            <input class="c-input" type="email" id="email" placeholder="Enter email">
-          </div>
-          <div class="c-form-group">
-            <label class="c-label" for="message">Message</label>
-            <textarea class="c-input c-input--textarea" id="message" placeholder="Your message"></textarea>
-          </div>
-          <button class="c-button c-button--primary" type="submit">Submit</button>
-        </form>
-      </div>
-    </div>
-  </section>
-  
-  <!-- Utility-First Approach -->
-  <section class="demo-section">
-    <h3>Utility-First Classes</h3>
-    <div class="utility-examples">
-      <div class="u-flex u-items-center u-gap-md u-p-lg u-bg-light u-rounded">
-        <div class="u-w-12 u-h-12 u-bg-primary u-rounded-full"></div>
-        <div class="u-flex-1">
-          <h6 class="u-text-lg u-font-semibold u-m-0">Utility Classes</h6>
-          <p class="u-text-sm u-text-muted u-m-0">Built with utility-first approach</p>
-        </div>
-        <button class="u-px-md u-py-sm u-bg-primary u-text-white u-rounded u-border-0">
-          Action
-        </button>
-      </div>
-    </div>
-  </section>
-  
-  <!-- Logical Properties -->
-  <section class="demo-section">
-    <h3>Modern CSS Features</h3>
-    <div class="modern-features">
-      <div class="feature-card logical-props">
-        <h6>Logical Properties</h6>
-        <p>Uses margin-inline-start instead of margin-left for better internationalization.</p>
-      </div>
-      
-      <div class="feature-card container-queries">
-        <h6>Container Queries</h6>
-        <p>Responsive design based on container size, not viewport.</p>
-      </div>
-      
-      <div class="feature-card subgrid">
-        <h6>CSS Subgrid</h6>
-        <p>Inherits parent grid tracks for complex layouts.</p>
-      </div>
-    </div>
-  </section>
-</div>
+css/
+├── base/
+│   ├── reset.css
+│   ├── typography.css
+│   └── base.css
+├── layout/
+│   ├── header.css
+│   ├── navigation.css
+│   ├── sidebar.css
+│   └── footer.css
+├── modules/
+│   ├── buttons.css
+│   ├── cards.css
+│   ├── forms.css
+│   └── modals.css
+├── state/
+│   ├── is-states.css
+│   └── has-states.css
+└── theme/
+    ├── colors.css
+    └── theme-dark.css
 ```
+
+### Strategy 2: Component-based Structure
+```
+css/
+├── abstracts/
+│   ├── variables.css
+│   ├── mixins.css
+│   └── functions.css
+├── base/
+│   ├── reset.css
+│   ├── typography.css
+│   └── base.css
+├── components/
+│   ├── button.css
+│   ├── card.css
+│   ├── modal.css
+│   ├── navigation.css
+│   └── form.css
+├── layout/
+│   ├── header.css
+│   ├── footer.css
+│   ├── sidebar.css
+│   └── grid.css
+├── pages/
+│   ├── home.css
+│   ├── about.css
+│   └── contact.css
+└── utilities/
+    ├── spacing.css
+    ├── text.css
+    └── display.css
+```
+
+## CSS Custom Properties Architecture
+
+Organize your design tokens with CSS custom properties:
 
 ```css
-/* Modern CSS Architecture Implementation */
-
-/* Design Tokens with CSS Custom Properties */
+/* Design System Variables */
 :root {
-  /* Color tokens */
-  --color-primary: #3b82f6;
-  --color-secondary: #64748b;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
+  /* Colors */
+  --color-primary: #007bff;
+  --color-primary-dark: #0056b3;
+  --color-primary-light: #66b3ff;
   
-  /* Neutral colors */
-  --color-white: #ffffff;
-  --color-black: #000000;
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
+  --color-secondary: #6c757d;
+  --color-success: #28a745;
+  --color-warning: #ffc107;
+  --color-danger: #dc3545;
   
-  /* Semantic colors */
-  --color-text-primary: var(--color-gray-900);
-  --color-text-secondary: var(--color-gray-600);
-  --color-text-muted: var(--color-gray-500);
-  --color-bg-primary: var(--color-white);
-  --color-bg-secondary: var(--color-gray-50);
-  --color-border: var(--color-gray-200);
-  
-  /* Spacing tokens */
-  --space-0: 0;
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-  
-  /* Font tokens */
+  /* Typography */
+  --font-family-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
   --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
   
-  /* Border radius tokens */
-  --radius-none: 0;
-  --radius-sm: 0.125rem;
-  --radius-base: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
-  --radius-full: 9999px;
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
   
-  /* Shadow tokens */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-base: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   
-  /* Animation tokens */
-  --duration-fast: 150ms;
-  --duration-base: 200ms;
-  --duration-slow: 300ms;
-  --easing-ease: ease;
-  --easing-ease-in: ease-in;
-  --easing-ease-out: ease-out;
-  --easing-ease-in-out: ease-in-out;
+  /* Z-index scale */
+  --z-dropdown: 1000;
+  --z-modal: 1050;
+  --z-tooltip: 1070;
 }
-
-/* Dark theme override */
-[data-theme="dark"] {
-  --color-text-primary: var(--color-gray-100);
-  --color-text-secondary: var(--color-gray-300);
-  --color-text-muted: var(--color-gray-400);
-  --color-bg-primary: var(--color-gray-900);
-  --color-bg-secondary: var(--color-gray-800);
-  --color-border: var(--color-gray-700);
-}
-
-/* Base styles */
-.modern-architecture {
-  padding: var(--space-8);
-  background: var(--color-bg-primary);
-  color: var(--color-text-primary);
-  font-family: system-ui, -apple-system, sans-serif;
-  border-radius: var(--radius-lg);
-}
-
-.demo-section {
-  margin-block-end: var(--space-16);
-}
-
-.demo-section h3 {
-  margin: 0 0 var(--space-6) 0;
-  color: var(--color-text-primary);
-  font-size: var(--font-size-xl);
-  font-weight: 600;
-  padding-block-end: var(--space-2);
-  border-block-end: 2px solid var(--color-border);
-}
-
-/* Token Showcase */
-.token-showcase {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--space-6);
-}
-
-.token-card {
-  padding: var(--space-6);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  transition: all var(--duration-base) var(--easing-ease);
-}
-
-.token-card h4 {
-  margin: 0 0 var(--space-4) 0;
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-}
-
-.color-swatches {
-  display: flex;
-  gap: var(--space-2);
-  margin-block-end: var(--space-4);
-}
-
-.swatch {
-  width: var(--space-12);
-  height: var(--space-12);
-  background: var(--color);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-}
-
-.sample-text {
-  margin: 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-/* Component-based Architecture */
-.component-library {
-  display: grid;
-  gap: var(--space-8);
-}
-
-.component-demo {
-  padding: var(--space-6);
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-}
-
-.component-demo h5 {
-  margin: 0 0 var(--space-4) 0;
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.component-variations {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-}
-
-/* Button Component */
-.c-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-primary);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--duration-base) var(--easing-ease);
-  text-decoration: none;
-}
-
-.c-button:hover {
-  background: var(--color-bg-secondary);
-}
-
-.c-button--primary {
-  background: var(--color-primary);
-  color: var(--color-white);
-  border-color: var(--color-primary);
-}
-
-.c-button--primary:hover {
-  background: color-mix(in srgb, var(--color-primary) 90%, black);
-}
-
-.c-button--secondary {
-  background: var(--color-secondary);
-  color: var(--color-white);
-  border-color: var(--color-secondary);
-}
-
-.c-button--secondary:hover {
-  background: color-mix(in srgb, var(--color-secondary) 90%, black);
-}
-
-.c-button--small {
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--font-size-xs);
-}
-
-.c-button--large {
-  padding: var(--space-4) var(--space-6);
-  font-size: var(--font-size-lg);
-}
-
-/* Card Component */
-.c-card {
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-}
-
-.c-card__header {
-  padding: var(--space-4) var(--space-6);
-  background: var(--color-bg-secondary);
-  border-block-end: 1px solid var(--color-border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.c-card__title {
-  margin: 0;
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.c-card__meta {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-}
-
-.c-card__body {
-  padding: var(--space-6);
-}
-
-.c-card__text {
-  margin: 0;
-  line-height: 1.6;
-  color: var(--color-text-secondary);
-}
-
-.c-card__footer {
-  padding: var(--space-4) var(--space-6);
-  background: var(--color-bg-secondary);
-  border-block-start: 1px solid var(--color-border);
-}
-
-/* Form Components */
-.c-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  max-width: 400px;
-}
-
-.c-form-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.c-label {
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  color: var(--color-text-primary);
-}
-
-.c-input {
-  padding: var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-primary);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-base);
-  transition: all var(--duration-base) var(--easing-ease);
-}
-
-.c-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
-}
-
-.c-input--textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-/* Utility Classes */
-.u-flex { display: flex; }
-.u-items-center { align-items: center; }
-.u-gap-sm { gap: var(--space-2); }
-.u-gap-md { gap: var(--space-4); }
-.u-p-lg { padding: var(--space-6); }
-.u-px-md { padding-inline: var(--space-4); }
-.u-py-sm { padding-block: var(--space-2); }
-.u-bg-light { background: var(--color-bg-secondary); }
-.u-bg-primary { background: var(--color-primary); }
-.u-rounded { border-radius: var(--radius-md); }
-.u-rounded-full { border-radius: var(--radius-full); }
-.u-w-12 { width: var(--space-12); }
-.u-h-12 { height: var(--space-12); }
-.u-flex-1 { flex: 1; }
-.u-text-lg { font-size: var(--font-size-lg); }
-.u-text-sm { font-size: var(--font-size-sm); }
-.u-font-semibold { font-weight: 600; }
-.u-text-white { color: var(--color-white); }
-.u-text-muted { color: var(--color-text-muted); }
-.u-m-0 { margin: 0; }
-.u-border-0 { border: 0; }
-
-.utility-examples {
-  margin-block-start: var(--space-4);
-}
-
-/* Modern CSS Features */
-.modern-features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--space-4);
-  margin-block-start: var(--space-4);
-}
-
-.feature-card {
-  padding: var(--space-4);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  container-type: inline-size;
-}
-
-.feature-card h6 {
-  margin: 0 0 var(--space-2) 0;
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.feature-card p {
-  margin: 0;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-}
-
-/* Logical Properties Demo */
-.logical-props {
-  margin-inline-start: var(--space-4);
-  padding-inline: var(--space-4);
-  border-inline-start: 3px solid var(--color-primary);
-}
-
-/* Container Queries Demo */
-@container (min-width: 300px) {
-  .container-queries {
-    background: color-mix(in srgb, var(--color-success) 10%, var(--color-bg-secondary));
-    border-color: var(--color-success);
-  }
-  
-  .container-queries h6 {
-    color: var(--color-success);
-  }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .modern-architecture {
-    padding: var(--space-4);
-  }
-  
-  .token-showcase {
-    grid-template-columns: 1fr;
-  }
-  
-  .component-variations {
-    flex-direction: column;
-  }
-  
-  .modern-features {
-    grid-template-columns: 1fr;
-  }
-}
-```
-</SeparatedEditorPreview>
-
-## File Organization Strategies
-
-### Folder Structure Examples
-
-```
-css/
-├── abstracts/          # Sass tools and helpers
-│   ├── _variables.scss
-│   ├── _functions.scss
-│   └── _mixins.scss
-├── base/              # Reset and base styles
-│   ├── _normalize.scss
-│   ├── _typography.scss
-│   └── _base.scss
-├── components/        # Reusable components
-│   ├── _buttons.scss
-│   ├── _cards.scss
-│   └── _navigation.scss
-├── layout/           # Layout-specific styles
-│   ├── _header.scss
-│   ├── _footer.scss
-│   └── _grid.scss
-├── pages/           # Page-specific styles
-│   ├── _home.scss
-│   └── _contact.scss
-├── themes/          # Theme variations
-│   ├── _light.scss
-│   └── _dark.scss
-├── utilities/       # Utility classes
-│   ├── _spacing.scss
-│   └── _text.scss
-└── main.scss       # Main import file
-```
-
-### CSS Import Strategy
-
-```css
-/* main.css */
-
-/* Abstracts */
-@import 'abstracts/variables';
-@import 'abstracts/functions';
-@import 'abstracts/mixins';
-
-/* Base */
-@import 'base/normalize';
-@import 'base/typography';
-@import 'base/base';
-
-/* Components */
-@import 'components/buttons';
-@import 'components/cards';
-@import 'components/navigation';
-
-/* Layout */
-@import 'layout/header';
-@import 'layout/footer';
-@import 'layout/grid';
-
-/* Pages */
-@import 'pages/home';
-@import 'pages/contact';
-
-/* Themes */
-@import 'themes/light';
-@import 'themes/dark';
-
-/* Utilities */
-@import 'utilities/spacing';
-@import 'utilities/text';
 ```
 
 ## Best Practices Summary
@@ -2010,28 +1120,28 @@ css/
 4. **Global Scope Pollution**: Namespace your classes
 5. **No Documentation**: Document complex logic
 
-### Tools and Workflow
+## Quiz Time! 🧠
 
-- **CSS Preprocessors**: Sass, Less, Stylus
-- **PostCSS**: Autoprefixer, CSSnano
-- **Linting**: Stylelint for code quality
-- **Build Tools**: Webpack, Vite, Parcel
-- **Documentation**: Living style guides
+Ready to test your CSS architecture mastery? The quiz will challenge your understanding of methodologies, best practices, and real-world scenarios!
 
-## Conclusion
+## Summary
 
-You've mastered CSS Architecture! You can now:
+Congratulations! You've mastered CSS architecture. You now know how to:
 
-- Choose appropriate CSS methodologies (BEM, OOCSS, SMACSS)
-- Implement component-based architecture
-- Use modern CSS features effectively
-- Organize large-scale CSS codebases
-- Create maintainable design systems
-- Apply utility-first approaches when appropriate
-- Follow architectural best practices
+- ✅ **Structure CSS** using proven methodologies like BEM and SMACSS
+- ✅ **Organize files** for maintainability and scalability
+- ✅ **Design component systems** that work across teams
+- ✅ **Use modern techniques** like CSS custom properties
+- ✅ **Avoid common pitfalls** that lead to CSS chaos
+- ✅ **Build design systems** with consistent patterns
+- ✅ **Write performant** and accessible CSS
+- ✅ **Document and maintain** large CSS codebases
 
-Good CSS architecture enables teams to build scalable, maintainable applications while avoiding common pitfalls and technical debt.
+CSS architecture is what separates professional developers from beginners. With these skills, you can confidently work on projects of any size and complexity!
 
-## What's Next?
-
-In the final tutorial, we'll explore **Modern CSS Features**, where you'll learn about the latest CSS capabilities including Container Queries, Cascade Layers, and cutting-edge layout techniques.
+**Next Steps:**
+- Practice these patterns in your own projects
+- Experiment with CSS-in-JS solutions like Styled Components
+- Learn CSS preprocessing with Sass or PostCSS
+- Explore design systems like Material Design or Ant Design
+- Master advanced CSS features like Container Queries and Cascade Layers
