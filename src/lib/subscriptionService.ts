@@ -38,6 +38,7 @@ export interface SubscriptionInfo {
   isTrialActive: boolean;
   trialEndsAt: Date | null;
   daysLeftInTrial: number | null;
+  cancelAtPeriodEnd: boolean;
 }
 
 export interface PlanLimits {
@@ -116,6 +117,7 @@ export class SubscriptionService {
           select: {
             stripeSubscriptionId: true,
             status: true,
+            cancelAtPeriodEnd: true,
           },
         },
       },
@@ -157,6 +159,7 @@ export class SubscriptionService {
       isTrialActive,
       trialEndsAt,
       daysLeftInTrial: daysLeftInTrial && daysLeftInTrial > 0 ? daysLeftInTrial : null,
+      cancelAtPeriodEnd: latestSubscription?.cancelAtPeriodEnd || false,
     };
   }
 

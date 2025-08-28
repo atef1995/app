@@ -230,6 +230,7 @@ export class WebhookService {
           stripePriceId: subscription.items.data[0]?.price.id,
           currentPeriodStart: subscriptionStartsAt,
           currentPeriodEnd: subscriptionEndsAt,
+          cancelAtPeriodEnd: subscription.cancel_at_period_end || false,
         },
       });
 
@@ -382,6 +383,7 @@ export class WebhookService {
           currentPeriodStart: subscriptionStartsAt,
           currentPeriodEnd: subscriptionEndsAt,
           stripePriceId: subscription.items.data[0]?.price.id,
+          cancelAtPeriodEnd: subscription.cancel_at_period_end || false,
         },
       });
 
@@ -440,6 +442,7 @@ export class WebhookService {
         where: { stripeSubscriptionId: subscription.id },
         data: {
           status: SubscriptionStatus.CANCELLED,
+          cancelAtPeriodEnd: false, // No longer relevant when cancelled
         },
       });
 

@@ -36,6 +36,21 @@ export function SubscriptionActions({
 }: SubscriptionActionsProps) {
   const isTrial = subscription.status === "TRIAL";
   const isCancelled = subscription.status === "CANCELLED";
+  
+  // Proper detection of cancelled subscriptions using the cancelAtPeriodEnd flag
+  const isEffectivelyCancelled = isCancelled || subscription.cancelAtPeriodEnd;
+  
+  // Debug logging to understand the current state
+  console.log("SubscriptionActions Debug:", {
+    status: subscription.status,
+    isTrial,
+    isCancelled,
+    isActive,
+    cancelling,
+    cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+    isEffectivelyCancelled,
+    currentPlan
+  });
 
   return (
     <div className="space-y-4">
@@ -57,7 +72,7 @@ export function SubscriptionActions({
         )}
 
         {/* Reactivate Button */}
-        {isCancelled && isActive && (
+        {isEffectivelyCancelled && isActive && !cancelling && (
           <button
             onClick={onReactivate}
             disabled={reactivating}
@@ -73,7 +88,7 @@ export function SubscriptionActions({
         )}
 
         {/* Cancel Button - Available during trial and paid subscriptions */}
-        {currentPlan !== "FREE" && isActive && !isCancelled && (
+        {currentPlan !== "FREE" && isActive && !isEffectivelyCancelled && (
           <button
             onClick={() => onCancel()}
             disabled={cancelling}
@@ -111,24 +126,30 @@ export function SubscriptionActions({
             </div>
             <div>
               <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-1">
-                Trial Period Active
+                {subscription.cancelAtPeriodEnd ? "Trial Ending Soon" : "Trial Period Active"}
               </h4>
               <div className="space-y-2">
                 <span className="text-sm text-blue-700 dark:text-blue-300">
                   Your 7-day trial ends in {subscription.daysLeftInTrial} day
-                  {subscription.daysLeftInTrial !== 1 ? "s" : ""}. After that, your subscription will automatically continue.
+                  {subscription.daysLeftInTrial !== 1 ? "s" : ""}. 
+                  {subscription.cancelAtPeriodEnd 
+                    ? " Your subscription has been cancelled and will not renew."
+                    : " After that, your subscription will automatically continue."
+                  }
                 </span>
-                <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
-                  <Check className="w-3 h-3" />
-                  <span>Cancel anytime during trial to avoid charges</span>
-                </div>
+                {!subscription.cancelAtPeriodEnd && (
+                  <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
+                    <Check className="w-3 h-3" />
+                    <span>Cancel anytime during trial to avoid charges</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {isCancelled && isActive && (
+      {isEffectivelyCancelled && isActive && (
         <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-orange-100 dark:bg-orange-800 rounded-lg">
@@ -136,16 +157,16 @@ export function SubscriptionActions({
             </div>
             <div>
               <h4 className="font-semibold text-orange-800 dark:text-orange-200 mb-1">
-                Subscription Cancelled
+                {isTrial ? "Trial Cancelled" : "Subscription Cancelled"}
               </h4>
               <span className="text-sm text-orange-700 dark:text-orange-300">
-                You still have access until{" "}
-                {subscription.subscriptionEndsAt
-                  ? new Date(
-                      subscription.subscriptionEndsAt
-                    ).toLocaleDateString()
-                  : "the end of your billing period"}
-                . You can reactivate anytime before then.
+                {isTrial 
+                  ? "Your trial has been cancelled and will not convert to a paid subscription."
+                  : `You still have access until ${subscription.subscriptionEndsAt
+                      ? new Date(subscription.subscriptionEndsAt).toLocaleDateString()
+                      : "the end of your billing period"
+                    }. You can reactivate anytime before then.`
+                }
               </span>
             </div>
           </div>
