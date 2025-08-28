@@ -7,6 +7,7 @@ import PromotionalEmailForm from '@/components/admin/PromotionalEmailForm';
 import StudyReminderForm from '@/components/admin/StudyReminderForm';
 import EmailStatsDashboard from '@/components/admin/EmailStatsDashboard';
 import CronJobMonitor from '@/components/admin/CronJobMonitor';
+import PeerReviewDashboard from '@/components/admin/PeerReviewDashboard';
 
 export default function AdminPage() {
   const { data: session, status } = useSession();
@@ -26,6 +27,7 @@ export default function AdminPage() {
 
   const tabs = [
     { id: 'dashboard', label: '📊 Dashboard', component: EmailStatsDashboard },
+    { id: 'reviews', label: '👥 Peer Reviews', component: PeerReviewDashboard },
     { id: 'promotional', label: '📧 Promotional Emails', component: PromotionalEmailForm },
     { id: 'reminders', label: '⏰ Study Reminders', component: StudyReminderForm },
     { id: 'cron', label: '🤖 Cron Jobs', component: CronJobMonitor },
@@ -40,7 +42,7 @@ export default function AdminPage() {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-gray-600">Manage email campaigns and user engagement</p>
+              <p className="text-gray-600">Manage system operations, peer reviews, and user engagement</p>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-500">

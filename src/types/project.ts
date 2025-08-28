@@ -122,6 +122,7 @@ export interface ProjectReviewAssignmentWithDetails extends BaseEntity {
   assignedBy: string;
   priority: number;
   status: ReviewAssignmentStatus;
+  type?: string; // PEER | ADMIN
   dueDate: Date;
   acceptedAt: Date | null;
   completedAt: Date | null;

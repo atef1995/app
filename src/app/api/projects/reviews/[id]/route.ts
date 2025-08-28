@@ -40,6 +40,14 @@ export async function POST(
         success: true,
         message: "Review assignment accepted",
       });
+    } else if (action === "reject") {
+      const { reason } = body;
+      await ProjectService.rejectReviewAssignment(assignmentId, session.user.id, reason);
+      
+      return NextResponse.json({
+        success: true,
+        message: "Review assignment rejected",
+      });
     } else if (action === "submit") {
       // Validate review data
       if (overallScore === undefined || overallScore < 0 || overallScore > 100) {
@@ -79,7 +87,7 @@ export async function POST(
       return NextResponse.json(
         {
           success: false,
-          error: "Invalid action. Must be 'accept' or 'submit'",
+          error: "Invalid action. Must be 'accept', 'reject', or 'submit'",
         },
         { status: 400 }
       );

@@ -5,10 +5,7 @@ import { useState, Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  useCategories,
   useCategoriesWithStats,
-  useTutorials,
-  useTutorialProgress,
   CategoryWithStats,
 } from "@/hooks/useTutorialQueries";
 import CategoryCard from "@/components/ui/CategoryCard";
@@ -28,6 +25,7 @@ import {
   MoodImpactSkeleton,
   StatsCardSkeleton,
 } from "@/components/tutorial/TutorialSkeleton";
+import CategoryLoading from "./category/loading";
 
 export default function TutorialsPage() {
   const { data: session } = useSession();
@@ -38,15 +36,15 @@ export default function TutorialsPage() {
   const [loadingCategory, setLoadingCategory] = useState<string | null>(null);
 
   // Fetch optimized categories with stats (includes tutorial counts and user progress)
-  const categoriesWithStatsQuery = useCategoriesWithStats(
+  const { data, error, isLoading } = useCategoriesWithStats(
     currentPage,
     itemsPerPage
   );
 
   // Get categories data from paginated response
-  const categories = categoriesWithStatsQuery.data?.data || [];
-  const categoryPagination = categoriesWithStatsQuery.data?.pagination;
-  const overallStats = categoriesWithStatsQuery.data?.overallStats;
+  const categories = data?.data || [];
+  const categoryPagination = data?.pagination;
+  const overallStats = data?.overallStats;
 
   // Use server-side pagination data instead of client-side calculations
   const totalItems = categoryPagination?.totalCount || 0;
@@ -113,9 +111,11 @@ export default function TutorialsPage() {
     );
   }
 
-  // Remove the loading state since it's handled by loading.tsx
+  if (isLoading) {
+    return <CategoryLoading />;
+  }
 
-  if (categoriesWithStatsQuery.error) {
+  if (error) {
     return (
       <PageLayout
         title="JavaScript Tutorials"
@@ -248,7 +248,9 @@ export default function TutorialsPage() {
                   <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                     {overallStats && overallStats.totalTutorials > 0
                       ? Math.round(
-                          (overallStats.completedTutorials / overallStats.totalTutorials) * 100
+                          (overallStats.completedTutorials /
+                            overallStats.totalTutorials) *
+                            100
                         )
                       : 0}
                     %

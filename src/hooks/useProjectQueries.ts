@@ -144,6 +144,25 @@ const acceptReviewAssignment = async (assignmentId: string): Promise<void> => {
   }
 };
 
+const rejectReviewAssignment = async (assignmentId: string, reason?: string): Promise<void> => {
+  const response = await fetch(`/api/projects/reviews/${assignmentId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ action: "reject", reason }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to reject review assignment");
+  }
+
+  const result = await response.json();
+  if (!result.success) {
+    throw new Error(result.error || "Failed to reject review assignment");
+  }
+};
+
 const submitReview = async (
   assignmentId: string,
   reviewData: {
@@ -236,6 +255,19 @@ export const useAcceptReviewAssignment = () => {
 
   return useMutation({
     mutationFn: acceptReviewAssignment,
+    onSuccess: () => {
+      // Invalidate review assignments
+      queryClient.invalidateQueries({ queryKey: ["review-assignments"] });
+    },
+  });
+};
+
+export const useRejectReviewAssignment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ assignmentId, reason }: { assignmentId: string; reason?: string }) =>
+      rejectReviewAssignment(assignmentId, reason),
     onSuccess: () => {
       // Invalidate review assignments
       queryClient.invalidateQueries({ queryKey: ["review-assignments"] });

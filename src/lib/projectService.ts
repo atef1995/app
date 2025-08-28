@@ -35,6 +35,7 @@ export type ProjectReviewAssignmentWithDetails = ProjectReviewAssignment & {
     project: Pick<Project, "id" | "title">;
     user: Pick<User, "id" | "name" | "username">;
   };
+  type?: string;
 };
 
 export interface CreateProjectSubmissionRequest {
@@ -387,6 +388,245 @@ export class ProjectService {
   }
 
   /**
+   * Reject a review assignment
+   */
+  static async rejectReviewAssignment(
+    assignmentId: string,
+    userId: string,
+    reason?: string
+  ): Promise<void> {
+    try {
+      await prisma.$transaction(async (tx) => {
+        // Update assignment status to rejected
+        await tx.projectReviewAssignment.update({
+          where: {
+            id: assignmentId,
+            reviewerId: userId,
+          },
+          data: {
+            status: "REJECTED",
+            rejectedAt: new Date(),
+            rejectionReason: reason,
+          },
+        });
+
+        // Get assignment details
+        const assignment = await tx.projectReviewAssignment.findUnique({
+          where: { id: assignmentId },
+          include: {
+            submission: {
+              include: {
+                project: {
+                  select: {
+                    minReviews: true,
+                    category: true,
+                    difficulty: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        if (assignment) {
+          // Schedule replacement assignment outside transaction
+          setImmediate(() => {
+            this.handleRejectedAssignment(assignment.submissionId).catch(
+              (err) => console.error("Error handling rejected assignment:", err)
+            );
+          });
+        }
+      });
+    } catch (error) {
+      console.error("Error in rejectReviewAssignment:", error);
+      throw new Error("Failed to reject review assignment");
+    }
+  }
+
+  /**
+   * Check if user is admin
+   */
+  static async isUserAdmin(userId: string): Promise<boolean> {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { role: true },
+      });
+
+      return user?.role === "ADMIN" || user?.role === "INSTRUCTOR";
+    } catch (error) {
+      console.error("Error checking admin status:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Assign admin reviewer to a submission
+   */
+  static async assignAdminReviewer(
+    submissionId: string,
+    adminUserId?: string
+  ): Promise<void> {
+    try {
+      // If no specific admin provided, find available admin users
+      let reviewerId = adminUserId;
+
+      if (!reviewerId) {
+        const admins = await prisma.user.findMany({
+          where: {
+            role: { in: ["ADMIN", "INSTRUCTOR"] },
+          },
+          select: { id: true },
+          take: 1,
+        });
+
+        if (admins.length === 0) {
+          throw new Error("No admin users available for review");
+        }
+
+        reviewerId = admins[0].id;
+      }
+
+      // Create admin assignment
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 3); // 3 days for admin review
+
+      await prisma.projectReviewAssignment.create({
+        data: {
+          submissionId,
+          reviewerId: reviewerId!,
+          priority: 999, // Highest priority
+          dueDate,
+          status: "ASSIGNED",
+          type: "ADMIN",
+          expiredAt: new Date(), // Will be updated when actually expired
+          rejectedAt: new Date(), // Will be updated when actually rejected  
+          rejectionReason: "", // Will be updated when actually rejected
+        },
+      });
+    } catch (error) {
+      console.error("Error in assignAdminReviewer:", error);
+      throw new Error("Failed to assign admin reviewer");
+    }
+  }
+
+  /**
+   * Handle rejected assignment by finding replacement or assigning admin
+   */
+  private static async handleRejectedAssignment(
+    submissionId: string
+  ): Promise<void> {
+    try {
+      const submission = await prisma.projectSubmission.findUnique({
+        where: { id: submissionId },
+        include: {
+          project: {
+            select: {
+              minReviews: true,
+              category: true,
+              difficulty: true,
+            },
+          },
+          reviewAssignments: {
+            where: {
+              status: { in: ["ASSIGNED", "ACCEPTED"] },
+            },
+          },
+        },
+      });
+
+      if (!submission) return;
+
+      const activeReviewers = submission.reviewAssignments.length;
+      const needsMore = submission.project.minReviews - activeReviewers;
+
+      if (needsMore > 0) {
+        // Try to find replacement peer reviewers
+        const potentialReviewers = await this.findPotentialReviewers(
+          submission.userId,
+          submission.project.category,
+          submission.project.difficulty,
+          needsMore
+        );
+
+        if (potentialReviewers.length > 0) {
+          // Assign new peer reviewers
+          const dueDate = new Date();
+          dueDate.setDate(dueDate.getDate() + 7);
+
+          const assignments = potentialReviewers.map((reviewerId, index) => ({
+            submissionId,
+            reviewerId,
+            priority: index + 1,
+            dueDate,
+            status: "ASSIGNED" as const,
+            type: "PEER" as const,
+            expiredAt: new Date(), // Will be updated when actually expired
+            rejectedAt: new Date(), // Will be updated when actually rejected  
+            rejectionReason: "", // Will be updated when actually rejected
+          }));
+
+          await prisma.projectReviewAssignment.createMany({
+            data: assignments,
+            skipDuplicates: true,
+          });
+        } else {
+          // No peer reviewers available, assign admin
+          await this.assignAdminReviewer(submissionId);
+        }
+      }
+    } catch (error) {
+      console.error("Error in handleRejectedAssignment:", error);
+    }
+  }
+
+  /**
+   * Handle expired review assignments
+   */
+  static async handleExpiredAssignments(): Promise<void> {
+    try {
+      const expiredAssignments = await prisma.projectReviewAssignment.findMany({
+        where: {
+          status: "ASSIGNED",
+          dueDate: {
+            lt: new Date(),
+          },
+        },
+        include: {
+          submission: {
+            include: {
+              project: {
+                select: {
+                  minReviews: true,
+                  category: true,
+                  difficulty: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      for (const assignment of expiredAssignments) {
+        // Mark as expired
+        await prisma.projectReviewAssignment.update({
+          where: { id: assignment.id },
+          data: {
+            status: "EXPIRED",
+            expiredAt: new Date(),
+          },
+        });
+
+        // Try to reassign
+        await this.handleRejectedAssignment(assignment.submissionId);
+      }
+    } catch (error) {
+      console.error("Error in handleExpiredAssignments:", error);
+      throw new Error("Failed to handle expired assignments");
+    }
+  }
+
+  /**
    * Submit a peer review
    */
   static async submitReview(
@@ -540,6 +780,11 @@ export class ProjectService {
         reviewerId,
         priority: potentialReviewers.length - index, // First reviewer gets highest priority
         dueDate,
+        status: "ASSIGNED" as const,
+        type: "PEER" as const,
+        expiredAt: new Date(), // Will be updated when actually expired
+        rejectedAt: new Date(), // Will be updated when actually rejected  
+        rejectionReason: "", // Will be updated when actually rejected
       }));
 
       await prisma.projectReviewAssignment.createMany({

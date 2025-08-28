@@ -554,22 +554,26 @@ model ProjectReview {
 }
 
 model ProjectReviewAssignment {
-  id             String            @id @default(cuid())
-  submissionId   String
-  reviewerId     String
-  assignedBy     String            @default("SYSTEM")
-  priority       Int               @default(1)
-  status         String            @default("ASSIGNED")
-  dueDate        DateTime
-  acceptedAt     DateTime?
-  completedAt    DateTime?
-  declinedReason String?
-  remindersSent  Int               @default(0)
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  reviewer       User              @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
-  submission     ProjectSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-  reviews        ProjectReview[]
+  id              String            @id @default(cuid())
+  submissionId    String
+  reviewerId      String
+  assignedBy      String            @default("SYSTEM")
+  priority        Int               @default(1)
+  status          String            @default("UNASSIGNED")
+  expiredAt       DateTime
+  rejectedAt      DateTime
+  rejectionReason String
+  dueDate         DateTime
+  type            String
+  acceptedAt      DateTime?
+  completedAt     DateTime?
+  declinedReason  String?
+  remindersSent   Int               @default(0)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  reviewer        User              @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+  submission      ProjectSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  reviews         ProjectReview[]
 
   @@unique([submissionId, reviewerId])
   @@map("project_review_assignments")
@@ -631,21 +635,21 @@ model Skill {
 }
 
 model Certificate {
-  id            String            @id @default(cuid())
-  userId        String
-  type          CertificateType
-  entityId      String           // Tutorial ID or Category ID
-  entityTitle   String           // Tutorial title or Category title
-  entitySlug    String           // Tutorial slug or Category slug
-  completedAt   DateTime
-  issuedAt      DateTime         @default(now())
-  shareableId   String           @unique // Public ID for sharing
-  shareableUrl  String?          // Generated shareable URL
-  isPublic      Boolean          @default(false)
-  metadata      Json?            // Additional data like score, time taken, etc.
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String          @id @default(cuid())
+  userId       String
+  type         CertificateType
+  entityId     String // Tutorial ID or Category ID
+  entityTitle  String // Tutorial title or Category title
+  entitySlug   String // Tutorial slug or Category slug
+  completedAt  DateTime
+  issuedAt     DateTime        @default(now())
+  shareableId  String          @unique // Public ID for sharing
+  shareableUrl String? // Generated shareable URL
+  isPublic     Boolean         @default(false)
+  metadata     Json? // Additional data like score, time taken, etc.
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, type, entityId])
   @@map("certificates")

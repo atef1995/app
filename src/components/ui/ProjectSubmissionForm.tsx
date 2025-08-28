@@ -19,6 +19,7 @@ import {
   Eye,
 } from "lucide-react";
 import getMoodColors from "@/lib/getMoodColors";
+import { useToast } from "@/hooks/useToast";
 
 interface ProjectSubmissionFormProps {
   project: ProjectWithDetails;
@@ -34,6 +35,7 @@ export default function ProjectSubmissionForm({
   const { data: session } = useSession();
   const { currentMood } = useMood();
   const submitProject = useSubmitProject();
+  const { info, error: toastError } = useToast();
 
   const [formData, setFormData] = useState({
     title: existingSubmission?.title || "",
@@ -44,11 +46,7 @@ export default function ProjectSubmissionForm({
   });
 
   const [activeTab, setActiveTab] = useState<string>(
-    project.submissionType === "CODE"
-      ? "code"
-      : project.submissionType === "LINK"
-      ? "link"
-      : "file"
+    project.submissionType === "LINK" ? "link" : "file"
   );
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -83,10 +81,6 @@ export default function ProjectSubmissionForm({
 
     if (!formData.title.trim()) {
       newErrors.title = "Project title is required";
-    }
-
-    if (activeTab === "code" && !formData.sourceCode.trim()) {
-      newErrors.sourceCode = "Source code is required for code submissions";
     }
 
     if (activeTab === "link" && !formData.submissionUrl.trim()) {
@@ -129,15 +123,15 @@ export default function ProjectSubmissionForm({
 
       // Show success message based on status
       if (status === "SUBMITTED") {
-        alert(
+        info(
           "Project submitted successfully! It will now be assigned for peer review."
         );
       } else {
-        alert("Draft saved successfully!");
+        info("Draft saved successfully!");
       }
     } catch (error) {
       console.error("Error submitting project:", error);
-      alert("Failed to submit project. Please try again.");
+      toastError("Failed to submit project. Please try again.");
     }
   };
 
@@ -216,21 +210,9 @@ export default function ProjectSubmissionForm({
         {/* Submission Type Tabs */}
         <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg mb-6">
           <button
-            onClick={() => setActiveTab("code")}
-            disabled={isReadOnly}
-            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === "code"
-                ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm"
-                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-            } ${isReadOnly ? "cursor-not-allowed opacity-60" : ""}`}
-          >
-            <Code className="w-4 h-4" />
-            Code
-          </button>
-          <button
             onClick={() => setActiveTab("link")}
             disabled={isReadOnly}
-            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
               activeTab === "link"
                 ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm"
                 : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
@@ -296,33 +278,6 @@ export default function ProjectSubmissionForm({
           </div>
 
           {/* Submission Content */}
-          {activeTab === "code" && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Source Code *
-              </label>
-              <textarea
-                value={formData.sourceCode}
-                onChange={(e) =>
-                  handleInputChange("sourceCode", e.target.value)
-                }
-                readOnly={isReadOnly}
-                rows={12}
-                className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                  focus:outline-none focus:ring-2 focus:${moodColors.accent}
-                  bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
-                  placeholder-gray-500 dark:placeholder-gray-400 font-mono text-sm resize-none
-                  ${isReadOnly ? "cursor-not-allowed opacity-60" : ""}
-                  ${errors.sourceCode ? "border-red-500" : ""}`}
-                placeholder="Paste your JavaScript code here..."
-              />
-              {errors.sourceCode && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                  {errors.sourceCode}
-                </p>
-              )}
-            </div>
-          )}
 
           {activeTab === "link" && (
             <div>

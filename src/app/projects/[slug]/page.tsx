@@ -47,7 +47,9 @@ export default function ProjectPage() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Loading project...</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Loading project...
+            </p>
           </div>
         </div>
       </PageLayout>
@@ -56,7 +58,10 @@ export default function ProjectPage() {
 
   if (projectQuery.error || !projectQuery.data) {
     return (
-      <PageLayout title="Project Not Found" subtitle="The requested project could not be found">
+      <PageLayout
+        title="Project Not Found"
+        subtitle="The requested project could not be found"
+      >
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -64,7 +69,8 @@ export default function ProjectPage() {
               Project Not Found
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              The project you&apos;re looking for doesn&apos;t exist or has been removed.
+              The project you&apos;re looking for doesn&apos;t exist or has been
+              removed.
             </p>
             <Link
               href="/projects"
@@ -110,8 +116,10 @@ export default function ProjectPage() {
   };
 
   const getDifficultyColor = (difficulty: number) => {
-    if (difficulty <= 1) return "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900";
-    if (difficulty <= 2) return "text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900";
+    if (difficulty <= 1)
+      return "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900";
+    if (difficulty <= 2)
+      return "text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900";
     return "text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900";
   };
 
@@ -140,7 +148,9 @@ export default function ProjectPage() {
   return (
     <PageLayout
       title={project.title}
-      subtitle={`${project.category.charAt(0).toUpperCase() + project.category.slice(1)} Project • ${currentMood.name} Mode`}
+      subtitle={`${
+        project.category.charAt(0).toUpperCase() + project.category.slice(1)
+      } Project • ${currentMood.name} Mode`}
     >
       {/* Mood Info Card */}
       <MoodInfoCard className="mb-8" />
@@ -167,7 +177,11 @@ export default function ProjectPage() {
                   <span className="text-xs px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-medium capitalize">
                     {project.category}
                   </span>
-                  <span className={`text-xs px-3 py-1 rounded-full font-medium ${getDifficultyColor(project.difficulty)}`}>
+                  <span
+                    className={`text-xs px-3 py-1 rounded-full font-medium ${getDifficultyColor(
+                      project.difficulty
+                    )}`}
+                  >
                     {getDifficultyLabel(project.difficulty)}
                   </span>
                   {project.isPremium && (
@@ -176,11 +190,11 @@ export default function ProjectPage() {
                     </span>
                   )}
                 </div>
-                
+
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
                   {project.title}
                 </h1>
-                
+
                 <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
                   {project.description}
                 </p>
@@ -215,24 +229,34 @@ export default function ProjectPage() {
                 <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">
                   Your Submission
                 </h3>
-                
+
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Status:</span>
-                    <span className={`text-sm font-medium ${
-                      submission.status === "APPROVED" ? "text-green-600 dark:text-green-400" :
-                      submission.status === "REVIEWED" ? "text-blue-600 dark:text-blue-400" :
-                      submission.status === "UNDER_REVIEW" ? "text-yellow-600 dark:text-yellow-400" :
-                      submission.status === "SUBMITTED" ? "text-purple-600 dark:text-purple-400" :
-                      "text-gray-600 dark:text-gray-400"
-                    }`}>
-                      {submission.status.replace(/_/g, ' ').toLowerCase()}
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      Status:
+                    </span>
+                    <span
+                      className={`text-sm font-medium ${
+                        submission.status === "APPROVED"
+                          ? "text-green-600 dark:text-green-400"
+                          : submission.status === "REVIEWED"
+                          ? "text-blue-600 dark:text-blue-400"
+                          : submission.status === "UNDER_REVIEW"
+                          ? "text-yellow-600 dark:text-yellow-400"
+                          : submission.status === "SUBMITTED"
+                          ? "text-purple-600 dark:text-purple-400"
+                          : "text-gray-600 dark:text-gray-400"
+                      }`}
+                    >
+                      {submission.status.replace(/_/g, " ").toLowerCase()}
                     </span>
                   </div>
-                  
+
                   {submission.grade && (
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Grade:</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        Grade:
+                      </span>
                       <div className="flex items-center gap-1">
                         <Trophy className="w-4 h-4 text-yellow-500" />
                         <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -241,9 +265,11 @@ export default function ProjectPage() {
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Reviews:</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      Reviews:
+                    </span>
                     <span className="text-sm text-gray-900 dark:text-gray-100">
                       {submission._count?.reviews || 0} / {project.minReviews}
                     </span>
@@ -251,7 +277,8 @@ export default function ProjectPage() {
 
                   {submission.submittedAt && (
                     <div className="pt-2 text-xs text-gray-500 dark:text-gray-400">
-                      Submitted {new Date(submission.submittedAt).toLocaleDateString()}
+                      Submitted{" "}
+                      {new Date(submission.submittedAt).toLocaleDateString()}
                     </div>
                   )}
                 </div>
@@ -271,7 +298,8 @@ export default function ProjectPage() {
               Premium Project
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              This project requires a {project.requiredPlan} subscription to access.
+              This project requires a {project.requiredPlan} subscription to
+              access.
             </p>
             <button
               onClick={handleProjectAccess}
@@ -301,31 +329,44 @@ export default function ProjectPage() {
                   className="flex items-start gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
                 >
                   <div className="flex-shrink-0 mt-1">
-                    <div className={`w-2 h-2 rounded-full ${
-                      requirement.priority === "MUST_HAVE" ? "bg-red-500" :
-                      requirement.priority === "SHOULD_HAVE" ? "bg-yellow-500" :
-                      "bg-green-500"
-                    }`}></div>
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        requirement.priority === "MUST_HAVE"
+                          ? "bg-red-500"
+                          : requirement.priority === "SHOULD_HAVE"
+                          ? "bg-yellow-500"
+                          : "bg-green-500"
+                      }`}
+                    ></div>
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                         {requirement.title}
                       </h3>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                        requirement.type === "FEATURE" ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400" :
-                        requirement.type === "TECHNICAL" ? "bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400" :
-                        requirement.type === "DESIGN" ? "bg-pink-100 dark:bg-pink-900 text-pink-600 dark:text-pink-400" :
-                        "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
-                      }`}>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full font-medium ${
+                          requirement.type === "FEATURE"
+                            ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400"
+                            : requirement.type === "TECHNICAL"
+                            ? "bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400"
+                            : requirement.type === "DESIGN"
+                            ? "bg-pink-100 dark:bg-pink-900 text-pink-600 dark:text-pink-400"
+                            : "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
+                        }`}
+                      >
                         {requirement.type.toLowerCase()}
                       </span>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                        requirement.priority === "MUST_HAVE" ? "bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400" :
-                        requirement.priority === "SHOULD_HAVE" ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400" :
-                        "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
-                      }`}>
-                        {requirement.priority.replace(/_/g, ' ').toLowerCase()}
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full font-medium ${
+                          requirement.priority === "MUST_HAVE"
+                            ? "bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400"
+                            : requirement.priority === "SHOULD_HAVE"
+                            ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400"
+                            : "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
+                        }`}
+                      >
+                        {requirement.priority.replace(/_/g, " ").toLowerCase()}
                       </span>
                     </div>
                     <p className="text-gray-600 dark:text-gray-400 text-sm">
@@ -365,12 +406,17 @@ export default function ProjectPage() {
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
-                    <div className={`w-2 h-2 rounded-full ${
-                      resource.type === "DOCUMENTATION" ? "bg-blue-500" :
-                      resource.type === "TUTORIAL" ? "bg-green-500" :
-                      resource.type === "EXAMPLE" ? "bg-purple-500" :
-                      "bg-yellow-500"
-                    }`}></div>
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        resource.type === "DOCUMENTATION"
+                          ? "bg-blue-500"
+                          : resource.type === "TUTORIAL"
+                          ? "bg-green-500"
+                          : resource.type === "EXAMPLE"
+                          ? "bg-purple-500"
+                          : "bg-yellow-500"
+                      }`}
+                    ></div>
                     <div className="flex-1">
                       <h4 className="font-medium text-gray-900 dark:text-gray-100">
                         {resource.title}
@@ -381,12 +427,17 @@ export default function ProjectPage() {
                         </p>
                       )}
                     </div>
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                      resource.type === "DOCUMENTATION" ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400" :
-                      resource.type === "TUTORIAL" ? "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400" :
-                      resource.type === "EXAMPLE" ? "bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400" :
-                      "bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400"
-                    }`}>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full font-medium ${
+                        resource.type === "DOCUMENTATION"
+                          ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400"
+                          : resource.type === "TUTORIAL"
+                          ? "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
+                          : resource.type === "EXAMPLE"
+                          ? "bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400"
+                          : "bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400"
+                      }`}
+                    >
                       {resource.type.toLowerCase()}
                     </span>
                   </a>
