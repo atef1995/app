@@ -89,6 +89,7 @@ function SubscriptionUpgradeContent() {
       period: "month",
       icon: <Star className="h-6 w-6" />,
       color: "bg-blue-600",
+      popular: true,
       features: [
         "Unlimited tutorials",
         "Advanced quizzes",
@@ -103,7 +104,7 @@ function SubscriptionUpgradeContent() {
       period: "month",
       icon: <Crown className="h-6 w-6" />,
       color: "bg-purple-600",
-      popular: true,
+      popular: false,
       features: [
         "Everything in VIBED",
         "Project reviews",

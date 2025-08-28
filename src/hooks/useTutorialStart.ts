@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useToastContext } from "@/components/providers/ToastProvider";
 import { startTutorialAction } from "@/lib/actions";
@@ -25,27 +25,35 @@ export const useTutorialStart = ({
 }: UseTutorialStartProps) => {
   const { data: session } = useSession();
   const toast = useToastContext();
+  const hasStarted = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (!canAccess || !tutorialId || !session?.user?.id) {
       return;
     }
 
+    // Prevent multiple calls for the same tutorial in the same session
+    const tutorialKey = `${session.user.id}-${tutorialId}`;
+    if (hasStarted.current.has(tutorialKey)) {
+      return;
+    }
+
     // Mark tutorial as started for progress tracking and achievements using server action
     startTutorialAction(tutorialId)
       .then((result) => {
-        if (
-          result.success &&
-          result.achievements &&
-          result.achievements.length > 0
-        ) {
-          // Show achievement notifications
-          result.achievements.forEach((achievement: UnlockedAchievement) => {
-            toast.achievement(
-              `🏆 Achievement Unlocked!`,
-              `${achievement.achievement.icon} ${achievement.achievement.title} - ${achievement.achievement.description}`
-            );
-          });
+        if (result.success) {
+          // Mark as started in this session to prevent duplicate calls
+          hasStarted.current.add(tutorialKey);
+          
+          if (result.achievements && result.achievements.length > 0) {
+            // Show achievement notifications
+            result.achievements.forEach((achievement: UnlockedAchievement) => {
+              toast.achievement(
+                `🏆 Achievement Unlocked!`,
+                `${achievement.achievement.icon} ${achievement.achievement.title} - ${achievement.achievement.description}`
+              );
+            });
+          }
         }
 
         if (!result.success && result.error) {

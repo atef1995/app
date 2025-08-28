@@ -10,7 +10,8 @@ import {
   Cpu,
   Code,
   Palette,
-  Database
+  Database,
+  Loader2
 } from "lucide-react";
 import { useMood } from "@/components/providers/MoodProvider";
 
@@ -25,6 +26,7 @@ interface CategoryCardProps {
   topics?: string[];
   onClick: () => void;
   className?: string;
+  isLoading?: boolean;
 }
 
 const categoryIcons = {
@@ -73,6 +75,7 @@ export default function CategoryCard({
   topics = [],
   onClick,
   className = "",
+  isLoading = false,
 }: CategoryCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { currentMood } = useMood();
@@ -86,14 +89,14 @@ export default function CategoryCard({
   return (
     <div
       className={`
-        relative overflow-hidden rounded-2xl border-2 transition-all duration-300 cursor-pointer
+        relative overflow-hidden rounded-2xl border-2 transition-all duration-300 
+        ${isLoading ? 'cursor-not-allowed opacity-80' : 'cursor-pointer hover:shadow-xl hover:scale-[1.02] hover:-translate-y-1'}
         ${styles.bg} ${styles.border}
-        hover:shadow-xl hover:scale-[1.02] hover:-translate-y-1
         ${className}
       `}
-      onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onClick={isLoading ? undefined : onClick}
+      onMouseEnter={() => !isLoading && setIsHovered(true)}
+      onMouseLeave={() => !isLoading && setIsHovered(false)}
     >
       {/* Progress bar */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-700">
@@ -120,12 +123,16 @@ export default function CategoryCard({
             </div>
           </div>
           
-          <ChevronRight 
-            className={`
-              w-5 h-5 text-gray-400 transition-transform duration-300
-              ${isHovered ? 'translate-x-1' : ''}
-            `} 
-          />
+          {isLoading ? (
+            <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+          ) : (
+            <ChevronRight 
+              className={`
+                w-5 h-5 text-gray-400 transition-transform duration-300
+                ${isHovered ? 'translate-x-1' : ''}
+              `} 
+            />
+          )}
         </div>
 
         {/* Description */}
@@ -216,9 +223,21 @@ export default function CategoryCard({
         className={`
           absolute inset-0 bg-gradient-to-br from-white/10 to-transparent 
           transition-opacity duration-300 pointer-events-none
-          ${isHovered ? 'opacity-100' : 'opacity-0'}
+          ${isHovered && !isLoading ? 'opacity-100' : 'opacity-0'}
         `} 
       />
+
+      {/* Loading overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-10">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin mx-auto mb-2" />
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Loading tutorials...
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

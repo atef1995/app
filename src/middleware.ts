@@ -31,21 +31,22 @@ export async function middleware(req: NextRequest) {
 
   // Check tutorial access limits for authenticated users
   if (pathname.startsWith("/tutorials/category/") && sessionToken) {
-    console.log("🔍 Tutorial path detected:", pathname);
-    console.log("🔍 Session token exists:", !!sessionToken);
-    console.log("🔍 About to check tutorial limits...");
-    
-    const limitCheckResult = await checkTutorialAccessLimits(sessionToken, pathname, req);
+    const limitCheckResult = await checkTutorialAccessLimits(
+      sessionToken,
+      pathname,
+      req
+    );
     console.log("🔍 Check result:", { limitCheckResult });
 
     if (!limitCheckResult.hasAccess) {
-      console.log(
-        `🚫 Tutorial access denied: ${limitCheckResult.reason}`
-      );
+      console.log(`🚫 Tutorial access denied: ${limitCheckResult.reason}`);
 
       // Redirect to subscription upgrade page with context
       const upgradeUrl = new URL("/subscription/upgrade", req.url);
-      upgradeUrl.searchParams.set("reason", limitCheckResult.reason || "Access denied");
+      upgradeUrl.searchParams.set(
+        "reason",
+        limitCheckResult.reason || "Access denied"
+      );
       upgradeUrl.searchParams.set("feature", "tutorials");
       upgradeUrl.searchParams.set("returnUrl", pathname);
 
@@ -83,13 +84,9 @@ async function checkTutorialAccessLimits(
   req: NextRequest
 ): Promise<TutorialAccessResult> {
   try {
-    console.log("🔧 checkTutorialAccessLimits called with:", { pathname });
-    
     // Extract tutorial slug from pathname (e.g., /tutorials/category/javascript/variables -> variables)
     const pathParts = pathname.split("/");
     const tutorialSlug = pathParts[pathParts.length - 1];
-    
-    console.log("🔧 Extracted tutorial slug:", tutorialSlug);
 
     if (!tutorialSlug) {
       console.log("🔧 No tutorial slug found, allowing category page");
@@ -99,24 +96,22 @@ async function checkTutorialAccessLimits(
     // Get user subscription info - use the request origin instead of NEXTAUTH_URL for internal calls
     const baseUrl = new URL(req.url).origin;
     const subscriptionUrl = `${baseUrl}/api/payments/subscription`;
-    console.log("🔧 Fetching subscription from:", subscriptionUrl);
-    
+
     // Use the session token from cookies
     const sessionTokenCookie = sessionToken?.value;
     const sessionTokenName = sessionToken?.name;
-    console.log("🔧 Using session token:", sessionTokenCookie ? "present" : "missing");
-    console.log("🔧 Session token name:", sessionTokenName);
-    
+
     const subscriptionResponse = await fetch(subscriptionUrl, {
       headers: {
         Cookie: `${sessionTokenName}=${sessionTokenCookie}`,
       },
     });
 
-    console.log("🔧 Subscription response status:", subscriptionResponse.status);
-
     if (!subscriptionResponse.ok) {
-      console.error("🔧 Failed to fetch subscription info in middleware, status:", subscriptionResponse.status);
+      console.error(
+        "🔧 Failed to fetch subscription info in middleware, status:",
+        subscriptionResponse.status
+      );
       return { hasAccess: true }; // Allow access on error to avoid blocking users
     }
 

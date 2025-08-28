@@ -175,11 +175,24 @@ export class WebhookService {
         `🔄 Updating user subscription: userId=${userId}, plan=${plan}, endsAt=${subscriptionEndsAt.toISOString()}`
       );
 
+      // Determine if this is a trial subscription
+      const isTrialSubscription = subscription.status === "trialing";
+      const subscriptionStatus = isTrialSubscription 
+        ? SubscriptionStatus.TRIAL 
+        : SubscriptionStatus.ACTIVE;
+
+      console.log(`📊 Subscription details:`, {
+        stripeStatus: subscription.status,
+        isTrialing: isTrialSubscription,
+        trialEnd: subscription.trial_end,
+        ourStatus: subscriptionStatus,
+      });
+
       // Update user subscription
       await SubscriptionService.updateUserSubscription(
         userId,
         plan,
-        SubscriptionStatus.ACTIVE,
+        subscriptionStatus,
         subscriptionEndsAt
       );
 
@@ -188,7 +201,7 @@ export class WebhookService {
         data: {
           userId,
           plan,
-          status: SubscriptionStatus.ACTIVE,
+          status: subscriptionStatus,
           stripeSubscriptionId: subscription.id,
           stripePriceId: subscription.items.data[0]?.price.id,
           currentPeriodStart: subscriptionStartsAt,
@@ -230,6 +243,8 @@ export class WebhookService {
       let status: SubscriptionStatus;
       if (subscription.status === "active") {
         status = SubscriptionStatus.ACTIVE;
+      } else if (subscription.status === "trialing") {
+        status = SubscriptionStatus.TRIAL;
       } else if (subscription.status === "canceled") {
         status = SubscriptionStatus.CANCELLED;
       } else if (
@@ -240,6 +255,12 @@ export class WebhookService {
       } else {
         status = SubscriptionStatus.INACTIVE;
       }
+
+      console.log(`📊 Status update:`, {
+        stripeStatus: subscription.status,
+        ourStatus: status,
+        isTrialTransition: subscription.status === "active" && status === SubscriptionStatus.ACTIVE,
+      });
 
       // Get plan from subscription metadata or price
       let plan: Plan = Plan.VIBED;
@@ -279,9 +300,14 @@ export class WebhookService {
       }
 
       // Update user subscription
+      // Allow premium access during trials and active subscriptions
+      const userPlan = (status === SubscriptionStatus.ACTIVE || status === SubscriptionStatus.TRIAL) 
+        ? plan 
+        : Plan.FREE;
+      
       await SubscriptionService.updateUserSubscription(
         userId,
-        status === SubscriptionStatus.ACTIVE ? plan : Plan.FREE,
+        userPlan,
         status,
         subscriptionEndsAt
       );
@@ -479,6 +505,51 @@ export class WebhookService {
       );
     } catch (error) {
       console.error("❌ Error handling invoice payment failed:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Handle customer.subscription.trial_will_end event
+   */
+  static async handleTrialWillEnd(
+    subscription: Stripe.Subscription
+  ): Promise<void> {
+    try {
+      console.log("🎯 Processing trial will end:", subscription.id);
+
+      const customerId = subscription.customer as string;
+      const customer = await stripe.customers.retrieve(customerId);
+
+      if (customer.deleted) {
+        console.error("❌ Customer is deleted");
+        return;
+      }
+
+      const userId = customer.metadata?.userId;
+      if (!userId) {
+        console.error("❌ No userId found in customer metadata");
+        return;
+      }
+
+      // Get trial end date
+      const trialEnd = subscription.trial_end
+        ? new Date(subscription.trial_end * 1000)
+        : null;
+
+      console.log("📅 Trial ending soon:", {
+        userId,
+        trialEnd: trialEnd?.toISOString(),
+        subscriptionId: subscription.id,
+      });
+
+      // TODO: Send email notification about trial ending
+      // You could implement email service here to notify user
+      // Example: await EmailService.sendTrialEndingNotification(userId, trialEnd);
+
+      console.log(`✅ Trial will end notification processed for user ${userId}`);
+    } catch (error) {
+      console.error("❌ Error handling trial will end:", error);
       throw error;
     }
   }

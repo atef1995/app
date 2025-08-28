@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import Stripe from "stripe";
-import { SubscriptionService } from "@/lib/subscriptionService";
+import { SubscriptionService, Plan } from "@/lib/subscriptionService";
 import { StripeHelpers } from "@/lib/stripeHelpers";
 import { StripeError } from "@stripe/stripe-js";
 
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { plan, annual = false } = body;
+    const { plan, annual = false, startTrial = false } = body;
 
     // Validate plan
     if (!plan || !["VIBED", "CRACKED"].includes(plan)) {
@@ -64,6 +64,35 @@ export async function POST(request: NextRequest) {
     const userSubscription = await SubscriptionService.getUserSubscription(
       session.user.id
     );
+
+    // Handle trial request
+    if (startTrial) {
+      const isEligible = await SubscriptionService.isEligibleForTrial(
+        session.user.id
+      );
+
+      if (!isEligible) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              message: "You are not eligible for a trial. Trial is only available for new users.",
+            },
+          },
+          { status: 400 }
+        );
+      }
+
+      // Start trial directly without Stripe
+      await SubscriptionService.startTrial(session.user.id, plan as Plan);
+
+      return NextResponse.json({
+        success: true,
+        trial: true,
+        message: `Your 7-day free trial for ${plan} has started! Enjoy full access to all premium features.`,
+        trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      });
+    }
 
     // Prevent users from purchasing the same plan they already have
     if (
@@ -174,8 +203,13 @@ export async function POST(request: NextRequest) {
       session.user.name || undefined
     );
 
+    // Check if user qualifies for trial period on subscription
+    const isEligibleForTrialPeriod = await SubscriptionService.isEligibleForTrial(
+      session.user.id
+    );
+
     // Create checkout session
-    const checkoutSession = await stripe.checkout.sessions.create({
+    const checkoutSessionData: Stripe.Checkout.SessionCreateParams = {
       customer: customerId,
       mode: "subscription",
       payment_method_types: ["card"],
@@ -192,6 +226,7 @@ export async function POST(request: NextRequest) {
         plan: plan,
         annual: annual.toString(),
         upgradeFrom: userSubscription.plan,
+        hasTrialPeriod: isEligibleForTrialPeriod.toString(),
       },
       subscription_data: {
         metadata: {
@@ -212,7 +247,21 @@ export async function POST(request: NextRequest) {
       customer_email: !customerId ? session.user.email! : undefined,
       // Automatic tax calculation with proper customer address handling
       automatic_tax: { enabled: true },
-    });
+    };
+
+    // Add trial period if eligible (7 days)
+    if (isEligibleForTrialPeriod) {
+      checkoutSessionData.subscription_data = {
+        ...checkoutSessionData.subscription_data,
+        trial_period_days: 7,
+      };
+      checkoutSessionData.metadata = {
+        ...checkoutSessionData.metadata,
+        trialDays: "7",
+      };
+    }
+
+    const checkoutSession = await stripe.checkout.sessions.create(checkoutSessionData);
 
     // Create payment record for tracking
     await SubscriptionService.createPayment(

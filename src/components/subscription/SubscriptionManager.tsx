@@ -19,6 +19,7 @@ import {
   useSubscriptionWithAccess,
   useSubscriptionCancellation,
 } from "@/hooks/useSubscription";
+import { useToast } from "@/hooks/useToast";
 
 interface SubscriptionManagerProps {
   onUpgrade?: (plan: Plan) => void;
@@ -34,6 +35,7 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
   } = useSubscriptionWithAccess();
   const { mutate: cancelSubscription, isPending: cancelling } =
     useSubscriptionCancellation();
+  const { info } = useToast();
 
   const error = queryError?.message || null;
 

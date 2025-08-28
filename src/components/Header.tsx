@@ -209,7 +209,7 @@ export function Header() {
             {session && (
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="hidden lg:flex items-center justify-center w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="hidden lg:flex items-center justify-center w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
                 title={isExpanded ? "Minimize header" : "Expand header"}
               >
                 {isExpanded ? (
@@ -225,7 +225,7 @@ export function Header() {
               <button
                 ref={mobileMenuButtonRef}
                 onClick={() => setShowMobileNav(!showMobileNav)}
-                className="lg:hidden flex items-center justify-center w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="lg:hidden flex items-center justify-center w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
                 title={showMobileNav ? "Close menu" : "Open menu"}
               >
                 {showMobileNav ? (
@@ -241,7 +241,7 @@ export function Header() {
               <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setShowDropdownMenu(!showDropdownMenu)}
-                  className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+                  className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors cursor-pointer"
                 >
                   <User className="w-5 h-5" />
                   <span className="hidden md:inline text-sm">
@@ -311,7 +311,7 @@ export function Header() {
                   onClick={() => {
                     signOut({ callbackUrl: "/" });
                   }}
-                  className="flex flex-col justify-center items-center text-xs gap-2 text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="flex flex-col justify-center items-center text-xs gap-2 text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" />
                   Logout

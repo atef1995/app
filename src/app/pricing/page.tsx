@@ -7,6 +7,7 @@ import { Check, ArrowRight, Star, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import getMoodColors from "@/lib/getMoodColors";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useToast } from "@/hooks/useToast";
 
 interface PlanFeature {
   text: string;
@@ -49,6 +50,7 @@ interface PricingPlan {
 export default function PricingPage() {
   const { data: session } = useSession();
   const { currentMood } = useMood();
+  const { info, error: toastError } = useToast();
   const { data: subscription } = useSubscription();
   const [isAnnual, setIsAnnual] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
@@ -187,11 +189,14 @@ export default function PricingPage() {
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         if (data.upgraded) {
           // Handle successful upgrade (no redirect needed)
-          alert(data.message || `Successfully upgraded to ${planId}!`);
+          info(
+            "Upgrade sucess!",
+            data.message || `Successfully upgraded to ${planId}!`
+          );
           // Refresh the page or update subscription state
           window.location.reload();
         } else if (data.url) {
@@ -199,13 +204,12 @@ export default function PricingPage() {
           window.location.href = data.url;
         }
       } else {
-        throw new Error(
-          data.error?.message || "Failed to process request"
-        );
+        throw new Error(data.error?.message || "Failed to process request");
       }
     } catch (error) {
       console.error("Error processing request:", error);
-      alert("Failed to process request. Please try again.");
+
+      toastError("Error", "Failed to process request. Please try again.");
     } finally {
       setLoading(null);
     }

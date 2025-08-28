@@ -272,6 +272,17 @@ ${css}
           </div>
         )}
       </div>
+      {/* Preview */}
+      {isVisible && (
+        <div className="h-full">
+          <iframe
+            srcDoc={generatePreviewHTML()}
+            title="Preview"
+            className="w-full h-full min-h-96 border-0"
+            sandbox="allow-scripts"
+          />
+        </div>
+      )}
 
       {/* Footer with tips */}
       <div className="bg-gray-50 dark:bg-gray-700 px-4 py-2 border-t border-gray-200 dark:border-gray-600">

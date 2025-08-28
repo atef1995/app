@@ -10,7 +10,7 @@ topics: ["CSS", "Flexbox", "Layout", "Responsive Design"]
 quizQuestions: 18
 ---
 
-import { HTMLEditorPreview } from "@/components/ui/HTMLEditorPreview";
+import { SeparatedEditorPreview } from "@/components/ui/SeparatedEditorPreview";
 import { InteractiveCodeBlock } from "@/components/InteractiveCodeBlock";
 
 # CSS Layout with Flexbox: Modern Web Layouts Made Easy
@@ -38,7 +38,7 @@ The magic starts when you add `display: flex` to a container. Watch what happens
 
 ### 🎮 Interactive Demo: Before and After Flexbox
 
-<HTMLEditorPreview
+<SeparatedEditorPreview
   initialHtml={`<h3>Without Flexbox (Regular Block Layout):</h3>
 <div class="normal-container">
   <div class="item">Item 1</div>
@@ -52,7 +52,7 @@ The magic starts when you add `display: flex` to a container. Watch what happens
   <div class="item">Item 2</div>
   <div class="item">Item 3</div>
 </div>`}
-  css={`/* Normal container - elements stack vertically */
+  initialCss={`/* Normal container - elements stack vertically */
 .normal-container {
   background: #f8f9fa;
   padding: 10px;
@@ -120,9 +120,17 @@ Controls the main axis direction:
   height: 100vh;
 }
 
-.header { background: #3498db; }
-.main { background: #ecf0f1; flex: 1; }
-.footer { background: #34495e; }
+.header { 
+  background: #3498db;
+}
+
+.main {
+  background: #ecf0f1; flex: 1;
+}
+
+.footer {
+  background: #34495e;
+}
 ```
 
 ## Justify Content (Main Axis Alignment)
@@ -133,7 +141,7 @@ This is where Flexbox gets really exciting! `justify-content` controls how items
 
 Try each value and see the magic happen:
 
-<HTMLEditorPreview
+<SeparatedEditorPreview
   initialHtml={`<div class="demo-container">
   <div class="flex-item">A</div>
   <div class="flex-item">B</div>
@@ -151,7 +159,7 @@ Try each value and see the magic happen:
     <li>space-evenly</li>
   </ol>
 </div>`}
-  css={`/* Change the justify-content value to see different alignments! */
+  initialCss={`/* Change the justify-content value to see different alignments! */
 .demo-container {
   display: flex;
   justify-content: flex-start; /* 👈 Change this! Try: center, space-between, etc. */
@@ -200,6 +208,8 @@ Try each value and see the magic happen:
   margin-right: 10px;
 }`}
   title="🎯 Justify Content Playground"
+  mission={"Try each value and see the magic happen:"}
+  instructions="Look at how `justify-content: center` centers the item. Try changing it to `justify-content: start`"
   height={400}
 />
 
@@ -590,7 +600,7 @@ Use browser dev tools to visualize flex containers:
 
 Time to put all your Flexbox skills to the test! Build a complete dashboard layout using everything you've learned.
 
-<HTMLEditorPreview
+<SeparatedEditorPreview
   initialHtml={`<div class="dashboard">
   <header class="dashboard-header">
     <div class="logo">📊 FlexDash</div>
@@ -638,7 +648,7 @@ Time to put all your Flexbox skills to the test! Build a complete dashboard layo
     </div>
   </main>
 </div>`}
-  css={`/* Your ultimate challenge: Create a modern dashboard! */
+  initialCss={`/* Your ultimate challenge: Create a modern dashboard! */
 
 .dashboard {
   /* Make this a full-height flex container with column direction */
@@ -718,6 +728,8 @@ Time to put all your Flexbox skills to the test! Build a complete dashboard layo
   }
 }`}
   title="🎯 Ultimate Flexbox Challenge: Modern Dashboard"
+  mission={"Build a Modern Dashboard"}
+  instructions="Time to put all your Flexbox skills to the test! Build a complete dashboard layout using everything you've learned."
   height={600}
 />
 

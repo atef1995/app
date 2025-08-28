@@ -1,5 +1,3 @@
-import { Suspense } from "react";
-
 // Category Card Skeleton
 function CategoryCardSkeleton() {
   return (
@@ -106,7 +104,7 @@ export default function TutorialsLoading() {
           <div className="animate-pulse mb-6">
             <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-lg w-1/4"></div>
           </div>
-          
+
           {/* Category Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (

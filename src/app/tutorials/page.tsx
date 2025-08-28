@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -102,6 +102,7 @@ export default function TutorialsPage() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6);
+  const [loadingCategory, setLoadingCategory] = useState<string | null>(null);
 
   // Fetch data with server-side pagination
   const categoriesQuery = useCategories(currentPage, itemsPerPage);
@@ -135,6 +136,22 @@ export default function TutorialsPage() {
     setItemsPerPage(newItemsPerPage);
     setCurrentPage(1); // Reset to first page when changing items per page
   };
+
+  const handleCategoryClick = (categorySlug: string) => {
+    setLoadingCategory(categorySlug);
+    router.push(`/tutorials/category/${categorySlug}`);
+  };
+
+  // Clear loading state after a timeout to prevent stuck loading states
+  useEffect(() => {
+    if (loadingCategory) {
+      const timeout = setTimeout(() => {
+        setLoadingCategory(null);
+      }, 5000); // Clear after 5 seconds
+
+      return () => clearTimeout(timeout);
+    }
+  }, [loadingCategory]);
 
   // Calculate category stats based on tutorials
   const getCategoryStats = (categorySlug: string) => {
@@ -260,9 +277,8 @@ export default function TutorialsPage() {
                     }
                     description={category.description}
                     topics={category.topics}
-                    onClick={() =>
-                      router.push(`/tutorials/category/${category.slug}`)
-                    }
+                    onClick={() => handleCategoryClick(category.slug)}
+                    isLoading={loadingCategory === category.slug}
                   />
                 );
               })}

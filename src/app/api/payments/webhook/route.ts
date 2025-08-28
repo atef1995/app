@@ -73,6 +73,12 @@ export async function POST(request: NextRequest) {
         );
         break;
 
+      case "customer.subscription.trial_will_end":
+        await WebhookService.handleTrialWillEnd(
+          event.data.object as Stripe.Subscription
+        );
+        break;
+
       default:
         console.log(`Unhandled event type: ${event.type}`);
     }

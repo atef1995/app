@@ -9,6 +9,7 @@ export const Plan = {
 
 export const SubscriptionStatus = {
   ACTIVE: "ACTIVE",
+  TRIAL: "TRIAL",
   INACTIVE: "INACTIVE",
   CANCELLED: "CANCELLED",
   EXPIRED: "EXPIRED",
@@ -34,6 +35,9 @@ export interface SubscriptionInfo {
   isActive: boolean;
   canAccessPremium: boolean;
   stripeSubscriptionId?: string | null;
+  isTrialActive: boolean;
+  trialEndsAt: Date | null;
+  daysLeftInTrial: number | null;
 }
 
 export interface PlanLimits {
@@ -43,6 +47,9 @@ export interface PlanLimits {
   hasMoodAdaptation: boolean;
   hasProgressTracking: boolean;
   hasAdvancedFeatures: boolean;
+  hasAIPoweredReviews?: boolean;
+  hasMentorshipSessions?: boolean;
+  hasEarlyAccess?: boolean;
 }
 
 // Plan configurations
@@ -62,6 +69,9 @@ export const PLAN_CONFIGS: Record<Plan, PlanLimits> = {
     hasMoodAdaptation: true,
     hasProgressTracking: true,
     hasAdvancedFeatures: true,
+    hasAIPoweredReviews: false,
+    hasMentorshipSessions: false,
+    hasEarlyAccess: false,
   },
   CRACKED: {
     maxTutorials: Infinity,
@@ -70,6 +80,10 @@ export const PLAN_CONFIGS: Record<Plan, PlanLimits> = {
     hasMoodAdaptation: true,
     hasProgressTracking: true,
     hasAdvancedFeatures: true,
+    // Additional premium features for CRACKED plan
+    hasAIPoweredReviews: true,
+    hasMentorshipSessions: true,
+    hasEarlyAccess: true,
   },
 };
 
@@ -92,18 +106,18 @@ export class SubscriptionService {
         subscriptions: {
           where: {
             status: {
-              in: ["ACTIVE", "TRIAL", "CANCELLED"]
-            }
+              in: ["ACTIVE", "TRIAL", "CANCELLED"],
+            },
           },
           orderBy: {
-            createdAt: "desc"
+            createdAt: "desc",
           },
           take: 1,
           select: {
             stripeSubscriptionId: true,
             status: true,
-          }
-        }
+          },
+        },
       },
     });
 
@@ -113,11 +127,25 @@ export class SubscriptionService {
 
     const now = new Date();
     const isActive =
-      (user.subscriptionStatus === SubscriptionStatus.ACTIVE || 
-       user.subscriptionStatus === SubscriptionStatus.CANCELLED) &&
+      (user.subscriptionStatus === SubscriptionStatus.ACTIVE ||
+        user.subscriptionStatus === SubscriptionStatus.TRIAL ||
+        user.subscriptionStatus === SubscriptionStatus.CANCELLED) &&
       (user.subscriptionEndsAt === null || user.subscriptionEndsAt > now);
 
     const latestSubscription = user.subscriptions[0];
+    
+    // Trial logic
+    const isTrialActive = user.subscriptionStatus === SubscriptionStatus.TRIAL && 
+                         user.subscriptionEndsAt !== null && 
+                         user.subscriptionEndsAt > now;
+    
+    const trialEndsAt = user.subscriptionStatus === SubscriptionStatus.TRIAL 
+                       ? user.subscriptionEndsAt 
+                       : null;
+    
+    const daysLeftInTrial = trialEndsAt 
+                           ? Math.ceil((trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+                           : null;
 
     return {
       plan: user.subscription as Plan,
@@ -126,6 +154,9 @@ export class SubscriptionService {
       isActive,
       canAccessPremium: isActive && user.subscription !== Plan.FREE,
       stripeSubscriptionId: latestSubscription?.stripeSubscriptionId,
+      isTrialActive,
+      trialEndsAt,
+      daysLeftInTrial: daysLeftInTrial && daysLeftInTrial > 0 ? daysLeftInTrial : null,
     };
   }
 
@@ -188,11 +219,12 @@ export class SubscriptionService {
       return { withinLimits: true, current: 0, max: Infinity };
     }
 
-    // Count user's progress in this content type
-    const progressCount = await prisma.tutorialProgress.count({
-      where: { userId },
-    });
-
+    // Count user's progress in the specific content type
+    const progressCount =
+      contentType === "tutorial"
+        ? await prisma.tutorialProgress.count({ where: { userId } })
+        : await prisma.challengeProgress.count({ where: { userId } });
+    console.log("user content limits", { progressCount });
     return {
       withinLimits: progressCount < maxAllowed,
       current: progressCount,
@@ -316,6 +348,45 @@ export class SubscriptionService {
         limits
       ),
     };
+  }
+
+  /**
+   * Check if user is eligible for trial
+   */
+  static async isEligibleForTrial(userId: string): Promise<boolean> {
+    // Check if user has ever had a subscription (including trials)
+    const existingSubscriptions = await prisma.subscription.findMany({
+      where: { userId },
+    });
+
+    // User is eligible if they've never had any subscription
+    return existingSubscriptions.length === 0;
+  }
+
+  /**
+   * Start trial subscription for user
+   */
+  static async startTrial(userId: string, plan: Plan): Promise<void> {
+    const trialEndsAt = new Date();
+    trialEndsAt.setDate(trialEndsAt.getDate() + 7); // 7 days trial
+
+    await this.updateUserSubscription(
+      userId,
+      plan,
+      SubscriptionStatus.TRIAL,
+      trialEndsAt
+    );
+
+    // Create subscription record for trial
+    await prisma.subscription.create({
+      data: {
+        userId,
+        plan,
+        status: SubscriptionStatus.TRIAL,
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: trialEndsAt,
+      },
+    });
   }
 
   /**

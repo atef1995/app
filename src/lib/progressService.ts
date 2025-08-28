@@ -500,18 +500,24 @@ export class ProgressService {
    * Mark tutorial as started (when user first views it)
    */
   static async markTutorialStarted(userId: string, tutorialId: string) {
-    return prisma.tutorialProgress.upsert({
+    // Check if progress already exists
+    const existingProgress = await prisma.tutorialProgress.findUnique({
       where: {
         userId_tutorialId: {
           userId,
           tutorialId,
         },
       },
-      update: {
-        status: CompletionStatus.IN_PROGRESS,
-        updatedAt: new Date(),
-      },
-      create: {
+    });
+
+    // If progress already exists, don't update it (avoids unnecessary writes)
+    if (existingProgress) {
+      return existingProgress;
+    }
+
+    // Only create new progress record if none exists
+    return prisma.tutorialProgress.create({
+      data: {
         userId,
         tutorialId,
         status: CompletionStatus.IN_PROGRESS,
@@ -523,19 +529,35 @@ export class ProgressService {
    * Mark challenge as started (when user first attempts it)
    */
   static async markChallengeStarted(userId: string, challengeId: string) {
-    return prisma.challengeProgress.upsert({
+    // Check if progress already exists
+    const existingProgress = await prisma.challengeProgress.findUnique({
       where: {
         userId_challengeId: {
           userId,
           challengeId,
         },
       },
-      update: {
-        status: CompletionStatus.IN_PROGRESS,
-        lastAttemptAt: new Date(),
-        updatedAt: new Date(),
-      },
-      create: {
+    });
+
+    // If progress already exists, only update lastAttemptAt
+    if (existingProgress) {
+      return prisma.challengeProgress.update({
+        where: {
+          userId_challengeId: {
+            userId,
+            challengeId,
+          },
+        },
+        data: {
+          lastAttemptAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+    }
+
+    // Only create new progress record if none exists
+    return prisma.challengeProgress.create({
+      data: {
         userId,
         challengeId,
         status: CompletionStatus.IN_PROGRESS,
