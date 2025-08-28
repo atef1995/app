@@ -48,7 +48,7 @@ export default function AccessControlWrapper({
               <div className="flex gap-4 justify-center">
                 <Link
                   href="/pricing"
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105 inline-flex items-center gap-2"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105 inline-flex items-center gap-2 cursor-pointer"
                 >
                   <Zap className="w-5 h-5" />
                   Upgrade Now
