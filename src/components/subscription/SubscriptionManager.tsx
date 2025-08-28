@@ -39,12 +39,9 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
     error: queryError,
     refetch,
   } = useSubscriptionWithAccess();
-  const { mutate: cancelSubscription, isPending: cancelling } =
-    useSubscriptionCancellation();
-  const { mutate: reactivateSubscription, isPending: reactivating } =
-    useSubscriptionReactivation();
-  const { success, error: showError } = useToast();
-
+  const cancelMutation = useSubscriptionCancellation();
+  const reactivationMutation = useSubscriptionReactivation();
+  const { success, error: showError, info } = useToast();
   const error = queryError?.message || null;
 
   const handleCancelSubscription = async (reason?: string) => {
@@ -58,18 +55,25 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
     const confirmed = window.confirm(confirmMessage);
     if (!confirmed) return;
 
-    cancelSubscription(
+    console.log("🎯 Starting cancellation process...");
+    info("Cancelling subscription...");
+
+    cancelMutation.mutate(
       { reason },
       {
         onSuccess: (result) => {
+          console.log("✅ Cancellation successful:", result);
           success(
             result.message ||
               (isTrial
                 ? "Trial cancelled successfully"
                 : "Subscription cancelled successfully")
           );
+          // Refetch data to update UI
+          refetch();
         },
-        onError: (error) => {
+        onError: (error: Error) => {
+          console.error("❌ Cancellation failed:", error);
           showError(error.message || "Failed to cancel subscription");
         },
       }
@@ -85,11 +89,18 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
 
     if (!confirmed) return;
 
-    reactivateSubscription(undefined, {
+    console.log("🎯 Starting reactivation process...", data.subscription);
+    info("Reactivating subscription...");
+
+    reactivationMutation.mutate(undefined, {
       onSuccess: (result) => {
+        console.log("✅ Reactivation successful:", result);
         success(result.message || "Subscription reactivated successfully");
+        // Refetch data to update UI
+        refetch();
       },
-      onError: (error) => {
+      onError: (error: Error) => {
+        console.error("❌ Reactivation failed:", error);
         showError(error.message || "Failed to reactivate subscription");
       },
     });
@@ -314,8 +325,8 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
           subscription={subscription}
           currentPlan={currentPlan}
           isActive={isActive}
-          cancelling={cancelling}
-          reactivating={reactivating}
+          cancelling={cancelMutation.isPending}
+          reactivating={reactivationMutation.isPending}
           onCancel={handleCancelSubscription}
           onReactivate={handleReactivateSubscription}
           onUpgrade={handleUpgrade}
@@ -467,7 +478,7 @@ function ActionButtons({
         )}
 
         {/* Reactivate Button */}
-        {isCancelled && isActive && (
+        {(isCancelled && isActive) && (
           <button
             onClick={onReactivate}
             disabled={reactivating}

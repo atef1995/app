@@ -148,6 +148,24 @@ class EmailService {
     return await this.sendEmail(devEmail!, subject, html);
   }
 
+  async sendPaymentConfirmationEmail(
+    user: User,
+    paymentData: {
+      plan: string;
+      amount: number;
+      currency: string;
+      subscriptionStatus: string;
+      subscriptionEndsAt?: Date;
+      isTrialActive?: boolean;
+      trialEndsAt?: Date;
+    }
+  ) {
+    const subject = `Payment Confirmed - Welcome to ${paymentData.plan}! 🎉`;
+    const html = this.generatePaymentConfirmationTemplate(user, paymentData);
+
+    return await this.sendEmail(user.email, subject, html);
+  }
+
   private generateWelcomeTemplate(user: User): string {
     const moodEmojis: Record<string, string> = {
       CHILL: "😎",
@@ -549,6 +567,147 @@ class EmailService {
           <div class="footer">
             <p>This bug report was submitted through the Vibed to Cracked platform.</p>
             <p><strong>Priority Level:</strong> ${bugData.severity.toUpperCase()}</p>
+          </div>
+        </body>
+      </html>
+    `;
+  }
+
+  private generatePaymentConfirmationTemplate(
+    user: User,
+    paymentData: {
+      plan: string;
+      amount: number;
+      currency: string;
+      subscriptionStatus: string;
+      subscriptionEndsAt?: Date;
+      isTrialActive?: boolean;
+      trialEndsAt?: Date;
+    }
+  ): string {
+    const planEmojis: Record<string, string> = {
+      VIBED: "🚀",
+      CRACKED: "⚡",
+      FREE: "🆓"
+    };
+
+    const formatCurrency = (amount: number, currency: string) => {
+      const value = amount / 100; // Convert cents to dollars
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency.toUpperCase(),
+      }).format(value);
+    };
+
+    const formatDate = (date?: Date) => {
+      return date ? date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }) : 'Not specified';
+    };
+
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Payment Confirmation - ${paymentData.plan}</title>
+          <style>
+            body { font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: white; padding: 30px; border: 1px solid #ddd; }
+            .success-badge { background: #dcfce7; color: #166534; padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0; border: 1px solid #bbf7d0; }
+            .plan-box { background: #f0f9ff; padding: 20px; border-radius: 10px; border-left: 4px solid #0ea5e9; margin: 20px 0; }
+            .payment-details { background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; }
+            .feature-list { background: #fefce8; padding: 20px; border-radius: 8px; border-left: 4px solid #eab308; margin: 20px 0; }
+            .cta-button { display: inline-block; background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; margin: 20px 0; font-weight: bold; }
+            .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 10px 10px; }
+            .label { font-weight: bold; color: #374151; }
+            .trial-notice { background: #dbeafe; color: #1e40af; padding: 15px; border-radius: 8px; margin: 15px 0; border: 1px solid #93c5fd; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Payment Confirmed! ${planEmojis[paymentData.plan] || "🎉"}</h1>
+            <p>Welcome to ${paymentData.plan} Plan</p>
+          </div>
+          
+          <div class="content">
+            <div class="success-badge">
+              <h2>✅ Payment Successfully Processed</h2>
+              <p>Your subscription is now active and ready to use!</p>
+            </div>
+
+            <h2>Hey ${user.name || user.username}! 👋</h2>
+            
+            <p>Thank you for upgrading to the ${paymentData.plan} plan! Your payment has been successfully processed and you now have access to all premium features.</p>
+
+            ${paymentData.isTrialActive && paymentData.trialEndsAt ? `
+              <div class="trial-notice">
+                <strong>🎯 Trial Period Active</strong>
+                <p>You're currently in a ${paymentData.plan} trial period until ${formatDate(paymentData.trialEndsAt)}. After your trial ends, your subscription will automatically continue at the regular price.</p>
+              </div>
+            ` : ''}
+            
+            <div class="plan-box">
+              <h3>${planEmojis[paymentData.plan]} ${paymentData.plan} Plan Features</h3>
+              ${paymentData.plan === 'VIBED' ? `
+                <ul>
+                  <li>✅ Unlimited tutorials and challenges</li>
+                  <li>✅ Interactive quiz system</li>
+                  <li>✅ Advanced progress tracking</li>
+                  <li>✅ Mood-adaptive learning experience</li>
+                  <li>✅ Priority support</li>
+                </ul>
+              ` : paymentData.plan === 'CRACKED' ? `
+                <ul>
+                  <li>✅ Everything in Vibed plan</li>
+                  <li>✅ AI-powered code reviews</li>
+                  <li>✅ 1-on-1 mentorship sessions</li>
+                  <li>✅ Early access to new features</li>
+                  <li>✅ Premium community access</li>
+                  <li>✅ Advanced project templates</li>
+                </ul>
+              ` : ''}
+            </div>
+
+            <div class="payment-details">
+              <h3>📄 Payment Details</h3>
+              <p><span class="label">Plan:</span> ${paymentData.plan}</p>
+              <p><span class="label">Amount:</span> ${formatCurrency(paymentData.amount, paymentData.currency)}</p>
+              <p><span class="label">Status:</span> ${paymentData.subscriptionStatus}</p>
+              ${paymentData.subscriptionEndsAt ? `
+                <p><span class="label">Next Billing:</span> ${formatDate(paymentData.subscriptionEndsAt)}</p>
+              ` : ''}
+              <p><span class="label">Date:</span> ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            </div>
+
+            <div class="feature-list">
+              <h3>🚀 What's Next?</h3>
+              <ul>
+                <li>🎯 Access all premium tutorials and challenges</li>
+                <li>📊 Track your detailed learning progress</li>
+                <li>🧠 Take advanced quizzes to test your knowledge</li>
+                <li>👥 Join our premium community</li>
+                <li>💪 Start working on real-world projects</li>
+              </ul>
+            </div>
+            
+            <p>Your learning journey just got supercharged! Switch between CHILL, RUSH, and GRIND modes to match your energy and maximize your coding potential.</p>
+            
+            <a href="${process.env.NEXTAUTH_URL}/dashboard" class="cta-button">Start Learning Now 🚀</a>
+            
+            <p><small>💡 Pro tip: Visit your <a href="${process.env.NEXTAUTH_URL}/settings">settings page</a> to customize your learning experience and notification preferences.</small></p>
+          </div>
+          
+          <div class="footer">
+            <p>🎉 Welcome to the premium experience!<br>The Vibed to Cracked Team</p>
+            <p>
+              <a href="${process.env.NEXTAUTH_URL}/settings">Manage Subscription</a> | 
+              <a href="${process.env.NEXTAUTH_URL}/contact">Get Support</a>
+            </p>
+            <p><small>If you have any questions, don't hesitate to reach out. We're here to help you succeed!</small></p>
           </div>
         </body>
       </html>

@@ -126,7 +126,8 @@ export const useSubscriptionCancellation = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to cancel subscription: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `Failed to cancel subscription: ${response.status}`);
       }
 
       const data = await response.json();
@@ -137,10 +138,14 @@ export const useSubscriptionCancellation = () => {
 
       return data;
     },
-    onSuccess: () => {
-      // Invalidate both subscription queries to refetch updated data
-      queryClient.invalidateQueries({ queryKey: ["subscription", userId] });
-      queryClient.invalidateQueries({ queryKey: ["subscription-access", userId] });
+    onSuccess: async () => {
+      // Invalidate and refetch both subscription queries to ensure UI updates
+      await queryClient.invalidateQueries({ queryKey: ["subscription", userId] });
+      await queryClient.invalidateQueries({ queryKey: ["subscription-access", userId] });
+      
+      // Force refetch to ensure fresh data
+      await queryClient.refetchQueries({ queryKey: ["subscription", userId] });
+      await queryClient.refetchQueries({ queryKey: ["subscription-access", userId] });
     },
   });
 };
@@ -164,7 +169,8 @@ export const useSubscriptionReactivation = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to reactivate subscription: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `Failed to reactivate subscription: ${response.status}`);
       }
 
       const data = await response.json();
@@ -175,10 +181,14 @@ export const useSubscriptionReactivation = () => {
 
       return data;
     },
-    onSuccess: () => {
-      // Invalidate both subscription queries to refetch updated data
-      queryClient.invalidateQueries({ queryKey: ["subscription", userId] });
-      queryClient.invalidateQueries({ queryKey: ["subscription-access", userId] });
+    onSuccess: async () => {
+      // Invalidate and refetch both subscription queries to ensure UI updates
+      await queryClient.invalidateQueries({ queryKey: ["subscription", userId] });
+      await queryClient.invalidateQueries({ queryKey: ["subscription-access", userId] });
+      
+      // Force refetch to ensure fresh data
+      await queryClient.refetchQueries({ queryKey: ["subscription", userId] });
+      await queryClient.refetchQueries({ queryKey: ["subscription-access", userId] });
     },
   });
 };

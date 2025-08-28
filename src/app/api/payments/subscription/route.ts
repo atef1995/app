@@ -329,18 +329,60 @@ async function handleReactivation(userId: string) {
       );
     }
 
-    if (currentSubscription.status !== SubscriptionStatus.CANCELLED) {
+    // Check if subscription can be reactivated
+    const canReactivate = 
+      currentSubscription.status === SubscriptionStatus.CANCELLED ||
+      (currentSubscription.status === SubscriptionStatus.TRIAL && 
+       currentSubscription.subscriptionEndsAt && 
+       currentSubscription.subscriptionEndsAt > new Date()) ||
+      (currentSubscription.status === SubscriptionStatus.EXPIRED &&
+       currentSubscription.subscriptionEndsAt &&
+       currentSubscription.subscriptionEndsAt > new Date());
+
+    if (!canReactivate) {
       return NextResponse.json(
-        { success: false, error: { message: "Subscription is not cancelled" } },
+        { 
+          success: false, 
+          error: { 
+            message: `Cannot reactivate subscription with status: ${currentSubscription.status}. Only cancelled subscriptions with remaining access can be reactivated.` 
+          } 
+        },
         { status: 400 }
       );
     }
 
+    // Handle local trial reactivation (no Stripe subscription)
     if (!currentSubscription.stripeSubscriptionId) {
+      console.log("🔄 Reactivating local trial subscription");
+      
+      // For local trials, just update the status back to TRIAL
+      if (currentSubscription.status === SubscriptionStatus.CANCELLED) {
+        const newStatus = currentSubscription.subscriptionEndsAt && 
+                         currentSubscription.subscriptionEndsAt > new Date()
+          ? SubscriptionStatus.TRIAL
+          : SubscriptionStatus.ACTIVE;
+
+        await SubscriptionService.updateUserSubscription(
+          userId,
+          currentSubscription.plan,
+          newStatus,
+          currentSubscription.subscriptionEndsAt || undefined
+        );
+
+        // Get updated subscription info
+        const updatedSubscription = await SubscriptionService.getUserSubscription(userId);
+
+        return NextResponse.json({
+          success: true,
+          message: "Subscription reactivated successfully. Your premium access will continue.",
+          data: updatedSubscription,
+        });
+      }
+
       return NextResponse.json(
         {
           success: false,
-          error: { message: "No Stripe subscription found to reactivate" },
+          error: { message: "No Stripe subscription found to reactivate and local subscription cannot be reactivated" },
         },
         { status: 400 }
       );

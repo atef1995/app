@@ -5,6 +5,7 @@ import {
   SubscriptionStatus,
 } from "@/lib/subscriptionService";
 import { prisma } from "@/lib/prisma";
+import { emailService } from "@/lib/services/emailService";
 
 // Type for Stripe Invoice parent with subscription details
 interface InvoiceParentWithSubscription {
@@ -72,6 +73,29 @@ export class WebhookService {
         console.log(
           "🔄 Session has subscription, will be handled by subscription events"
         );
+      }
+
+      // Send payment confirmation email
+      try {
+        const user = await prisma.user.findUnique({
+          where: { id: userId }
+        });
+
+        if (user) {
+          console.log("📧 Sending payment confirmation email to user");
+          await emailService.sendPaymentConfirmationEmail(user, {
+            plan: plan,
+            amount: 0, // Will be updated by invoice payment handler
+            currency: "usd",
+            subscriptionStatus: "COMPLETED",
+            subscriptionEndsAt: undefined,
+            isTrialActive: false
+          });
+          console.log("✅ Payment confirmation email sent successfully");
+        }
+      } catch (emailError) {
+        console.error("⚠️ Failed to send payment confirmation email:", emailError);
+        // Don't throw - email failure shouldn't break webhook processing
       }
 
       console.log(`✅ Checkout completed for user ${userId}, plan ${plan}`);
@@ -208,6 +232,44 @@ export class WebhookService {
           currentPeriodEnd: subscriptionEndsAt,
         },
       });
+
+      // Send payment confirmation email with full subscription details
+      try {
+        const user = await prisma.user.findUnique({
+          where: { id: userId }
+        });
+
+        if (user) {
+          console.log("📧 Sending subscription confirmation email to user");
+          
+          // Get subscription price from Stripe
+          const priceId = subscription.items.data[0]?.price.id;
+          let amount = 0;
+          
+          if (priceId) {
+            try {
+              const price = await stripe.prices.retrieve(priceId);
+              amount = price.unit_amount || 0;
+            } catch (priceError) {
+              console.warn("⚠️ Could not retrieve price information:", priceError);
+            }
+          }
+
+          await emailService.sendPaymentConfirmationEmail(user, {
+            plan: plan,
+            amount: amount,
+            currency: subscription.currency || "usd",
+            subscriptionStatus: subscriptionStatus,
+            subscriptionEndsAt: subscriptionEndsAt,
+            isTrialActive: isTrialSubscription,
+            trialEndsAt: subscription.trial_end ? new Date(subscription.trial_end * 1000) : undefined
+          });
+          console.log("✅ Subscription confirmation email sent successfully");
+        }
+      } catch (emailError) {
+        console.error("⚠️ Failed to send subscription confirmation email:", emailError);
+        // Don't throw - email failure shouldn't break webhook processing
+      }
 
       console.log(`✅ Subscription created for user ${userId}, plan ${plan}`);
     } catch (error) {
