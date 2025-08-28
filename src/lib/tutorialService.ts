@@ -183,6 +183,96 @@ export class TutorialService {
   }
 
   /**
+   * Get categories with tutorial counts and user progress stats
+   */
+  static async getCategoriesWithStats(userId?: string): Promise<(Category & {
+    _count: { tutorials: number };
+    tutorialStats?: { total: number; completed: number };
+  })[]> {
+    try {
+      // Get categories with tutorial counts using Prisma _count
+      const categoriesWithCounts = await prisma.category.findMany({
+        where: {
+          published: true,
+        },
+        include: {
+          _count: {
+            select: {
+              tutorials: {
+                where: {
+                  published: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          order: "asc",
+        },
+      });
+
+      // If no user provided, just return categories with tutorial counts
+      if (!userId) {
+        return categoriesWithCounts.map(category => ({
+          ...category,
+          tutorialStats: {
+            total: category._count.tutorials,
+            completed: 0,
+          },
+        }));
+      }
+
+      // Get user's completed tutorials grouped by category
+      const userProgressByCategoryRaw = await prisma.tutorialProgress.groupBy({
+        by: ['tutorialId'],
+        where: {
+          userId,
+          status: 'COMPLETED',
+          quizPassed: true,
+        },
+        _count: {
+          tutorialId: true,
+        },
+      });
+
+      // Get tutorial category mappings for completed tutorials
+      const completedTutorialIds = userProgressByCategoryRaw.map(p => p.tutorialId);
+      const tutorialCategoryMappings = await prisma.tutorial.findMany({
+        where: {
+          id: {
+            in: completedTutorialIds,
+          },
+        },
+        select: {
+          id: true,
+          categoryId: true,
+        },
+      });
+
+      // Group completed tutorials by category
+      const completedByCategory = tutorialCategoryMappings.reduce((acc, tutorial) => {
+        if (!acc[tutorial.categoryId]) {
+          acc[tutorial.categoryId] = 0;
+        }
+        acc[tutorial.categoryId]++;
+        return acc;
+      }, {} as Record<string, number>);
+
+      // Combine with category data
+      return categoriesWithCounts.map(category => ({
+        ...category,
+        tutorialStats: {
+          total: category._count.tutorials,
+          completed: completedByCategory[category.id] || 0,
+        },
+      }));
+    } catch (error) {
+      console.error("Error in getCategoriesWithStats:", error);
+      throw new Error("Failed to fetch categories with stats");
+    }
+  }
+
+  /**
    * Get a specific category by slug
    */
   static async getCategoryBySlug(slug: string): Promise<Category | null> {

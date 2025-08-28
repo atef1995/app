@@ -1,10 +1,11 @@
-import { useQuery, useQueries } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { TutorialWithAll } from "@/lib/tutorialService";
 import { Category } from "@prisma/client";
 
 // Types
 interface TutorialProgress {
   id: string;
+  tutorialId: string;
   status: string;
   quizPassed: boolean;
   quizAttempts: number;
@@ -132,24 +133,27 @@ const fetchTutorials = async (
   };
 };
 
-const fetchTutorialProgress = async (
-  tutorialId: string,
-  userId: string
-): Promise<TutorialProgress | null> => {
+const fetchTutorialsProgressBulk = async (
+  tutorialIds: string[]
+): Promise<TutorialProgress[]> => {
+  if (tutorialIds.length === 0) {
+    return [];
+  }
+
   const response = await fetch(
-    `/api/progress/tutorial?tutorialId=${tutorialId}&userId=${userId}`
+    `/api/progress/tutorials-bulk?tutorialIds=${tutorialIds.join(",")}`
   );
 
   if (!response.ok) {
-    // If progress doesn't exist, return null instead of throwing
-    if (response.status === 404) {
-      return null;
-    }
-    throw new Error(`Failed to fetch progress for tutorial ${tutorialId}`);
+    throw new Error("Failed to fetch bulk tutorial progress");
   }
 
-  const progressData = await response.json();
-  return progressData.data;
+  const data = await response.json();
+  if (!data.success) {
+    throw new Error(data.error || "Failed to fetch bulk tutorial progress");
+  }
+
+  return data.data;
 };
 
 const fetchCategories = async (
@@ -192,6 +196,38 @@ const fetchCategoryBySlug = async (slug: string): Promise<Category | null> => {
   }
 
   return data.data;
+};
+
+// Type for categories with stats
+export interface CategoryWithStats extends Category {
+  _count: { tutorials: number };
+  tutorialStats?: { total: number; completed: number };
+}
+
+interface CategoriesWithStatsResponse extends PaginatedResponse<CategoryWithStats> {
+  overallStats?: {
+    totalTutorials: number;
+    completedTutorials: number;
+  } | null;
+}
+
+const fetchCategoriesWithStats = async (
+  page = 1,
+  limit = 10
+): Promise<CategoriesWithStatsResponse> => {
+  const response = await fetch(
+    `/api/tutorials/categories-with-stats?page=${page}&limit=${limit}`
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch categories with stats");
+  }
+
+  const data = await response.json();
+  if (!data.success) {
+    throw new Error(data.error || "Failed to fetch categories with stats");
+  }
+
+  return data;
 };
 
 const fetchTutorialsByCategory = async (
@@ -242,31 +278,33 @@ export const useTutorialProgress = (
 ) => {
   // Only fetch progress if we have tutorials and userId
   const shouldFetch = Boolean(userId && tutorials.length > 0);
+  const tutorialIds = tutorials.map(t => t.id);
 
-  const progressQueries = useQueries({
-    queries: tutorials.map((tutorial) => ({
-      queryKey: ["tutorial-progress", tutorial.id, userId],
-      queryFn: () => fetchTutorialProgress(tutorial.id, userId!),
-      enabled: shouldFetch,
-      staleTime: 2 * 60 * 1000, // 2 minutes for progress
-      gcTime: 5 * 60 * 1000, // 5 minutes
-      retry: 1, // Less retries for progress as it's less critical
-    })),
+  // Use optimized bulk fetching instead of individual queries
+  const progressQuery = useQuery({
+    queryKey: ["tutorials-progress-bulk", tutorialIds.sort().join(","), userId],
+    queryFn: () => fetchTutorialsProgressBulk(tutorialIds),
+    enabled: shouldFetch,
+    staleTime: 2 * 60 * 1000, // 2 minutes for progress
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1, // Less retries for progress as it's less critical
   });
 
-  // Combine tutorials with their progress
-  const tutorialsWithProgress = tutorials.map((tutorial, index) => ({
-    ...tutorial,
-    progress: progressQueries[index]?.data || null,
-  }));
+  // Create a map for O(1) lookup of progress data
+  const progressMap = new Map(
+    (progressQuery.data || []).map(p => [p.tutorialId, p])
+  );
 
-  const isLoading = progressQueries.some((query) => query.isLoading);
-  const hasError = progressQueries.some((query) => query.error);
+  // Combine tutorials with their progress
+  const tutorialsWithProgress = tutorials.map((tutorial) => ({
+    ...tutorial,
+    progress: progressMap.get(tutorial.id) || null,
+  }));
 
   return {
     tutorialsWithProgress,
-    isProgressLoading: isLoading,
-    progressError: hasError,
+    isProgressLoading: progressQuery.isLoading,
+    progressError: progressQuery.error,
   };
 };
 
@@ -276,6 +314,15 @@ export const useCategories = (page = 1, limit = 10) => {
     queryFn: () => fetchCategories(page, limit),
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes
+  });
+};
+
+export const useCategoriesWithStats = (page = 1, limit = 10) => {
+  return useQuery({
+    queryKey: ["tutorial-categories-with-stats", page, limit],
+    queryFn: () => fetchCategoriesWithStats(page, limit),
+    staleTime: 5 * 60 * 1000, // 5 minutes (shorter since it includes user progress)
+    gcTime: 15 * 60 * 1000, // 15 minutes
   });
 };
 

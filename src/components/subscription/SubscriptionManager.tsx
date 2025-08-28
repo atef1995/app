@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Plan } from "@/lib/subscriptionService";
@@ -13,6 +14,7 @@ import { SubscriptionStatus } from "./SubscriptionStatus";
 import { SubscriptionActions } from "./SubscriptionActions";
 import { UsageLimitsWarning } from "./UsageLimitsWarning";
 import { UpgradeRecommendations } from "./UpgradeRecommendations";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import {
   formatDate,
   formatPrice,
@@ -36,38 +38,46 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
   const reactivationMutation = useSubscriptionReactivation();
   const { success, error: showError, info } = useToast();
   const error = queryError?.message || null;
+  
+  // Modal states
+  const [cancelModal, setCancelModal] = useState<{
+    isOpen: boolean;
+    reason?: string;
+    isTrial: boolean;
+  }>({ isOpen: false, isTrial: false });
+  const [reactivateModal, setReactivateModal] = useState(false);
 
   const handleCancelSubscription = async (reason?: string) => {
     if (!data?.subscription) return;
 
     const isTrial = data.subscription.status === "TRIAL";
-    const confirmMessage = isTrial
-      ? "Are you sure you want to cancel your trial? You will lose access to premium features when your trial expires."
-      : "Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your current billing period.";
-
-    const confirmed = window.confirm(confirmMessage);
-    if (!confirmed) return;
+    setCancelModal({ isOpen: true, reason, isTrial });
+  };
+  
+  const confirmCancellation = async () => {
+    if (!data?.subscription) return;
 
     console.log("🎯 Starting cancellation process...");
     info("Cancelling subscription...");
 
     cancelMutation.mutate(
-      { reason },
+      { reason: cancelModal.reason },
       {
         onSuccess: (result) => {
           console.log("✅ Cancellation successful:", result);
           success(
             result.message ||
-              (isTrial
+              (cancelModal.isTrial
                 ? "Trial cancelled successfully"
                 : "Subscription cancelled successfully")
           );
-          // Refetch data to update UI
+          setCancelModal({ isOpen: false, isTrial: false });
           refetch();
         },
         onError: (error: Error) => {
           console.error("❌ Cancellation failed:", error);
           showError(error.message || "Failed to cancel subscription");
+          setCancelModal({ isOpen: false, isTrial: false });
         },
       }
     );
@@ -75,12 +85,11 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
 
   const handleReactivateSubscription = async () => {
     if (!data?.subscription) return;
-
-    const confirmed = window.confirm(
-      "Are you sure you want to reactivate your subscription? Your premium access will continue and billing will resume."
-    );
-
-    if (!confirmed) return;
+    setReactivateModal(true);
+  };
+  
+  const confirmReactivation = async () => {
+    if (!data?.subscription) return;
 
     console.log("🎯 Starting reactivation process...", data.subscription);
     info("Reactivating subscription...");
@@ -89,12 +98,13 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
       onSuccess: (result) => {
         console.log("✅ Reactivation successful:", result);
         success(result.message || "Subscription reactivated successfully");
-        // Refetch data to update UI
+        setReactivateModal(false);
         refetch();
       },
       onError: (error: Error) => {
         console.error("❌ Reactivation failed:", error);
         showError(error.message || "Failed to reactivate subscription");
+        setReactivateModal(false);
       },
     });
   };
@@ -223,6 +233,35 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
         currentPlan={currentPlan}
         onUpgrade={handleUpgrade}
         formatPrice={formatPrice}
+      />
+
+      {/* Confirmation Modals */}
+      <ConfirmationModal
+        isOpen={cancelModal.isOpen}
+        onClose={() => setCancelModal({ isOpen: false, isTrial: false })}
+        onConfirm={confirmCancellation}
+        title={cancelModal.isTrial ? "Cancel Trial" : "Cancel Subscription"}
+        message={
+          cancelModal.isTrial
+            ? "Are you sure you want to cancel your trial? You will lose access to premium features when your trial expires and your subscription will not renew."
+            : "Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your current billing period."
+        }
+        confirmText={cancelModal.isTrial ? "Cancel Trial" : "Cancel Subscription"}
+        cancelText="Keep Subscription"
+        variant="danger"
+        isLoading={cancelMutation.isPending}
+      />
+
+      <ConfirmationModal
+        isOpen={reactivateModal}
+        onClose={() => setReactivateModal(false)}
+        onConfirm={confirmReactivation}
+        title="Reactivate Subscription"
+        message="Are you sure you want to reactivate your subscription? Your premium access will continue and billing will resume according to your plan."
+        confirmText="Reactivate"
+        cancelText="Keep Cancelled"
+        variant="success"
+        isLoading={reactivationMutation.isPending}
       />
     </div>
   );

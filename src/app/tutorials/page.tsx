@@ -6,8 +6,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   useCategories,
+  useCategoriesWithStats,
   useTutorials,
   useTutorialProgress,
+  CategoryWithStats,
 } from "@/hooks/useTutorialQueries";
 import CategoryCard from "@/components/ui/CategoryCard";
 import { PageLayout } from "@/components/ui/PageLayout";
@@ -21,80 +23,11 @@ import {
 import ErrorBoundary, {
   ComponentErrorFallback,
 } from "@/components/ErrorBoundary";
-
-// Skeleton Components for Suspense fallbacks
-function MoodImpactSkeleton() {
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 animate-pulse">
-      <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-lg mb-3 w-1/3"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-        </div>
-        <div className="ml-6 flex space-x-2">
-          <div className="h-10 w-16 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-          <div className="h-10 w-16 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-          <div className="h-10 w-16 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CategoryCardSkeleton() {
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg animate-pulse">
-      <div className="mb-4">
-        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-lg w-3/4"></div>
-      </div>
-      <div className="mb-4">
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-2"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-      </div>
-      <div className="flex flex-wrap gap-2 mb-4">
-        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-16"></div>
-        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-20"></div>
-        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-18"></div>
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
-        </div>
-        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-lg w-24"></div>
-      </div>
-    </div>
-  );
-}
-
-function CategoriesGridSkeleton() {
-  return (
-    <ContentGrid>
-      {[1, 2, 3, 4, 5, 6].map((i) => (
-        <CategoryCardSkeleton key={i} />
-      ))}
-    </ContentGrid>
-  );
-}
-
-function StatsCardSkeleton() {
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg animate-pulse">
-      <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4 w-1/2"></div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="text-center">
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2 w-12 mx-auto"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mx-auto"></div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+import {
+  CategoriesGridSkeleton,
+  MoodImpactSkeleton,
+  StatsCardSkeleton,
+} from "@/components/tutorial/TutorialSkeleton";
 
 export default function TutorialsPage() {
   const { data: session } = useSession();
@@ -104,20 +37,16 @@ export default function TutorialsPage() {
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [loadingCategory, setLoadingCategory] = useState<string | null>(null);
 
-  // Fetch data with server-side pagination
-  const categoriesQuery = useCategories(currentPage, itemsPerPage);
-  const allTutorialsQuery = useTutorials(1, 10, true); // Get all tutorials for stats
+  // Fetch optimized categories with stats (includes tutorial counts and user progress)
+  const categoriesWithStatsQuery = useCategoriesWithStats(
+    currentPage,
+    itemsPerPage
+  );
 
   // Get categories data from paginated response
-  const categories = categoriesQuery.data?.data || [];
-  const categoryPagination = categoriesQuery.data?.pagination;
-
-  // Progress data
-  const allTutorials = allTutorialsQuery.data?.data || [];
-  const { tutorialsWithProgress } = useTutorialProgress(
-    allTutorials,
-    session?.user?.id
-  );
+  const categories = categoriesWithStatsQuery.data?.data || [];
+  const categoryPagination = categoriesWithStatsQuery.data?.pagination;
+  const overallStats = categoriesWithStatsQuery.data?.overallStats;
 
   // Use server-side pagination data instead of client-side calculations
   const totalItems = categoryPagination?.totalCount || 0;
@@ -153,29 +82,11 @@ export default function TutorialsPage() {
     }
   }, [loadingCategory]);
 
-  // Calculate category stats based on tutorials
-  const getCategoryStats = (categorySlug: string) => {
-    if (!allTutorials.length) {
-      // Fallback when tutorials are not loaded yet
-      return {
-        total: 0,
-        completed: 0,
-      };
-    }
-
-    const categoryTuts = allTutorials.filter(
-      (t) => t.category.slug === categorySlug
-    );
-    const completed = categoryTuts.filter((t) => {
-      const progress = tutorialsWithProgress.find(
-        (tp) => tp.id === t.id
-      )?.progress;
-      return progress?.quizPassed;
-    }).length;
-
+  // Optimized category stats - now comes from the server
+  const getCategoryStats = (category: CategoryWithStats) => {
     return {
-      total: categoryTuts.length,
-      completed,
+      total: category.tutorialStats?.total || 0,
+      completed: category.tutorialStats?.completed || 0,
     };
   };
 
@@ -204,7 +115,7 @@ export default function TutorialsPage() {
 
   // Remove the loading state since it's handled by loading.tsx
 
-  if (categoriesQuery.error || allTutorialsQuery.error) {
+  if (categoriesWithStatsQuery.error) {
     return (
       <PageLayout
         title="JavaScript Tutorials"
@@ -259,7 +170,7 @@ export default function TutorialsPage() {
           <Suspense fallback={<CategoriesGridSkeleton />}>
             <ContentGrid>
               {categories.map((category) => {
-                const stats = getCategoryStats(category.slug);
+                const stats = getCategoryStats(category);
 
                 return (
                   <CategoryCard
@@ -319,7 +230,7 @@ export default function TutorialsPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {allTutorials.length}
+                    {overallStats?.totalTutorials || 0}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
                     Total Tutorials
@@ -327,10 +238,7 @@ export default function TutorialsPage() {
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {
-                      tutorialsWithProgress.filter((t) => t.progress?.quizPassed)
-                        .length
-                    }
+                    {overallStats?.completedTutorials || 0}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
                     Completed
@@ -338,10 +246,15 @@ export default function TutorialsPage() {
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                    {categories.length}
+                    {overallStats && overallStats.totalTutorials > 0
+                      ? Math.round(
+                          (overallStats.completedTutorials / overallStats.totalTutorials) * 100
+                        )
+                      : 0}
+                    %
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Categories
+                    Completion
                   </div>
                 </div>
               </div>
