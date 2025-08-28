@@ -389,6 +389,7 @@ export class SubscriptionService {
     });
   }
 
+
   /**
    * Get upgrade recommendations based on current plan
    */

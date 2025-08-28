@@ -2,15 +2,10 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
+import type { SubscriptionInfo } from "@/lib/subscriptionService";
 
-// Core subscription interface
-export interface SubscriptionInfo {
-  plan: "FREE" | "VIBED" | "CRACKED";
-  status: string;
-  subscriptionEndsAt: Date | null;
-  isActive: boolean;
-  canAccessPremium: boolean;
-}
+// Re-export for convenience
+export type { SubscriptionInfo };
 
 interface SubscriptionResponse {
   success: boolean;
@@ -119,9 +114,15 @@ export const useSubscriptionCancellation = () => {
   const userId = (session?.user as { id?: string })?.id;
 
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (options?: { reason?: string }) => {
       const response = await fetch("/api/payments/subscription", {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reason: options?.reason || "user_requested",
+        }),
       });
 
       if (!response.ok) {
@@ -134,7 +135,45 @@ export const useSubscriptionCancellation = () => {
         throw new Error(data.error?.message || "Failed to cancel subscription");
       }
 
-      return data.data;
+      return data;
+    },
+    onSuccess: () => {
+      // Invalidate both subscription queries to refetch updated data
+      queryClient.invalidateQueries({ queryKey: ["subscription", userId] });
+      queryClient.invalidateQueries({ queryKey: ["subscription-access", userId] });
+    },
+  });
+};
+
+// Subscription reactivation mutation
+export const useSubscriptionReactivation = () => {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+  const userId = (session?.user as { id?: string })?.id;
+
+  return useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/payments/subscription", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "reactivate",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to reactivate subscription: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error?.message || "Failed to reactivate subscription");
+      }
+
+      return data;
     },
     onSuccess: () => {
       // Invalidate both subscription queries to refetch updated data
@@ -185,4 +224,61 @@ export const planMeetsRequirement = (userPlan: string, requiredPlan: string): bo
   const userPlanIndex = planHierarchy.indexOf(userPlan);
   const requiredPlanIndex = planHierarchy.indexOf(requiredPlan);
   return userPlanIndex >= requiredPlanIndex;
+};
+
+// Utility functions for subscription status
+export const getSubscriptionStatusInfo = (subscription: SubscriptionInfo | undefined) => {
+  if (!subscription) return { message: "Loading...", color: "gray", isActionable: false };
+
+  const now = new Date();
+  const endsAt = subscription.subscriptionEndsAt ? new Date(subscription.subscriptionEndsAt) : null;
+  
+  switch (subscription.status) {
+    case "TRIAL":
+      const daysLeft = subscription.daysLeftInTrial;
+      return {
+        message: daysLeft ? `${daysLeft} days left in trial` : "Trial active",
+        color: "blue",
+        isActionable: true,
+        actionType: "cancel-trial" as const,
+      };
+    
+    case "ACTIVE":
+      return {
+        message: "Active subscription",
+        color: "green",
+        isActionable: true,
+        actionType: "cancel" as const,
+      };
+    
+    case "CANCELLED":
+      if (endsAt && endsAt > now) {
+        const daysLeft = Math.ceil((endsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        return {
+          message: `Cancelled • ${daysLeft} days of access left`,
+          color: "orange",
+          isActionable: true,
+          actionType: "reactivate" as const,
+        };
+      }
+      return {
+        message: "Cancelled",
+        color: "red",
+        isActionable: false,
+      };
+    
+    case "EXPIRED":
+      return {
+        message: "Expired",
+        color: "red",
+        isActionable: false,
+      };
+    
+    default:
+      return {
+        message: subscription.status,
+        color: "gray",
+        isActionable: false,
+      };
+  }
 };
