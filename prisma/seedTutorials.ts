@@ -576,6 +576,372 @@ const TUTORIALS = [
       ],
     },
   },
+  {
+    slug: "operators",
+    title: "JavaScript Operators - Master All Types",
+    description: "Learn all JavaScript operators: arithmetic, comparison, logical, assignment, and more with practical examples",
+    mdxFile: "fundamentals/05-operators",
+    category: "fundamentals",
+    difficulty: 1,
+    order: 6,
+    published: true,
+    isPremium: false,
+    requiredPlan: "FREE",
+    quiz: {
+      title: "JavaScript Operators Quiz",
+      isPremium: false,
+      requiredPlan: "FREE",
+      questions: [
+        {
+          question: "Which operator checks for strict equality without type conversion?",
+          options: ["=", "==", "===", "!="],
+          correct: 2,
+          explanation: "The === operator checks for strict equality, comparing both value and type without automatic type conversion."
+        },
+        {
+          question: "What does the modulus operator (%) return?",
+          options: ["The quotient", "The remainder", "The percentage", "The average"],
+          correct: 1,
+          explanation: "The modulus operator (%) returns the remainder of a division operation."
+        },
+        {
+          question: "Which logical operator returns true if at least one condition is true?",
+          options: ["&&", "||", "!", "??"],
+          correct: 1,
+          explanation: "The OR operator (||) returns true if at least one of the conditions is true."
+        },
+        {
+          question: "What is the difference between + and += operators?",
+          options: ["No difference", "+= is shorthand for variable = variable + value", "+ is faster", "+= only works with numbers"],
+          correct: 1,
+          explanation: "The += operator is shorthand assignment: x += 5 is equivalent to x = x + 5."
+        },
+        {
+          question: "What does the ternary operator syntax look like?",
+          options: ["if ? then : else", "condition ? trueValue : falseValue", "condition : true ? false", "? condition true false"],
+          correct: 1,
+          explanation: "The ternary operator syntax is: condition ? valueIfTrue : valueIfFalse"
+        },
+        {
+          question: "Which operator has the highest precedence?",
+          options: ["+ (addition)", "* (multiplication)", "** (exponentiation)", "= (assignment)"],
+          correct: 2,
+          explanation: "The exponentiation operator (**) has higher precedence than multiplication, which has higher precedence than addition."
+        },
+        {
+          question: "What is the difference between || and ?? operators?",
+          options: ["No difference", "|| checks for falsy values, ?? only checks for null/undefined", "?? is faster", "|| is deprecated"],
+          correct: 1,
+          explanation: "The nullish coalescing (??) operator only checks for null or undefined, while || checks for any falsy value."
+        },
+        {
+          question: "What happens when you use + with a string and a number?",
+          options: ["Addition", "String concatenation", "Error", "Undefined behavior"],
+          correct: 1,
+          explanation: "When + is used with a string and number, the number is converted to a string and concatenation occurs."
+        }
+      ]
+    }
+  },
+  {
+    slug: "type-conversion-coercion",
+    title: "Type Conversion and Coercion in JavaScript",
+    description: "Master explicit and implicit type conversion in JavaScript with interactive examples and best practices",
+    mdxFile: "fundamentals/06-type-conversion-coercion",
+    category: "fundamentals",
+    difficulty: 1,
+    order: 7,
+    published: true,
+    isPremium: false,
+    requiredPlan: "FREE",
+    quiz: {
+      title: "Type Conversion and Coercion Quiz",
+      isPremium: false,
+      requiredPlan: "FREE",
+      questions: [
+        {
+          question: "What is the difference between type conversion and type coercion?",
+          options: ["No difference", "Conversion is explicit, coercion is implicit", "Coercion is faster", "Conversion is deprecated"],
+          correct: 1,
+          explanation: "Type conversion is explicit (you do it deliberately), while type coercion is implicit (JavaScript does it automatically)."
+        },
+        {
+          question: "What does String(123) return?",
+          options: ["123", "\"123\"", "NaN", "Error"],
+          correct: 1,
+          explanation: "String(123) explicitly converts the number 123 to the string '123'."
+        },
+        {
+          question: "What is the result of Number('hello')?",
+          options: ["0", "null", "NaN", "Error"],
+          correct: 2,
+          explanation: "Number('hello') returns NaN because 'hello' cannot be converted to a valid number."
+        },
+        {
+          question: "Which values are falsy in JavaScript?",
+          options: ["Only false", "false, 0, '', null, undefined, NaN", "Only null and undefined", "Only 0 and false"],
+          correct: 1,
+          explanation: "JavaScript has 6 falsy values: false, 0, '', null, undefined, and NaN."
+        },
+        {
+          question: "What does '5' - 3 equal?",
+          options: ["'53'", "2", "NaN", "Error"],
+          correct: 1,
+          explanation: "The - operator triggers numeric coercion, converting '5' to 5, so '5' - 3 = 2."
+        },
+        {
+          question: "What is the safest way to convert a string to a number?",
+          options: ["Using + operator", "Using Number() function", "Using parseInt()", "Using * 1"],
+          correct: 1,
+          explanation: "Number() is the most explicit and predictable way to convert strings to numbers with proper error handling."
+        }
+      ]
+    }
+  },
+  {
+    slug: "error-handling",
+    title: "Error Handling in JavaScript - Try, Catch & Beyond",
+    description: "Master JavaScript error handling with try/catch, finally, and best practices for building robust applications",
+    mdxFile: "fundamentals/07-error-handling",
+    category: "fundamentals",
+    difficulty: 1,
+    order: 8,
+    published: true,
+    isPremium: false,
+    requiredPlan: "FREE",
+    quiz: {
+      title: "Error Handling Quiz",
+      isPremium: false,
+      requiredPlan: "FREE",
+      questions: [
+        {
+          question: "What is the purpose of a try-catch block?",
+          options: ["To speed up code", "To handle errors gracefully without crashing", "To create loops", "To define functions"],
+          correct: 1,
+          explanation: "Try-catch blocks allow you to handle errors gracefully, preventing your application from crashing when errors occur."
+        },
+        {
+          question: "When does the finally block execute?",
+          options: ["Only if no error occurs", "Only if an error occurs", "Always, regardless of errors", "Never"],
+          correct: 2,
+          explanation: "The finally block always executes, whether an error occurs or not, making it perfect for cleanup operations."
+        },
+        {
+          question: "How do you throw a custom error?",
+          options: ["error('message')", "throw new Error('message')", "catch new Error('message')", "try Error('message')"],
+          correct: 1,
+          explanation: "You throw custom errors using the 'throw' statement with a new Error object: throw new Error('message')."
+        },
+        {
+          question: "What are the three main types of JavaScript errors?",
+          options: ["Syntax, Logic, Runtime", "ReferenceError, TypeError, SyntaxError", "Big, Medium, Small", "Client, Server, Network"],
+          correct: 1,
+          explanation: "The main JavaScript error types are ReferenceError (undefined variables), TypeError (wrong type operations), and SyntaxError (invalid syntax)."
+        },
+        {
+          question: "How do you handle errors in async/await functions?",
+          options: ["Use .catch()", "Use try-catch blocks", "Errors handle themselves", "Use finally only"],
+          correct: 1,
+          explanation: "Async/await functions use try-catch blocks to handle errors from awaited promises."
+        },
+        {
+          question: "What is the best practice for error messages?",
+          options: ["Make them vague", "Make them descriptive and actionable", "Don't include any messages", "Only show error codes"],
+          correct: 1,
+          explanation: "Good error messages are descriptive and actionable, helping developers understand what went wrong and how to fix it."
+        },
+        {
+          question: "What happens if you don't handle an error?",
+          options: ["Nothing", "The application continues normally", "The application may crash or behave unexpectedly", "Errors are ignored"],
+          correct: 2,
+          explanation: "Unhandled errors can cause applications to crash or behave unpredictably, which is why proper error handling is essential."
+        }
+      ]
+    }
+  },
+  {
+    slug: "modules",
+    title: "JavaScript Modules - Import, Export & Organization",
+    description: "Learn how to organize JavaScript code with ES6 modules, import/export statements, and modern module patterns",
+    mdxFile: "fundamentals/08-modules",
+    category: "fundamentals",
+    difficulty: 1,
+    order: 9,
+    published: true,
+    isPremium: false,
+    requiredPlan: "FREE",
+    quiz: {
+      title: "JavaScript Modules Quiz",
+      isPremium: false,
+      requiredPlan: "FREE",
+      questions: [
+        {
+          question: "What is the main benefit of using modules?",
+          options: ["Faster code execution", "Better code organization and reusability", "Smaller file sizes", "Automatic error handling"],
+          correct: 1,
+          explanation: "Modules help organize code into reusable, maintainable pieces and avoid naming conflicts in the global scope."
+        },
+        {
+          question: "How do you export a function as the default export?",
+          options: ["export function myFunc()", "export default function myFunc()", "default export myFunc", "export = myFunc"],
+          correct: 1,
+          explanation: "Default exports use the 'export default' syntax: export default function myFunc() {}"
+        },
+        {
+          question: "How do you import a default export?",
+          options: ["import { myFunc } from './module'", "import myFunc from './module'", "import * as myFunc from './module'", "import default myFunc from './module'"],
+          correct: 1,
+          explanation: "Default exports are imported without curly braces: import myFunc from './module'"
+        },
+        {
+          question: "What is the difference between named and default exports?",
+          options: ["No difference", "Named exports can have multiple per module, default exports only one", "Default exports are faster", "Named exports are deprecated"],
+          correct: 1,
+          explanation: "You can have multiple named exports per module, but only one default export per module."
+        },
+        {
+          question: "How do you import all exports from a module?",
+          options: ["import all from './module'", "import * as moduleName from './module'", "import everything from './module'", "import {...} from './module'"],
+          correct: 1,
+          explanation: "Use the wildcard import syntax: import * as moduleName from './module'"
+        },
+        {
+          question: "What is the module pattern used for?",
+          options: ["Making code run faster", "Creating private variables and public APIs", "Handling errors", "Managing memory"],
+          correct: 1,
+          explanation: "The module pattern uses closures to create private variables while exposing a public API."
+        }
+      ]
+    }
+  },
+  {
+    slug: "debugging-techniques",
+    title: "JavaScript Debugging Techniques & Developer Tools",
+    description: "Master debugging JavaScript with console methods, browser developer tools, and professional debugging strategies",
+    mdxFile: "fundamentals/09-debugging-techniques",
+    category: "fundamentals",
+    difficulty: 1,
+    order: 10,
+    published: true,
+    isPremium: false,
+    requiredPlan: "FREE",
+    quiz: {
+      title: "Debugging Techniques Quiz",
+      isPremium: false,
+      requiredPlan: "FREE",
+      questions: [
+        {
+          question: "Which console method is best for displaying tabular data?",
+          options: ["console.log()", "console.table()", "console.info()", "console.debug()"],
+          correct: 1,
+          explanation: "console.table() displays arrays and objects in a nice tabular format, making data easier to read."
+        },
+        {
+          question: "What is the purpose of console.time()?",
+          options: ["To show current time", "To measure code execution performance", "To set timeouts", "To create timestamps"],
+          correct: 1,
+          explanation: "console.time() and console.timeEnd() are used to measure how long code takes to execute."
+        },
+        {
+          question: "What is a breakpoint in debugging?",
+          options: ["A point where code breaks", "A pause point for examining code execution", "An error location", "A function endpoint"],
+          correct: 1,
+          explanation: "A breakpoint pauses code execution at a specific line, allowing you to inspect variables and step through code."
+        },
+        {
+          question: "Which debugging strategy involves testing the middle of a process first?",
+          options: ["Linear debugging", "Binary search debugging", "Random debugging", "Reverse debugging"],
+          correct: 1,
+          explanation: "Binary search debugging involves checking the middle of a process first to quickly isolate where problems occur."
+        },
+        {
+          question: "What should you do when you encounter a bug?",
+          options: ["Immediately start fixing", "First reproduce the bug reliably", "Delete the problematic code", "Restart the application"],
+          correct: 1,
+          explanation: "The first step in professional debugging is to reproduce the bug reliably so you can understand and fix it systematically."
+        },
+        {
+          question: "What is console.assert() used for?",
+          options: ["Making assertions about code", "Testing conditions and showing errors only if false", "Creating functions", "Handling errors"],
+          correct: 1,
+          explanation: "console.assert() only shows an error message if the condition is false, useful for testing assumptions."
+        },
+        {
+          question: "What is the best approach to debugging complex problems?",
+          options: ["Guess and check randomly", "Use a systematic approach: reproduce, isolate, test, fix", "Ask someone else immediately", "Rewrite all the code"],
+          correct: 1,
+          explanation: "Professional debugging follows a systematic approach: reproduce the bug, isolate the problem, form and test hypotheses, then implement and verify the fix."
+        }
+      ]
+    }
+  },
+  {
+    slug: "best-practices",
+    title: "JavaScript Best Practices & Clean Code",
+    description: "Learn professional JavaScript coding standards, clean code principles, and maintainable programming patterns",
+    mdxFile: "fundamentals/10-best-practices",
+    category: "fundamentals",
+    difficulty: 1,
+    order: 11,
+    published: true,
+    isPremium: false,
+    requiredPlan: "FREE",
+    quiz: {
+      title: "Best Practices Quiz",
+      isPremium: false,
+      requiredPlan: "FREE",
+      questions: [
+        {
+          question: "What makes code 'clean'?",
+          options: ["No bugs", "Readable, maintainable, and well-organized", "Short and compact", "Uses latest features"],
+          correct: 1,
+          explanation: "Clean code is readable, maintainable, testable, and self-documenting - making it easy for others (and future you) to understand."
+        },
+        {
+          question: "What is the single responsibility principle for functions?",
+          options: ["Functions should have one parameter", "Functions should do one thing well", "Functions should be short", "Functions should return one value"],
+          correct: 1,
+          explanation: "The single responsibility principle states that each function should have one clear, well-defined purpose."
+        },
+        {
+          question: "Which naming convention is used for JavaScript variables and functions?",
+          options: ["snake_case", "camelCase", "PascalCase", "SCREAMING_SNAKE_CASE"],
+          correct: 1,
+          explanation: "JavaScript uses camelCase for variables and functions (e.g., userName, calculateTotal)."
+        },
+        {
+          question: "What is the recommended naming convention for constants?",
+          options: ["camelCase", "PascalCase", "SCREAMING_SNAKE_CASE", "lowercase"],
+          correct: 2,
+          explanation: "Constants use SCREAMING_SNAKE_CASE (e.g., MAX_FILE_SIZE, API_BASE_URL)."
+        },
+        {
+          question: "What is a code smell?",
+          options: ["Actual odor from computers", "Code that indicates potential problems", "Commented code", "Long variable names"],
+          correct: 1,
+          explanation: "Code smells are indicators of potential problems in code structure, design, or implementation that may need refactoring."
+        },
+        {
+          question: "Why should you validate user input?",
+          options: ["It's optional", "To prevent security vulnerabilities and ensure data integrity", "To make code longer", "Only for forms"],
+          correct: 1,
+          explanation: "Input validation prevents security vulnerabilities (like XSS), ensures data integrity, and improves user experience."
+        },
+        {
+          question: "What is the DRY principle?",
+          options: ["Don't Repeat Yourself", "Do Right Yesterday", "Debug Regularly Yearly", "Don't Rush Yet"],
+          correct: 0,
+          explanation: "DRY (Don't Repeat Yourself) principle advocates for reducing repetition by extracting common functionality into reusable components."
+        },
+        {
+          question: "When should you write comments in code?",
+          options: ["For every line", "To explain 'why' not 'what'", "Never", "Only for complex math"],
+          correct: 1,
+          explanation: "Comments should explain the reasoning behind code (why), not what the code does (which should be self-evident from well-named functions and variables)."
+        }
+      ]
+    }
+  },
 
   // OOP CATEGORY
   {

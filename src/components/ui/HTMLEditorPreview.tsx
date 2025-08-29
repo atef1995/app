@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Eye, EyeOff, RotateCcw, Code, Play, Copy, Check } from "lucide-react";
+import { Editor } from "@monaco-editor/react";
 
 interface HTMLEditorPreviewProps {
   initialHtml: string;
@@ -30,7 +31,6 @@ export function HTMLEditorPreview({
   const [isMounted, setIsMounted] = useState(false);
   const [copied, setCopied] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Handle client-side mounting
   useEffect(() => {
@@ -212,20 +212,6 @@ export function HTMLEditorPreview({
     }
   };
 
-  // Auto-resize textarea
-  const adjustTextareaHeight = useCallback(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (showEditor) {
-      adjustTextareaHeight();
-    }
-  }, [html, showEditor, adjustTextareaHeight]);
-
   return (
     <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
       {/* Header */}
@@ -304,19 +290,23 @@ export function HTMLEditorPreview({
               HTML Editor - Edit the code below and click Run to see changes
             </span>
           </div>
-
-          <textarea
-            ref={textareaRef}
+          <Editor
+            height="300px"
+            defaultLanguage="html"
             value={html}
-            onChange={(e) => {
-              setHtml(e.target.value);
-              adjustTextareaHeight();
+            onChange={(value) => setHtml(value || "")}
+            theme="vs-dark"
+            options={{
+              minimap: { enabled: false },
+              fontSize: 14,
+              wordWrap: "on",
+              scrollBeyondLastLine: false,
+              automaticLayout: true,
+              tabSize: 2,
+              insertSpaces: true,
+              formatOnPaste: true,
+              formatOnType: true,
             }}
-            onInput={adjustTextareaHeight}
-            className="w-full p-4 font-mono text-sm text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-900 border-none resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 max-h-96 overflow-scroll"
-            style={{ minHeight: "120px" }}
-            placeholder="Enter your HTML code here..."
-            spellCheck={false}
           />
         </div>
       )}

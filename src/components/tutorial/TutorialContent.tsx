@@ -40,8 +40,8 @@ const createHeadingComponent = (level: 1 | 2 | 3 | 4) => {
     const id = generateAnchorId(text);
 
     const baseClasses = {
-      1: "text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4",
-      2: "text-2xl font-semibold text-gray-800 dark:text-gray-200 mt-8 mb-4 scroll-mt-20",
+      1: "text-3xl font-bold text-gray-900 dark:text-gray-300 mb-4",
+      2: "text-2xl font-semibold text-gray-800 dark:text-gray-300 mt-8 mb-4 scroll-mt-20",
       3: "text-xl font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3 scroll-mt-20",
       4: "text-lg font-medium text-gray-700 dark:text-gray-300 mt-4 mb-2 scroll-mt-20",
     };
@@ -122,7 +122,7 @@ const mdxComponents = {
   h4: createHeadingComponent(4),
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p
-      className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4"
+      className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4"
       {...props}
     />
   ),
@@ -134,18 +134,17 @@ const mdxComponents = {
       // Inline code styling
       return (
         <code
-          className="bg-gray-100 dark:bg-gray-800 text-pink-600 dark:text-pink-400 px-2 py-1 rounded text-sm font-mono border border-gray-200 dark:border-gray-700"
+          className="bg-gray-100 dark:bg-gray-800 text-red-600 dark:text-red-300 text-pretty font-semibold px-3 py-1 my-1 rounded text-sm font-mono border border-gray-200 dark:border-gray-700"
           {...props}
         />
       );
     } else {
       // Block code - use SyntaxHighlighter
       // Extract only the props that SyntaxHighlighter expects
-      const codeContent = typeof props.children === 'string' ? props.children : '';
+      const codeContent =
+        typeof props.children === "string" ? props.children : "";
       return (
-        <SyntaxHighlighter 
-          className={props.className}
-        >
+        <SyntaxHighlighter className={props.className}>
           {codeContent}
         </SyntaxHighlighter>
       );
@@ -164,7 +163,7 @@ const mdxComponents = {
       // Regular pre block
       return (
         <pre
-          className="m-2 shadow-inner bg-gray-900/20 dark:bg-gray-950/20 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono whitespace-pre-wrap"
+          className="m-2 shadow-inner bg-gray-900/20 dark:bg-gray-950/20 text-gray-300 p-4 rounded-lg overflow-x-auto text-sm font-mono whitespace-pre-wrap"
           {...props}
         />
       );
@@ -172,27 +171,24 @@ const mdxComponents = {
   },
   ul: (props: React.HTMLAttributes<HTMLUListElement>) => (
     <ul
-      className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400 mb-4 ml-4"
+      className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-300 mb-4 ml-4"
       {...props}
     />
   ),
   ol: (props: React.HTMLAttributes<HTMLOListElement>) => (
     <ol
-      className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-400 mb-4 ml-4"
+      className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-300 mb-4 ml-4"
       {...props}
     />
   ),
   li: (props: React.HTMLAttributes<HTMLLIElement>) => (
     <li
-      className="text-gray-600 dark:text-gray-400 leading-relaxed"
+      className="text-gray-600 dark:text-gray-300 leading-relaxed"
       {...props}
     />
   ),
   strong: (props: React.HTMLAttributes<HTMLElement>) => (
-    <strong
-      className="font-bold text-gray-900 dark:text-gray-100"
-      {...props}
-    />
+    <strong className="font-bold text-gray-900 dark:text-blue-300" {...props} />
   ),
   em: (props: React.HTMLAttributes<HTMLElement>) => (
     <em className="italic text-gray-700 dark:text-gray-300" {...props} />
@@ -214,9 +210,9 @@ const mdxComponents = {
   ),
 };
 
-export default function TutorialContent({ 
-  tutorial, 
-  contentLoaded 
+export default function TutorialContent({
+  tutorial,
+  contentLoaded,
 }: TutorialContentProps) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl mb-8 relative">

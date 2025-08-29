@@ -8,6 +8,7 @@ import { ToastProvider } from "@/components/providers/ToastProvider";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { LiveMoodFeedback } from "@/components/ui/LiveMoodFeedback";
+import { AdSenseScript } from "@/components/AdSenseScript";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,9 +34,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6300047399627327" crossOrigin="anonymous"></script>
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-black min-h-screen`}
       >
@@ -44,6 +42,7 @@ export default function RootLayout({
             <AuthProvider>
               <MoodProvider>
                 <ToastProvider>
+                  <AdSenseScript />
                   <Header />
                   <main>{children}</main>
                   <Footer />

@@ -1,0 +1,1383 @@
+---
+title: "JavaScript Best Practices & Clean Code"
+description: "Learn professional JavaScript coding standards, clean code principles, and maintainable programming patterns"
+level: "beginner"
+estimatedTime: "30 minutes"
+topics: ["Best Practices", "Clean Code", "Code Quality", "Naming", "Functions", "Performance", "Security"]
+quizQuestions: 8
+order: 10
+---
+
+# JavaScript Best Practices & Clean Code
+
+Welcome to the final fundamentals tutorial! 🚀 You've learned all the core JavaScript concepts. Now let's master **best practices** - the professional standards that make your code clean, maintainable, and bug-free. These practices will set you apart as a developer!
+
+## What Makes Code "Good"?
+
+Good code is not just code that works - it's code that is readable, maintainable, efficient, and secure.
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="Good Code vs Bad Code" 
+  description="See the difference between amateur and professional code"
+  initialCode={`console.log("--- Good Code vs Bad Code ---");
+
+// ❌ BAD CODE EXAMPLE
+function calc(x,y,z){let r=x>y?x*z:y*z;if(r>1000)r=1000;return r}
+let data=[1,2,3,4,5];
+for(let i=0;i<data.length;i++){data[i]=calc(data[i],10,2);}
+
+console.log("Bad code result:", data);
+
+// ✅ GOOD CODE EXAMPLE
+function calculateWithLimit(value, multiplier, factor, maxLimit = 1000) {
+  // Calculate result based on the larger of value or multiplier
+  let result = value > multiplier 
+    ? value * factor 
+    : multiplier * factor;
+  
+  // Apply limit constraint
+  return Math.min(result, maxLimit);
+}
+
+function processDataArray(numbers) {
+  return numbers.map(number => 
+    calculateWithLimit(number, 10, 2)
+  );
+}
+
+let inputData = [1, 2, 3, 4, 5];
+let processedData = processDataArray(inputData);
+
+console.log("Good code result:", processedData);
+
+// Why the good code is better:
+console.log("\\n--- Why Good Code is Better ---");
+console.log("✅ Readable: Anyone can understand what it does");
+console.log("✅ Maintainable: Easy to modify and extend");
+console.log("✅ Testable: Functions can be tested individually");
+console.log("✅ Reusable: Functions can be used in different contexts");
+console.log("✅ Self-documenting: Code explains itself");`}
+/>
+{/* prettier-ignore-end */}
+
+## 1. Naming Conventions
+
+Great names make code self-documenting and reduce the need for comments.
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="Professional Naming Guide" 
+  description="Learn to write names that make your code self-explanatory"
+  initialCode={`console.log("--- Professional Naming Conventions ---");
+
+// ❌ BAD: Unclear, abbreviated names
+let d = new Date();
+let u = {n: "Alice", a: 25};
+function calc(x, y) { return x * 0.1 + y; }
+let arr = [1, 2, 3];
+
+console.log("Bad names - what do these do?");
+console.log("d:", d);
+console.log("u:", u);
+console.log("calc result:", calc(100, 50));
+
+// ✅ GOOD: Clear, descriptive names
+let currentDate = new Date();
+let currentUser = {name: "Alice", age: 25};
+
+function calculateTotalWithTax(subtotal, taxAmount) {
+  return subtotal * 0.1 + taxAmount;
+}
+
+let productPrices = [19.99, 29.99, 39.99];
+
+console.log("\\nGood names - crystal clear!");
+console.log("currentDate:", currentDate.toLocaleDateString());
+console.log("currentUser:", currentUser);
+console.log("total with tax:", calculateTotalWithTax(100, 50));
+
+// NAMING CONVENTIONS BY TYPE
+console.log("\\n--- Naming Conventions ---");
+
+// Variables and functions: camelCase
+let userName = "alice";
+let isLoggedIn = true;
+let maxRetryCount = 3;
+
+function validateUserInput(input) { return input.length > 0; }
+function sendWelcomeEmail(userEmail) { console.log(\`Email sent to \${userEmail}\`); }
+
+// Constants: SCREAMING_SNAKE_CASE
+const MAX_FILE_SIZE = 1024 * 1024; // 1MB
+const API_BASE_URL = "https://api.example.com";
+const DEFAULT_TIMEOUT = 5000;
+
+// Classes: PascalCase
+class UserManager {
+  constructor() {
+    this.users = [];
+  }
+  
+  addUser(user) {
+    this.users.push(user);
+  }
+}
+
+class ApiService {
+  static async fetchData(endpoint) {
+    console.log(\`Fetching from \${endpoint}\`);
+    return {data: "sample"};
+  }
+}
+
+// Booleans: Use is/has/can/should prefixes
+let isLoading = false;
+let hasPermission = true;  
+let canEdit = false;
+let shouldRetry = true;
+
+console.log("Boolean examples:");
+console.log("isLoading:", isLoading);
+console.log("hasPermission:", hasPermission);
+console.log("canEdit:", canEdit);
+console.log("shouldRetry:", shouldRetry);
+
+// Functions: Use verbs
+function createUser() { return {name: "New User"}; }
+function validateEmail(email) { return email.includes("@"); }
+function calculateDiscount(price, percent) { return price * (percent / 100); }
+function formatCurrency(amount) { return \`$\${amount.toFixed(2)}\`; }
+
+console.log("\\nFunction examples:");
+console.log("Created user:", createUser());
+console.log("Email valid:", validateEmail("test@email.com"));
+console.log("Discount:", calculateDiscount(100, 20));
+console.log("Formatted:", formatCurrency(123.456));`}
+/>
+{/* prettier-ignore-end */}
+
+## 2. Function Best Practices
+
+Functions are the building blocks of good code. Let's make them excellent!
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="Function Excellence Guide" 
+  description="Learn to write functions that are clean, focused, and reusable"
+  initialCode={`console.log("--- Function Best Practices ---");
+
+// PRINCIPLE 1: Single Responsibility
+// ❌ BAD: Function does too many things
+function badUserProcessor(userData) {
+  // Validates data
+  if (!userData.email || !userData.email.includes("@")) {
+    throw new Error("Invalid email");
+  }
+  
+  // Formats data
+  userData.name = userData.name.toLowerCase().trim();
+  
+  // Saves to database (simulated)
+  console.log("Saving to database...");
+  
+  // Sends email (simulated)
+  console.log("Sending welcome email...");
+  
+  // Updates UI (simulated)
+  console.log("Updating UI...");
+  
+  return userData;
+}
+
+// ✅ GOOD: Each function has one responsibility
+function validateUserData(userData) {
+  if (!userData.email || !userData.email.includes("@")) {
+    throw new Error("Invalid email");
+  }
+  
+  if (!userData.name || userData.name.trim().length === 0) {
+    throw new Error("Name is required");
+  }
+  
+  return true;
+}
+
+function formatUserData(userData) {
+  return {
+    ...userData,
+    name: userData.name.toLowerCase().trim(),
+    email: userData.email.toLowerCase().trim()
+  };
+}
+
+function saveUserToDatabase(userData) {
+  console.log("Saving to database:", userData.name);
+  return {id: Math.random(), ...userData};
+}
+
+function sendWelcomeEmail(userData) {
+  console.log(\`Welcome email sent to: \${userData.email}\`);
+  return true;
+}
+
+// PRINCIPLE 2: Pure Functions (when possible)
+// ✅ GOOD: Pure function - same input always gives same output
+function calculateTax(price, taxRate) {
+  return price * taxRate;
+}
+
+function formatPrice(price) {
+  return \`$\${price.toFixed(2)}\`;
+}
+
+// ✅ GOOD: Clear function composition
+function processNewUser(rawUserData) {
+  try {
+    validateUserData(rawUserData);
+    let formattedUser = formatUserData(rawUserData);
+    let savedUser = saveUserToDatabase(formattedUser);
+    sendWelcomeEmail(savedUser);
+    
+    return savedUser;
+  } catch (error) {
+    console.error("User processing failed:", error.message);
+    return null;
+  }
+}
+
+// PRINCIPLE 3: Descriptive Parameters
+// ❌ BAD: Unclear parameters
+function calculate(a, b, c) {
+  return a + (b * c);
+}
+
+// ✅ GOOD: Clear parameters with default values
+function calculateOrderTotal(subtotal, taxRate = 0.08, shippingCost = 0) {
+  return subtotal + (subtotal * taxRate) + shippingCost;
+}
+
+// PRINCIPLE 4: Error Handling
+// ✅ GOOD: Defensive programming
+function safeCalculateAverage(numbers) {
+  if (!Array.isArray(numbers)) {
+    console.warn("Input must be an array");
+    return 0;
+  }
+  
+  if (numbers.length === 0) {
+    console.warn("Cannot calculate average of empty array");
+    return 0;
+  }
+  
+  let validNumbers = numbers.filter(num => typeof num === 'number' && !isNaN(num));
+  
+  if (validNumbers.length === 0) {
+    console.warn("No valid numbers found");
+    return 0;
+  }
+  
+  let sum = validNumbers.reduce((acc, num) => acc + num, 0);
+  return sum / validNumbers.length;
+}
+
+// Test the functions
+console.log("\\n--- Testing Function Best Practices ---");
+
+let testUser = {name: "  Alice Smith  ", email: "ALICE@EMAIL.COM"};
+let processedUser = processNewUser(testUser);
+console.log("Processed user:", processedUser);
+
+console.log("\\nCalculation examples:");
+console.log("Order total:", formatPrice(calculateOrderTotal(100, 0.08, 10)));
+console.log("Safe average:", safeCalculateAverage([1, 2, 3, 4, 5]));
+console.log("Safe average (mixed):", safeCalculateAverage([1, "2", 3, null, 5]));
+console.log("Safe average (empty):", safeCalculateAverage([]));`}
+/>
+{/* prettier-ignore-end */}
+
+## 3. Code Organization & Structure
+
+Well-organized code is easier to understand, maintain, and debug.
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="Code Organization Patterns" 
+  description="Learn to structure your code for maximum maintainability"
+  initialCode={`console.log("--- Code Organization Patterns ---");
+
+// PATTERN 1: Module Pattern for Related Functionality
+const MathUtilities = {
+  // Constants grouped together
+  PI: Math.PI,
+  E: Math.E,
+  
+  // Basic operations
+  add: (a, b) => a + b,
+  subtract: (a, b) => a - b,
+  multiply: (a, b) => a * b,
+  divide: (a, b) => b !== 0 ? a / b : null,
+  
+  // Advanced operations
+  calculateCircleArea: (radius) => MathUtilities.PI * radius ** 2,
+  calculateCircleCircumference: (radius) => 2 * MathUtilities.PI * radius,
+  
+  // Utility functions
+  isEven: (number) => number % 2 === 0,
+  isOdd: (number) => number % 2 !== 0,
+  
+  // Validation
+  isValidNumber: (value) => typeof value === 'number' && !isNaN(value)
+};
+
+// PATTERN 2: Configuration Objects
+const AppConfig = {
+  api: {
+    baseUrl: 'https://api.example.com',
+    timeout: 5000,
+    retryAttempts: 3
+  },
+  
+  ui: {
+    theme: 'light',
+    animationDuration: 300,
+    maxItemsPerPage: 20
+  },
+  
+  validation: {
+    minPasswordLength: 8,
+    maxUsernameLength: 50,
+    allowedEmailDomains: ['gmail.com', 'yahoo.com', 'company.com']
+  }
+};
+
+// PATTERN 3: Service Layer Pattern
+class UserService {
+  constructor(apiClient) {
+    this.apiClient = apiClient;
+    this.cache = new Map();
+  }
+  
+  async getUser(userId) {
+    // Check cache first
+    if (this.cache.has(userId)) {
+      console.log("Returning cached user:", userId);
+      return this.cache.get(userId);
+    }
+    
+    // Fetch from API
+    try {
+      console.log("Fetching user from API:", userId);
+      let user = await this.apiClient.get(\`/users/\${userId}\`);
+      this.cache.set(userId, user);
+      return user;
+    } catch (error) {
+      console.error("Failed to fetch user:", error.message);
+      return null;
+    }
+  }
+  
+  async createUser(userData) {
+    try {
+      let user = await this.apiClient.post('/users', userData);
+      this.cache.set(user.id, user);
+      console.log("User created:", user.id);
+      return user;
+    } catch (error) {
+      console.error("Failed to create user:", error.message);
+      throw error;
+    }
+  }
+}
+
+// PATTERN 4: Factory Pattern for Object Creation
+class UserFactory {
+  static createUser(type, userData) {
+    const userTypes = {
+      admin: () => ({
+        ...userData,
+        role: 'admin',
+        permissions: ['read', 'write', 'delete'],
+        createdAt: new Date().toISOString()
+      }),
+      
+      regular: () => ({
+        ...userData,
+        role: 'user',
+        permissions: ['read'],
+        createdAt: new Date().toISOString()
+      }),
+      
+      guest: () => ({
+        name: 'Guest User',
+        role: 'guest',
+        permissions: [],
+        createdAt: new Date().toISOString()
+      })
+    };
+    
+    if (!userTypes[type]) {
+      throw new Error(\`Unknown user type: \${type}\`);
+    }
+    
+    return userTypes[type]();
+  }
+}
+
+// PATTERN 5: Error Handling Wrapper
+function withErrorHandling(operation, context = '') {
+  return async (...args) => {
+    try {
+      return await operation(...args);
+    } catch (error) {
+      console.error(\`Error in \${context}:\`, error.message);
+      
+      // Could send to error reporting service
+      // errorReporter.report(error, context);
+      
+      return {
+        success: false,
+        error: error.message,
+        context: context
+      };
+    }
+  };
+}
+
+// DEMONSTRATION
+console.log("\\n--- Using Organized Code ---");
+
+// Math utilities
+console.log("Circle area:", MathUtilities.calculateCircleArea(5));
+console.log("Is 4 even?", MathUtilities.isEven(4));
+
+// Configuration usage
+console.log("API timeout:", AppConfig.api.timeout);
+console.log("Theme:", AppConfig.ui.theme);
+
+// User factory
+let adminUser = UserFactory.createUser('admin', {name: 'Admin User', email: 'admin@company.com'});
+let regularUser = UserFactory.createUser('regular', {name: 'John Doe', email: 'john@email.com'});
+let guestUser = UserFactory.createUser('guest');
+
+console.log("Admin user:", adminUser);
+console.log("Regular user:", regularUser);
+console.log("Guest user:", guestUser);
+
+// Error handling wrapper
+let safeOperation = withErrorHandling(async (x, y) => {
+  if (y === 0) throw new Error("Division by zero");
+  return x / y;
+}, 'division operation');
+
+safeOperation(10, 2).then(result => console.log("Safe division result:", result));
+safeOperation(10, 0).then(result => console.log("Safe division error:", result));`}
+/>
+{/* prettier-ignore-end */}
+
+## 4. Performance Best Practices
+
+Write code that not only works but works efficiently!
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="Performance Optimization Guide" 
+  description="Learn techniques to make your JavaScript code faster and more efficient"
+  initialCode={`console.log("--- Performance Best Practices ---");
+
+// PRACTICE 1: Avoid Unnecessary Work
+// ❌ BAD: Doing work in every iteration
+function inefficientSearch(users, searchTerm) {
+  let results = [];
+  for (let user of users) {
+    // Converting to lowercase on every iteration!
+    if (user.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+      results.push(user);
+    }
+  }
+  return results;
+}
+
+// ✅ GOOD: Do work once, reuse result
+function efficientSearch(users, searchTerm) {
+  let lowerSearchTerm = searchTerm.toLowerCase(); // Do once
+  return users.filter(user => 
+    user.name.toLowerCase().includes(lowerSearchTerm)
+  );
+}
+
+// PRACTICE 2: Use Appropriate Data Structures
+// ❌ BAD: Using array for lookup operations
+let usersList = [
+  {id: 1, name: "Alice"},
+  {id: 2, name: "Bob"},
+  {id: 3, name: "Charlie"}
+];
+
+function findUserByIdSlow(id) {
+  return usersList.find(user => user.id === id); // O(n) operation
+}
+
+// ✅ GOOD: Using Map for O(1) lookup
+let usersMap = new Map([
+  [1, {id: 1, name: "Alice"}],
+  [2, {id: 2, name: "Bob"}],
+  [3, {id: 3, name: "Charlie"}]
+]);
+
+function findUserByIdFast(id) {
+  return usersMap.get(id); // O(1) operation
+}
+
+// PRACTICE 3: Lazy Loading and Caching
+class DataManager {
+  constructor() {
+    this.cache = new Map();
+    this.expiry = new Map();
+  }
+  
+  // Memoization pattern
+  expensiveCalculation(input) {
+    const cacheKey = \`calc_\${input}\`;
+    
+    // Check if we have cached result
+    if (this.cache.has(cacheKey)) {
+      console.log("Using cached result for:", input);
+      return this.cache.get(cacheKey);
+    }
+    
+    console.log("Performing expensive calculation for:", input);
+    
+    // Simulate expensive operation
+    let result = 0;
+    for (let i = 0; i < input * 1000; i++) {
+      result += Math.sqrt(i);
+    }
+    
+    // Cache the result
+    this.cache.set(cacheKey, result);
+    return result;
+  }
+  
+  // Debounced function for frequent operations
+  createDebouncedFunction(func, delay) {
+    let timeoutId;
+    
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
+}
+
+// PRACTICE 4: Efficient DOM Operations (concept)
+const DOMOptimizer = {
+  // Batch DOM updates
+  batchDOMUpdates: function(updates) {
+    console.log("Batching", updates.length, "DOM updates");
+    
+    // Instead of updating DOM multiple times:
+    // updates.forEach(update => updateDOM(update)); // BAD
+    
+    // Batch all updates together:
+    let fragment = "document.createDocumentFragment()"; // Would be real DOM fragment
+    console.log("Created document fragment");
+    
+    updates.forEach((update, index) => {
+      console.log(\`Adding update \${index + 1} to fragment\`);
+    });
+    
+    console.log("Applying all updates at once");
+    // realDOMElement.appendChild(fragment); // Would be real DOM operation
+  },
+  
+  // Use event delegation instead of multiple listeners
+  useEventDelegation: function() {
+    console.log("✅ Using event delegation:");
+    console.log("  - One listener on parent element");
+    console.log("  - Handle events for all children");
+    console.log("  - Better memory usage");
+    console.log("  - Works for dynamically added elements");
+  }
+};
+
+// PRACTICE 5: Memory Management
+class MemoryEfficient {
+  constructor() {
+    this.listeners = [];
+    this.timers = [];
+  }
+  
+  addEventListenerSafely(element, event, handler) {
+    // element.addEventListener(event, handler); // Would be real
+    this.listeners.push({element, event, handler});
+    console.log("Event listener added safely");
+  }
+  
+  cleanup() {
+    // Remove all event listeners to prevent memory leaks
+    this.listeners.forEach(({element, event, handler}) => {
+      // element.removeEventListener(event, handler); // Would be real
+      console.log("Removed event listener");
+    });
+    
+    // Clear all timers
+    this.timers.forEach(timerId => {
+      clearTimeout(timerId);
+      console.log("Cleared timer");
+    });
+    
+    // Clear references
+    this.listeners = [];
+    this.timers = [];
+    
+    console.log("Memory cleanup completed");
+  }
+}
+
+// DEMONSTRATION
+console.log("\\n--- Performance Testing ---");
+
+// Test search efficiency
+let testUsers = [
+  {name: "Alice Johnson"}, {name: "Bob Smith"}, 
+  {name: "Charlie Brown"}, {name: "David Wilson"}
+];
+
+console.time("Inefficient Search");
+let result1 = inefficientSearch(testUsers, "Alice");
+console.timeEnd("Inefficient Search");
+
+console.time("Efficient Search");
+let result2 = efficientSearch(testUsers, "Alice");
+console.timeEnd("Efficient Search");
+
+// Test lookup efficiency
+console.time("Array Lookup");
+let user1 = findUserByIdSlow(2);
+console.timeEnd("Array Lookup");
+
+console.time("Map Lookup");
+let user2 = findUserByIdFast(2);
+console.timeEnd("Map Lookup");
+
+// Test caching
+let dataManager = new DataManager();
+dataManager.expensiveCalculation(5); // First call - calculated
+dataManager.expensiveCalculation(5); // Second call - cached
+
+// Demonstrate other patterns
+DOMOptimizer.batchDOMUpdates(['update1', 'update2', 'update3']);
+DOMOptimizer.useEventDelegation();
+
+let memManager = new MemoryEfficient();
+memManager.addEventListenerSafely("element", "click", () => {});
+memManager.cleanup();`}
+/>
+{/* prettier-ignore-end */}
+
+## 5. Security Best Practices
+
+Secure coding prevents vulnerabilities and protects user data.
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="JavaScript Security Essentials" 
+  description="Learn to write secure JavaScript code and avoid common vulnerabilities"
+  initialCode={`console.log("--- JavaScript Security Best Practices ---");
+
+// SECURITY 1: Input Validation and Sanitization
+const SecurityUtils = {
+  // Validate and sanitize user input
+  validateAndSanitizeInput: function(input, type = 'string') {
+    if (input === null || input === undefined) {
+      throw new Error("Input cannot be null or undefined");
+    }
+    
+    switch (type) {
+      case 'string':
+        // Remove potentially dangerous characters
+        return String(input)
+          .trim()
+          .replace(/<script[^>]*>.*?<\\/script>/gi, '') // Remove script tags
+          .replace(/javascript:/gi, '')                 // Remove javascript: protocols
+          .replace(/on\\w+\\s*=/gi, '');               // Remove event handlers
+      
+      case 'number':
+        let num = Number(input);
+        if (isNaN(num)) {
+          throw new Error("Invalid number input");
+        }
+        return num;
+      
+      case 'email':
+        let email = String(input).trim().toLowerCase();
+        if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+          throw new Error("Invalid email format");
+        }
+        return email;
+      
+      default:
+        return String(input).trim();
+    }
+  },
+  
+  // Escape HTML to prevent XSS
+  escapeHtml: function(unsafe) {
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  },
+  
+  // Generate secure random tokens
+  generateSecureToken: function(length = 32) {
+    let result = '';
+    let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    
+    return result;
+  }
+};
+
+// SECURITY 2: Safe Data Handling
+class SecureDataHandler {
+  constructor() {
+    this.sensitiveData = new Map(); // Use Map for better security
+  }
+  
+  // Store sensitive data safely
+  storeSensitiveData(key, data) {
+    if (!key || !data) {
+      throw new Error("Key and data are required");
+    }
+    
+    // Don't log sensitive data
+    console.log("Storing sensitive data for key:", key.substring(0, 3) + "***");
+    
+    // In real app, you'd encrypt this data
+    this.sensitiveData.set(key, data);
+  }
+  
+  // Retrieve sensitive data safely
+  getSensitiveData(key) {
+    if (!key) {
+      throw new Error("Key is required");
+    }
+    
+    if (!this.sensitiveData.has(key)) {
+      console.log("No data found for key");
+      return null;
+    }
+    
+    console.log("Retrieved sensitive data for key:", key.substring(0, 3) + "***");
+    return this.sensitiveData.get(key);
+  }
+  
+  // Clear sensitive data
+  clearSensitiveData(key) {
+    if (key) {
+      this.sensitiveData.delete(key);
+      console.log("Cleared sensitive data for key:", key.substring(0, 3) + "***");
+    } else {
+      this.sensitiveData.clear();
+      console.log("Cleared all sensitive data");
+    }
+  }
+}
+
+// SECURITY 3: API Security Patterns
+class SecureApiClient {
+  constructor(baseUrl) {
+    this.baseUrl = baseUrl;
+    this.authToken = null;
+    this.rateLimitInfo = {
+      requests: 0,
+      resetTime: Date.now() + 60000 // Reset every minute
+    };
+  }
+  
+  setAuthToken(token) {
+    // Validate token format
+    if (!token || typeof token !== 'string' || token.length < 10) {
+      throw new Error("Invalid authentication token");
+    }
+    
+    this.authToken = token;
+    console.log("Auth token set (length:", token.length, ")");
+  }
+  
+  // Rate limiting to prevent abuse
+  checkRateLimit() {
+    let now = Date.now();
+    
+    if (now > this.rateLimitInfo.resetTime) {
+      this.rateLimitInfo.requests = 0;
+      this.rateLimitInfo.resetTime = now + 60000;
+    }
+    
+    if (this.rateLimitInfo.requests >= 100) {
+      throw new Error("Rate limit exceeded. Try again later.");
+    }
+    
+    this.rateLimitInfo.requests++;
+  }
+  
+  async secureRequest(endpoint, options = {}) {
+    // Check rate limiting
+    this.checkRateLimit();
+    
+    // Validate endpoint
+    if (!endpoint || typeof endpoint !== 'string') {
+      throw new Error("Invalid endpoint");
+    }
+    
+    // Ensure HTTPS (in real app)
+    if (this.baseUrl.startsWith('http:') && !this.baseUrl.includes('localhost')) {
+      console.warn("⚠️  WARNING: Using HTTP instead of HTTPS");
+    }
+    
+    // Add authentication if available
+    let headers = {
+      'Content-Type': 'application/json',
+      ...options.headers
+    };
+    
+    if (this.authToken) {
+      headers['Authorization'] = \`Bearer \${this.authToken}\`;
+    }
+    
+    console.log("Making secure request to:", endpoint);
+    return {
+      success: true,
+      data: "Simulated secure response",
+      headers: headers
+    };
+  }
+}
+
+// SECURITY 4: Content Security Policy Helpers
+const CSPHelpers = {
+  // Safe ways to add dynamic content
+  safeSetInnerHTML: function(element, content) {
+    // In real app, you'd use DOMPurify or similar
+    let safeContent = SecurityUtils.escapeHtml(content);
+    console.log("Setting safe HTML content");
+    return safeContent;
+  },
+  
+  // Safe script loading
+  loadScriptSafely: function(scriptUrl, allowedDomains) {
+    let url = new URL(scriptUrl);
+    
+    if (!allowedDomains.includes(url.hostname)) {
+      throw new Error(\`Script domain not allowed: \${url.hostname}\`);
+    }
+    
+    console.log("Loading script from allowed domain:", url.hostname);
+    return true;
+  }
+};
+
+// DEMONSTRATION
+console.log("\\n--- Security Demonstrations ---");
+
+// Input validation
+try {
+  let userInput = "<script>alert('xss')</script>Hello World";
+  let safeInput = SecurityUtils.validateAndSanitizeInput(userInput);
+  console.log("Original:", userInput);
+  console.log("Sanitized:", safeInput);
+  
+  let email = SecurityUtils.validateAndSanitizeInput("user@email.com", "email");
+  console.log("Validated email:", email);
+} catch (error) {
+  console.error("Validation error:", error.message);
+}
+
+// Secure data handling
+let dataHandler = new SecureDataHandler();
+dataHandler.storeSensitiveData("user123", {password: "secret123", creditCard: "1234-5678"});
+let retrievedData = dataHandler.getSensitiveData("user123");
+dataHandler.clearSensitiveData("user123");
+
+// Secure API client
+let apiClient = new SecureApiClient("https://api.example.com");
+apiClient.setAuthToken(SecurityUtils.generateSecureToken());
+apiClient.secureRequest("/user/profile").then(response => {
+  console.log("API Response:", response.success);
+});
+
+// HTML escaping
+let unsafeHTML = "<img src='x' onerror='alert(\"XSS\")'>";
+let safeHTML = SecurityUtils.escapeHtml(unsafeHTML);
+console.log("Unsafe HTML:", unsafeHTML);
+console.log("Safe HTML:", safeHTML);
+
+console.log("\\n--- Security Checklist ---");
+console.log("✅ Always validate and sanitize user input");
+console.log("✅ Use HTTPS for all network communications");
+console.log("✅ Never log sensitive information");
+console.log("✅ Implement rate limiting for APIs");
+console.log("✅ Escape HTML content to prevent XSS");
+console.log("✅ Use secure random tokens");
+console.log("✅ Clear sensitive data when no longer needed");`}
+/>
+{/* prettier-ignore-end */}
+
+## 6. Testing & Documentation
+
+Good code is tested code and documented code!
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="Testing & Documentation Best Practices" 
+  description="Learn to write testable code and clear documentation"
+  initialCode={`console.log("--- Testing & Documentation Best Practices ---");
+
+// DOCUMENTATION: Self-Documenting Code
+/**
+ * Calculates the monthly payment for a loan
+ * @param {number} principal - The loan amount in dollars
+ * @param {number} annualRate - Annual interest rate as decimal (e.g., 0.05 for 5%)
+ * @param {number} years - Loan term in years
+ * @returns {number} Monthly payment amount
+ * @throws {Error} If any parameter is invalid
+ * @example
+ * // Calculate payment for $200,000 loan at 5% for 30 years
+ * const payment = calculateMonthlyPayment(200000, 0.05, 30);
+ * console.log(payment); // $1073.64
+ */
+function calculateMonthlyPayment(principal, annualRate, years) {
+  // Input validation with clear error messages
+  if (typeof principal !== 'number' || principal <= 0) {
+    throw new Error('Principal must be a positive number');
+  }
+  
+  if (typeof annualRate !== 'number' || annualRate < 0) {
+    throw new Error('Annual rate must be a non-negative number');
+  }
+  
+  if (typeof years !== 'number' || years <= 0) {
+    throw new Error('Years must be a positive number');
+  }
+  
+  // Handle edge case: no interest
+  if (annualRate === 0) {
+    return principal / (years * 12);
+  }
+  
+  // Standard loan calculation
+  const monthlyRate = annualRate / 12;
+  const numberOfPayments = years * 12;
+  
+  const monthlyPayment = (principal * monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) /
+                        (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+  
+  return Math.round(monthlyPayment * 100) / 100; // Round to nearest cent
+}
+
+// TESTING: Simple Test Framework
+class SimpleTestFramework {
+  constructor() {
+    this.tests = [];
+    this.passed = 0;
+    this.failed = 0;
+  }
+  
+  /**
+   * Add a test case
+   * @param {string} description - What the test is checking
+   * @param {Function} testFunction - Function that should return true if test passes
+   */
+  test(description, testFunction) {
+    this.tests.push({description, testFunction});
+  }
+  
+  /**
+   * Assert that two values are equal
+   */
+  assertEqual(actual, expected, message = '') {
+    if (actual === expected) {
+      return true;
+    } else {
+      throw new Error(\`\${message} Expected: \${expected}, Actual: \${actual}\`);
+    }
+  }
+  
+  /**
+   * Assert that a function throws an error
+   */
+  assertThrows(func, expectedErrorMessage = '') {
+    try {
+      func();
+      throw new Error('Expected function to throw, but it did not');
+    } catch (error) {
+      if (expectedErrorMessage && !error.message.includes(expectedErrorMessage)) {
+        throw new Error(\`Expected error to contain "\${expectedErrorMessage}", but got "\${error.message}"\`);
+      }
+      return true;
+    }
+  }
+  
+  /**
+   * Run all tests
+   */
+  runTests() {
+    console.log(\`\\n--- Running \${this.tests.length} Tests ---\`);
+    
+    this.tests.forEach((test, index) => {
+      try {
+        test.testFunction();
+        console.log(\`✅ Test \${index + 1}: \${test.description}\`);
+        this.passed++;
+      } catch (error) {
+        console.error(\`❌ Test \${index + 1}: \${test.description}\`);
+        console.error(\`   Error: \${error.message}\`);
+        this.failed++;
+      }
+    });
+    
+    console.log(\`\\n--- Test Results ---\`);
+    console.log(\`Passed: \${this.passed}\`);
+    console.log(\`Failed: \${this.failed}\`);
+    console.log(\`Total: \${this.tests.length}\`);
+    
+    return this.failed === 0;
+  }
+}
+
+// TESTING EXAMPLES
+const testFramework = new SimpleTestFramework();
+
+// Test valid inputs
+testFramework.test('should calculate correct monthly payment for standard loan', () => {
+  const payment = calculateMonthlyPayment(200000, 0.05, 30);
+  testFramework.assertEqual(payment, 1073.64, 'Monthly payment calculation');
+});
+
+testFramework.test('should handle zero interest rate', () => {
+  const payment = calculateMonthlyPayment(120000, 0, 10);
+  testFramework.assertEqual(payment, 1000, 'Zero interest calculation');
+});
+
+testFramework.test('should handle small loan amounts', () => {
+  const payment = calculateMonthlyPayment(1000, 0.03, 1);
+  testFramework.assertEqual(payment, 84.69, 'Small loan calculation');
+});
+
+// Test error conditions
+testFramework.test('should throw error for negative principal', () => {
+  testFramework.assertThrows(
+    () => calculateMonthlyPayment(-1000, 0.05, 30),
+    'Principal must be a positive number'
+  );
+});
+
+testFramework.test('should throw error for negative years', () => {
+  testFramework.assertThrows(
+    () => calculateMonthlyPayment(100000, 0.05, -5),
+    'Years must be a positive number'
+  );
+});
+
+testFramework.test('should throw error for invalid principal type', () => {
+  testFramework.assertThrows(
+    () => calculateMonthlyPayment('not a number', 0.05, 30),
+    'Principal must be a positive number'
+  );
+});
+
+// DOCUMENTATION EXAMPLES
+const DocumentationExamples = {
+  /**
+   * User management utilities
+   * @namespace UserUtils
+   */
+  
+  /**
+   * Validates user registration data
+   * @memberof UserUtils
+   * @param {Object} userData - User registration data
+   * @param {string} userData.email - User's email address
+   * @param {string} userData.password - User's password (min 8 characters)
+   * @param {string} userData.name - User's full name
+   * @returns {Object} Validation result
+   * @returns {boolean} returns.isValid - Whether data is valid
+   * @returns {string[]} returns.errors - Array of error messages
+   */
+  validateUserRegistration(userData) {
+    let errors = [];
+    
+    // Email validation
+    if (!userData.email || !userData.email.includes('@')) {
+      errors.push('Valid email is required');
+    }
+    
+    // Password validation
+    if (!userData.password || userData.password.length < 8) {
+      errors.push('Password must be at least 8 characters');
+    }
+    
+    // Name validation
+    if (!userData.name || userData.name.trim().length < 2) {
+      errors.push('Name must be at least 2 characters');
+    }
+    
+    return {
+      isValid: errors.length === 0,
+      errors: errors
+    };
+  }
+};
+
+// RUN TESTS
+testFramework.runTests();
+
+// DEMO DOCUMENTATION FUNCTION
+console.log("\\n--- Documentation Examples ---");
+let validUser = {
+  email: 'user@email.com',
+  password: 'securepass123',
+  name: 'John Doe'
+};
+
+let invalidUser = {
+  email: 'invalid-email',
+  password: 'short',
+  name: 'A'
+};
+
+console.log("Valid user validation:", DocumentationExamples.validateUserRegistration(validUser));
+console.log("Invalid user validation:", DocumentationExamples.validateUserRegistration(invalidUser));
+
+console.log("\\n--- Documentation Best Practices ---");
+console.log("✅ Write clear function descriptions");
+console.log("✅ Document all parameters and return values");
+console.log("✅ Include examples in documentation");
+console.log("✅ Document error conditions");
+console.log("✅ Keep documentation up-to-date with code");
+console.log("✅ Write tests for all important functions");
+console.log("✅ Test both success and error cases");`}
+/>
+{/* prettier-ignore-end */}
+
+## Your Turn! 💪
+
+Practice with these exercises:
+
+{/* prettier-ignore-start */}
+### Exercise 1: Code Refactoring Challenge
+
+<InteractiveCodeBlock 
+  title="Refactor Bad Code" 
+  description="Transform this messy code into clean, professional code following best practices"
+  initialCode={`// CHALLENGE: Refactor this bad code into clean, professional code
+// Apply naming conventions, single responsibility, error handling, and documentation
+
+function f(d){let r=[];for(let i=0;i<d.length;i++){if(d[i].a>18&&d[i].s==="active"){let x=d[i].n.split(" ");r.push({fn:x[0],ln:x[1]||"",e:d[i].e,a:d[i].a});}}return r;}
+
+let users=[
+  {n:"alice smith",a:25,s:"active",e:"alice@email.com"},
+  {n:"bob jones",a:17,s:"active",e:"bob@email.com"},  
+  {n:"charlie brown",a:30,s:"inactive",e:"charlie@email.com"},
+  {n:"diana",a:22,s:"active",e:"diana@email.com"}
+];
+
+console.log("Original result:", f(users));
+
+// YOUR REFACTORED VERSION:
+// 1. Give the function a descriptive name
+// 2. Use proper parameter and variable names
+// 3. Add input validation and error handling
+// 4. Break into smaller functions if needed
+// 5. Add JSDoc documentation
+// 6. Handle edge cases (like missing last name)
+
+function refactoredFunction(userData) {
+  // Your clean code here
+}
+
+// Test your refactored function
+console.log("Refactored result:", refactoredFunction(users));`}
+/>
+
+### Exercise 2: Secure Form Validator
+
+<InteractiveCodeBlock 
+  title="Build a Secure Form Validator" 
+  description="Create a comprehensive form validator with security best practices"
+  initialCode={`// Build a secure form validator with these requirements:
+// 1. Validate all input types (string, email, password, number)
+// 2. Sanitize inputs to prevent XSS
+// 3. Provide detailed error messages
+// 4. Use proper error handling
+// 5. Add rate limiting to prevent abuse
+// 6. Document all functions
+
+class SecureFormValidator {
+  constructor() {
+    this.validationAttempts = new Map();
+    this.maxAttemptsPerMinute = 5;
+  }
+  
+  // Add your validation methods here:
+  
+  validateRequired(value, fieldName) {
+    // Check if field has a value
+  }
+  
+  validateEmail(email) {
+    // Validate email format and sanitize
+  }
+  
+  validatePassword(password) {
+    // Check password strength (length, complexity)
+  }
+  
+  validateAge(age) {
+    // Validate age is a number between 13 and 120
+  }
+  
+  sanitizeInput(input) {
+    // Remove potentially dangerous content
+  }
+  
+  validateForm(formData) {
+    // Validate entire form object
+    // Return {isValid: boolean, errors: array, sanitizedData: object}
+  }
+}
+
+// Test your validator
+let validator = new SecureFormValidator();
+
+let testFormData = {
+  name: "  <script>alert('xss')</script>John Doe  ",
+  email: "john@email.com",
+  password: "weak",
+  age: "25"
+};
+
+let result = validator.validateForm(testFormData);
+console.log("Validation result:", result);`}
+/>
+
+### Exercise 3: Performance-Optimized Data Processor
+
+<InteractiveCodeBlock 
+  title="Optimize Data Processing" 
+  description="Build an efficient data processor that handles large datasets"
+  initialCode={`// Build a performance-optimized data processor that can:
+// 1. Process large arrays efficiently
+// 2. Use caching for expensive operations
+// 3. Implement batching for heavy work
+// 4. Provide progress tracking
+// 5. Handle errors gracefully
+// 6. Support different processing strategies
+
+class DataProcessor {
+  constructor() {
+    this.cache = new Map();
+    this.processingStrategies = new Map();
+  }
+  
+  // Add your methods:
+  
+  registerStrategy(name, strategyFunction) {
+    // Register different processing strategies
+  }
+  
+  processWithCaching(data, processor) {
+    // Use memoization for repeated calculations
+  }
+  
+  batchProcess(largeDataSet, batchSize = 1000) {
+    // Process large datasets in chunks
+  }
+  
+  processAsync(data, onProgress) {
+    // Process data asynchronously with progress updates
+  }
+  
+  processLargeDataset(data, strategyName = 'default') {
+    // Main processing method that uses all optimizations
+  }
+}
+
+// Test your processor
+let processor = new DataProcessor();
+
+// Register a processing strategy
+processor.registerStrategy('square', (x) => x * x);
+processor.registerStrategy('fibonacci', (n) => {
+  // Your fibonacci implementation
+});
+
+// Create test data
+let largeDataset = Array.from({length: 10000}, (_, i) => i + 1);
+
+console.time('Data Processing');
+let result = processor.processLargeDataset(largeDataset, 'square');
+console.timeEnd('Data Processing');
+
+console.log("Processed first 10 items:", result.slice(0, 10));`}
+/>
+{/* prettier-ignore-end */}
+
+## Key Takeaways
+
+🎯 **Clean code** is readable, maintainable, and self-documenting
+
+🎯 **Good names** eliminate the need for most comments
+
+🎯 **Single responsibility** makes functions easier to understand and test
+
+🎯 **Error handling** prevents crashes and provides better user experience
+
+🎯 **Security practices** protect against common vulnerabilities
+
+🎯 **Performance optimization** makes applications faster and more responsive
+
+🎯 **Testing and documentation** ensure code quality and maintainability
+
+## Quiz Time! 🧠
+
+Congratulations! You've completed all JavaScript fundamentals and learned professional best practices! Time for your final quiz.
+
+## 🎉 Congratulations! You've Mastered JavaScript Fundamentals!
+
+You've completed an incredible journey through JavaScript fundamentals! Here's what you've accomplished:
+
+### ✅ Core Concepts Mastered:
+- **Variables & Data Types** - Store and work with different kinds of data
+- **Functions** - Create reusable, organized code blocks  
+- **Arrays & Objects** - Organize and manipulate complex data
+- **Control Structures** - Control program flow with conditions and loops
+- **Operators** - Perform operations on data efficiently
+- **Type Conversion** - Handle data type changes safely
+- **Error Handling** - Build robust, fault-tolerant applications
+- **Modules** - Organize code into maintainable, reusable pieces
+- **Debugging** - Find and fix problems like a pro
+- **Best Practices** - Write clean, secure, performant code
+
+### 🚀 What's Next?
+
+You now have a solid foundation in JavaScript! Consider exploring:
+
+- **DOM Manipulation** - Make web pages interactive
+- **Asynchronous JavaScript** - Handle API calls and async operations
+- **Advanced Functions & Scope** - Master closures and advanced patterns
+- **Object-Oriented Programming** - Build complex applications with classes
+- **Modern JavaScript Features** - ES6+ syntax and capabilities
+
+### 💪 Keep Coding!
+
+The best way to solidify these concepts is through practice. Build projects, solve problems, and keep experimenting. You've got this!
+
+**Happy coding, JavaScript developer!** 🎯

@@ -1,0 +1,1097 @@
+---
+title: "JavaScript Operators - Master All Types"
+description: "Learn all JavaScript operators: arithmetic, comparison, logical, assignment, and more with practical examples"
+level: "beginner"
+estimatedTime: "25 minutes"
+topics: ["Operators", "Arithmetic", "Comparison", "Logical", "Assignment"]
+quizQuestions: 8
+order: 5
+---
+
+# JavaScript Operators - Master All Types
+
+**Hey there, future JavaScript wizard!** 🚀 
+
+**Quick question**: Have you ever wondered how calculators work? Or how websites check if you're old enough to sign up? Or how shopping carts calculate your total? 
+
+The secret is **operators** - the magical symbols that make computers do math, comparisons, and logic!
+
+**Let me ask you this**: If I gave you `5 + 3`, you'd say `8`, right? But what about `5 + "3"`? Or `5 === "5"`? 🤔
+
+That's where operators get interesting (and sometimes tricky)!
+
+## What are Operators? (The Building Blocks of Logic!)
+
+Think about it like this: **operators are like verbs in English** - they tell JavaScript what ACTION to perform on your data.
+
+- `+` means "add these together" 
+- `===` means "are these exactly the same?"
+- `&&` means "are BOTH of these true?"
+
+**Real-world moment**: Every time you:
+- Like a post (checking if you're logged in `&&` if the post exists)
+- Add items to a cart (using `+=` to increase the total)
+- Check your age for a website (using `>=` to see if you're old enough)
+
+You're using operators! 
+
+**Ready to become an operator master?** Let's start with the most familiar ones...
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="🎯 Operator Prediction Challenge" 
+  description="Before running: guess what each line will output!"
+  initialCode={`// 🤔 PREDICTION TIME: What will these output? Guess first!
+let result = 5 + 3; // + is the operator, 5 and 3 are operands
+console.log(result); // Your guess: ???
+
+// Numbers vs strings - what's the difference?
+let numberResult = 15 + 27;
+console.log("Numbers:", numberResult); // Your guess: ???
+
+let stringResult = "Hello" + " " + "World";
+console.log("Strings:", stringResult); // Your guess: ???
+
+// 🎯 THE BIG QUESTION: What about mixing types?
+let mixedResult1 = 5 + "3";  // Number + String
+console.log("5 + '3' =", mixedResult1); // Your guess: ??? (8 or "53"?)
+
+let mixedResult2 = "5" + 3;  // String + Number  
+console.log("'5' + 3 =", mixedResult2); // Your guess: ??? 
+
+// 🧠 BRAIN TEASER: Try to predict this one!
+let weirdResult = 10 + 5 + " points";
+console.log(weirdResult); // Your guess: ???
+
+// 💡 EXPERIMENT: Change these values and see what happens!
+let yourNumber = 42;
+let yourString = " is the answer";
+console.log("Your experiment:", yourNumber + yourString);`}
+/>
+{/* prettier-ignore-end */}
+
+**🧠 Quick Learning Check**: 
+
+Did any of those results surprise you? Let's think about it:
+
+- `5 + "3"` gives `"53"` - JavaScript sees a string and thinks "they want to join them!"
+- `10 + 5 + " points"` gives `"15 points"` - JavaScript does math first (left to right), then joins
+
+**Developer insight**: This is why JavaScript can be tricky! The `+` operator has two jobs - addition AND string concatenation.
+
+**Question for you**: Now that you've seen this behavior, how would you ensure you always get math instead of string joining? 🤔
+
+## 1. Arithmetic Operators
+
+**Let's get mathematical!** 📊 These are the operators you probably know from school, but JavaScript has a few surprises...
+
+These operators perform mathematical calculations. Let's explore each one interactively!
+
+### Basic Arithmetic - Try Them All!
+
+**Before we dive in**: Can you guess what `10 % 3` equals? Or what `2 ** 3` does? Let's find out!
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="🔢 Math Operations Challenge" 
+  description="🎯 PREDICTION GAME: Guess each result before running the code!"
+  initialCode={`let a = 10;
+let b = 3;
+
+// 🎯 PREDICT FIRST, THEN RUN!
+console.log("=== Basic Math Operations ===");
+console.log("Addition:", a + b);      // Your guess: ???
+console.log("Subtraction:", a - b);   // Your guess: ???  
+console.log("Multiplication:", a * b); // Your guess: ???
+console.log("Division:", a / b);      // Your guess: ??? (Will it be a whole number?)
+
+// 🤔 THE MYSTERIOUS ONES:
+console.log("Modulus (remainder):", a % b); // What's left when 10 ÷ 3?
+console.log("Exponentiation:", a ** b);     // 10 to the power of 3 = ???
+
+console.log("\\n=== Real-World Examples ===");
+// Pizza slices: 17 slices, 4 people - how many each + leftovers?
+let totalSlices = 17;
+let people = 4;
+console.log("Slices per person:", Math.floor(totalSlices / people));
+console.log("Leftover slices:", totalSlices % people);
+
+// Compound interest calculation
+let principal = 1000;
+let rate = 1.05; // 5% interest
+let years = 3;
+let finalAmount = principal * (rate ** years);
+console.log(\`$\${principal} after \${years} years at 5%: $\${finalAmount.toFixed(2)}\`);
+
+// 🧠 YOUR EXPERIMENT: 
+let x = 8;
+let y = 2;
+console.log("\\n=== Your Math Lab ===");
+console.log(\`\${x} + \${y} = \${x + y}\`);
+console.log(\`\${x} % \${y} = \${x % y}\`); // Even number % 2 = ???
+console.log(\`\${x} ** \${y} = \${x ** y}\`); // 8 squared!
+
+// 🎯 CHALLENGE: What happens with negative numbers?
+console.log("\\n=== Negative Number Challenge ===");
+console.log("-10 % 3 =", -10 % 3); // Positive or negative remainder?
+console.log("10 % -3 =", 10 % -3);  // What about this one?`}
+/>
+{/* prettier-ignore-end */}
+
+### Increment and Decrement - Interactive Practice
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="Increment/Decrement Explorer" 
+  description="See the difference between pre-increment (++x) and post-increment (x++) in action!"
+  initialCode={`let counter = 5;
+console.log("Starting counter:", counter);
+
+// Pre-increment: increment first, then use value
+console.log("++counter:", ++counter); // 6 (counter is now 6)
+console.log("counter after pre-increment:", counter);
+
+// Post-increment: use value first, then increment  
+console.log("counter++:", counter++); // 6 (displays 6, counter becomes 7)
+console.log("counter after post-increment:", counter);
+
+// Try with decrement:
+console.log("\\n--- Decrement Practice ---");
+let value = 10;
+console.log("Starting value:", value);
+console.log("--value:", --value);
+console.log("value after:", value);`}
+/>
+{/* prettier-ignore-end */}
+
+### Real-World Arithmetic - Build Useful Functions!
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="Practical Arithmetic Functions" 
+  description="Try these real-world examples - modify the values to see different results!"
+  initialCode={`// Calculate tip
+function calculateTip(billAmount, tipPercent) {
+  return billAmount * (tipPercent / 100);
+}
+
+// Calculate area of circle  
+function circleArea(radius) {
+  return Math.PI * (radius ** 2);
+}
+
+// Check if number is even
+function isEven(number) {
+  return number % 2 === 0;
+}
+
+// Test the functions:
+console.log("Tip for $50 bill at 18%:", calculateTip(50, 18));
+console.log("Circle area (radius 5):", circleArea(5).toFixed(2));
+console.log("Is 7 even?", isEven(7));
+console.log("Is 8 even?", isEven(8));
+
+// Try your own values:
+let myBill = 35.50;
+let myTipPercent = 20;
+console.log(\`Tip for $\${myBill} at \${myTipPercent}%: $\${calculateTip(myBill, myTipPercent)}\`);`}
+/>
+{/* prettier-ignore-end */}
+
+## 2. Assignment Operators
+
+These operators assign values to variables. Let's see them in action!
+
+### Compound Assignment - Watch Variables Change!
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="Assignment Operators in Action" 
+  description="See how compound assignment operators modify variables step by step!"
+  initialCode={`let score = 100;
+console.log("Starting score:", score);
+
+score += 25;  // Same as: score = score + 25
+console.log("After += 25:", score);
+
+score -= 10;  // Same as: score = score - 10  
+console.log("After -= 10:", score);
+
+score *= 2;   // Same as: score = score * 2
+console.log("After *= 2:", score);
+
+score /= 5;   // Same as: score = score / 5
+console.log("After /= 5:", score);
+
+score %= 7;   // Same as: score = score % 7
+console.log("After %= 7:", score);
+
+// Try with your own starting value:
+let myNumber = 50;
+console.log("\\nStarting with:", myNumber);
+myNumber += 30;
+myNumber *= 2;
+console.log("After += 30 and *= 2:", myNumber);`}
+/>
+{/* prettier-ignore-end */}
+
+### Real-World Assignment Examples
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="Shopping Cart & User Points System" 
+  description="Build a shopping cart and points system using assignment operators!"
+  initialCode={`// Shopping cart total
+let cartTotal = 0;
+console.log("Empty cart:", cartTotal);
+
+cartTotal += 29.99; // Add product 1: T-shirt
+console.log("Added T-shirt ($29.99):", cartTotal);
+
+cartTotal += 15.50; // Add product 2: Mug
+console.log("Added Mug ($15.50):", cartTotal);
+
+cartTotal += 8.75;  // Add product 3: Stickers
+console.log("Added Stickers ($8.75):", cartTotal);
+
+console.log(\`Final Total: $\${cartTotal.toFixed(2)}\`);
+
+// User points system
+let userPoints = 1000;
+console.log("\\nStarting points:", userPoints);
+
+userPoints += 250; // Bonus points for purchase
+console.log("Earned bonus points:", userPoints);
+
+userPoints -= 50;  // Used points for discount
+console.log("After using points:", userPoints);
+
+// Try building your own message:
+let message = "Welcome";
+message += " to";
+message += " Vibed to Cracked!";
+console.log("\\nBuilt message:", message);`}
+/>
+{/* prettier-ignore-end */}
+
+**🎉 Arithmetic Mastery Checkpoint!**
+
+**Let's pause and reflect**: You just discovered some powerful math concepts!
+
+**Which surprised you most?**
+- That `10 / 3` gives you decimals instead of doing "long division"?
+- That modulus (`%`) tells you the remainder - super useful for checking even/odd numbers!
+- That `**` is exponentiation (like `2 ** 3 = 8`)?
+
+**Developer wisdom**: The modulus operator (`%`) is incredibly useful! You'll use it for:
+- Checking if numbers are even: `number % 2 === 0`
+- Cycling through arrays: `index % array.length`  
+- Creating repeating patterns
+
+**Quick self-test**: Can you now figure out if a number is divisible by 5? 🤔
+
+## 3. Comparison Operators
+
+**Time for some true/false detective work!** 🔍
+
+These operators are like JavaScript's way of asking questions: "Is this bigger than that?" "Are these the same?" 
+
+**Here's where it gets spicy**: JavaScript has TWO ways to check if things are equal, and they're very different!
+
+### Equality Operators - Learn the Differences!
+
+**The million-dollar question**: What's the difference between `==` and `===`? This trips up even experienced developers!
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="🎯 The == vs === Challenge" 
+  description="🤯 MIND-BLOWING: Guess which comparisons return true or false!"
+  initialCode={`// 🧠 THE SETUP: Three values that LOOK similar
+let a = 5;        // Number 5
+let b = "5";      // String "5"  
+let c = 5;        // Number 5
+
+console.log("Our contestants:", {a, b, c});
+console.log("Their types:", typeof a, typeof b, typeof c);
+
+// 🎯 PREDICTION CHALLENGE: True or False?
+console.log("\\n=== LOOSE EQUALITY (==) Challenge ===");
+console.log("QUESTION: Does 5 == '5'?");
+console.log("Your prediction: ??? (true/false)");
+console.log("ANSWER:", a == b);  // JavaScript converts "5" to number first!
+
+console.log("\\nQUESTION: Does 5 == 5?");  
+console.log("Your prediction: ??? (should be obvious!)");
+console.log("ANSWER:", a == c);
+
+// 🔍 STRICT EQUALITY (===) - The Truth Teller
+console.log("\\n=== STRICT EQUALITY (===) Challenge ===");
+console.log("QUESTION: Does 5 === '5'?");
+console.log("Your prediction: ??? (same value, different types!)");
+console.log("ANSWER:", a === b); // No conversion - different types = false
+
+console.log("\\nQUESTION: Does 5 === 5?");
+console.log("Your prediction: ??? (same type AND value)");
+console.log("ANSWER:", a === c);
+
+// 🤯 THE SHOCKING TRUTH: These will blow your mind!
+console.log("\\n=== PREPARE TO BE AMAZED ===");
+console.log("0 == false:", 0 == false);       // JavaScript thinks 0 is false!?
+console.log("0 === false:", 0 === false);     // Strict equality: different types
+console.log("'' == false:", "" == false);     // Empty string equals false!?
+console.log("'' === false:", "" === false);   // Strict: string vs boolean
+
+console.log("[] == false:", [] == false);     // Empty array equals false!? 
+console.log("[] === false:", [] === false);   // Strict: array vs boolean
+
+// 🎯 YOUR TURN: Predict these weird ones!
+console.log("\\n=== WEIRD JAVASCRIPT MOMENTS ===");
+console.log("null == undefined:", null == undefined);   // Predict: ???
+console.log("null === undefined:", null === undefined); // Predict: ???
+console.log("'0' == 0:", "0" == 0);                    // Predict: ???
+console.log("'0' === 0:", "0" === 0);                  // Predict: ???
+
+// 💡 DEVELOPER WISDOM: Which one should you use?
+console.log("\\n=== THE VERDICT ===");
+console.log("Use === for clarity and fewer bugs!");
+console.log("Most developers ALWAYS use === unless they have a specific reason not to.");`}
+/>
+{/* prettier-ignore-end */}
+
+### Relational Operators - Age and Range Checking
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="Relational Operators Practice" 
+  description="Practice with age verification and range checking - change the values!"
+  initialCode={`let age = 25;
+let minAge = 18;
+let maxAge = 65;
+
+console.log("Age:", age);
+console.log("Min Age:", minAge);
+console.log("Max Age:", maxAge);
+
+console.log("\\n--- Age Checks ---");
+console.log("Is adult? (age >= 18):", age >= minAge);
+console.log("Can work? (age < 65):", age < maxAge);  
+console.log("Exactly 25?:", age === 25);
+console.log("Over 30?:", age > 30);
+
+// Try your own age:
+let myAge = 22; // Change this!
+console.log(\`\\nYour age (\${myAge}) checks:\`);
+console.log("Can vote?", myAge >= 18);
+console.log("Can drink? (US)", myAge >= 21);
+console.log("Senior discount?", myAge >= 65);`}
+/>
+{/* prettier-ignore-end */}
+
+### Practical Examples
+
+```javascript
+// Age verification
+function canDrink(age) {
+  return age >= 21;
+}
+
+// Password strength check
+function isStrongPassword(password) {
+  return password.length >= 8;
+}
+
+// Grade evaluation
+function getGrade(score) {
+  if (score >= 90) return 'A';
+  if (score >= 80) return 'B';
+  if (score >= 70) return 'C';
+  if (score >= 60) return 'D';
+  return 'F';
+}
+
+console.log(canDrink(22));           // true
+console.log(isStrongPassword("abc")); // false
+console.log(getGrade(85));           // "B"
+```
+
+## 4. Logical Operators
+
+These operators work with boolean values and are super useful for conditions!
+
+### AND (&&) Operator - Both Must Be True
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="AND Operator - Access Control System" 
+  description="Explore how && requires BOTH conditions to be true. Try changing the values!"
+  initialCode={`// Access control system
+let isLoggedIn = true;
+let hasPermission = true;
+let isActive = true;
+
+console.log("User status:");
+console.log("- Logged in:", isLoggedIn);
+console.log("- Has permission:", hasPermission);  
+console.log("- Account active:", isActive);
+
+// AND operator - ALL must be true
+console.log("\\n--- Access Checks ---");
+console.log("Basic access (logged in AND has permission):", 
+            isLoggedIn && hasPermission);
+
+console.log("Full access (all three conditions):",
+            isLoggedIn && hasPermission && isActive);
+
+// Short-circuit evaluation demo
+let user = null; // Try changing to {name: "Alice"}
+console.log("\\n--- Short-circuit Demo ---");
+console.log("User:", user);
+console.log("Trying to access user.name...");
+user && console.log("User name:", user.name); // Safe!
+
+// Change user to see difference:
+let activeUser = {name: "Bob", role: "admin"};
+activeUser && console.log("Active user:", activeUser.name);`}
+/>
+{/* prettier-ignore-end */}
+
+### OR (||) Operator - At Least One Must Be True
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="OR Operator - Flexible Permissions" 
+  description="See how || needs only ONE condition to be true. Perfect for default values!"
+  initialCode={`// Permission system - user needs to be admin OR moderator
+let isAdmin = false;
+let isModerator = true;
+let isOwner = false;
+
+console.log("User roles:");
+console.log("- Admin:", isAdmin);
+console.log("- Moderator:", isModerator);
+console.log("- Owner:", isOwner);
+
+// OR operator - ANY can be true
+console.log("\\n--- Permission Checks ---");
+console.log("Can moderate? (admin OR moderator):", 
+            isAdmin || isModerator);
+
+console.log("Can delete posts? (admin OR owner):", 
+            isAdmin || isOwner);
+
+// Default values with OR
+function greetUser(name) {
+  name = name || "Guest"; // If name is falsy, use "Guest"
+  return \`Hello, \${name}!\`;
+}
+
+console.log("\\n--- Greetings ---");
+console.log(greetUser("Alice"));     // "Hello, Alice!"
+console.log(greetUser(""));          // "Hello, Guest!" (empty string)
+console.log(greetUser(null));        // "Hello, Guest!" (null)
+console.log(greetUser());            // "Hello, Guest!" (undefined)`}
+/>
+{/* prettier-ignore-end */}
+
+### NOT (!) Operator - Flip the Logic
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="NOT Operator - Opposite Logic" 
+  description="Master the NOT operator to flip boolean values and check for empty things!"
+  initialCode={`let isVisible = true;
+let isComplete = false;
+let isLoading = true;
+
+console.log("Original values:");
+console.log("- isVisible:", isVisible);
+console.log("- isComplete:", isComplete);
+console.log("- isLoading:", isLoading);
+
+// NOT operator flips values
+console.log("\\n--- Flipped with ! ---");
+console.log("- !isVisible:", !isVisible);
+console.log("- !isComplete:", !isComplete);  
+console.log("- !isLoading:", !isLoading);
+
+// Double NOT converts to boolean
+console.log("\\n--- Double NOT !! ---");
+console.log("!!isVisible:", !!isVisible);
+console.log("!!isComplete:", !!isComplete);
+
+// Useful functions with NOT
+function isEmpty(array) {
+  return !array.length; // true if length is 0
+}
+
+function isNotEmpty(str) {
+  return !(!str || str.trim() === ""); // Check if string has content
+}
+
+console.log("\\n--- Practical Examples ---");
+console.log("Is [] empty?", isEmpty([]));
+console.log("Is [1,2] empty?", isEmpty([1, 2]));
+console.log("Is '' not empty?", isNotEmpty(""));
+console.log("Is 'hello' not empty?", isNotEmpty("hello"));`}
+/>
+{/* prettier-ignore-end */}
+
+### Nullish Coalescing (??) - Modern JavaScript Magic
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="Nullish Coalescing vs OR Operator" 
+  description="See the difference between ?? and || - it's subtle but important!"
+  initialCode={`// Nullish coalescing only cares about null and undefined
+let username = null;
+let emptyString = "";
+let zero = 0;
+let falseValue = false;
+
+console.log("Values to test:");
+console.log("username:", username);
+console.log("emptyString:", emptyString);
+console.log("zero:", zero);
+console.log("falseValue:", falseValue);
+
+console.log("\\n--- Using OR (||) ---");
+console.log("username || 'Anonymous':", username || "Anonymous");
+console.log("emptyString || 'Anonymous':", emptyString || "Anonymous");  
+console.log("zero || 'Anonymous':", zero || "Anonymous");
+console.log("falseValue || 'Anonymous':", falseValue || "Anonymous");
+
+console.log("\\n--- Using Nullish Coalescing (??) ---");
+console.log("username ?? 'Anonymous':", username ?? "Anonymous");
+console.log("emptyString ?? 'Anonymous':", emptyString ?? "Anonymous");
+console.log("zero ?? 'Anonymous':", zero ?? "Anonymous");
+console.log("falseValue ?? 'Anonymous':", falseValue ?? "Anonymous");
+
+// Practical example:
+function createUser(name, age, email) {
+  return {
+    name: name ?? "Unknown",
+    age: age ?? 0,        // Want to keep age 0 if provided!
+    email: email ?? "no-email@example.com"
+  };
+}
+
+console.log("\\n--- User Creation ---");
+console.log(createUser("Alice", 0, ""));  // Age 0 is kept with ??`}
+/>
+{/* prettier-ignore-end */}
+
+## 5. Ternary Operator - Quick If/Else
+
+The ternary operator is a shorthand for simple if/else statements!
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="Ternary Operator Playground" 
+  description="Master the ternary operator: condition ? ifTrue : ifFalse"
+  initialCode={`// Basic syntax: condition ? valueIfTrue : valueIfFalse
+let age = 20;
+let status = age >= 18 ? "adult" : "minor";
+console.log(\`Age \${age} is \${status}\`);
+
+// Try different ages:
+let testAge = 16; // Change this!
+let canVote = testAge >= 18 ? "Can vote!" : "Too young to vote";
+console.log(\`Age \${testAge}: \${canVote}\`);
+
+// Function with ternary
+function getAbsoluteValue(number) {
+  return number >= 0 ? number : -number;
+}
+
+console.log("\\n--- Absolute Values ---");
+console.log("Absolute of -5:", getAbsoluteValue(-5));
+console.log("Absolute of 3:", getAbsoluteValue(3));
+
+// Multiple conditions (be careful!)
+function getCategory(age) {
+  return age < 13 ? "child" : 
+         age < 20 ? "teenager" : 
+         age < 60 ? "adult" : "senior";
+}
+
+console.log("\\n--- Age Categories ---");
+console.log("Age 8:", getCategory(8));
+console.log("Age 16:", getCategory(16));
+console.log("Age 25:", getCategory(25));
+console.log("Age 70:", getCategory(70));
+
+// Practical example - user greeting
+let userName = ""; // Try changing this!
+let greeting = userName ? \`Welcome back, \${userName}!\` : "Welcome, Guest!";
+console.log("\\nGreeting:", greeting);`}
+/>
+{/* prettier-ignore-end */}
+
+## 6. String Operators - Building Messages
+
+### String Concatenation Methods
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="String Building Workshop" 
+  description="Learn different ways to combine strings - try editing the names!"
+  initialCode={`let firstName = "John";
+let lastName = "Doe";
+let title = "Mr.";
+
+console.log("Name parts:");
+console.log("First:", firstName);
+console.log("Last:", lastName);
+console.log("Title:", title);
+
+// Method 1: Using + operator
+let fullName = firstName + " " + lastName;
+console.log("\\n1. With + operator:", fullName);
+
+// Method 2: Using += operator (building step by step)
+let message = "Hello";
+message += " ";
+message += firstName;
+message += "!";
+console.log("2. With += operator:", message);
+
+// Method 3: Template literals (modern and preferred!)
+let greeting = \`Welcome, \${title} \${firstName} \${lastName}!\`;
+console.log("3. With template literals:", greeting);
+
+// Interactive example - build your own message:
+let yourName = "Alice";  // Change this!
+let hobby = "coding";    // And this!
+let customMessage = \`Hi, I'm \${yourName} and I love \${hobby}!\`;
+console.log("\\nYour custom message:", customMessage);`}
+/>
+{/* prettier-ignore-end */}
+
+## 7. Type Operators - Discover Data Types
+
+### typeof Operator - What Am I?
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="Type Detective" 
+  description="Use typeof to discover what type your data is - try adding your own values!"
+  initialCode={`// Test different values
+let number = 42;
+let text = "hello";
+let flag = true;
+let nothing = undefined;
+let empty = null;
+let obj = {name: "Alice"};
+let list = [1, 2, 3];
+let func = function() { return "I'm a function!"; };
+
+console.log("--- Type Detective Results ---");
+console.log("typeof 42:", typeof number);
+console.log("typeof 'hello':", typeof text);
+console.log("typeof true:", typeof flag);
+console.log("typeof undefined:", typeof nothing);
+console.log("typeof null:", typeof empty);        // Surprise! This is "object" 
+console.log("typeof {}:", typeof obj);
+console.log("typeof []:", typeof list);           // Arrays are objects!
+console.log("typeof function:", typeof func);
+
+// Practical type checking function
+function whatIsThis(value) {
+  let type = typeof value;
+  if (type === "object" && value === null) {
+    return "null (it's special!)";
+  }
+  if (type === "object" && Array.isArray(value)) {
+    return "array";
+  }
+  return type;
+}
+
+console.log("\\n--- Better Type Checking ---");
+console.log("What is null?", whatIsThis(null));
+console.log("What is []?", whatIsThis([1, 2, 3]));
+console.log("What is 'hello'?", whatIsThis("hello"));`}
+/>
+{/* prettier-ignore-end */}
+
+## Operator Precedence - Order Matters!
+
+{/* prettier-ignore-start */}
+<InteractiveCodeBlock 
+  title="Math Order of Operations" 
+  description="See how JavaScript follows math rules - try changing the numbers!"
+  initialCode={`// JavaScript follows math order of operations (PEMDAS)
+console.log("--- Order of Operations Demo ---");
+
+let result1 = 2 + 3 * 4; 
+console.log("2 + 3 * 4 =", result1); // Multiplication first: 2 + 12 = 14
+
+let result2 = (2 + 3) * 4;
+console.log("(2 + 3) * 4 =", result2); // Parentheses first: 5 * 4 = 20
+
+// Complex example with multiple operators
+let x = 10;
+let y = 5;  
+let z = 2;
+
+let calculation = x + y * z ** 2 - 3;
+console.log(\`\${x} + \${y} * \${z} ** 2 - 3\`);
+console.log("Step by step:");
+console.log("1. z ** 2 =", z ** 2);         // Exponent first: 4
+console.log("2. y * 4 =", y * 4);           // Then multiplication: 20  
+console.log("3. x + 20 =", x + 20);         // Then addition: 30
+console.log("4. 30 - 3 =", 30 - 3);        // Finally subtraction: 27
+console.log("Final result:", calculation);
+
+// Practice with your own numbers:
+let a = 6;
+let b = 4; 
+let c = 3;
+let myCalculation = a * b + c ** 2;
+console.log(\`\\nYour turn: \${a} * \${b} + \${c} ** 2 = \${myCalculation}\`);
+
+// Always use parentheses when in doubt!
+let clear = (a * b) + (c ** 2);
+console.log("With parentheses:", clear);`}
+/>
+{/* prettier-ignore-end */}
+
+## 🧠 MAJOR LEARNING CHECKPOINT
+
+**Congratulations, operator apprentice!** You've just mastered JavaScript's most important tools! 🎉
+
+**Quick self-assessment**: Before we practice, let's make sure you've got the key concepts:
+
+1. **The Tricky +**: What happens when you do `5 + "3"`? Why is it different from `5 - "3"`?
+
+2. **The === Rule**: Why do experienced developers always use `===` instead of `==`?
+
+3. **The Logical Challenge**: If `isLoggedIn = true` and `hasPermission = false`, what does `isLoggedIn && hasPermission` return?
+
+4. **The Ternary Test**: Can you read this? `age >= 18 ? "adult" : "minor"`
+
+**If you can answer these confidently, you're ready for the practice challenges!**
+
+**Developer mindset**: Remember, operators are the building blocks of all programming logic. Every app, every game, every website uses these concepts millions of times per second!
+
+---
+
+## Your Turn! 💪 **The Operator Gym**
+
+**Welcome to progressive training!** 🏋️‍♂️ These exercises start easy and get more challenging. Don't skip ahead - each level builds important skills!
+
+### 💪 **Level 1: Foundation Builder**
+
+{/* prettier-ignore-start */}
+#### Exercise 1: Build Your First Calculator
+
+**Your mission**: Create bulletproof calculator functions that handle real-world scenarios!
+
+<InteractiveCodeBlock 
+  title="🧮 Calculator Challenge - Build Safe Functions" 
+  description="🎯 CHALLENGE: Make functions that won't break with bad input!"
+  initialCode={`// 🏗️ FOUNDATION CHALLENGE: Build basic arithmetic functions
+function add(a, b) {
+  // 🤔 THINK: What if someone passes "5" + "3"? Should still work!
+  // 💡 HINT: You might want to ensure they're numbers first
+  
+  // YOUR CODE HERE
+}
+
+function multiply(a, b) {
+  // 🤔 THINK: Multiplication with strings - what should happen?
+  // YOUR CODE HERE
+}
+
+function isEven(number) {
+  // 🤔 THINK: How do you check if a number divides evenly by 2?
+  // 💡 HINT: Remember the modulus operator (%)!
+  
+  // YOUR CODE HERE
+}
+
+function power(base, exponent) {
+  // 🤔 THINK: There's a special operator for this!
+  // 💡 HINT: ** is your friend
+  
+  // YOUR CODE HERE
+}
+
+// 🧪 TEST LABORATORY - Try to break your functions!
+console.log("=== BASIC TESTS ===");
+console.log("add(5, 3):", add(5, 3));        // Expected: 8
+console.log("multiply(4, 7):", multiply(4, 7)); // Expected: 28
+console.log("isEven(10):", isEven(10));       // Expected: true
+console.log("isEven(7):", isEven(7));         // Expected: false
+console.log("power(2, 3):", power(2, 3));    // Expected: 8
+
+console.log("\\n=== TRICKY TESTS ===");  
+console.log("add('5', '3'):", add("5", "3"));    // Should still work!
+console.log("isEven(0):", isEven(0));             // Is 0 even?
+console.log("power(10, 0):", power(10, 0));      // Anything to power 0 = ?
+
+// 🎯 BONUS CHALLENGE: Add your own edge case tests!
+console.log("\\n=== YOUR TESTS ===");
+// Test with your own tricky inputs here!`}
+/>
+
+### 💪 **Level 2: Real-World Applications**
+
+#### Exercise 2: Age Verification & Scoring System (Like Netflix!)
+
+**Real scenario**: You're building the next big streaming app! You need age verification, content ratings, and score validation.
+
+<InteractiveCodeBlock 
+  title="🎬 Streaming Platform Challenge" 
+  description="🌟 BUILD: Age verification system for a streaming service!"
+  initialCode={`// 🎯 STREAMING PLATFORM CHALLENGE
+// Build functions that power real app features!
+
+function canVote(age) {
+  // 🤔 THINK: What age can people vote in most countries?
+  // 💡 REMEMBER: Use strict comparison (===)
+  
+  // YOUR CODE HERE
+}
+
+function getAgeCategory(age) {
+  // 🎬 REAL WORLD: Netflix has Kids, Teens, and Adults categories
+  // Return "child" if under 13
+  // Return "teenager" if 13-17  
+  // Return "adult" if 18 or older
+  
+  // 💡 CHALLENGE: Can you do this with ternary operators?
+  // Example: condition ? value1 : condition2 ? value2 : value3
+  
+  // YOUR CODE HERE
+}
+
+function isValidScore(score) {
+  // 🎮 GAMING CONTEXT: Scores should be 0-100
+  // Return true if score is between 0 and 100 (inclusive)
+  
+  // 🤔 THINK: Do you need && (AND) or || (OR)?
+  
+  // YOUR CODE HERE
+}
+
+function getMovieRating(age, parentalConsent) {
+  // 🎬 ADVANCED: Movie rating system
+  // Return "G" if any age
+  // Return "PG-13" if 13+ OR has parental consent
+  // Return "R" if 17+ OR (13+ AND has parental consent)
+  // Return "Adults Only" if 18+
+  
+  // 💡 This combines multiple operators! Take it step by step
+  
+  // YOUR CODE HERE
+}
+
+// 🧪 STREAMING SERVICE TESTING
+console.log("=== BASIC FEATURES ===");
+console.log("Can 17yo vote?", canVote(17));           // Expected: false
+console.log("15yo category:", getAgeCategory(15));    // Expected: "teenager"
+console.log("Score 85 valid?", isValidScore(85));     // Expected: true
+console.log("Score -5 valid?", isValidScore(-5));     // Expected: false
+
+console.log("\\n=== MOVIE RATING SYSTEM ===");
+console.log("10yo with parent consent:", getMovieRating(10, true));
+console.log("16yo without parent consent:", getMovieRating(16, false));
+console.log("20yo:", getMovieRating(20, false));
+
+// 🎯 EDGE CASES (Real apps need to handle these!)
+console.log("\\n=== EDGE CASE TESTING ===");
+console.log("Age 0:", getAgeCategory(0));             // Baby category?
+console.log("Age 100:", getAgeCategory(100));         // Still adult?
+console.log("Score exactly 0:", isValidScore(0));     // Boundary case
+console.log("Score exactly 100:", isValidScore(100)); // Boundary case
+
+// 🚀 YOUR STREAMING SERVICE: What features would you add?`}
+/>
+
+### 💪 **Level 3: Expert Mode - Multi-System Logic**
+
+#### Exercise 3: Build a Complete User Management System
+
+**Master challenge**: You're the lead developer for a social platform! Build the entire access control and user experience system.
+
+<InteractiveCodeBlock 
+  title="🚀 Social Platform Master Challenge" 
+  description="🏆 EXPERT LEVEL: Build the logic that powers a complete social platform!"
+  initialCode={`// 🏆 EXPERT CHALLENGE: Social Platform Logic Engine
+// This is the kind of code that powers Instagram, TikTok, Twitter!
+
+function canAccessVIPArea(isVIP, age, hasTicket) {
+  // 🎪 VIP LOUNGE ACCESS: Complex real-world logic
+  // Must be VIP AND (21+ OR has special ticket)
+  // 💡 THINK: How do you combine AND with OR using parentheses?
+  
+  // YOUR CODE HERE
+}
+
+function canGetDiscount(isStudent, isSenior, isMember, age) {
+  // 💸 SMART DISCOUNT SYSTEM
+  // Discount if: student OR senior OR (member AND under 30)
+  // 🤔 COMPLEX LOGIC: Multiple conditions with nested logic
+  
+  // YOUR CODE HERE
+}
+
+function isValidUser(username, password, email) {
+  // 🔐 BULLETPROOF USER VALIDATION
+  // Requirements:
+  // - Username: exists AND at least 3 characters
+  // - Password: exists AND at least 8 characters  
+  // - Email: exists AND contains "@" symbol
+  
+  // 💡 PRO TIP: Chain multiple && conditions
+  
+  // YOUR CODE HERE
+}
+
+function getWelcomeMessage(name, timeOfDay, isPremium) {
+  // 🎭 PERSONALIZED GREETINGS (like Netflix!)
+  // Logic:
+  // - If no name: "Good [timeOfDay], Guest!"
+  // - If name but not premium: "Good [timeOfDay], [name]!"
+  // - If premium: "Good [timeOfDay], [name]! ⭐ Premium Member"
+  
+  // 🤔 CHALLENGE: Use || for defaults and ? : for conditionals
+  
+  // YOUR CODE HERE
+}
+
+function calculateUserLevel(posts, likes, followers, joinedDays) {
+  // 📊 INFLUENCE ALGORITHM (like social media platforms!)
+  // Return user level based on activity:
+  // - "Newbie": less than 10 posts OR joined less than 30 days
+  // - "Active": 10+ posts AND 100+ likes AND joined 30+ days
+  // - "Influencer": 50+ posts AND 1000+ likes AND 500+ followers
+  // - "Celebrity": 100+ posts AND 10000+ likes AND 10000+ followers
+  
+  // 💡 EXPERT TIP: Use if/else with complex conditions
+  
+  // YOUR CODE HERE
+}
+
+// 🧪 SOCIAL PLATFORM TESTING SUITE
+console.log("=== VIP ACCESS SYSTEM ===");
+console.log("VIP, 25yo, no ticket:", canAccessVIPArea(true, 25, false));
+console.log("Not VIP, 19yo, has ticket:", canAccessVIPArea(false, 19, true));
+console.log("VIP, 19yo, has ticket:", canAccessVIPArea(true, 19, true));
+
+console.log("\\n=== DISCOUNT ALGORITHM ===");
+console.log("Student discount:", canGetDiscount(true, false, false, 25));
+console.log("Senior discount:", canGetDiscount(false, true, false, 70));
+console.log("Young member discount:", canGetDiscount(false, false, true, 25));
+console.log("Old member (no discount):", canGetDiscount(false, false, true, 40));
+
+console.log("\\n=== USER VALIDATION ===");
+console.log("Valid user:", isValidUser("alice123", "password123", "alice@email.com"));
+console.log("Short username:", isValidUser("al", "password123", "al@email.com"));
+console.log("Short password:", isValidUser("alice", "pass", "alice@email.com"));
+console.log("Invalid email:", isValidUser("alice", "password123", "alice.email.com"));
+
+console.log("\\n=== PERSONALIZED GREETINGS ===");
+console.log(getWelcomeMessage("", "morning", false));
+console.log(getWelcomeMessage("Alice", "evening", false));
+console.log(getWelcomeMessage("Bob", "afternoon", true));
+
+console.log("\\n=== SOCIAL INFLUENCE ALGORITHM ===");
+console.log("New user:", calculateUserLevel(2, 10, 5, 15));
+console.log("Active user:", calculateUserLevel(15, 150, 100, 60));
+console.log("Influencer:", calculateUserLevel(75, 5000, 800, 365));
+console.log("Celebrity:", calculateUserLevel(500, 50000, 50000, 1000));
+
+// 🎯 MASTER CHALLENGE: Can you handle ALL the edge cases?
+console.log("\\n=== EDGE CASE MASTERS ===");
+console.log("What if age is exactly 21?", canAccessVIPArea(true, 21, false));
+console.log("What if username is exactly 3 chars?", isValidUser("abc", "password123", "abc@test.com"));
+
+// 🚀 CONGRATULATIONS: If you solved all of these, you're thinking like a senior developer!`}
+/>
+{/* prettier-ignore-end */}
+
+## Common Pitfalls to Avoid
+
+### 1. Using == Instead of ===
+
+```javascript
+// ❌ Avoid loose equality
+console.log(0 == false);   // true (confusing!)
+console.log("" == false);  // true (confusing!)
+console.log(null == undefined); // true (confusing!)
+
+// ✅ Use strict equality
+console.log(0 === false);  // false (clear!)
+console.log("" === false); // false (clear!)
+console.log(null === undefined); // false (clear!)
+```
+
+### 2. Forgetting Operator Precedence
+
+```javascript
+// ❌ Confusing without parentheses
+let result = 5 + 3 * 2; // 11, not 16!
+
+// ✅ Clear with parentheses
+let result1 = 5 + (3 * 2); // 11 (explicit)
+let result2 = (5 + 3) * 2; // 16 (different intention)
+```
+
+### 3. Assignment in Conditions
+
+```javascript
+// ❌ Accidental assignment
+let x = 5;
+if (x = 10) { // Should be x === 10
+  console.log("This always runs!"); // x is now 10
+}
+
+// ✅ Proper comparison
+let y = 5;
+if (y === 10) {
+  console.log("This won't run");
+}
+```
+
+## 🎓 **Victory! You're Now an Operator Master!**
+
+**Incredible work, JavaScript champion!** 🎉 You've just mastered the fundamental building blocks that power EVERY application on the planet!
+
+**Here's what makes you dangerous now**:
+
+🎯 **Arithmetic mastery** - You can build calculators, financial apps, games, and anything that needs math!
+
+🎯 **Assignment superpowers** - You know how to efficiently modify variables with `+=`, `*=`, and more!
+
+🎯 **Comparison expertise** - You'll NEVER fall for the `==` vs `===` trap that trips up beginners!
+
+🎯 **Logical thinking** - You can build complex access control systems with `&&`, `||`, and `!`
+
+🎯 **Ternary fluency** - You can write elegant conditional logic in a single line!
+
+🎯 **Precedence awareness** - You understand order of operations and use parentheses like a pro!
+
+**But here's the secret**: The best developers don't just memorize operators - they think in **logical patterns**. You've learned to think like the computer thinks!
+
+**Real talk**: Every time you use an app, you're seeing operators in action:
+- Instagram checking if you're logged in `&&` if the post exists
+- Uber calculating `fare + tip + taxes`  
+- Netflix deciding `age >= 18 ? showAdultContent : showKidsContent`
+
+**You've got the foundation - now go build something amazing!** 🚀
+
+## Quiz Time! 🧠
+
+You've mastered JavaScript operators! Time to test your knowledge with a quiz.
+
+## What's Next?
+
+Excellent work! 🎉 You now understand how to perform operations on data. Coming up next:
+
+- **Type Conversion and Coercion** - How JavaScript converts between different data types
+- **Error Handling** - Handle and manage errors gracefully
+- **Modules** - Organize and share code between files
+
+Keep building those fundamental skills! 💪

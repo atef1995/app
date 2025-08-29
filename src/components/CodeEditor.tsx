@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { executeJavaScriptSimple } from "@/lib/codeRunner";
 import Editor from "@monaco-editor/react";
+import type { editor } from "monaco-editor";
 import { useTheme } from "@/components/providers/ThemeProvider";
 
 interface CodeEditorProps {
@@ -22,7 +23,7 @@ interface ExecutionResult {
 const CodeEditor: React.FC<CodeEditorProps> = ({
   initialCode = "",
   readOnly = false,
-  height = "300px",
+  height = "500px",
   placeholder,
   onCodeChange,
 }) => {
@@ -31,10 +32,17 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   const [isRunning, setIsRunning] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const { resolvedTheme } = useTheme();
+  const editorRef = React.useRef<editor.IStandaloneCodeEditor | null>(null);
 
   // Update code when initialCode changes
   React.useEffect(() => {
     setCode(initialCode);
+    // Format code after it's been set
+    if (initialCode.trim() && editorRef.current) {
+      setTimeout(() => {
+        editorRef.current?.getAction("editor.action.formatDocument")?.run();
+      }, 100);
+    }
   }, [initialCode]);
 
   // Call onCodeChange when code changes
@@ -42,6 +50,25 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     setCode(newCode);
     onCodeChange?.(newCode);
   };
+
+  // Handle keyboard shortcuts
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // F11 to toggle fullscreen
+      if (event.key === 'F11' && !readOnly) {
+        event.preventDefault();
+        setIsExpanded(!isExpanded);
+      }
+      // ESC to exit fullscreen
+      if (event.key === 'Escape' && isExpanded) {
+        event.preventDefault();
+        setIsExpanded(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isExpanded, readOnly]);
 
   const handleRunCode = async () => {
     if (!code.trim() || isRunning) return;
@@ -91,10 +118,20 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-              title="Toggle fullscreen"
+              className="px-2 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-xs rounded border border-gray-300 dark:border-gray-500 transition-colors flex items-center gap-1"
+              title={isExpanded ? "Exit fullscreen (ESC)" : "Expand to fullscreen (F11)"}
             >
-              {isExpanded ? "⤓" : "⤢"}
+              {isExpanded ? (
+                <>
+                  <span className="text-xs">⤓</span>
+                  <span>Collapse</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-xs">⤢</span>
+                  <span>Expand</span>
+                </>
+              )}
             </button>
             <button
               onClick={handleRunCode}
@@ -120,9 +157,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             </span>
             <button
               onClick={() => setIsExpanded(false)}
-              className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-sm rounded border border-gray-300 dark:border-gray-500 transition-colors flex items-center gap-1"
+              title="Exit fullscreen (ESC)"
             >
-              ✕ Close
+              <span>✕</span>
+              <span>Close</span>
             </button>
           </div>
         )}
@@ -135,7 +174,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
           theme={resolvedTheme === "dark" ? "vs-dark" : "light"}
           options={{
             minimap: { enabled: false },
-            fontSize: 14,
+            fontSize: 16,
             lineNumbers: "on",
             roundedSelection: false,
             scrollBeyondLastLine: false,
@@ -164,13 +203,15 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
               : {}),
           }}
           onMount={(editor, monaco) => {
-            // Add keyboard shortcut for running code
-            editor.addCommand(
-              monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
-              () => {
-                handleRunCode();
-              }
-            );
+            // Store editor reference
+            editorRef.current = editor;
+
+            // Format initial code when editor mounts
+            if (code.trim()) {
+              setTimeout(() => {
+                editor.getAction("editor.action.formatDocument")?.run();
+              }, 100);
+            }
 
             // Add placeholder support
             if (placeholder && !code) {
@@ -209,18 +250,12 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             }
           }}
         />
-
-        {!readOnly && (
-          <div className="absolute bottom-2 right-2 text-xs text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-800 px-2 py-1 rounded">
-            Ctrl+Enter to run
-          </div>
-        )}
       </div>
 
       {/* Output */}
       {result && (
-        <div className="border-t border-gray-200 dark:border-gray-600">
-          <div className="p-3 bg-gray-50 dark:bg-gray-700">
+        <div className="border-t border-gray-200 dark:border-gray-600 h-80">
+          <div className="flex flex-col p-3 bg-gray-50 dark:bg-gray-700 h-80">
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Output
@@ -230,11 +265,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
               </span>
             </div>
 
-            <div className="bg-black text-green-400 p-3 rounded font-mono text-sm max-h-40 overflow-y-auto">
+            <div className="bg-black text-green-400 p-3 rounded font-mono text-sm overflow-y-auto text-balance">
               {result.output.length > 0 ? (
                 result.output.map((log, index) => (
-                  <div key={index} className="mb-1">
-                    {log}
+                  <div key={index} className="mb-1 my-1">
+                    {">"} {log}
                   </div>
                 ))
               ) : (

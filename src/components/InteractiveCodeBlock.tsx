@@ -84,7 +84,7 @@ const InteractiveCodeBlock: React.FC<InteractiveCodeBlockProps> = ({
       <CodeEditor
         initialCode={code}
         readOnly={!editable}
-        height="250px"
+        height="450px"
         placeholder={
           editable
             ? "// Try modifying this code and click Run!"
@@ -96,7 +96,7 @@ const InteractiveCodeBlock: React.FC<InteractiveCodeBlockProps> = ({
         <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
           <Lightbulb className="h-3 w-3" />
           Tip: Modify the code above and click &ldquo;Run&rdquo; to see the
-          results, or use Ctrl+Enter
+          results
         </div>
       )}
     </div>
