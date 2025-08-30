@@ -50,7 +50,7 @@ const TUTORIALS = [
             "No difference",
             "let can be reassigned, const cannot",
             "const is faster",
-            "let is block-scoped, const is function-scoped"
+            "let is block-scoped, const is function-scoped",
           ],
           correct: 1,
           explanation:
@@ -62,7 +62,7 @@ const TUTORIALS = [
             "Using a var variable before declaration",
             "Using a let variable before declaration",
             "Using a const variable after declaration",
-            "Declaring the same var twice"
+            "Declaring the same var twice",
           ],
           correct: 1,
           explanation:
@@ -81,19 +81,20 @@ const TUTORIALS = [
             "var is block-scoped",
             "var variables are hoisted",
             "var cannot be redeclared",
-            "var requires initialization"
+            "var requires initialization",
           ],
           correct: 1,
           explanation:
             "Variables declared with 'var' are hoisted to the top of their scope and initialized with undefined.",
         },
         {
-          question: "What happens when you declare a variable without any keyword?",
+          question:
+            "What happens when you declare a variable without any keyword?",
           options: [
             "Creates a local variable",
             "Creates a global variable",
             "Throws a syntax error",
-            "Creates a constant"
+            "Creates a constant",
           ],
           correct: 1,
           explanation:
@@ -105,7 +106,7 @@ const TUTORIALS = [
             "let a, b, c;",
             "let a; b; c;",
             "let a + b + c;",
-            "let (a, b, c);"
+            "let (a, b, c);",
           ],
           correct: 0,
           explanation:
@@ -124,7 +125,7 @@ const TUTORIALS = [
             "variable === NaN",
             "typeof variable === 'NaN'",
             "Number.isNaN(variable)",
-            "variable == NaN"
+            "variable == NaN",
           ],
           correct: 2,
           explanation:
@@ -184,7 +185,7 @@ const TUTORIALS = [
             "function myFunc[a, b] {}",
             "function myFunc(a, b) {}",
             "function myFunc{a, b} {}",
-            "function myFunc <a, b> {}"
+            "function myFunc <a, b> {}",
           ],
           correct: 1,
           explanation:
@@ -196,19 +197,20 @@ const TUTORIALS = [
             "Global scope",
             "Local to the function",
             "Block scope only",
-            "No scope"
+            "No scope",
           ],
           correct: 1,
           explanation:
             "Function parameters are local variables within the function scope.",
         },
         {
-          question: "What happens when you call a function with fewer arguments than parameters?",
+          question:
+            "What happens when you call a function with fewer arguments than parameters?",
           options: [
             "Error is thrown",
             "Missing parameters are undefined",
             "Function won't execute",
-            "Missing parameters are null"
+            "Missing parameters are null",
           ],
           correct: 1,
           explanation:
@@ -220,7 +222,7 @@ const TUTORIALS = [
             "=> (a, b) { return a + b; }",
             "(a, b) => { return a + b; }",
             "(a, b) -> { return a + b; }",
-            "function => (a, b) { return a + b; }"
+            "function => (a, b) { return a + b; }",
           ],
           correct: 1,
           explanation:
@@ -232,36 +234,38 @@ const TUTORIALS = [
             "Function parameters only",
             "All arguments passed to the function",
             "Return values",
-            "Variable declarations"
+            "Variable declarations",
           ],
           correct: 1,
           explanation:
             "The 'arguments' object contains all arguments passed to the function, even if there are more than the defined parameters.",
         },
         {
-          question: "How do you create a function that can accept any number of arguments?",
+          question:
+            "How do you create a function that can accept any number of arguments?",
           options: [
             "Use the arguments object",
             "Use rest parameters (...args)",
             "Both A and B",
-            "Use spread operator"
+            "Use spread operator",
           ],
           correct: 2,
           explanation:
             "Both the arguments object and rest parameters (...args) allow functions to accept variable numbers of arguments.",
         },
         {
-          question: "What is the difference between function scope and block scope?",
+          question:
+            "What is the difference between function scope and block scope?",
           options: [
             "No difference",
             "Function scope is created by functions, block scope by {}",
             "Block scope is older",
-            "Function scope is faster"
+            "Function scope is faster",
           ],
           correct: 1,
           explanation:
             "Function scope is created by function declarations/expressions, while block scope is created by curly braces {} with let/const.",
-        }
+        },
       ],
     },
   },
@@ -300,7 +304,7 @@ const TUTORIALS = [
             "Scope determined by where variables are declared",
             "Scope determined at runtime",
             "Global scope only",
-            "No scoping rules"
+            "No scoping rules",
           ],
           correct: 0,
           explanation:
@@ -312,19 +316,20 @@ const TUTORIALS = [
             "Only its own variables",
             "Variables in its own scope and outer scopes",
             "Only global variables",
-            "Only parent function variables"
+            "Only parent function variables",
           ],
           correct: 1,
           explanation:
             "A nested function has access to variables in its own scope, its parent function's scope, and the global scope.",
         },
         {
-          question: "What happens to outer function variables after the function returns?",
+          question:
+            "What happens to outer function variables after the function returns?",
           options: [
             "They are destroyed immediately",
             "They remain accessible if referenced by a closure",
             "They become global variables",
-            "They throw an error"
+            "They throw an error",
           ],
           correct: 1,
           explanation:
@@ -336,7 +341,7 @@ const TUTORIALS = [
             "A way to chain functions together",
             "The order JavaScript looks for variables from inner to outer scope",
             "A method to create variables",
-            "A type of data structure"
+            "A type of data structure",
           ],
           correct: 1,
           explanation:
@@ -348,7 +353,7 @@ const TUTORIALS = [
             "When a variable is undefined",
             "When an inner scope variable has the same name as an outer scope variable",
             "When variables are hidden",
-            "When variables are global"
+            "When variables are global",
           ],
           correct: 1,
           explanation:
@@ -360,7 +365,7 @@ const TUTORIALS = [
             "Use the private keyword",
             "Use closures to encapsulate variables",
             "Use var in global scope",
-            "Private variables don't exist in JavaScript"
+            "Private variables don't exist in JavaScript",
           ],
           correct: 1,
           explanation:
@@ -372,7 +377,7 @@ const TUTORIALS = [
             "A way to import modules",
             "Using closures to create private and public methods",
             "A CSS pattern",
-            "A database pattern"
+            "A database pattern",
           ],
           correct: 1,
           explanation:
@@ -384,12 +389,12 @@ const TUTORIALS = [
             "Where code is written",
             "The environment where JavaScript code is executed",
             "The browser only",
-            "The server only"
+            "The server only",
           ],
           correct: 1,
           explanation:
             "Execution context is the environment in which JavaScript code is executed, containing variables, functions, and the scope chain.",
-        }
+        },
       ],
     },
   },
@@ -442,7 +447,7 @@ const TUTORIALS = [
             "var arr = {}",
             "var arr = []",
             "var arr = new Object()",
-            "var arr = Array"
+            "var arr = Array",
           ],
           correct: 1,
           explanation:
@@ -454,7 +459,7 @@ const TUTORIALS = [
             "The index of the last element",
             "The number of elements in the array",
             "The memory size of the array",
-            "The array type"
+            "The array type",
           ],
           correct: 1,
           explanation:
@@ -466,7 +471,7 @@ const TUTORIALS = [
             "obj.newProp = value or obj['newProp'] = value",
             "obj->newProp = value",
             "obj::newProp = value",
-            "addProperty(obj, 'newProp', value)"
+            "addProperty(obj, 'newProp', value)",
           ],
           correct: 0,
           explanation:
@@ -478,7 +483,7 @@ const TUTORIALS = [
             "No difference",
             "Arrays use numeric indices, objects use string keys",
             "Objects are faster",
-            "Arrays can't store functions"
+            "Arrays can't store functions",
           ],
           correct: 1,
           explanation:
@@ -490,7 +495,7 @@ const TUTORIALS = [
             "obj.hasProperty('prop')",
             "'prop' in obj or obj.hasOwnProperty('prop')",
             "obj.contains('prop')",
-            "obj.exists('prop')"
+            "obj.exists('prop')",
           ],
           correct: 1,
           explanation:
@@ -502,12 +507,12 @@ const TUTORIALS = [
             "Converts a string to an object",
             "Converts an object to a JSON string",
             "Validates JSON format",
-            "Creates a new object"
+            "Creates a new object",
           ],
           correct: 1,
           explanation:
             "JSON.stringify() converts a JavaScript object into a JSON string representation.",
-        }
+        },
       ],
     },
   },
@@ -530,7 +535,12 @@ const TUTORIALS = [
       questions: [
         {
           question: "Which loop is guaranteed to run at least once?",
-          options: ["for loop", "while loop", "do...while loop", "for...of loop"],
+          options: [
+            "for loop",
+            "while loop",
+            "do...while loop",
+            "for...of loop",
+          ],
           correct: 2,
           explanation:
             "The do...while loop executes the code block first, then checks the condition, ensuring it runs at least once.",
@@ -568,7 +578,12 @@ const TUTORIALS = [
         },
         {
           question: "Which loop is best for iterating over array values?",
-          options: ["for...in loop", "while loop", "for...of loop", "do...while loop"],
+          options: [
+            "for...in loop",
+            "while loop",
+            "for...of loop",
+            "do...while loop",
+          ],
           correct: 2,
           explanation:
             "The for...of loop is specifically designed to iterate over values in iterable objects like arrays.",
@@ -579,7 +594,8 @@ const TUTORIALS = [
   {
     slug: "operators",
     title: "JavaScript Operators - Master All Types",
-    description: "Learn all JavaScript operators: arithmetic, comparison, logical, assignment, and more with practical examples",
+    description:
+      "Learn all JavaScript operators: arithmetic, comparison, logical, assignment, and more with practical examples",
     mdxFile: "fundamentals/05-operators",
     category: "fundamentals",
     difficulty: 1,
@@ -593,60 +609,101 @@ const TUTORIALS = [
       requiredPlan: "FREE",
       questions: [
         {
-          question: "Which operator checks for strict equality without type conversion?",
+          question:
+            "Which operator checks for strict equality without type conversion?",
           options: ["=", "==", "===", "!="],
           correct: 2,
-          explanation: "The === operator checks for strict equality, comparing both value and type without automatic type conversion."
+          explanation:
+            "The === operator checks for strict equality, comparing both value and type without automatic type conversion.",
         },
         {
           question: "What does the modulus operator (%) return?",
-          options: ["The quotient", "The remainder", "The percentage", "The average"],
+          options: [
+            "The quotient",
+            "The remainder",
+            "The percentage",
+            "The average",
+          ],
           correct: 1,
-          explanation: "The modulus operator (%) returns the remainder of a division operation."
+          explanation:
+            "The modulus operator (%) returns the remainder of a division operation.",
         },
         {
-          question: "Which logical operator returns true if at least one condition is true?",
+          question:
+            "Which logical operator returns true if at least one condition is true?",
           options: ["&&", "||", "!", "??"],
           correct: 1,
-          explanation: "The OR operator (||) returns true if at least one of the conditions is true."
+          explanation:
+            "The OR operator (||) returns true if at least one of the conditions is true.",
         },
         {
           question: "What is the difference between + and += operators?",
-          options: ["No difference", "+= is shorthand for variable = variable + value", "+ is faster", "+= only works with numbers"],
+          options: [
+            "No difference",
+            "+= is shorthand for variable = variable + value",
+            "+ is faster",
+            "+= only works with numbers",
+          ],
           correct: 1,
-          explanation: "The += operator is shorthand assignment: x += 5 is equivalent to x = x + 5."
+          explanation:
+            "The += operator is shorthand assignment: x += 5 is equivalent to x = x + 5.",
         },
         {
           question: "What does the ternary operator syntax look like?",
-          options: ["if ? then : else", "condition ? trueValue : falseValue", "condition : true ? false", "? condition true false"],
+          options: [
+            "if ? then : else",
+            "condition ? trueValue : falseValue",
+            "condition : true ? false",
+            "? condition true false",
+          ],
           correct: 1,
-          explanation: "The ternary operator syntax is: condition ? valueIfTrue : valueIfFalse"
+          explanation:
+            "The ternary operator syntax is: condition ? valueIfTrue : valueIfFalse",
         },
         {
           question: "Which operator has the highest precedence?",
-          options: ["+ (addition)", "* (multiplication)", "** (exponentiation)", "= (assignment)"],
+          options: [
+            "+ (addition)",
+            "* (multiplication)",
+            "** (exponentiation)",
+            "= (assignment)",
+          ],
           correct: 2,
-          explanation: "The exponentiation operator (**) has higher precedence than multiplication, which has higher precedence than addition."
+          explanation:
+            "The exponentiation operator (**) has higher precedence than multiplication, which has higher precedence than addition.",
         },
         {
           question: "What is the difference between || and ?? operators?",
-          options: ["No difference", "|| checks for falsy values, ?? only checks for null/undefined", "?? is faster", "|| is deprecated"],
+          options: [
+            "No difference",
+            "|| checks for falsy values, ?? only checks for null/undefined",
+            "?? is faster",
+            "|| is deprecated",
+          ],
           correct: 1,
-          explanation: "The nullish coalescing (??) operator only checks for null or undefined, while || checks for any falsy value."
+          explanation:
+            "The nullish coalescing (??) operator only checks for null or undefined, while || checks for any falsy value.",
         },
         {
           question: "What happens when you use + with a string and a number?",
-          options: ["Addition", "String concatenation", "Error", "Undefined behavior"],
+          options: [
+            "Addition",
+            "String concatenation",
+            "Error",
+            "Undefined behavior",
+          ],
           correct: 1,
-          explanation: "When + is used with a string and number, the number is converted to a string and concatenation occurs."
-        }
-      ]
-    }
+          explanation:
+            "When + is used with a string and number, the number is converted to a string and concatenation occurs.",
+        },
+      ],
+    },
   },
   {
     slug: "type-conversion-coercion",
     title: "Type Conversion and Coercion in JavaScript",
-    description: "Master explicit and implicit type conversion in JavaScript with interactive examples and best practices",
+    description:
+      "Master explicit and implicit type conversion in JavaScript with interactive examples and best practices",
     mdxFile: "fundamentals/06-type-conversion-coercion",
     category: "fundamentals",
     difficulty: 1,
@@ -660,48 +717,71 @@ const TUTORIALS = [
       requiredPlan: "FREE",
       questions: [
         {
-          question: "What is the difference between type conversion and type coercion?",
-          options: ["No difference", "Conversion is explicit, coercion is implicit", "Coercion is faster", "Conversion is deprecated"],
+          question:
+            "What is the difference between type conversion and type coercion?",
+          options: [
+            "No difference",
+            "Conversion is explicit, coercion is implicit",
+            "Coercion is faster",
+            "Conversion is deprecated",
+          ],
           correct: 1,
-          explanation: "Type conversion is explicit (you do it deliberately), while type coercion is implicit (JavaScript does it automatically)."
+          explanation:
+            "Type conversion is explicit (you do it deliberately), while type coercion is implicit (JavaScript does it automatically).",
         },
         {
           question: "What does String(123) return?",
-          options: ["123", "\"123\"", "NaN", "Error"],
+          options: ["123", '"123"', "NaN", "Error"],
           correct: 1,
-          explanation: "String(123) explicitly converts the number 123 to the string '123'."
+          explanation:
+            "String(123) explicitly converts the number 123 to the string '123'.",
         },
         {
           question: "What is the result of Number('hello')?",
           options: ["0", "null", "NaN", "Error"],
           correct: 2,
-          explanation: "Number('hello') returns NaN because 'hello' cannot be converted to a valid number."
+          explanation:
+            "Number('hello') returns NaN because 'hello' cannot be converted to a valid number.",
         },
         {
           question: "Which values are falsy in JavaScript?",
-          options: ["Only false", "false, 0, '', null, undefined, NaN", "Only null and undefined", "Only 0 and false"],
+          options: [
+            "Only false",
+            "false, 0, '', null, undefined, NaN",
+            "Only null and undefined",
+            "Only 0 and false",
+          ],
           correct: 1,
-          explanation: "JavaScript has 6 falsy values: false, 0, '', null, undefined, and NaN."
+          explanation:
+            "JavaScript has 6 falsy values: false, 0, '', null, undefined, and NaN.",
         },
         {
           question: "What does '5' - 3 equal?",
           options: ["'53'", "2", "NaN", "Error"],
           correct: 1,
-          explanation: "The - operator triggers numeric coercion, converting '5' to 5, so '5' - 3 = 2."
+          explanation:
+            "The - operator triggers numeric coercion, converting '5' to 5, so '5' - 3 = 2.",
         },
         {
           question: "What is the safest way to convert a string to a number?",
-          options: ["Using + operator", "Using Number() function", "Using parseInt()", "Using * 1"],
+          options: [
+            "Using + operator",
+            "Using Number() function",
+            "Using parseInt()",
+            "Using * 1",
+          ],
           correct: 1,
-          explanation: "Number() is the most explicit and predictable way to convert strings to numbers with proper error handling."
-        }
-      ]
-    }
+          explanation:
+            "Number() is the most explicit and predictable way to convert strings to numbers with proper error handling.",
+        },
+      ],
+    },
   },
   {
     slug: "error-handling",
     title: "Error Handling in JavaScript - Try, Catch & Beyond",
-    description: "Master JavaScript error handling with try/catch, finally, and best practices for building robust applications",
+    description:
+      "Master JavaScript error handling with try/catch, finally, and best practices for building robust applications",
     mdxFile: "fundamentals/07-error-handling",
     category: "fundamentals",
     difficulty: 1,
@@ -716,53 +796,96 @@ const TUTORIALS = [
       questions: [
         {
           question: "What is the purpose of a try-catch block?",
-          options: ["To speed up code", "To handle errors gracefully without crashing", "To create loops", "To define functions"],
+          options: [
+            "To speed up code",
+            "To handle errors gracefully without crashing",
+            "To create loops",
+            "To define functions",
+          ],
           correct: 1,
-          explanation: "Try-catch blocks allow you to handle errors gracefully, preventing your application from crashing when errors occur."
+          explanation:
+            "Try-catch blocks allow you to handle errors gracefully, preventing your application from crashing when errors occur.",
         },
         {
           question: "When does the finally block execute?",
-          options: ["Only if no error occurs", "Only if an error occurs", "Always, regardless of errors", "Never"],
+          options: [
+            "Only if no error occurs",
+            "Only if an error occurs",
+            "Always, regardless of errors",
+            "Never",
+          ],
           correct: 2,
-          explanation: "The finally block always executes, whether an error occurs or not, making it perfect for cleanup operations."
+          explanation:
+            "The finally block always executes, whether an error occurs or not, making it perfect for cleanup operations.",
         },
         {
           question: "How do you throw a custom error?",
-          options: ["error('message')", "throw new Error('message')", "catch new Error('message')", "try Error('message')"],
+          options: [
+            "error('message')",
+            "throw new Error('message')",
+            "catch new Error('message')",
+            "try Error('message')",
+          ],
           correct: 1,
-          explanation: "You throw custom errors using the 'throw' statement with a new Error object: throw new Error('message')."
+          explanation:
+            "You throw custom errors using the 'throw' statement with a new Error object: throw new Error('message').",
         },
         {
           question: "What are the three main types of JavaScript errors?",
-          options: ["Syntax, Logic, Runtime", "ReferenceError, TypeError, SyntaxError", "Big, Medium, Small", "Client, Server, Network"],
+          options: [
+            "Syntax, Logic, Runtime",
+            "ReferenceError, TypeError, SyntaxError",
+            "Big, Medium, Small",
+            "Client, Server, Network",
+          ],
           correct: 1,
-          explanation: "The main JavaScript error types are ReferenceError (undefined variables), TypeError (wrong type operations), and SyntaxError (invalid syntax)."
+          explanation:
+            "The main JavaScript error types are ReferenceError (undefined variables), TypeError (wrong type operations), and SyntaxError (invalid syntax).",
         },
         {
           question: "How do you handle errors in async/await functions?",
-          options: ["Use .catch()", "Use try-catch blocks", "Errors handle themselves", "Use finally only"],
+          options: [
+            "Use .catch()",
+            "Use try-catch blocks",
+            "Errors handle themselves",
+            "Use finally only",
+          ],
           correct: 1,
-          explanation: "Async/await functions use try-catch blocks to handle errors from awaited promises."
+          explanation:
+            "Async/await functions use try-catch blocks to handle errors from awaited promises.",
         },
         {
           question: "What is the best practice for error messages?",
-          options: ["Make them vague", "Make them descriptive and actionable", "Don't include any messages", "Only show error codes"],
+          options: [
+            "Make them vague",
+            "Make them descriptive and actionable",
+            "Don't include any messages",
+            "Only show error codes",
+          ],
           correct: 1,
-          explanation: "Good error messages are descriptive and actionable, helping developers understand what went wrong and how to fix it."
+          explanation:
+            "Good error messages are descriptive and actionable, helping developers understand what went wrong and how to fix it.",
         },
         {
           question: "What happens if you don't handle an error?",
-          options: ["Nothing", "The application continues normally", "The application may crash or behave unexpectedly", "Errors are ignored"],
+          options: [
+            "Nothing",
+            "The application continues normally",
+            "The application may crash or behave unexpectedly",
+            "Errors are ignored",
+          ],
           correct: 2,
-          explanation: "Unhandled errors can cause applications to crash or behave unpredictably, which is why proper error handling is essential."
-        }
-      ]
-    }
+          explanation:
+            "Unhandled errors can cause applications to crash or behave unpredictably, which is why proper error handling is essential.",
+        },
+      ],
+    },
   },
   {
     slug: "modules",
     title: "JavaScript Modules - Import, Export & Organization",
-    description: "Learn how to organize JavaScript code with ES6 modules, import/export statements, and modern module patterns",
+    description:
+      "Learn how to organize JavaScript code with ES6 modules, import/export statements, and modern module patterns",
     mdxFile: "fundamentals/08-modules",
     category: "fundamentals",
     difficulty: 1,
@@ -777,47 +900,84 @@ const TUTORIALS = [
       questions: [
         {
           question: "What is the main benefit of using modules?",
-          options: ["Faster code execution", "Better code organization and reusability", "Smaller file sizes", "Automatic error handling"],
+          options: [
+            "Faster code execution",
+            "Better code organization and reusability",
+            "Smaller file sizes",
+            "Automatic error handling",
+          ],
           correct: 1,
-          explanation: "Modules help organize code into reusable, maintainable pieces and avoid naming conflicts in the global scope."
+          explanation:
+            "Modules help organize code into reusable, maintainable pieces and avoid naming conflicts in the global scope.",
         },
         {
           question: "How do you export a function as the default export?",
-          options: ["export function myFunc()", "export default function myFunc()", "default export myFunc", "export = myFunc"],
+          options: [
+            "export function myFunc()",
+            "export default function myFunc()",
+            "default export myFunc",
+            "export = myFunc",
+          ],
           correct: 1,
-          explanation: "Default exports use the 'export default' syntax: export default function myFunc() {}"
+          explanation:
+            "Default exports use the 'export default' syntax: export default function myFunc() {}",
         },
         {
           question: "How do you import a default export?",
-          options: ["import { myFunc } from './module'", "import myFunc from './module'", "import * as myFunc from './module'", "import default myFunc from './module'"],
+          options: [
+            "import { myFunc } from './module'",
+            "import myFunc from './module'",
+            "import * as myFunc from './module'",
+            "import default myFunc from './module'",
+          ],
           correct: 1,
-          explanation: "Default exports are imported without curly braces: import myFunc from './module'"
+          explanation:
+            "Default exports are imported without curly braces: import myFunc from './module'",
         },
         {
           question: "What is the difference between named and default exports?",
-          options: ["No difference", "Named exports can have multiple per module, default exports only one", "Default exports are faster", "Named exports are deprecated"],
+          options: [
+            "No difference",
+            "Named exports can have multiple per module, default exports only one",
+            "Default exports are faster",
+            "Named exports are deprecated",
+          ],
           correct: 1,
-          explanation: "You can have multiple named exports per module, but only one default export per module."
+          explanation:
+            "You can have multiple named exports per module, but only one default export per module.",
         },
         {
           question: "How do you import all exports from a module?",
-          options: ["import all from './module'", "import * as moduleName from './module'", "import everything from './module'", "import {...} from './module'"],
+          options: [
+            "import all from './module'",
+            "import * as moduleName from './module'",
+            "import everything from './module'",
+            "import {...} from './module'",
+          ],
           correct: 1,
-          explanation: "Use the wildcard import syntax: import * as moduleName from './module'"
+          explanation:
+            "Use the wildcard import syntax: import * as moduleName from './module'",
         },
         {
           question: "What is the module pattern used for?",
-          options: ["Making code run faster", "Creating private variables and public APIs", "Handling errors", "Managing memory"],
+          options: [
+            "Making code run faster",
+            "Creating private variables and public APIs",
+            "Handling errors",
+            "Managing memory",
+          ],
           correct: 1,
-          explanation: "The module pattern uses closures to create private variables while exposing a public API."
-        }
-      ]
-    }
+          explanation:
+            "The module pattern uses closures to create private variables while exposing a public API.",
+        },
+      ],
+    },
   },
   {
     slug: "debugging-techniques",
     title: "JavaScript Debugging Techniques & Developer Tools",
-    description: "Master debugging JavaScript with console methods, browser developer tools, and professional debugging strategies",
+    description:
+      "Master debugging JavaScript with console methods, browser developer tools, and professional debugging strategies",
     mdxFile: "fundamentals/09-debugging-techniques",
     category: "fundamentals",
     difficulty: 1,
@@ -832,53 +992,97 @@ const TUTORIALS = [
       questions: [
         {
           question: "Which console method is best for displaying tabular data?",
-          options: ["console.log()", "console.table()", "console.info()", "console.debug()"],
+          options: [
+            "console.log()",
+            "console.table()",
+            "console.info()",
+            "console.debug()",
+          ],
           correct: 1,
-          explanation: "console.table() displays arrays and objects in a nice tabular format, making data easier to read."
+          explanation:
+            "console.table() displays arrays and objects in a nice tabular format, making data easier to read.",
         },
         {
           question: "What is the purpose of console.time()?",
-          options: ["To show current time", "To measure code execution performance", "To set timeouts", "To create timestamps"],
+          options: [
+            "To show current time",
+            "To measure code execution performance",
+            "To set timeouts",
+            "To create timestamps",
+          ],
           correct: 1,
-          explanation: "console.time() and console.timeEnd() are used to measure how long code takes to execute."
+          explanation:
+            "console.time() and console.timeEnd() are used to measure how long code takes to execute.",
         },
         {
           question: "What is a breakpoint in debugging?",
-          options: ["A point where code breaks", "A pause point for examining code execution", "An error location", "A function endpoint"],
+          options: [
+            "A point where code breaks",
+            "A pause point for examining code execution",
+            "An error location",
+            "A function endpoint",
+          ],
           correct: 1,
-          explanation: "A breakpoint pauses code execution at a specific line, allowing you to inspect variables and step through code."
+          explanation:
+            "A breakpoint pauses code execution at a specific line, allowing you to inspect variables and step through code.",
         },
         {
-          question: "Which debugging strategy involves testing the middle of a process first?",
-          options: ["Linear debugging", "Binary search debugging", "Random debugging", "Reverse debugging"],
+          question:
+            "Which debugging strategy involves testing the middle of a process first?",
+          options: [
+            "Linear debugging",
+            "Binary search debugging",
+            "Random debugging",
+            "Reverse debugging",
+          ],
           correct: 1,
-          explanation: "Binary search debugging involves checking the middle of a process first to quickly isolate where problems occur."
+          explanation:
+            "Binary search debugging involves checking the middle of a process first to quickly isolate where problems occur.",
         },
         {
           question: "What should you do when you encounter a bug?",
-          options: ["Immediately start fixing", "First reproduce the bug reliably", "Delete the problematic code", "Restart the application"],
+          options: [
+            "Immediately start fixing",
+            "First reproduce the bug reliably",
+            "Delete the problematic code",
+            "Restart the application",
+          ],
           correct: 1,
-          explanation: "The first step in professional debugging is to reproduce the bug reliably so you can understand and fix it systematically."
+          explanation:
+            "The first step in professional debugging is to reproduce the bug reliably so you can understand and fix it systematically.",
         },
         {
           question: "What is console.assert() used for?",
-          options: ["Making assertions about code", "Testing conditions and showing errors only if false", "Creating functions", "Handling errors"],
+          options: [
+            "Making assertions about code",
+            "Testing conditions and showing errors only if false",
+            "Creating functions",
+            "Handling errors",
+          ],
           correct: 1,
-          explanation: "console.assert() only shows an error message if the condition is false, useful for testing assumptions."
+          explanation:
+            "console.assert() only shows an error message if the condition is false, useful for testing assumptions.",
         },
         {
           question: "What is the best approach to debugging complex problems?",
-          options: ["Guess and check randomly", "Use a systematic approach: reproduce, isolate, test, fix", "Ask someone else immediately", "Rewrite all the code"],
+          options: [
+            "Guess and check randomly",
+            "Use a systematic approach: reproduce, isolate, test, fix",
+            "Ask someone else immediately",
+            "Rewrite all the code",
+          ],
           correct: 1,
-          explanation: "Professional debugging follows a systematic approach: reproduce the bug, isolate the problem, form and test hypotheses, then implement and verify the fix."
-        }
-      ]
-    }
+          explanation:
+            "Professional debugging follows a systematic approach: reproduce the bug, isolate the problem, form and test hypotheses, then implement and verify the fix.",
+        },
+      ],
+    },
   },
   {
     slug: "best-practices",
     title: "JavaScript Best Practices & Clean Code",
-    description: "Learn professional JavaScript coding standards, clean code principles, and maintainable programming patterns",
+    description:
+      "Learn professional JavaScript coding standards, clean code principles, and maintainable programming patterns",
     mdxFile: "fundamentals/10-best-practices",
     category: "fundamentals",
     difficulty: 1,
@@ -893,54 +1097,104 @@ const TUTORIALS = [
       questions: [
         {
           question: "What makes code 'clean'?",
-          options: ["No bugs", "Readable, maintainable, and well-organized", "Short and compact", "Uses latest features"],
+          options: [
+            "No bugs",
+            "Readable, maintainable, and well-organized",
+            "Short and compact",
+            "Uses latest features",
+          ],
           correct: 1,
-          explanation: "Clean code is readable, maintainable, testable, and self-documenting - making it easy for others (and future you) to understand."
+          explanation:
+            "Clean code is readable, maintainable, testable, and self-documenting - making it easy for others (and future you) to understand.",
         },
         {
-          question: "What is the single responsibility principle for functions?",
-          options: ["Functions should have one parameter", "Functions should do one thing well", "Functions should be short", "Functions should return one value"],
+          question:
+            "What is the single responsibility principle for functions?",
+          options: [
+            "Functions should have one parameter",
+            "Functions should do one thing well",
+            "Functions should be short",
+            "Functions should return one value",
+          ],
           correct: 1,
-          explanation: "The single responsibility principle states that each function should have one clear, well-defined purpose."
+          explanation:
+            "The single responsibility principle states that each function should have one clear, well-defined purpose.",
         },
         {
-          question: "Which naming convention is used for JavaScript variables and functions?",
-          options: ["snake_case", "camelCase", "PascalCase", "SCREAMING_SNAKE_CASE"],
+          question:
+            "Which naming convention is used for JavaScript variables and functions?",
+          options: [
+            "snake_case",
+            "camelCase",
+            "PascalCase",
+            "SCREAMING_SNAKE_CASE",
+          ],
           correct: 1,
-          explanation: "JavaScript uses camelCase for variables and functions (e.g., userName, calculateTotal)."
+          explanation:
+            "JavaScript uses camelCase for variables and functions (e.g., userName, calculateTotal).",
         },
         {
           question: "What is the recommended naming convention for constants?",
-          options: ["camelCase", "PascalCase", "SCREAMING_SNAKE_CASE", "lowercase"],
+          options: [
+            "camelCase",
+            "PascalCase",
+            "SCREAMING_SNAKE_CASE",
+            "lowercase",
+          ],
           correct: 2,
-          explanation: "Constants use SCREAMING_SNAKE_CASE (e.g., MAX_FILE_SIZE, API_BASE_URL)."
+          explanation:
+            "Constants use SCREAMING_SNAKE_CASE (e.g., MAX_FILE_SIZE, API_BASE_URL).",
         },
         {
           question: "What is a code smell?",
-          options: ["Actual odor from computers", "Code that indicates potential problems", "Commented code", "Long variable names"],
+          options: [
+            "Actual odor from computers",
+            "Code that indicates potential problems",
+            "Commented code",
+            "Long variable names",
+          ],
           correct: 1,
-          explanation: "Code smells are indicators of potential problems in code structure, design, or implementation that may need refactoring."
+          explanation:
+            "Code smells are indicators of potential problems in code structure, design, or implementation that may need refactoring.",
         },
         {
           question: "Why should you validate user input?",
-          options: ["It's optional", "To prevent security vulnerabilities and ensure data integrity", "To make code longer", "Only for forms"],
+          options: [
+            "It's optional",
+            "To prevent security vulnerabilities and ensure data integrity",
+            "To make code longer",
+            "Only for forms",
+          ],
           correct: 1,
-          explanation: "Input validation prevents security vulnerabilities (like XSS), ensures data integrity, and improves user experience."
+          explanation:
+            "Input validation prevents security vulnerabilities (like XSS), ensures data integrity, and improves user experience.",
         },
         {
           question: "What is the DRY principle?",
-          options: ["Don't Repeat Yourself", "Do Right Yesterday", "Debug Regularly Yearly", "Don't Rush Yet"],
+          options: [
+            "Don't Repeat Yourself",
+            "Do Right Yesterday",
+            "Debug Regularly Yearly",
+            "Don't Rush Yet",
+          ],
           correct: 0,
-          explanation: "DRY (Don't Repeat Yourself) principle advocates for reducing repetition by extracting common functionality into reusable components."
+          explanation:
+            "DRY (Don't Repeat Yourself) principle advocates for reducing repetition by extracting common functionality into reusable components.",
         },
         {
           question: "When should you write comments in code?",
-          options: ["For every line", "To explain 'why' not 'what'", "Never", "Only for complex math"],
+          options: [
+            "For every line",
+            "To explain 'why' not 'what'",
+            "Never",
+            "Only for complex math",
+          ],
           correct: 1,
-          explanation: "Comments should explain the reasoning behind code (why), not what the code does (which should be self-evident from well-named functions and variables)."
-        }
-      ]
-    }
+          explanation:
+            "Comments should explain the reasoning behind code (why), not what the code does (which should be self-evident from well-named functions and variables).",
+        },
+      ],
+    },
   },
 
   // OOP CATEGORY
@@ -992,11 +1246,10 @@ const TUTORIALS = [
             "var obj = new Object()",
             "var obj = {}",
             "var obj = Object.create()",
-            "var obj = Object()"
+            "var obj = Object()",
           ],
           correct: 1,
-          explanation:
-            "Object literal syntax uses curly braces: var obj = {}",
+          explanation: "Object literal syntax uses curly braces: var obj = {}",
         },
         {
           question: "What is a method in an object?",
@@ -1004,7 +1257,7 @@ const TUTORIALS = [
             "A property that stores data",
             "A property that stores a function",
             "A way to create objects",
-            "A type of variable"
+            "A type of variable",
           ],
           correct: 1,
           explanation:
@@ -1016,7 +1269,7 @@ const TUTORIALS = [
             "Always",
             "When property names have spaces or special characters",
             "Never",
-            "Only with arrays"
+            "Only with arrays",
           ],
           correct: 1,
           explanation:
@@ -1028,7 +1281,7 @@ const TUTORIALS = [
             "Object values",
             "Array of object property names",
             "Object methods only",
-            "Object length"
+            "Object length",
           ],
           correct: 1,
           explanation:
@@ -1040,7 +1293,7 @@ const TUTORIALS = [
             "obj.property = null",
             "delete obj.property",
             "obj.remove('property')",
-            "obj.property = undefined"
+            "obj.property = undefined",
           ],
           correct: 1,
           explanation:
@@ -1052,24 +1305,25 @@ const TUTORIALS = [
             "Breaking objects into pieces",
             "Extracting properties from objects into variables",
             "Deleting object properties",
-            "Creating new objects"
+            "Creating new objects",
           ],
           correct: 1,
           explanation:
             "Object destructuring allows extracting properties from objects and assigning them to variables in a single statement.",
         },
         {
-          question: "What is the difference between Object.create() and object literals?",
+          question:
+            "What is the difference between Object.create() and object literals?",
           options: [
             "No difference",
             "Object.create() allows setting the prototype chain",
             "Object literals are faster",
-            "Object.create() is deprecated"
+            "Object.create() is deprecated",
           ],
           correct: 1,
           explanation:
             "Object.create() allows you to specify the prototype of the new object, while object literals use Object.prototype by default.",
-        }
+        },
       ],
     },
   },
@@ -1122,7 +1376,7 @@ const TUTORIALS = [
             "A function that constructs buildings",
             "A function used to create and initialize objects",
             "A function that cannot be called",
-            "A function that only returns values"
+            "A function that only returns values",
           ],
           correct: 1,
           explanation:
@@ -1134,19 +1388,20 @@ const TUTORIALS = [
             "Creates a new variable",
             "Creates a new object, sets up prototype chain, and binds 'this'",
             "Creates a new function",
-            "Creates a new scope"
+            "Creates a new scope",
           ],
           correct: 1,
           explanation:
             "The 'new' keyword creates a new object, sets up the prototype chain, binds 'this' to the new object, and returns the object.",
         },
         {
-          question: "How do you access the prototype of a constructor function?",
+          question:
+            "How do you access the prototype of a constructor function?",
           options: [
             "ConstructorFunc.prototype",
             "ConstructorFunc.__proto__",
             "ConstructorFunc.getPrototype()",
-            "new ConstructorFunc().prototype"
+            "new ConstructorFunc().prototype",
           ],
           correct: 0,
           explanation:
@@ -1158,19 +1413,20 @@ const TUTORIALS = [
             "A chain of function calls",
             "A series of linked objects used for property lookup",
             "A way to chain constructors",
-            "A method of inheritance only"
+            "A method of inheritance only",
           ],
           correct: 1,
           explanation:
             "The prototype chain is a series of linked objects that JavaScript uses to look up properties and methods.",
         },
         {
-          question: "How do you check if an object is an instance of a constructor?",
+          question:
+            "How do you check if an object is an instance of a constructor?",
           options: [
             "obj.constructor === Constructor",
             "obj instanceof Constructor",
             "typeof obj === Constructor",
-            "obj.isInstance(Constructor)"
+            "obj.isInstance(Constructor)",
           ],
           correct: 1,
           explanation:
@@ -1182,7 +1438,7 @@ const TUTORIALS = [
             "No difference",
             "__proto__ is on instances, prototype is on constructor functions",
             "prototype is deprecated",
-            "__proto__ is faster"
+            "__proto__ is faster",
           ],
           correct: 1,
           explanation:
@@ -1194,12 +1450,12 @@ const TUTORIALS = [
             "Use extends keyword only",
             "Set Child.prototype = Object.create(Parent.prototype)",
             "Use super() function",
-            "Inheritance is not possible with prototypes"
+            "Inheritance is not possible with prototypes",
           ],
           correct: 1,
           explanation:
             "Prototypal inheritance is achieved by setting Child.prototype = Object.create(Parent.prototype)",
-        }
+        },
       ],
     },
   },
@@ -1246,7 +1502,8 @@ const TUTORIALS = [
             "Interfaces define contracts that specify what properties and methods an object must have, enabling better type checking and code documentation.",
         },
         {
-          question: "How do generics improve type safety in TypeScript classes?",
+          question:
+            "How do generics improve type safety in TypeScript classes?",
           options: [
             "They eliminate all runtime errors",
             "They allow type parameters to be specified when using the class",
@@ -1258,7 +1515,8 @@ const TUTORIALS = [
             "Generics allow you to create reusable classes that work with different types while maintaining type safety through parameterized types.",
         },
         {
-          question: "What is the difference between abstract classes and interfaces?",
+          question:
+            "What is the difference between abstract classes and interfaces?",
           options: [
             "Abstract classes can have implementations, interfaces cannot",
             "Interfaces are faster than abstract classes",
@@ -1270,7 +1528,8 @@ const TUTORIALS = [
             "Abstract classes can contain both abstract methods (no implementation) and concrete methods (with implementation), while interfaces only define contracts without implementations.",
         },
         {
-          question: "Which TypeScript feature helps prevent the instantiation of a class more than once?",
+          question:
+            "Which TypeScript feature helps prevent the instantiation of a class more than once?",
           options: [
             "Private constructor in Singleton pattern",
             "Abstract classes",
@@ -1294,7 +1553,8 @@ const TUTORIALS = [
             "The readonly modifier prevents a property from being modified after it's initialized, providing immutability at compile time.",
         },
         {
-          question: "How do you implement multiple inheritance of behavior in TypeScript?",
+          question:
+            "How do you implement multiple inheritance of behavior in TypeScript?",
           options: [
             "Use multiple extends keywords",
             "Use interfaces and composition",
@@ -1318,7 +1578,8 @@ const TUTORIALS = [
             "Type guards are functions that perform runtime checks to narrow union types, allowing TypeScript to understand which specific type you're working with.",
         },
         {
-          question: "Which pattern is best for creating objects when you don't know the exact type until runtime?",
+          question:
+            "Which pattern is best for creating objects when you don't know the exact type until runtime?",
           options: [
             "Singleton pattern",
             "Observer pattern",
@@ -1330,7 +1591,8 @@ const TUTORIALS = [
             "The Factory pattern provides a way to create objects without specifying their exact class, making decisions about which type to instantiate at runtime.",
         },
         {
-          question: "What is the benefit of using the 'super' keyword in TypeScript inheritance?",
+          question:
+            "What is the benefit of using the 'super' keyword in TypeScript inheritance?",
           options: [
             "It makes the class run faster",
             "It calls the parent class constructor or methods",
@@ -1382,7 +1644,7 @@ const TUTORIALS = [
             "(function() { })();",
             "function() { }();",
             "immediate function() { };",
-            "function()() { };"
+            "function()() { };",
           ],
           correct: 0,
           explanation:
@@ -1394,7 +1656,7 @@ const TUTORIALS = [
             "A cooking technique",
             "Transforming a function with multiple arguments into nested functions",
             "A way to speed up functions",
-            "A method of error handling"
+            "A method of error handling",
           ],
           correct: 1,
           explanation:
@@ -1406,7 +1668,7 @@ const TUTORIALS = [
             "Applying some arguments to a function and returning a new function",
             "Running only part of a function",
             "A broken function",
-            "A function that returns undefined"
+            "A function that returns undefined",
           ],
           correct: 0,
           explanation:
@@ -1418,7 +1680,7 @@ const TUTORIALS = [
             "A function with many parameters",
             "A function that takes functions as arguments or returns functions",
             "A function at the top of the file",
-            "A function with complex logic"
+            "A function with complex logic",
           ],
           correct: 1,
           explanation:
@@ -1430,7 +1692,7 @@ const TUTORIALS = [
             "A memory management technique",
             "Caching function results to improve performance",
             "Remembering variable names",
-            "A debugging technique"
+            "A debugging technique",
           ],
           correct: 1,
           explanation:
@@ -1442,7 +1704,7 @@ const TUTORIALS = [
             "Making phone calls",
             "Calling a function with a specific 'this' context",
             "Creating function calls",
-            "Calling callbacks"
+            "Calling callbacks",
           ],
           correct: 1,
           explanation:
@@ -1454,7 +1716,7 @@ const TUTORIALS = [
             "No difference",
             "call() takes individual arguments, apply() takes an array",
             "apply() is faster",
-            "call() is deprecated"
+            "call() is deprecated",
           ],
           correct: 1,
           explanation:
@@ -1466,12 +1728,12 @@ const TUTORIALS = [
             "Binds variables together",
             "Creates a new function with a specific 'this' context",
             "Connects two functions",
-            "Validates function parameters"
+            "Validates function parameters",
           ],
           correct: 1,
           explanation:
             "The bind() method creates a new function with a permanently bound 'this' value and optionally preset arguments.",
-        }
+        },
       ],
     },
   },
@@ -1537,7 +1799,7 @@ const TUTORIALS = [
             "A function that calls back to the server",
             "A function passed as an argument to be executed later",
             "A function that returns another function",
-            "A function that handles errors"
+            "A function that handles errors",
           ],
           correct: 1,
           explanation:
@@ -1549,7 +1811,7 @@ const TUTORIALS = [
             "When callbacks are very slow",
             "Deeply nested callbacks that make code hard to read",
             "When callbacks throw errors",
-            "When callbacks are undefined"
+            "When callbacks are undefined",
           ],
           correct: 1,
           explanation:
@@ -1561,7 +1823,7 @@ const TUTORIALS = [
             "new Promise((resolve, reject) => {})",
             "Promise.create((success, fail) => {})",
             "createPromise((yes, no) => {})",
-            "Promise((resolve, reject) => {})"
+            "Promise((resolve, reject) => {})",
           ],
           correct: 0,
           explanation:
@@ -1573,7 +1835,7 @@ const TUTORIALS = [
             "Makes code run asynchronously",
             "Provides syntactic sugar for working with Promises",
             "Speeds up function execution",
-            "Handles errors automatically"
+            "Handles errors automatically",
           ],
           correct: 1,
           explanation:
@@ -1585,7 +1847,7 @@ const TUTORIALS = [
             "Runs promises in sequence",
             "Returns the result of the first promise to settle",
             "Compares promise performance",
-            "Cancels slower promises"
+            "Cancels slower promises",
           ],
           correct: 1,
           explanation:
@@ -1597,143 +1859,12 @@ const TUTORIALS = [
             "Use .catch() method",
             "Use try/catch blocks",
             "Use error callbacks",
-            "Errors are handled automatically"
+            "Errors are handled automatically",
           ],
           correct: 1,
           explanation:
             "Errors in async/await are handled using try/catch blocks around the await expression.",
-        }
-      ],
-    },
-  },
-
-  // DOM CATEGORY
-  {
-    slug: "dom-manipulation",
-    title: "DOM Manipulation",
-    description:
-      "Learn to dynamically manipulate web page content using the Document Object Model",
-    mdxFile: "dom/05-dom-manipulation",
-    category: "dom",
-    difficulty: 2,
-    order: 1,
-    published: true,
-    isPremium: false,
-    requiredPlan: "FREE",
-    quiz: {
-      title: "DOM Manipulation Quiz",
-      isPremium: false,
-      requiredPlan: "FREE",
-      questions: [
-        {
-          question:
-            "Which method is used to select a single element by its ID?",
-          options: [
-            "getElementsById()",
-            "getElementById()",
-            "querySelector()",
-            "selectById()",
-          ],
-          correct: 1,
-          explanation:
-            "getElementById() is the specific method for selecting an element by its ID attribute.",
         },
-        {
-          question: "What's the difference between innerHTML and textContent?",
-          options: [
-            "No difference",
-            "innerHTML parses HTML, textContent treats everything as plain text",
-            "textContent is faster",
-            "innerHTML is deprecated",
-          ],
-          correct: 1,
-          explanation:
-            "innerHTML parses and renders HTML tags, while textContent treats all content as plain text and is safer from XSS attacks.",
-        },
-        {
-          question: "How do you select elements by class name?",
-          options: [
-            "getElementsByClassName('className')",
-            "getElementByClass('className')",
-            "selectByClass('className')",
-            "findByClassName('className')"
-          ],
-          correct: 0,
-          explanation:
-            "getElementsByClassName() returns a live HTMLCollection of elements with the specified class name.",
-        },
-        {
-          question: "What does querySelector() return?",
-          options: [
-            "All matching elements",
-            "The first matching element",
-            "The last matching element",
-            "A boolean value"
-          ],
-          correct: 1,
-          explanation:
-            "querySelector() returns the first element that matches the specified CSS selector.",
-        },
-        {
-          question: "How do you create a new HTML element?",
-          options: [
-            "document.createElement('tagName')",
-            "document.newElement('tagName')",
-            "createElement('tagName')",
-            "new Element('tagName')"
-          ],
-          correct: 0,
-          explanation:
-            "document.createElement() creates a new HTML element with the specified tag name.",
-        },
-        {
-          question: "How do you add an element to the DOM?",
-          options: [
-            "element.add()",
-            "parentElement.appendChild(element)",
-            "document.add(element)",
-            "element.insert()"
-          ],
-          correct: 1,
-          explanation:
-            "appendChild() adds a new child element to the end of the parent's children list.",
-        },
-        {
-          question: "What is the difference between addEventListener and onclick?",
-          options: [
-            "No difference",
-            "addEventListener can attach multiple listeners, onclick only one",
-            "onclick is faster",
-            "addEventListener is deprecated"
-          ],
-          correct: 1,
-          explanation:
-            "addEventListener allows multiple event listeners for the same event, while onclick property can only hold one function.",
-        },
-        {
-          question: "How do you remove an element from the DOM?",
-          options: [
-            "element.delete()",
-            "element.remove() or parentElement.removeChild(element)",
-            "element.destroy()",
-            "delete element"
-          ],
-          correct: 1,
-          explanation:
-            "Elements can be removed using element.remove() or parentElement.removeChild(element).",
-        },
-        {
-          question: "What is event bubbling?",
-          options: [
-            "When events create bubbles",
-            "Events propagating from child to parent elements",
-            "When events fail to execute",
-            "A way to prevent events"
-          ],
-          correct: 1,
-          explanation:
-            "Event bubbling is the propagation of events from the target element up through its parent elements in the DOM tree.",
-        }
       ],
     },
   },
@@ -1762,37 +1893,39 @@ const TUTORIALS = [
             "Hyper Text Markup Language",
             "High Tech Modern Language",
             "Home Tool Markup Language",
-            "Hyperlink and Text Markup Language"
+            "Hyperlink and Text Markup Language",
           ],
           correct: 0,
           explanation:
-            "HTML stands for HyperText Markup Language, the standard markup language for creating web pages."
+            "HTML stands for HyperText Markup Language, the standard markup language for creating web pages.",
         },
         {
           question: "Which tag is used to create the largest heading?",
           options: ["<h6>", "<h1>", "<header>", "<heading>"],
           correct: 1,
           explanation:
-            "The <h1> tag creates the largest heading in HTML, representing the most important heading level."
+            "The <h1> tag creates the largest heading in HTML, representing the most important heading level.",
         },
         {
-          question: "What is the correct way to create a link to another website?",
+          question:
+            "What is the correct way to create a link to another website?",
           options: [
             "<link href='https://example.com'>Example</link>",
             "<a href='https://example.com'>Example</a>",
             "<url>https://example.com</url>",
-            "<website url='https://example.com'>Example</website>"
+            "<website url='https://example.com'>Example</website>",
           ],
           correct: 1,
           explanation:
-            "The <a> tag with the href attribute is used to create hyperlinks to other web pages."
+            "The <a> tag with the href attribute is used to create hyperlinks to other web pages.",
         },
         {
-          question: "Which attribute is required for the <img> tag for accessibility?",
+          question:
+            "Which attribute is required for the <img> tag for accessibility?",
           options: ["src", "alt", "title", "width"],
           correct: 1,
           explanation:
-            "The alt attribute provides alternative text for images, which is essential for screen readers and accessibility."
+            "The alt attribute provides alternative text for images, which is essential for screen readers and accessibility.",
         },
         {
           question: "What is the purpose of the <!DOCTYPE html> declaration?",
@@ -1800,18 +1933,18 @@ const TUTORIALS = [
             "To include CSS styles",
             "To tell the browser this is an HTML5 document",
             "To create a comment",
-            "To import JavaScript"
+            "To import JavaScript",
           ],
           correct: 1,
           explanation:
-            "The <!DOCTYPE html> declaration tells the browser that this is an HTML5 document and should be rendered accordingly."
+            "The <!DOCTYPE html> declaration tells the browser that this is an HTML5 document and should be rendered accordingly.",
         },
         {
           question: "Which tag is used to create an unordered list?",
           options: ["<ol>", "<ul>", "<list>", "<ulist>"],
           correct: 1,
           explanation:
-            "The <ul> tag creates an unordered (bulleted) list, while <ol> creates an ordered (numbered) list."
+            "The <ul> tag creates an unordered (bulleted) list, while <ol> creates an ordered (numbered) list.",
         },
         {
           question: "What is semantic HTML?",
@@ -1819,18 +1952,18 @@ const TUTORIALS = [
             "HTML that looks good",
             "HTML that uses meaningful elements that describe their content",
             "HTML with CSS styling",
-            "HTML with JavaScript functionality"
+            "HTML with JavaScript functionality",
           ],
           correct: 1,
           explanation:
-            "Semantic HTML uses elements that clearly describe their meaning and content, improving accessibility and SEO."
+            "Semantic HTML uses elements that clearly describe their meaning and content, improving accessibility and SEO.",
         },
         {
           question: "Which tag should contain the main content of a web page?",
           options: ["<content>", "<body>", "<main>", "<section>"],
           correct: 2,
           explanation:
-            "The <main> element contains the main content of the document, excluding headers, footers, and navigation."
+            "The <main> element contains the main content of the document, excluding headers, footers, and navigation.",
         },
         {
           question: "What is the difference between <strong> and <b>?",
@@ -1838,11 +1971,11 @@ const TUTORIALS = [
             "No difference",
             "<strong> has semantic meaning (importance), <b> is just visual styling",
             "<b> is better for accessibility",
-            "<strong> is deprecated"
+            "<strong> is deprecated",
           ],
           correct: 1,
           explanation:
-            "<strong> indicates importance semantically, while <b> is purely presentational. <strong> is better for accessibility."
+            "<strong> indicates importance semantically, while <b> is purely presentational. <strong> is better for accessibility.",
         },
         {
           question: "Which input type is used for email addresses in forms?",
@@ -1850,11 +1983,11 @@ const TUTORIALS = [
             "<input type='text'>",
             "<input type='email'>",
             "<input type='mail'>",
-            "<input type='address'>"
+            "<input type='address'>",
           ],
           correct: 1,
           explanation:
-            "The input type='email' provides built-in email validation and appropriate mobile keyboards."
+            "The input type='email' provides built-in email validation and appropriate mobile keyboards.",
         },
         {
           question: "What does the 'required' attribute do in form inputs?",
@@ -1862,18 +1995,18 @@ const TUTORIALS = [
             "Makes the input larger",
             "Changes the input color",
             "Makes the field mandatory to fill before submission",
-            "Adds a tooltip"
+            "Adds a tooltip",
           ],
           correct: 2,
           explanation:
-            "The required attribute makes form fields mandatory - the form cannot be submitted without filling them."
+            "The required attribute makes form fields mandatory - the form cannot be submitted without filling them.",
         },
         {
           question: "Which tag is used to group related form elements?",
           options: ["<group>", "<fieldset>", "<formgroup>", "<section>"],
           correct: 1,
           explanation:
-            "The <fieldset> tag groups related form controls and is often used with <legend> to provide a caption."
+            "The <fieldset> tag groups related form controls and is often used with <legend> to provide a caption.",
         },
         {
           question: "What is the purpose of the <head> section?",
@@ -1881,18 +2014,18 @@ const TUTORIALS = [
             "Contains visible page content",
             "Contains metadata about the document",
             "Contains the page header",
-            "Contains navigation links"
+            "Contains navigation links",
           ],
           correct: 1,
           explanation:
-            "The <head> contains metadata like title, character encoding, viewport settings, and links to CSS/JavaScript files."
+            "The <head> contains metadata like title, character encoding, viewport settings, and links to CSS/JavaScript files.",
         },
         {
           question: "Which tag creates a line break?",
           options: ["<break>", "<br>", "<lb>", "<newline>"],
           correct: 1,
           explanation:
-            "The <br> tag creates a line break and is one of the few self-closing tags in HTML."
+            "The <br> tag creates a line break and is one of the few self-closing tags in HTML.",
         },
         {
           question: "How do you add a comment in HTML?",
@@ -1900,12 +2033,12 @@ const TUTORIALS = [
             "// This is a comment",
             "/* This is a comment */",
             "<!-- This is a comment -->",
-            "# This is a comment"
+            "# This is a comment",
           ],
           correct: 2,
           explanation:
-            "HTML comments are written using <!-- comment text --> and are not visible on the rendered page."
-        }
+            "HTML comments are written using <!-- comment text --> and are not visible on the rendered page.",
+        },
       ],
     },
   },
@@ -1933,7 +2066,7 @@ const TUTORIALS = [
           options: ["unshift()", "push()", "pop()", "shift()"],
           correct: 1,
           explanation:
-            "The push() method adds one or more elements to the end of an array and returns the new length."
+            "The push() method adds one or more elements to the end of an array and returns the new length.",
         },
         {
           question: "What does the array method map() return?",
@@ -1941,18 +2074,19 @@ const TUTORIALS = [
             "The original array modified",
             "A new array with transformed elements",
             "The first element that matches",
-            "True or false"
+            "True or false",
           ],
           correct: 1,
           explanation:
-            "The map() method creates a new array with the results of calling a function for every array element."
+            "The map() method creates a new array with the results of calling a function for every array element.",
         },
         {
-          question: "Which method is best for finding elements that meet a condition?",
+          question:
+            "Which method is best for finding elements that meet a condition?",
           options: ["forEach()", "map()", "filter()", "reduce()"],
           correct: 2,
           explanation:
-            "The filter() method creates a new array with all elements that pass a test implemented by the provided function."
+            "The filter() method creates a new array with all elements that pass a test implemented by the provided function.",
         },
         {
           question: "What does the reduce() method do?",
@@ -1960,18 +2094,18 @@ const TUTORIALS = [
             "Removes elements from an array",
             "Filters array elements",
             "Reduces array to a single value",
-            "Sorts array elements"
+            "Sorts array elements",
           ],
           correct: 2,
           explanation:
-            "The reduce() method executes a reducer function on each element, resulting in a single output value."
+            "The reduce() method executes a reducer function on each element, resulting in a single output value.",
         },
         {
           question: "Which method removes the last element from an array?",
           options: ["push()", "pop()", "shift()", "unshift()"],
           correct: 1,
           explanation:
-            "The pop() method removes the last element from an array and returns that element."
+            "The pop() method removes the last element from an array and returns that element.",
         },
         {
           question: "What is the difference between slice() and splice()?",
@@ -1979,18 +2113,19 @@ const TUTORIALS = [
             "No difference",
             "slice() modifies original, splice() creates new",
             "slice() creates new, splice() modifies original",
-            "splice() is faster"
+            "splice() is faster",
           ],
           correct: 2,
           explanation:
-            "slice() returns a shallow copy without modifying the original array, while splice() changes the original array."
+            "slice() returns a shallow copy without modifying the original array, while splice() changes the original array.",
         },
         {
-          question: "Which method would you use to check if an array contains a specific value?",
+          question:
+            "Which method would you use to check if an array contains a specific value?",
           options: ["contains()", "includes()", "has()", "exists()"],
           correct: 1,
           explanation:
-            "The includes() method determines whether an array includes a certain value among its entries."
+            "The includes() method determines whether an array includes a certain value among its entries.",
         },
         {
           question: "What does [...array] create?",
@@ -1998,31 +2133,33 @@ const TUTORIALS = [
             "A reference to the original array",
             "A shallow copy of the array",
             "A deep copy of the array",
-            "An error"
+            "An error",
           ],
           correct: 1,
           explanation:
-            "The spread operator [...array] creates a shallow copy of the array with new references for the array itself."
+            "The spread operator [...array] creates a shallow copy of the array with new references for the array itself.",
         },
         {
-          question: "Which array method should you avoid for performance with large arrays?",
+          question:
+            "Which array method should you avoid for performance with large arrays?",
           options: ["forEach()", "map()", "indexOf() in a loop", "filter()"],
           correct: 2,
           explanation:
-            "Using indexOf() in a loop creates O(n²) complexity, which is inefficient for large arrays."
+            "Using indexOf() in a loop creates O(n²) complexity, which is inefficient for large arrays.",
         },
         {
-          question: "What happens when you call map() without returning a value?",
+          question:
+            "What happens when you call map() without returning a value?",
           options: [
             "Returns the original array",
             "Returns an array of undefined values",
             "Throws an error",
-            "Returns an empty array"
+            "Returns an empty array",
           ],
           correct: 1,
           explanation:
-            "If no return statement is used in the map callback, each element becomes undefined in the new array."
-        }
+            "If no return statement is used in the map callback, each element becomes undefined in the new array.",
+        },
       ],
     },
   },
@@ -2110,9 +2247,6 @@ async function seedTutorials() {
     );
     console.log(
       `   - Async: ${TUTORIALS.filter((t) => t.category === "async").length}`
-    );
-    console.log(
-      `   - DOM: ${TUTORIALS.filter((t) => t.category === "dom").length}`
     );
     console.log(
       `   - Data Structures: ${

@@ -1,9 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { Play, Code, Eye } from "lucide-react";
 import { HTMLPreviewWindow } from "./HTMLPreviewWindow";
-
+import CodeEditor from "../CodeEditor";
+import BlockConsole from "./BlockConsole";
 interface DOMInteractiveBlockProps {
   title: string;
   description: string;
@@ -19,13 +26,23 @@ export function DOMInteractiveBlock({
   javascript,
   html,
   css = "",
-  height = 250,
+  height = 500,
 }: DOMInteractiveBlockProps) {
   const [activeTab, setActiveTab] = useState<"code" | "preview">("code");
   const [currentCode, setCurrentCode] = useState(javascript);
   const [executed, setExecuted] = useState(false);
   const [executeCount, setExecuteCount] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
+  const executeCountRef = useRef(0);
+
+  // Create unique block ID based on title and description
+  const blockId = useMemo(
+    () =>
+      btoa(title + description)
+        .replace(/[^a-zA-Z0-9]/g, "")
+        .substring(0, 8),
+    [title, description]
+  );
 
   // Handle client-side mounting to prevent hydration issues
   useEffect(() => {
@@ -37,21 +54,45 @@ export function DOMInteractiveBlock({
     setCurrentCode(javascript);
     setExecuted(false);
     setExecuteCount(0);
+    executeCountRef.current = 0;
+    // Clear console via postMessage
+    window.postMessage({ type: "dom-console-clear" }, "*");
   }, [javascript]);
 
-  const executeCode = () => {
+  const executeCode = useCallback(() => {
     if (!isMounted) return;
 
+    // Clear console via postMessage
+    window.postMessage({ type: "dom-console-clear" }, "*");
+
     setExecuted(true);
-    setExecuteCount((prev) => prev + 1);
+    const newCount = executeCountRef.current + 1;
+    executeCountRef.current = newCount;
+    setExecuteCount(newCount);
 
     // Switch to preview tab with a slight delay to ensure state updates
     if (activeTab === "code") {
       setTimeout(() => {
         setActiveTab("preview");
-      }, 100);
+      }, 500);
     }
-  };
+  }, [isMounted, activeTab]);
+
+  // Memoized preview component to prevent re-renders
+  const PreviewComponent = useMemo(() => {
+    return (
+      <HTMLPreviewWindow
+        key={`dom-preview-${executeCount}`}
+        html={html}
+        css={css}
+        javascript={executed ? currentCode : ""}
+        title="DOM Manipulation Result"
+        height={height}
+        forceUpdateTrigger={executeCount}
+        blockId={blockId}
+      />
+    );
+  }, [html, css, executed, currentCode, height, executeCount, blockId]);
 
   return (
     <div className="my-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
@@ -97,12 +138,11 @@ export function DOMInteractiveBlock({
           <div className="p-4">
             {/* Code Editor */}
             <div className="relative">
-              <textarea
-                value={currentCode}
-                onChange={(e) => setCurrentCode(e.target.value)}
-                className="w-full h-48 p-3 font-mono text-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
-                spellCheck={false}
+              <CodeEditor
+                initialCode={currentCode}
+                onCodeChange={(code) => setCurrentCode(code)}
                 placeholder="Write your JavaScript code here..."
+                canRun={false}
               />
             </div>
 
@@ -110,41 +150,29 @@ export function DOMInteractiveBlock({
             <div className="mt-4 flex flex-col items-center gap-3">
               <button
                 onClick={executeCode}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors cursor-pointer active:scale-95"
               >
                 <Play className="w-4 h-4" />
                 Run Code & See Result
               </button>
-
-              {/* Console Tip */}
-              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-lg border border-blue-200 dark:border-blue-800">
-                <span className="font-mono">💡</span>
-                <span>
-                  <strong>Tip:</strong> Open your browser&apos;s Developer Tools
-                  (F12) and check the Console tab to see any logging output from
-                  your code!
-                </span>
-              </div>
             </div>
           </div>
         )}
 
         {activeTab === "preview" && isMounted && (
           <div className="p-4">
-            <HTMLPreviewWindow
-              key={`dom-preview-${executeCount}-${
-                currentCode.length
-              }-${Date.now()}`}
-              html={html}
-              css={css}
-              javascript={executed ? currentCode : ""}
-              title="DOM Manipulation Result"
-              height={height}
-              forceUpdateTrigger={executeCount}
-            />
+            {PreviewComponent}
 
+            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-lg border border-blue-200 dark:border-blue-800">
+              <span className="font-mono">💡</span>
+              <span>
+                <strong>Tip:</strong> Click &apos;Run Code&apos; then switch to
+                the Preview tab to see your DOM manipulation in action! Console
+                output will appear above.
+              </span>
+            </div>
             {!executed && (
-              <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+              <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg ">
                 <p className="text-sm text-yellow-800 dark:text-yellow-200">
                   Click {"'"}Run Code & See Result{"'"} in the JavaScript tab to
                   execute your code and see the changes.
@@ -155,15 +183,22 @@ export function DOMInteractiveBlock({
         )}
       </div>
 
+      {/* Console Output - Shows for both tabs */}
+      <BlockConsole blockId={blockId} />
+
       {/* Sample HTML Structure Info */}
       <div className="bg-gray-50 dark:bg-gray-900 px-4 py-3 border-t border-gray-200 dark:border-gray-700">
         <details className="text-sm">
           <summary className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-medium">
             View HTML Structure
           </summary>
-          <pre className="mt-2 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-xs text-gray-700 dark:text-gray-300 overflow-x-auto">
-            {html}
-          </pre>
+          <CodeEditor
+            language="html"
+            initialCode={html}
+            height="200px"
+            canRun={false}
+            readOnly
+          />
         </details>
       </div>
     </div>

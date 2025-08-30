@@ -12,6 +12,8 @@ interface CodeEditorProps {
   height?: string;
   placeholder?: string;
   onCodeChange?: (code: string) => void;
+  canRun?: boolean;
+  language?: string;
 }
 
 interface ExecutionResult {
@@ -26,6 +28,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   height = "500px",
   placeholder,
   onCodeChange,
+  canRun = true,
+  language = "javascript",
 }) => {
   const [code, setCode] = useState(initialCode);
   const [result, setResult] = useState<ExecutionResult | null>(null);
@@ -55,19 +59,19 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // F11 to toggle fullscreen
-      if (event.key === 'F11' && !readOnly) {
+      if (event.key === "F11" && !readOnly) {
         event.preventDefault();
         setIsExpanded(!isExpanded);
       }
       // ESC to exit fullscreen
-      if (event.key === 'Escape' && isExpanded) {
+      if (event.key === "Escape" && isExpanded) {
         event.preventDefault();
         setIsExpanded(false);
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isExpanded, readOnly]);
 
   const handleRunCode = async () => {
@@ -98,6 +102,9 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       setIsRunning(false);
     }
   };
+  const firstLetter = language.charAt(0);
+
+  const lang = language.replace(firstLetter, firstLetter.toUpperCase());
 
   return (
     <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
@@ -110,7 +117,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             <div className="w-3 h-3 rounded-full bg-green-400"></div>
           </div>
           <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-            JavaScript Console
+            {lang}
           </span>
         </div>
 
@@ -119,7 +126,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="px-2 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-xs rounded border border-gray-300 dark:border-gray-500 transition-colors flex items-center gap-1"
-              title={isExpanded ? "Exit fullscreen (ESC)" : "Expand to fullscreen (F11)"}
+              title={
+                isExpanded
+                  ? "Exit fullscreen (ESC)"
+                  : "Expand to fullscreen (F11)"
+              }
             >
               {isExpanded ? (
                 <>
@@ -133,13 +144,15 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                 </>
               )}
             </button>
-            <button
-              onClick={handleRunCode}
-              disabled={isRunning || !code.trim()}
-              className="px-3 py-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white text-sm rounded font-medium transition-colors"
-            >
-              {isRunning ? "⏳" : "▶"} Run
-            </button>
+            {canRun && (
+              <button
+                onClick={handleRunCode}
+                disabled={isRunning || !code.trim()}
+                className="px-3 py-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white text-sm rounded font-medium transition-colors"
+              >
+                {isRunning ? "⏳" : "▶"} Run
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -168,7 +181,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
         <Editor
           height={isExpanded ? "calc(100vh - 140px)" : height}
-          defaultLanguage="javascript"
+          defaultLanguage={language}
           value={code}
           onChange={(value) => handleCodeChange(value || "")}
           theme={resolvedTheme === "dark" ? "vs-dark" : "light"}
@@ -255,7 +268,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       {/* Output */}
       {result && (
         <div className="border-t border-gray-200 dark:border-gray-600 h-80">
-          <div className="flex flex-col p-3 bg-gray-50 dark:bg-gray-700 h-80">
+          <div className="flex flex-col p-3 bg-gray-50 dark:bg-gray-700 h-full">
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Output
@@ -265,7 +278,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
               </span>
             </div>
 
-            <div className="bg-black text-green-400 p-3 rounded font-mono text-sm overflow-y-auto text-balance">
+            <div className="bg-black text-green-400 p-3 rounded font-mono text-sm overflow-y-auto text-balance h-full">
               {result.output.length > 0 ? (
                 result.output.map((log, index) => (
                   <div key={index} className="mb-1 my-1">

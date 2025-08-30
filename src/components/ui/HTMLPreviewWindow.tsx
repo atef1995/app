@@ -10,6 +10,8 @@ interface HTMLPreviewWindowProps {
   title?: string;
   height?: number;
   forceUpdateTrigger?: number;
+  onConsoleOutput?: (message: string, type: "log" | "error") => void;
+  blockId?: string;
 }
 
 export function HTMLPreviewWindow({
@@ -19,6 +21,8 @@ export function HTMLPreviewWindow({
   title = "Preview",
   height = 300,
   forceUpdateTrigger = 0,
+  onConsoleOutput,
+  blockId = "default",
 }: HTMLPreviewWindowProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [srcDoc, setSrcDoc] = useState("");
@@ -135,11 +139,52 @@ export function HTMLPreviewWindow({
       includeJS
         ? `
     <script>
-        // Timestamp: ${timestamp} - Force update: ${forceUpdate}
+        // Capture console output and send to parent immediately
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        let messageId = 0;
+        
+        console.log = function(...args) {
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+            ).join(' ');
+            
+            // Send to parent window with unique ID and block ID
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'dom-console-log',
+                    message: message,
+                    id: ++messageId,
+                    blockId: '${blockId}'
+                }, '*');
+            }
+            
+            originalLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+            ).join(' ');
+            
+            // Send to parent window with unique ID and block ID
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'dom-console-error',
+                    message: message,
+                    id: ++messageId,
+                    blockId: '${blockId}'
+                }, '*');
+            }
+            
+            originalError.apply(console, args);
+        };
+        
         try {
             ${javascript}
         } catch (error) {
-            console.error('Preview Error:', error);
+            console.error('Error: ' + error.message);
         }
     </script>`
         : ""
@@ -147,7 +192,7 @@ export function HTMLPreviewWindow({
 </body>
 </html>`;
     },
-    [css, html, javascript, forceUpdate]
+    [css, html, javascript, forceUpdate, blockId]
   );
 
   useEffect(() => {
@@ -163,7 +208,7 @@ export function HTMLPreviewWindow({
         iframeRef.current.srcdoc = fullHTML;
       }
     }, 50);
-  }, [generateHTML, isMounted]);
+  }, [html, css, javascript, forceUpdate, isMounted]); // Use specific dependencies instead of generateHTML
 
   const resetPreview = () => {
     // Force re-render of the iframe by creating fresh HTML without JavaScript
@@ -224,7 +269,7 @@ export function HTMLPreviewWindow({
               className="w-full border-none"
               style={{ height: `${height}px` }}
               title="HTML Preview"
-              sandbox="allow-scripts"
+              sandbox="allow-scripts allow-same-origin"
               srcDoc={srcDoc}
               key={`iframe-${forceUpdate}-${Date.now()}`}
             />

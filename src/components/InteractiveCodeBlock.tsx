@@ -10,6 +10,7 @@ interface InteractiveCodeBlockProps {
   editable?: boolean;
   title?: string;
   description?: string;
+  language?: string;
 }
 
 const InteractiveCodeBlock: React.FC<InteractiveCodeBlockProps> = ({
@@ -18,6 +19,7 @@ const InteractiveCodeBlock: React.FC<InteractiveCodeBlockProps> = ({
   editable = true,
   title,
   description,
+  language = "javascript",
 }) => {
   // Extract code from children if provided
   const codeFromChildren = React.useMemo(() => {
@@ -82,6 +84,7 @@ const InteractiveCodeBlock: React.FC<InteractiveCodeBlockProps> = ({
       )}
 
       <CodeEditor
+        language={language}
         initialCode={code}
         readOnly={!editable}
         height="450px"

@@ -61,7 +61,7 @@ async function seedDomTutorials() {
         estimatedTime: 60,
         order: 3,
         isPremium: true,
-        requiredPlan: "PRO",
+        requiredPlan: "VIBED",
       },
       {
         title: "Form Handling & Validation: User Input Mastery",
@@ -73,7 +73,7 @@ async function seedDomTutorials() {
         estimatedTime: 55,
         order: 4,
         isPremium: true,
-        requiredPlan: "PRO",
+        requiredPlan: "VIBED",
       },
       {
         title: "Browser Object Model (BOM): Mastering the Browser Environment",
@@ -85,7 +85,7 @@ async function seedDomTutorials() {
         estimatedTime: 50,
         order: 5,
         isPremium: true,
-        requiredPlan: "PRO",
+        requiredPlan: "VIBED",
       },
     ];
 
