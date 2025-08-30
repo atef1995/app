@@ -3,13 +3,19 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { TutorialNavigation } from "@/types/quiz";
+import { devMode } from "@/lib/services/envService";
 
 interface UseAntiCheatProps {
   tutorialNavigation: TutorialNavigation | null;
   quizSlug: string;
 }
 
-export function useAntiCheat({ tutorialNavigation, quizSlug }: UseAntiCheatProps) {
+const debugMode = devMode();
+
+export function useAntiCheat({
+  tutorialNavigation,
+  quizSlug,
+}: UseAntiCheatProps) {
   const [cheatAttempts, setCheatAttempts] = useState(0);
   const router = useRouter();
 
@@ -111,7 +117,9 @@ export function useAntiCheat({ tutorialNavigation, quizSlug }: UseAntiCheatProps
       });
 
       try {
-        console.log(element);
+        if (debugMode) {
+          console.log(element);
+        }
         console.clear();
       } catch {
         consoleOpen = true;

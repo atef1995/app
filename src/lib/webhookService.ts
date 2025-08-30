@@ -6,6 +6,7 @@ import {
 } from "@/lib/subscriptionService";
 import { prisma } from "@/lib/prisma";
 import { emailService } from "@/lib/services/emailService";
+import { devMode } from "./services/envService";
 
 // Type for Stripe Invoice parent with subscription details
 interface InvoiceParentWithSubscription {
@@ -20,6 +21,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-06-30.basil",
 });
 
+const debugMode = devMode();
+
 /**
  * Service for handling Stripe webhook events
  */
@@ -31,34 +34,39 @@ export class WebhookService {
     session: Stripe.Checkout.Session
   ): Promise<void> {
     try {
-      console.log("🎯 Processing checkout session completed:", session.id);
-      console.log("📊 Session data:", {
-        customer: session.customer,
-        metadata: session.metadata,
-        paymentStatus: session.payment_status,
-        subscriptionId: session.subscription,
-      });
-
-      if (!session.customer || !session.metadata?.userId) {
-        console.error("❌ Missing customer or userId in session metadata:", {
-          hasCustomer: !!session.customer,
+      if (debugMode) {
+        console.log("🎯 Processing checkout session completed:", session.id);
+        console.log("📊 Session data:", {
+          customer: session.customer,
           metadata: session.metadata,
+          paymentStatus: session.payment_status,
+          subscriptionId: session.subscription,
         });
+      }
+      if (!session.customer || !session.metadata?.userId) {
+        if (debugMode) {
+          console.error("❌ Missing customer or userId in session metadata:", {
+            hasCustomer: !!session.customer,
+            metadata: session.metadata,
+          });
+        }
         return;
       }
 
       const userId = session.metadata.userId;
       const plan = session.metadata.plan as Plan;
-
-      console.log(`💳 Processing payment for user ${userId}, plan ${plan}`);
-
+      if (debugMode) {
+        console.log(`💳 Processing payment for user ${userId}, plan ${plan}`);
+      }
       // Update payment record
       const payment = await prisma.payment.findFirst({
         where: { stripeSessionId: session.id },
       });
 
       if (payment) {
-        console.log("📝 Updating payment record:", payment.id);
+        if (debugMode) {
+          console.log("📝 Updating payment record:", payment.id);
+        }
         await prisma.payment.update({
           where: { id: payment.id },
           data: { status: "COMPLETED" },
@@ -70,31 +78,40 @@ export class WebhookService {
       // If there's a subscription, it will be handled by subscription.created event
       // But we can also check subscription status here for immediate updates
       if (session.subscription) {
-        console.log(
-          "🔄 Session has subscription, will be handled by subscription events"
-        );
+        if (debugMode) {
+          console.log(
+            "🔄 Session has subscription, will be handled by subscription events"
+          );
+        }
       }
 
       // Send payment confirmation email
       try {
         const user = await prisma.user.findUnique({
-          where: { id: userId }
+          where: { id: userId },
         });
 
         if (user) {
-          console.log("📧 Sending payment confirmation email to user");
+          if (debugMode) {
+            console.log("📧 Sending payment confirmation email to user");
+          }
           await emailService.sendPaymentConfirmationEmail(user, {
             plan: plan,
             amount: 0, // Will be updated by invoice payment handler
             currency: "usd",
             subscriptionStatus: "COMPLETED",
             subscriptionEndsAt: undefined,
-            isTrialActive: false
+            isTrialActive: false,
           });
-          console.log("✅ Payment confirmation email sent successfully");
+          if (debugMode) {
+            console.log("✅ Payment confirmation email sent successfully");
+          }
         }
       } catch (emailError) {
-        console.error("⚠️ Failed to send payment confirmation email:", emailError);
+        console.error(
+          "⚠️ Failed to send payment confirmation email:",
+          emailError
+        );
         // Don't throw - email failure shouldn't break webhook processing
       }
 
@@ -112,14 +129,15 @@ export class WebhookService {
     subscription: Stripe.Subscription
   ): Promise<void> {
     try {
-      console.log("🎯 Processing subscription created:", subscription.id);
-      console.log("📊 Subscription data:", {
-        customerId: subscription.customer,
-        status: subscription.status,
-        metadata: subscription.metadata,
-        priceId: subscription.items.data[0]?.price.id,
-      });
-
+      if (debugMode) {
+        console.log("🎯 Processing subscription created:", subscription.id);
+        console.log("📊 Subscription data:", {
+          customerId: subscription.customer,
+          status: subscription.status,
+          metadata: subscription.metadata,
+          priceId: subscription.items.data[0]?.price.id,
+        });
+      }
       const customerId = subscription.customer as string;
       const customer = await stripe.customers.retrieve(customerId);
 
@@ -127,18 +145,20 @@ export class WebhookService {
         console.error("❌ Customer is deleted");
         return;
       }
-
-      console.log("👤 Customer data:", {
-        id: customer.id,
-        metadata: customer.metadata,
-      });
-
+      if (debugMode) {
+        console.log("👤 Customer data:", {
+          id: customer.id,
+          metadata: customer.metadata,
+        });
+      }
       const userId = customer.metadata?.userId;
       if (!userId) {
-        console.error(
-          "❌ No userId found in customer metadata:",
-          customer.metadata
-        );
+        if (debugMode) {
+          console.error(
+            "❌ No userId found in customer metadata:",
+            customer.metadata
+          );
+        }
         return;
       }
 
@@ -165,7 +185,7 @@ export class WebhookService {
       // Get billing cycle dates from subscription
       const billingCycleAnchor = subscription.billing_cycle_anchor;
       const subscriptionItem = subscription.items.data[0];
-      
+
       // Calculate subscription end date from subscription item
       const subscriptionEndsAt = new Date(
         subscriptionItem.current_period_end * 1000
@@ -173,17 +193,17 @@ export class WebhookService {
       const subscriptionStartsAt = new Date(
         subscriptionItem.current_period_start * 1000
       );
-
-      console.log("📅 Subscription dates:", {
-        billing_cycle_anchor: billingCycleAnchor,
-        item_current_period_end: subscriptionItem.current_period_end,
-        item_current_period_start: subscriptionItem.current_period_start,
-        subscriptionEndsAt: subscriptionEndsAt.toISOString(),
-        subscriptionStartsAt: subscriptionStartsAt.toISOString(),
-        isValidEndDate: !isNaN(subscriptionEndsAt.getTime()),
-        isValidStartDate: !isNaN(subscriptionStartsAt.getTime()),
-      });
-
+      if (debugMode) {
+        console.log("📅 Subscription dates:", {
+          billing_cycle_anchor: billingCycleAnchor,
+          item_current_period_end: subscriptionItem.current_period_end,
+          item_current_period_start: subscriptionItem.current_period_start,
+          subscriptionEndsAt: subscriptionEndsAt.toISOString(),
+          subscriptionStartsAt: subscriptionStartsAt.toISOString(),
+          isValidEndDate: !isNaN(subscriptionEndsAt.getTime()),
+          isValidStartDate: !isNaN(subscriptionStartsAt.getTime()),
+        });
+      }
       // Validate dates before updating
       if (
         isNaN(subscriptionEndsAt.getTime()) ||
@@ -195,23 +215,24 @@ export class WebhookService {
         return;
       }
 
-      console.log(
-        `🔄 Updating user subscription: userId=${userId}, plan=${plan}, endsAt=${subscriptionEndsAt.toISOString()}`
-      );
-
+      if (debugMode) {
+        console.log(
+          `🔄 Updating user subscription: userId=${userId}, plan=${plan}, endsAt=${subscriptionEndsAt.toISOString()}`
+        );
+      }
       // Determine if this is a trial subscription
       const isTrialSubscription = subscription.status === "trialing";
-      const subscriptionStatus = isTrialSubscription 
-        ? SubscriptionStatus.TRIAL 
+      const subscriptionStatus = isTrialSubscription
+        ? SubscriptionStatus.TRIAL
         : SubscriptionStatus.ACTIVE;
-
-      console.log(`📊 Subscription details:`, {
-        stripeStatus: subscription.status,
-        isTrialing: isTrialSubscription,
-        trialEnd: subscription.trial_end,
-        ourStatus: subscriptionStatus,
-      });
-
+      if (debugMode) {
+        console.log(`📊 Subscription details:`, {
+          stripeStatus: subscription.status,
+          isTrialing: isTrialSubscription,
+          trialEnd: subscription.trial_end,
+          ourStatus: subscriptionStatus,
+        });
+      }
       // Update user subscription
       await SubscriptionService.updateUserSubscription(
         userId,
@@ -237,22 +258,28 @@ export class WebhookService {
       // Send payment confirmation email with full subscription details
       try {
         const user = await prisma.user.findUnique({
-          where: { id: userId }
+          where: { id: userId },
         });
 
         if (user) {
-          console.log("📧 Sending subscription confirmation email to user");
-          
+          if (debugMode) {
+            console.log("📧 Sending subscription confirmation email to user");
+          }
           // Get subscription price from Stripe
           const priceId = subscription.items.data[0]?.price.id;
           let amount = 0;
-          
+
           if (priceId) {
             try {
               const price = await stripe.prices.retrieve(priceId);
               amount = price.unit_amount || 0;
             } catch (priceError) {
-              console.warn("⚠️ Could not retrieve price information:", priceError);
+              if (debugMode) {
+                console.warn(
+                  "⚠️ Could not retrieve price information:",
+                  priceError
+                );
+              }
             }
           }
 
@@ -263,16 +290,24 @@ export class WebhookService {
             subscriptionStatus: subscriptionStatus,
             subscriptionEndsAt: subscriptionEndsAt,
             isTrialActive: isTrialSubscription,
-            trialEndsAt: subscription.trial_end ? new Date(subscription.trial_end * 1000) : undefined
+            trialEndsAt: subscription.trial_end
+              ? new Date(subscription.trial_end * 1000)
+              : undefined,
           });
           console.log("✅ Subscription confirmation email sent successfully");
         }
       } catch (emailError) {
-        console.error("⚠️ Failed to send subscription confirmation email:", emailError);
+        if (debugMode) {
+          console.error(
+            "⚠️ Failed to send subscription confirmation email:",
+            emailError
+          );
+        }
         // Don't throw - email failure shouldn't break webhook processing
       }
-
-      console.log(`✅ Subscription created for user ${userId}, plan ${plan}`);
+      if (debugMode) {
+        console.log(`✅ Subscription created for user ${userId}, plan ${plan}`);
+      }
     } catch (error) {
       console.error("❌ Error handling subscription created:", error);
       throw error;
@@ -286,8 +321,9 @@ export class WebhookService {
     subscription: Stripe.Subscription
   ): Promise<void> {
     try {
-      console.log("🎯 Processing subscription updated:", subscription.id);
-
+      if (debugMode) {
+        console.log("🎯 Processing subscription updated:", subscription.id);
+      }
       const customerId = subscription.customer as string;
       const customer = await stripe.customers.retrieve(customerId);
 
@@ -319,12 +355,15 @@ export class WebhookService {
         status = SubscriptionStatus.INACTIVE;
       }
 
-      console.log(`📊 Status update:`, {
-        stripeStatus: subscription.status,
-        ourStatus: status,
-        isTrialTransition: subscription.status === "active" && status === SubscriptionStatus.ACTIVE,
-      });
-
+      if (debugMode) {
+        console.log(`📊 Status update:`, {
+          stripeStatus: subscription.status,
+          ourStatus: status,
+          isTrialTransition:
+            subscription.status === "active" &&
+            status === SubscriptionStatus.ACTIVE,
+        });
+      }
       // Get plan from subscription metadata or price
       let plan: Plan = Plan.VIBED;
       if (subscription.metadata?.plan) {
@@ -364,10 +403,12 @@ export class WebhookService {
 
       // Update user subscription
       // Allow premium access during trials and active subscriptions
-      const userPlan = (status === SubscriptionStatus.ACTIVE || status === SubscriptionStatus.TRIAL) 
-        ? plan 
-        : Plan.FREE;
-      
+      const userPlan =
+        status === SubscriptionStatus.ACTIVE ||
+        status === SubscriptionStatus.TRIAL
+          ? plan
+          : Plan.FREE;
+
       await SubscriptionService.updateUserSubscription(
         userId,
         userPlan,
@@ -387,9 +428,11 @@ export class WebhookService {
         },
       });
 
-      console.log(
-        `✅ Subscription updated for user ${userId}, status ${status}`
-      );
+      if (debugMode) {
+        console.log(
+          `✅ Subscription updated for user ${userId}, status ${status}`
+        );
+      }
     } catch (error) {
       console.error("❌ Error handling subscription updated:", error);
       throw error;
@@ -403,8 +446,9 @@ export class WebhookService {
     subscription: Stripe.Subscription
   ): Promise<void> {
     try {
-      console.log("🎯 Processing subscription deleted:", subscription.id);
-
+      if (debugMode) {
+        console.log("🎯 Processing subscription deleted:", subscription.id);
+      }
       const customerId = subscription.customer as string;
       const customer = await stripe.customers.retrieve(customerId);
 
@@ -424,11 +468,12 @@ export class WebhookService {
         ? new Date(subscription.canceled_at * 1000)
         : new Date();
 
-      console.log("📅 Cancellation date:", {
-        canceled_at: subscription.canceled_at,
-        canceledAtDate: canceledAt.toISOString(),
-      });
-
+      if (debugMode) {
+        console.log("📅 Cancellation date:", {
+          canceled_at: subscription.canceled_at,
+          canceledAtDate: canceledAt.toISOString(),
+        });
+      }
       // Update user to free plan
       await SubscriptionService.updateUserSubscription(
         userId,
@@ -446,7 +491,9 @@ export class WebhookService {
         },
       });
 
-      console.log(`✅ Subscription deleted for user ${userId}`);
+      if (debugMode) {
+        console.log(`✅ Subscription deleted for user ${userId}`);
+      }
     } catch (error) {
       console.error("❌ Error handling subscription deleted:", error);
       throw error;
@@ -460,20 +507,24 @@ export class WebhookService {
     invoice: Stripe.Invoice
   ): Promise<void> {
     try {
-      console.log("🎯 Processing invoice payment succeeded:", invoice.id);
-
+      if (debugMode) {
+        console.log("🎯 Processing invoice payment succeeded:", invoice.id);
+      }
       // Check for subscription ID in the correct location
       const invoiceParent = invoice.parent as InvoiceParentWithSubscription;
       const subscriptionId = invoiceParent?.subscription_details?.subscription;
-      
-      console.log("📊 Invoice parent data:", {
-        parentType: invoiceParent?.type,
-        hasSubscriptionDetails: !!invoiceParent?.subscription_details,
-        subscriptionId: subscriptionId
-      });
 
+      if (debugMode) {
+        console.log("📊 Invoice parent data:", {
+          parentType: invoiceParent?.type,
+          hasSubscriptionDetails: !!invoiceParent?.subscription_details,
+          subscriptionId: subscriptionId,
+        });
+      }
       if (!subscriptionId) {
-        console.log("⏭️ Skipping non-subscription invoice");
+        if (debugMode) {
+          console.log("⏭️ Skipping non-subscription invoice");
+        }
         return; // Skip non-subscription invoices
       }
 
@@ -503,9 +554,11 @@ export class WebhookService {
         },
       });
 
-      console.log(
-        `✅ Invoice payment succeeded for user ${userId}, amount ${invoice.amount_paid}`
-      );
+      if (debugMode) {
+        console.log(
+          `✅ Invoice payment succeeded for user ${userId}, amount ${invoice.amount_paid}`
+        );
+      }
     } catch (error) {
       console.error("❌ Error handling invoice payment succeeded:", error);
       throw error;
@@ -519,20 +572,24 @@ export class WebhookService {
     invoice: Stripe.Invoice
   ): Promise<void> {
     try {
-      console.log("🎯 Processing invoice payment failed:", invoice.id);
-
+      if (debugMode) {
+        console.log("🎯 Processing invoice payment failed:", invoice.id);
+      }
       // Check for subscription ID in the correct location
       const invoiceParent = invoice.parent as InvoiceParentWithSubscription;
       const subscriptionId = invoiceParent?.subscription_details?.subscription;
-      
-      console.log("📊 Invoice parent data (failed):", {
-        parentType: invoiceParent?.type,
-        hasSubscriptionDetails: !!invoiceParent?.subscription_details,
-        subscriptionId: subscriptionId
-      });
 
+      if (debugMode) {
+        console.log("📊 Invoice parent data (failed):", {
+          parentType: invoiceParent?.type,
+          hasSubscriptionDetails: !!invoiceParent?.subscription_details,
+          subscriptionId: subscriptionId,
+        });
+      }
       if (!subscriptionId) {
-        console.log("⏭️ Skipping non-subscription invoice");
+        if (debugMode) {
+          console.log("⏭️ Skipping non-subscription invoice");
+        }
         return; // Skip non-subscription invoices
       }
 
@@ -565,9 +622,11 @@ export class WebhookService {
       // #TODO: Send email notification about failed payment
       // #TODO: Implement dunning management
 
-      console.log(
-        `✅ Invoice payment failed for user ${userId}, amount ${invoice.amount_due}`
-      );
+      if (debugMode) {
+        console.log(
+          `✅ Invoice payment failed for user ${userId}, amount ${invoice.amount_due}`
+        );
+      }
     } catch (error) {
       console.error("❌ Error handling invoice payment failed:", error);
       throw error;
@@ -581,8 +640,9 @@ export class WebhookService {
     subscription: Stripe.Subscription
   ): Promise<void> {
     try {
-      console.log("🎯 Processing trial will end:", subscription.id);
-
+      if (debugMode) {
+        console.log("🎯 Processing trial will end:", subscription.id);
+      }
       const customerId = subscription.customer as string;
       const customer = await stripe.customers.retrieve(customerId);
 
@@ -602,17 +662,22 @@ export class WebhookService {
         ? new Date(subscription.trial_end * 1000)
         : null;
 
-      console.log("📅 Trial ending soon:", {
-        userId,
-        trialEnd: trialEnd?.toISOString(),
-        subscriptionId: subscription.id,
-      });
-
+      if (debugMode) {
+        console.log("📅 Trial ending soon:", {
+          userId,
+          trialEnd: trialEnd?.toISOString(),
+          subscriptionId: subscription.id,
+        });
+      }
       // TODO: Send email notification about trial ending
       // You could implement email service here to notify user
       // Example: await EmailService.sendTrialEndingNotification(userId, trialEnd);
 
-      console.log(`✅ Trial will end notification processed for user ${userId}`);
+      if (debugMode) {
+        console.log(
+          `✅ Trial will end notification processed for user ${userId}`
+        );
+      }
     } catch (error) {
       console.error("❌ Error handling trial will end:", error);
       throw error;

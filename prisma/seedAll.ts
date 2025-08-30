@@ -4,6 +4,7 @@ import { seedTutorials } from "./seedTutorials";
 import seedHtmlTutorials from "./seedHtmlTutorials";
 import seedCssTutorials from "./seedCssTutorials";
 import { seedSkills } from "./seeds/skillSeeds";
+import { seedTypescriptOOP } from "./seeds/typescriptOOPSeeds";
 
 const prisma = new PrismaClient();
 
@@ -25,6 +26,9 @@ async function seedAll() {
     
     // Seed CSS tutorials
     await seedCssTutorials();
+    
+    // Seed TypeScript OOP tutorials and related content
+    await seedTypescriptOOP();
     
     console.log("🎉 Complete seeding finished successfully!");
   } catch (error) {

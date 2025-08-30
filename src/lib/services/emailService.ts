@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { User } from "@prisma/client";
+import { devMode } from "./envService";
 
 interface EmailConfig {
   host: string;
@@ -14,6 +15,7 @@ interface EmailConfig {
     ciphers?: string;
   };
 }
+const debugMode = devMode();
 
 class EmailService {
   private transporter: nodemailer.Transporter;
@@ -39,7 +41,9 @@ class EmailService {
   async verifyConnection(): Promise<{ success: boolean; error?: string }> {
     try {
       await this.transporter.verify();
-      console.log("✅ Zoho Mail SMTP connection verified successfully");
+      if (debugMode) {
+        console.log("✅ Zoho Mail SMTP connection verified successfully");
+      }
       return { success: true };
     } catch (error) {
       console.error("❌ Zoho Mail SMTP connection failed:", error);
@@ -61,8 +65,9 @@ class EmailService {
         subject,
         html,
       });
-
-      console.log("Email sent successfully:", info.messageId);
+      if (debugMode) {
+        console.log("Email sent successfully:", info.messageId);
+      }
       return { success: true, messageId: info.messageId };
     } catch (error) {
       console.error("Failed to send email via Zoho Mail:", error);
@@ -588,23 +593,25 @@ class EmailService {
     const planEmojis: Record<string, string> = {
       VIBED: "🚀",
       CRACKED: "⚡",
-      FREE: "🆓"
+      FREE: "🆓",
     };
 
     const formatCurrency = (amount: number, currency: string) => {
       const value = amount / 100; // Convert cents to dollars
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
         currency: currency.toUpperCase(),
       }).format(value);
     };
 
     const formatDate = (date?: Date) => {
-      return date ? date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }) : 'Not specified';
+      return date
+        ? date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        : "Not specified";
     };
 
     return `
@@ -641,18 +648,32 @@ class EmailService {
 
             <h2>Hey ${user.name || user.username}! 👋</h2>
             
-            <p>Thank you for upgrading to the ${paymentData.plan} plan! Your payment has been successfully processed and you now have access to all premium features.</p>
+            <p>Thank you for upgrading to the ${
+              paymentData.plan
+            } plan! Your payment has been successfully processed and you now have access to all premium features.</p>
 
-            ${paymentData.isTrialActive && paymentData.trialEndsAt ? `
+            ${
+              paymentData.isTrialActive && paymentData.trialEndsAt
+                ? `
               <div class="trial-notice">
                 <strong>🎯 Trial Period Active</strong>
-                <p>You're currently in a ${paymentData.plan} trial period until ${formatDate(paymentData.trialEndsAt)}. After your trial ends, your subscription will automatically continue at the regular price.</p>
+                <p>You're currently in a ${
+                  paymentData.plan
+                } trial period until ${formatDate(
+                    paymentData.trialEndsAt
+                  )}. After your trial ends, your subscription will automatically continue at the regular price.</p>
               </div>
-            ` : ''}
+            `
+                : ""
+            }
             
             <div class="plan-box">
-              <h3>${planEmojis[paymentData.plan]} ${paymentData.plan} Plan Features</h3>
-              ${paymentData.plan === 'VIBED' ? `
+              <h3>${planEmojis[paymentData.plan]} ${
+      paymentData.plan
+    } Plan Features</h3>
+              ${
+                paymentData.plan === "VIBED"
+                  ? `
                 <ul>
                   <li>✅ Unlimited tutorials and challenges</li>
                   <li>✅ Interactive quiz system</li>
@@ -660,7 +681,9 @@ class EmailService {
                   <li>✅ Mood-adaptive learning experience</li>
                   <li>✅ Priority support</li>
                 </ul>
-              ` : paymentData.plan === 'CRACKED' ? `
+              `
+                  : paymentData.plan === "CRACKED"
+                  ? `
                 <ul>
                   <li>✅ Everything in Vibed plan</li>
                   <li>✅ AI-powered code reviews</li>
@@ -669,18 +692,34 @@ class EmailService {
                   <li>✅ Premium community access</li>
                   <li>✅ Advanced project templates</li>
                 </ul>
-              ` : ''}
+              `
+                  : ""
+              }
             </div>
 
             <div class="payment-details">
               <h3>📄 Payment Details</h3>
               <p><span class="label">Plan:</span> ${paymentData.plan}</p>
-              <p><span class="label">Amount:</span> ${formatCurrency(paymentData.amount, paymentData.currency)}</p>
-              <p><span class="label">Status:</span> ${paymentData.subscriptionStatus}</p>
-              ${paymentData.subscriptionEndsAt ? `
-                <p><span class="label">Next Billing:</span> ${formatDate(paymentData.subscriptionEndsAt)}</p>
-              ` : ''}
-              <p><span class="label">Date:</span> ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+              <p><span class="label">Amount:</span> ${formatCurrency(
+                paymentData.amount,
+                paymentData.currency
+              )}</p>
+              <p><span class="label">Status:</span> ${
+                paymentData.subscriptionStatus
+              }</p>
+              ${
+                paymentData.subscriptionEndsAt
+                  ? `
+                <p><span class="label">Next Billing:</span> ${formatDate(
+                  paymentData.subscriptionEndsAt
+                )}</p>
+              `
+                  : ""
+              }
+              <p><span class="label">Date:</span> ${new Date().toLocaleDateString(
+                "en-US",
+                { year: "numeric", month: "long", day: "numeric" }
+              )}</p>
             </div>
 
             <div class="feature-list">
@@ -696,15 +735,21 @@ class EmailService {
             
             <p>Your learning journey just got supercharged! Switch between CHILL, RUSH, and GRIND modes to match your energy and maximize your coding potential.</p>
             
-            <a href="${process.env.NEXTAUTH_URL}/dashboard" class="cta-button">Start Learning Now 🚀</a>
+            <a href="${
+              process.env.NEXTAUTH_URL
+            }/dashboard" class="cta-button">Start Learning Now 🚀</a>
             
-            <p><small>💡 Pro tip: Visit your <a href="${process.env.NEXTAUTH_URL}/settings">settings page</a> to customize your learning experience and notification preferences.</small></p>
+            <p><small>💡 Pro tip: Visit your <a href="${
+              process.env.NEXTAUTH_URL
+            }/settings">settings page</a> to customize your learning experience and notification preferences.</small></p>
           </div>
           
           <div class="footer">
             <p>🎉 Welcome to the premium experience!<br>The Vibed to Cracked Team</p>
             <p>
-              <a href="${process.env.NEXTAUTH_URL}/settings">Manage Subscription</a> | 
+              <a href="${
+                process.env.NEXTAUTH_URL
+              }/settings">Manage Subscription</a> | 
               <a href="${process.env.NEXTAUTH_URL}/contact">Get Support</a>
             </p>
             <p><small>If you have any questions, don't hesitate to reach out. We're here to help you succeed!</small></p>

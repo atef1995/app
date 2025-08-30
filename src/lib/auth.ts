@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { generateUniqueUsername } from "@/lib/username";
 import { emailService } from "@/lib/services/emailService";
 import type { NextAuthOptions } from "next-auth";
+import { devMode } from "./services/envService";
+const debugMode = devMode();
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -20,14 +22,21 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     session: async ({ session, user }) => {
-      console.log("Session callback - session:", session, "user:", user);
+      if (debugMode) {
+        console.log("Session callback - session:", session, "user:", user);
+      }
       try {
         if (session?.user && user) {
           session.user.id = user.id;
           // Add mood, subscription, and role to session
           const dbUser = await prisma.user.findUnique({
             where: { id: user.id },
-            select: { mood: true, subscription: true, username: true, role: true },
+            select: {
+              mood: true,
+              subscription: true,
+              username: true,
+              role: true,
+            },
           });
           session.user.mood = dbUser?.mood || "CHILL";
           session.user.subscription = dbUser?.subscription || "FREE";
@@ -43,9 +52,11 @@ export const authOptions: NextAuthOptions = {
               where: { id: user.id },
               data: { username: newUsername },
             });
-            console.log(
-              `Generated username "${newUsername}" for user ${user.email} during session`
-            );
+            if (debugMode) {
+              console.log(
+                `Generated username "${newUsername}" for user ${user.email} during session`
+              );
+            }
           }
         }
       } catch (error) {
@@ -60,8 +71,9 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     signIn: async ({ user, account }) => {
-      console.log("SignIn callback - user:", user, "account:", account);
-
+      if (debugMode) {
+        console.log("SignIn callback - user:", user, "account:", account);
+      }
       // For new users, we'll generate username after they're created
       // The session callback will handle it for both new and existing users
       return true;
@@ -69,8 +81,9 @@ export const authOptions: NextAuthOptions = {
   },
   events: {
     createUser: async ({ user }) => {
-      console.log("CreateUser event - user:", user);
-
+      if (debugMode) {
+        console.log("CreateUser event - user:", user);
+      }
       // Generate username for newly created users
       if (user.email && user.name) {
         try {
@@ -82,15 +95,16 @@ export const authOptions: NextAuthOptions = {
             where: { id: user.id },
             data: { username: newUsername },
           });
-          console.log(
-            `Generated username "${newUsername}" for new user ${user.email}`
-          );
-          
+          if (debugMode) {
+            console.log(
+              `Generated username "${newUsername}" for new user ${user.email}`
+            );
+          }
           // Get the updated user data for welcome email
           const fullUser = await prisma.user.findUnique({
             where: { id: user.id },
           });
-          
+
           if (fullUser) {
             // Send welcome email asynchronously
             emailService.sendWelcomeEmail(fullUser).catch((error) => {

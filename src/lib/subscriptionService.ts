@@ -1,4 +1,7 @@
 import { prisma } from "./prisma";
+import { devMode } from "./services/envService";
+
+const debugMode = devMode();
 
 // Define the constants since they're not enums in the schema
 export const Plan = {
@@ -135,19 +138,23 @@ export class SubscriptionService {
       (user.subscriptionEndsAt === null || user.subscriptionEndsAt > now);
 
     const latestSubscription = user.subscriptions[0];
-    
+
     // Trial logic
-    const isTrialActive = user.subscriptionStatus === SubscriptionStatus.TRIAL && 
-                         user.subscriptionEndsAt !== null && 
-                         user.subscriptionEndsAt > now;
-    
-    const trialEndsAt = user.subscriptionStatus === SubscriptionStatus.TRIAL 
-                       ? user.subscriptionEndsAt 
-                       : null;
-    
-    const daysLeftInTrial = trialEndsAt 
-                           ? Math.ceil((trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-                           : null;
+    const isTrialActive =
+      user.subscriptionStatus === SubscriptionStatus.TRIAL &&
+      user.subscriptionEndsAt !== null &&
+      user.subscriptionEndsAt > now;
+
+    const trialEndsAt =
+      user.subscriptionStatus === SubscriptionStatus.TRIAL
+        ? user.subscriptionEndsAt
+        : null;
+
+    const daysLeftInTrial = trialEndsAt
+      ? Math.ceil(
+          (trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+        )
+      : null;
 
     return {
       plan: user.subscription as Plan,
@@ -158,7 +165,8 @@ export class SubscriptionService {
       stripeSubscriptionId: latestSubscription?.stripeSubscriptionId,
       isTrialActive,
       trialEndsAt,
-      daysLeftInTrial: daysLeftInTrial && daysLeftInTrial > 0 ? daysLeftInTrial : null,
+      daysLeftInTrial:
+        daysLeftInTrial && daysLeftInTrial > 0 ? daysLeftInTrial : null,
       cancelAtPeriodEnd: latestSubscription?.cancelAtPeriodEnd || false,
     };
   }
@@ -227,7 +235,9 @@ export class SubscriptionService {
       contentType === "tutorial"
         ? await prisma.tutorialProgress.count({ where: { userId } })
         : await prisma.challengeProgress.count({ where: { userId } });
-    console.log("user content limits", { progressCount });
+    if (debugMode) {
+      console.log("user content limits", { progressCount });
+    }
     return {
       withinLimits: progressCount < maxAllowed,
       current: progressCount,
@@ -392,7 +402,6 @@ export class SubscriptionService {
     });
   }
 
-
   /**
    * Get upgrade recommendations based on current plan
    */
@@ -400,8 +409,9 @@ export class SubscriptionService {
     currentPlan: Plan,
     limits: PlanLimits
   ) {
-    console.log("Plan limits:", limits); // Use the parameter to avoid warning
-
+    if (debugMode) {
+      console.log("Plan limits:", limits); // Use the parameter to avoid warning
+    }
     if (currentPlan === Plan.FREE) {
       return {
         suggestedPlan: Plan.VIBED,

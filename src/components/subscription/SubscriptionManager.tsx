@@ -38,7 +38,7 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
   const reactivationMutation = useSubscriptionReactivation();
   const { success, error: showError, info } = useToast();
   const error = queryError?.message || null;
-  
+
   // Modal states
   const [cancelModal, setCancelModal] = useState<{
     isOpen: boolean;
@@ -53,18 +53,22 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
     const isTrial = data.subscription.status === "TRIAL";
     setCancelModal({ isOpen: true, reason, isTrial });
   };
-  
+
   const confirmCancellation = async () => {
     if (!data?.subscription) return;
 
-    console.log("🎯 Starting cancellation process...");
+    if (process.env.NODE_ENV === "development") {
+      console.log("🎯 Starting cancellation process...");
+    }
     info("Cancelling subscription...");
 
     cancelMutation.mutate(
       { reason: cancelModal.reason },
       {
         onSuccess: (result) => {
-          console.log("✅ Cancellation successful:", result);
+          if (process.env.NODE_ENV === "development") {
+            console.log("✅ Cancellation successful:", result);
+          }
           success(
             result.message ||
               (cancelModal.isTrial
@@ -87,16 +91,19 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
     if (!data?.subscription) return;
     setReactivateModal(true);
   };
-  
+
   const confirmReactivation = async () => {
     if (!data?.subscription) return;
-
-    console.log("🎯 Starting reactivation process...", data.subscription);
+    if (process.env.NODE_ENV === "development") {
+      console.log("🎯 Starting reactivation process...", data.subscription);
+    }
     info("Reactivating subscription...");
 
     reactivationMutation.mutate(undefined, {
       onSuccess: (result) => {
-        console.log("✅ Reactivation successful:", result);
+        if (process.env.NODE_ENV === "development") {
+          console.log("✅ Reactivation successful:", result);
+        }
         success(result.message || "Subscription reactivated successfully");
         setReactivateModal(false);
         refetch();
@@ -246,7 +253,9 @@ export function SubscriptionManager({ onUpgrade }: SubscriptionManagerProps) {
             ? "Are you sure you want to cancel your trial? You will lose access to premium features when your trial expires and your subscription will not renew."
             : "Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your current billing period."
         }
-        confirmText={cancelModal.isTrial ? "Cancel Trial" : "Cancel Subscription"}
+        confirmText={
+          cancelModal.isTrial ? "Cancel Trial" : "Cancel Subscription"
+        }
         cancelText="Keep Subscription"
         variant="danger"
         isLoading={cancelMutation.isPending}

@@ -36,21 +36,22 @@ export function SubscriptionActions({
 }: SubscriptionActionsProps) {
   const isTrial = subscription.status === "TRIAL";
   const isCancelled = subscription.status === "CANCELLED";
-  
+
   // Proper detection of cancelled subscriptions using the cancelAtPeriodEnd flag
   const isEffectivelyCancelled = isCancelled || subscription.cancelAtPeriodEnd;
-  
-  // Debug logging to understand the current state
-  console.log("SubscriptionActions Debug:", {
-    status: subscription.status,
-    isTrial,
-    isCancelled,
-    isActive,
-    cancelling,
-    cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
-    isEffectivelyCancelled,
-    currentPlan
-  });
+  if (process.env.NODE_ENV == "development") {
+    // Debug logging to understand the current state
+    console.log("SubscriptionActions Debug:", {
+      status: subscription.status,
+      isTrial,
+      isCancelled,
+      isActive,
+      cancelling,
+      cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+      isEffectivelyCancelled,
+      currentPlan,
+    });
+  }
 
   return (
     <div className="space-y-4">
@@ -65,9 +66,7 @@ export function SubscriptionActions({
             className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl font-medium shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
           >
             <Crown className="w-5 h-5" />
-            {currentPlan === "FREE"
-              ? "Upgrade to Vibed"
-              : "Upgrade to Cracked"}
+            {currentPlan === "FREE" ? "Upgrade to Vibed" : "Upgrade to Cracked"}
           </button>
         )}
 
@@ -99,11 +98,11 @@ export function SubscriptionActions({
             ) : (
               <X className="w-5 h-5" />
             )}
-            {cancelling 
-              ? "Cancelling..." 
-              : isTrial 
-                ? "Cancel Before Billing" 
-                : "Cancel Subscription"}
+            {cancelling
+              ? "Cancelling..."
+              : isTrial
+              ? "Cancel Before Billing"
+              : "Cancel Subscription"}
           </button>
         )}
 
@@ -126,16 +125,17 @@ export function SubscriptionActions({
             </div>
             <div>
               <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-1">
-                {subscription.cancelAtPeriodEnd ? "Trial Ending Soon" : "Trial Period Active"}
+                {subscription.cancelAtPeriodEnd
+                  ? "Trial Ending Soon"
+                  : "Trial Period Active"}
               </h4>
               <div className="space-y-2">
                 <span className="text-sm text-blue-700 dark:text-blue-300">
                   Your 7-day trial ends in {subscription.daysLeftInTrial} day
-                  {subscription.daysLeftInTrial !== 1 ? "s" : ""}. 
-                  {subscription.cancelAtPeriodEnd 
+                  {subscription.daysLeftInTrial !== 1 ? "s" : ""}.
+                  {subscription.cancelAtPeriodEnd
                     ? " Your subscription has been cancelled and will not renew."
-                    : " After that, your subscription will automatically continue."
-                  }
+                    : " After that, your subscription will automatically continue."}
                 </span>
                 {!subscription.cancelAtPeriodEnd && (
                   <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
@@ -160,13 +160,15 @@ export function SubscriptionActions({
                 {isTrial ? "Trial Cancelled" : "Subscription Cancelled"}
               </h4>
               <span className="text-sm text-orange-700 dark:text-orange-300">
-                {isTrial 
+                {isTrial
                   ? "Your trial has been cancelled and will not convert to a paid subscription."
-                  : `You still have access until ${subscription.subscriptionEndsAt
-                      ? new Date(subscription.subscriptionEndsAt).toLocaleDateString()
-                      : "the end of your billing period"
-                    }. You can reactivate anytime before then.`
-                }
+                  : `You still have access until ${
+                      subscription.subscriptionEndsAt
+                        ? new Date(
+                            subscription.subscriptionEndsAt
+                          ).toLocaleDateString()
+                        : "the end of your billing period"
+                    }. You can reactivate anytime before then.`}
               </span>
             </div>
           </div>

@@ -1,0 +1,1517 @@
+---
+title: "TypeScript Design Patterns - Professional Solutions"
+description: "Master essential design patterns in TypeScript including Singleton, Factory, Observer, Strategy, and more. Build professional, maintainable code"
+difficulty: 4
+estimatedTime: "50 minutes"
+prerequisites: ["typescript-classes", "typescript-interfaces", "typescript-inheritance", "typescript-abstract-classes", "typescript-oop"]
+category: "oop"
+---
+
+# TypeScript Design Patterns - Professional Solutions
+
+Welcome to the world of professional software development! 🏗️ **Design patterns are like architectural blueprints for your code** - they're time-tested solutions to common programming problems that have been refined by thousands of developers over decades.
+
+**Here's what blew my mind when I first learned design patterns:** These aren't just theoretical concepts - they're practical solutions that you'll use every day in real applications. It's like having a toolkit of professional-grade solutions ready to go!
+
+## Why Design Patterns Are Essential 🚀
+
+**Think about it:** Would you rather reinvent the wheel every time you encounter a common problem, or use a proven solution that's been battle-tested?
+
+**Key benefits of design patterns:**
+- **Proven Solutions** ✅ - Time-tested approaches to common problems
+- **Communication** 💬 - Common vocabulary for developers
+- **Maintainability** 🔧 - Easier to understand and modify code
+- **Flexibility** 🤸 - Adapt to changing requirements
+- **Best Practices** 🌟 - Learn from experienced developers
+- **Career Growth** 📈 - Essential knowledge for senior developers
+
+**Real-world analogy:** Design patterns are like architectural patterns in construction. Just as buildings use common patterns (foundations, load-bearing walls, staircases), software uses common structural patterns to solve recurring problems.
+
+## Creational Patterns
+
+### Singleton Pattern - One Instance to Rule Them All
+
+**The Problem:** Sometimes you need exactly one instance of a class throughout your application - like a database connection, logger, or configuration manager.
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// 🏛️ Singleton Pattern - Ensure only one instance exists
+
+class DatabaseConnection {
+  private static instance: DatabaseConnection;
+  private connectionString: string;
+  private isConnected: boolean = false;
+  private queryCount: number = 0;
+
+  // 🔒 Private constructor prevents direct instantiation
+  private constructor() {
+    this.connectionString = "database://localhost:5432/myapp";
+  }
+
+  // 🎯 Static method to get the single instance
+  public static getInstance(): DatabaseConnection {
+    if (!DatabaseConnection.instance) {
+      DatabaseConnection.instance = new DatabaseConnection();
+      console.log("🆕 Creating new database connection instance");
+    }
+    return DatabaseConnection.instance;
+  }
+
+  // Database operations
+  connect(): string {
+    if (!this.isConnected) {
+      console.log(\`🔌 Connecting to \${this.connectionString}\`);
+      this.isConnected = true;
+      return "Connected to database";
+    }
+    return "Already connected";
+  }
+
+  disconnect(): string {
+    if (this.isConnected) {
+      console.log("🔌 Disconnecting from database");
+      this.isConnected = false;
+      return "Disconnected from database";
+    }
+    return "Already disconnected";
+  }
+
+  query(sql: string): any[] {
+    if (!this.isConnected) {
+      throw new Error("Not connected to database");
+    }
+    this.queryCount++;
+    console.log(\`🔍 Executing query #\${this.queryCount}: \${sql}\`);
+    return []; // Mock result
+  }
+
+  getStats(): object {
+    return {
+      isConnected: this.isConnected,
+      queriesExecuted: this.queryCount,
+      connectionString: this.connectionString.replace(/\\/\\/.*@/, "//***@") // Hide credentials
+    };
+  }
+}
+
+// 🎮 Application Configuration Singleton
+class AppConfig {
+  private static instance: AppConfig;
+  private config: Map<string, any> = new Map();
+
+  private constructor() {
+    // Load default configuration
+    this.config.set("theme", "dark");
+    this.config.set("language", "en");
+    this.config.set("debug", false);
+    this.config.set("apiUrl", "https://api.example.com");
+  }
+
+  public static getInstance(): AppConfig {
+    if (!AppConfig.instance) {
+      AppConfig.instance = new AppConfig();
+    }
+    return AppConfig.instance;
+  }
+
+  get(key: string): any {
+    return this.config.get(key);
+  }
+
+  set(key: string, value: any): void {
+    console.log(\`⚙️ Config updated: \${key} = \${value}\`);
+    this.config.set(key, value);
+  }
+
+  getAll(): object {
+    return Object.fromEntries(this.config);
+  }
+}
+
+// 📝 Logger Singleton with different log levels
+enum LogLevel {
+  DEBUG = 0,
+  INFO = 1,
+  WARN = 2,
+  ERROR = 3
+}
+
+class Logger {
+  private static instance: Logger;
+  private logLevel: LogLevel = LogLevel.INFO;
+  private logs: Array<{level: LogLevel, message: string, timestamp: Date}> = [];
+
+  private constructor() {}
+
+  public static getInstance(): Logger {
+    if (!Logger.instance) {
+      Logger.instance = new Logger();
+    }
+    return Logger.instance;
+  }
+
+  setLogLevel(level: LogLevel): void {
+    this.logLevel = level;
+    console.log(\`🔧 Log level set to \${LogLevel[level]}\`);
+  }
+
+  private log(level: LogLevel, message: string): void {
+    if (level >= this.logLevel) {
+      const logEntry = {
+        level,
+        message,
+        timestamp: new Date()
+      };
+      this.logs.push(logEntry);
+      
+      const levelName = LogLevel[level];
+      const emoji = level === LogLevel.DEBUG ? "🐛" : 
+                   level === LogLevel.INFO ? "ℹ️" : 
+                   level === LogLevel.WARN ? "⚠️" : "🚨";
+      
+      console.log(\`\${emoji} [\${levelName}] \${message}\`);
+    }
+  }
+
+  debug(message: string): void { this.log(LogLevel.DEBUG, message); }
+  info(message: string): void { this.log(LogLevel.INFO, message); }
+  warn(message: string): void { this.log(LogLevel.WARN, message); }
+  error(message: string): void { this.log(LogLevel.ERROR, message); }
+
+  getLogs(level?: LogLevel): Array<{level: LogLevel, message: string, timestamp: Date}> {
+    return level !== undefined 
+      ? this.logs.filter(log => log.level === level)
+      : [...this.logs];
+  }
+
+  clearLogs(): void {
+    this.logs = [];
+    console.log("🗑️ Logs cleared");
+  }
+}
+
+// 🚀 Testing the Singleton Pattern
+console.log("=== Singleton Pattern Demo ===");
+
+// Test database singleton
+console.log("\\n--- Database Connection Singleton ---");
+const db1 = DatabaseConnection.getInstance();
+const db2 = DatabaseConnection.getInstance();
+console.log("Same instance?", db1 === db2); // true
+
+db1.connect();
+db1.query("SELECT * FROM users");
+db2.query("SELECT * FROM products"); // Same instance!
+console.log("Stats:", db1.getStats());
+
+// Test configuration singleton
+console.log("\\n--- Configuration Singleton ---");
+const config1 = AppConfig.getInstance();
+const config2 = AppConfig.getInstance();
+console.log("Same config instance?", config1 === config2); // true
+
+console.log("Current theme:", config1.get("theme"));
+config1.set("theme", "light");
+console.log("Theme from config2:", config2.get("theme")); // "light" - same instance!
+
+// Test logger singleton
+console.log("\\n--- Logger Singleton ---");
+const logger1 = Logger.getInstance();
+const logger2 = Logger.getInstance();
+console.log("Same logger instance?", logger1 === logger2); // true
+
+logger1.info("Application started");
+logger2.warn("This is a warning from logger2");
+logger1.error("Something went wrong!");
+
+logger1.setLogLevel(LogLevel.DEBUG);
+logger2.debug("Debug message from logger2"); // Works because same instance!
+
+console.log("\\nTotal logs:", logger1.getLogs().length);
+console.log("Error logs:", logger1.getLogs(LogLevel.ERROR).length);
+
+console.log("\\n=== Singleton Benefits ===");
+console.log("✅ Guaranteed single instance");
+console.log("✅ Global access point");
+console.log("✅ Controlled resource usage");
+console.log("✅ Shared state across application");
+console.log("✅ Lazy initialization");`}
+</InteractiveCodeBlock>
+
+**Key points about Singleton:**
+1. **Private constructor** - Prevents `new ClassName()`
+2. **Static getInstance()** - Controls instance creation
+3. **Static instance property** - Holds the single instance
+4. **Lazy initialization** - Instance created only when needed
+
+### Factory Pattern - Object Creation Made Easy
+
+**The Problem:** You need to create different types of objects based on conditions, but you don't want to scatter object creation logic throughout your code.
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// 🏭 Factory Pattern - Centralized object creation
+
+// 📱 Product interfaces and classes
+interface Notification {
+  send(message: string, recipient: string): string;
+  getType(): string;
+  getCost(): number;
+}
+
+class EmailNotification implements Notification {
+  private template: string;
+
+  constructor(template: string = "default") {
+    this.template = template;
+  }
+
+  send(message: string, recipient: string): string {
+    return \`📧 Email sent to \${recipient}: \${message} (Template: \${this.template})\`;
+  }
+
+  getType(): string {
+    return "Email";
+  }
+
+  getCost(): number {
+    return 0.01; // $0.01 per email
+  }
+}
+
+class SMSNotification implements Notification {
+  private carrier: string;
+
+  constructor(carrier: string = "default") {
+    this.carrier = carrier;
+  }
+
+  send(message: string, recipient: string): string {
+    const truncated = message.length > 160 ? message.substring(0, 157) + "..." : message;
+    return \`📱 SMS sent via \${this.carrier} to \${recipient}: \${truncated}\`;
+  }
+
+  getType(): string {
+    return "SMS";
+  }
+
+  getCost(): number {
+    return 0.05; // $0.05 per SMS
+  }
+}
+
+class PushNotification implements Notification {
+  private platform: string;
+
+  constructor(platform: string = "mobile") {
+    this.platform = platform;
+  }
+
+  send(message: string, recipient: string): string {
+    return \`🔔 Push notification sent via \${this.platform} to \${recipient}: \${message}\`;
+  }
+
+  getType(): string {
+    return "Push";
+  }
+
+  getCost(): number {
+    return 0.001; // $0.001 per push
+  }
+}
+
+class SlackNotification implements Notification {
+  private channel: string;
+
+  constructor(channel: string = "#general") {
+    this.channel = channel;
+  }
+
+  send(message: string, recipient: string): string {
+    return \`💬 Slack message sent to \${recipient} in \${this.channel}: \${message}\`;
+  }
+
+  getType(): string {
+    return "Slack";
+  }
+
+  getCost(): number {
+    return 0.02; // $0.02 per slack message
+  }
+}
+
+// 🏭 Factory classes
+abstract class NotificationFactory {
+  // Template method using factory method
+  public createAndSend(message: string, recipient: string): string {
+    const notification = this.createNotification();
+    const result = notification.send(message, recipient);
+    console.log(\`💰 Cost: $\${notification.getCost()}\`);
+    return result;
+  }
+
+  // Abstract factory method
+  protected abstract createNotification(): Notification;
+}
+
+// Concrete factories
+class EmailFactory extends NotificationFactory {
+  private template: string;
+
+  constructor(template: string = "marketing") {
+    super();
+    this.template = template;
+  }
+
+  protected createNotification(): Notification {
+    return new EmailNotification(this.template);
+  }
+}
+
+class SMSFactory extends NotificationFactory {
+  private carrier: string;
+
+  constructor(carrier: string = "AT&T") {
+    super();
+    this.carrier = carrier;
+  }
+
+  protected createNotification(): Notification {
+    return new SMSNotification(this.carrier);
+  }
+}
+
+class PushFactory extends NotificationFactory {
+  private platform: string;
+
+  constructor(platform: string = "iOS") {
+    super();
+    this.platform = platform;
+  }
+
+  protected createNotification(): Notification {
+    return new PushNotification(this.platform);
+  }
+}
+
+// 🎯 Simple Factory - chooses factory based on type
+class NotificationService {
+  private factories: Map<string, NotificationFactory> = new Map();
+
+  constructor() {
+    // Register available factories
+    this.factories.set("email", new EmailFactory("professional"));
+    this.factories.set("sms", new SMSFactory("Verizon"));
+    this.factories.set("push", new PushFactory("Android"));
+    this.factories.set("slack", new SlackFactory("#notifications"));
+  }
+
+  // Simple factory method
+  createNotification(type: string): Notification {
+    switch (type.toLowerCase()) {
+      case "email":
+        return new EmailNotification("default");
+      case "sms":
+        return new SMSNotification("default");
+      case "push":
+        return new PushNotification("mobile");
+      case "slack":
+        return new SlackNotification("#general");
+      default:
+        throw new Error(\`Unknown notification type: \${type}\`);
+    }
+  }
+
+  // Factory method using registered factories
+  sendNotification(type: string, message: string, recipient: string): string {
+    const factory = this.factories.get(type.toLowerCase());
+    if (!factory) {
+      throw new Error(\`No factory registered for type: \${type}\`);
+    }
+    return factory.createAndSend(message, recipient);
+  }
+
+  registerFactory(type: string, factory: NotificationFactory): void {
+    this.factories.set(type.toLowerCase(), factory);
+    console.log(\`🏭 Registered factory for type: \${type}\`);
+  }
+
+  getSupportedTypes(): string[] {
+    return Array.from(this.factories.keys());
+  }
+}
+
+class SlackFactory extends NotificationFactory {
+  private channel: string;
+
+  constructor(channel: string = "#general") {
+    super();
+    this.channel = channel;
+  }
+
+  protected createNotification(): Notification {
+    return new SlackNotification(this.channel);
+  }
+}
+
+// 🎯 Abstract Factory Pattern - families of related objects
+interface UIComponent {
+  render(): string;
+  getTheme(): string;
+}
+
+interface Button extends UIComponent {
+  click(): string;
+}
+
+interface Input extends UIComponent {
+  setValue(value: string): void;
+  getValue(): string;
+}
+
+// Dark theme components
+class DarkButton implements Button {
+  render(): string {
+    return "🖤 [Dark Button]";
+  }
+  
+  getTheme(): string {
+    return "dark";
+  }
+  
+  click(): string {
+    return "Dark button clicked!";
+  }
+}
+
+class DarkInput implements Input {
+  private value: string = "";
+
+  render(): string {
+    return \`🖤 [Dark Input: \${this.value}]\`;
+  }
+  
+  getTheme(): string {
+    return "dark";
+  }
+  
+  setValue(value: string): void {
+    this.value = value;
+  }
+  
+  getValue(): string {
+    return this.value;
+  }
+}
+
+// Light theme components
+class LightButton implements Button {
+  render(): string {
+    return "🤍 [Light Button]";
+  }
+  
+  getTheme(): string {
+    return "light";
+  }
+  
+  click(): string {
+    return "Light button clicked!";
+  }
+}
+
+class LightInput implements Input {
+  private value: string = "";
+
+  render(): string {
+    return \`🤍 [Light Input: \${this.value}]\`;
+  }
+  
+  getTheme(): string {
+    return "light";
+  }
+  
+  setValue(value: string): void {
+    this.value = value;
+  }
+  
+  getValue(): string {
+    return this.value;
+  }
+}
+
+// Abstract factory for UI components
+abstract class UIFactory {
+  abstract createButton(): Button;
+  abstract createInput(): Input;
+  
+  // Template method using factory methods
+  createLoginForm(): { button: Button; input: Input } {
+    const button = this.createButton();
+    const input = this.createInput();
+    input.setValue("Enter username");
+    
+    console.log(\`🎨 Created \${button.getTheme()} theme login form\`);
+    return { button, input };
+  }
+}
+
+class DarkThemeFactory extends UIFactory {
+  createButton(): Button {
+    return new DarkButton();
+  }
+  
+  createInput(): Input {
+    return new DarkInput();
+  }
+}
+
+class LightThemeFactory extends UIFactory {
+  createButton(): Button {
+    return new LightButton();
+  }
+  
+  createInput(): Input {
+    return new LightInput();
+  }
+}
+
+// 🚀 Testing Factory Patterns
+console.log("=== Factory Pattern Demo ===");
+
+// Simple Factory
+console.log("\\n--- Simple Factory ---");
+const notificationService = new NotificationService();
+
+console.log("Supported types:", notificationService.getSupportedTypes());
+
+const email = notificationService.createNotification("email");
+console.log(email.send("Welcome to our service!", "user@example.com"));
+
+const sms = notificationService.createNotification("sms");
+console.log(sms.send("Your code is 123456", "+1234567890"));
+
+// Factory Method Pattern
+console.log("\\n--- Factory Method Pattern ---");
+const emailFactory = new EmailFactory("newsletter");
+const smsFactory = new SMSFactory("T-Mobile");
+
+console.log(emailFactory.createAndSend("Monthly newsletter", "subscriber@example.com"));
+console.log(smsFactory.createAndSend("Flash sale: 50% off!", "+1987654321"));
+
+// Using the service with factories
+console.log("\\n--- Notification Service with Factories ---");
+console.log(notificationService.sendNotification("email", "System alert", "admin@company.com"));
+console.log(notificationService.sendNotification("sms", "Urgent: Server down", "+1555123456"));
+
+// Register custom factory
+const customSlackFactory = new SlackFactory("#alerts");
+notificationService.registerFactory("slack", customSlackFactory);
+console.log(notificationService.sendNotification("slack", "New user registered", "@devteam"));
+
+// Abstract Factory Pattern
+console.log("\\n--- Abstract Factory Pattern ---");
+const darkFactory = new DarkThemeFactory();
+const lightFactory = new LightThemeFactory();
+
+const darkUI = darkFactory.createLoginForm();
+console.log("Dark UI:");
+console.log("  Button:", darkUI.button.render());
+console.log("  Input:", darkUI.input.render());
+console.log("  Action:", darkUI.button.click());
+
+const lightUI = lightFactory.createLoginForm();
+console.log("\\nLight UI:");
+console.log("  Button:", lightUI.button.render());
+console.log("  Input:", lightUI.input.render());
+console.log("  Action:", lightUI.button.click());
+
+console.log("\\n=== Factory Pattern Benefits ===");
+console.log("✅ Centralized object creation logic");
+console.log("✅ Easy to add new types without changing existing code");
+console.log("✅ Consistent object configuration");
+console.log("✅ Separation of creation and usage logic");
+console.log("✅ Support for families of related objects (Abstract Factory)");`}
+</InteractiveCodeBlock>
+
+## Behavioral Patterns
+
+### Observer Pattern - Event-Driven Communication
+
+**The Problem:** You need to notify multiple objects when something interesting happens, but you don't want tight coupling between the notifier and the notified objects.
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// 👁️ Observer Pattern - Publish/Subscribe mechanism
+
+// Observer interface
+interface Observer<T = any> {
+  update(data: T): void;
+  getName(): string;
+}
+
+// Subject interface
+interface Subject<T = any> {
+  addObserver(observer: Observer<T>): void;
+  removeObserver(observer: Observer<T>): void;
+  notifyObservers(data: T): void;
+}
+
+// 📊 Stock price tracking system
+interface StockData {
+  symbol: string;
+  price: number;
+  change: number;
+  timestamp: Date;
+}
+
+class Stock implements Subject<StockData> {
+  private observers: Observer<StockData>[] = [];
+  private symbol: string;
+  private price: number;
+  private previousPrice: number;
+
+  constructor(symbol: string, initialPrice: number) {
+    this.symbol = symbol;
+    this.price = initialPrice;
+    this.previousPrice = initialPrice;
+  }
+
+  addObserver(observer: Observer<StockData>): void {
+    this.observers.push(observer);
+    console.log(\`👁️ \${observer.getName()} started watching \${this.symbol}\`);
+  }
+
+  removeObserver(observer: Observer<StockData>): void {
+    const index = this.observers.indexOf(observer);
+    if (index > -1) {
+      this.observers.splice(index, 1);
+      console.log(\`👋 \${observer.getName()} stopped watching \${this.symbol}\`);
+    }
+  }
+
+  notifyObservers(data: StockData): void {
+    console.log(\`📢 Notifying \${this.observers.length} observers about \${this.symbol}\`);
+    this.observers.forEach(observer => {
+      try {
+        observer.update(data);
+      } catch (error) {
+        console.error(\`❌ Error notifying \${observer.getName()}: \${error}\`);
+      }
+    });
+  }
+
+  setPrice(newPrice: number): void {
+    this.previousPrice = this.price;
+    this.price = newPrice;
+    
+    const change = ((newPrice - this.previousPrice) / this.previousPrice) * 100;
+    
+    const stockData: StockData = {
+      symbol: this.symbol,
+      price: newPrice,
+      change: change,
+      timestamp: new Date()
+    };
+
+    console.log(\`📈 \${this.symbol}: $\${this.previousPrice} → $\${newPrice} (\${change > 0 ? '+' : ''}\${change.toFixed(2)}%)\`);
+    this.notifyObservers(stockData);
+  }
+
+  getPrice(): number {
+    return this.price;
+  }
+
+  getSymbol(): string {
+    return this.symbol;
+  }
+}
+
+// 💼 Portfolio tracker observer
+class PortfolioTracker implements Observer<StockData> {
+  private name: string;
+  private holdings: Map<string, { shares: number; avgPrice: number }> = new Map();
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  getName(): string {
+    return \`Portfolio(\${this.name})\`;
+  }
+
+  addHolding(symbol: string, shares: number, avgPrice: number): void {
+    this.holdings.set(symbol, { shares, avgPrice });
+    console.log(\`💼 \${this.name} added \${shares} shares of \${symbol} at $\${avgPrice}\`);
+  }
+
+  update(data: StockData): void {
+    const holding = this.holdings.get(data.symbol);
+    if (holding) {
+      const currentValue = holding.shares * data.price;
+      const originalValue = holding.shares * holding.avgPrice;
+      const totalGainLoss = currentValue - originalValue;
+      const percentGainLoss = (totalGainLoss / originalValue) * 100;
+
+      console.log(\`💼 \${this.name} Portfolio Update for \${data.symbol}:\`);
+      console.log(\`   Shares: \${holding.shares} | Current Value: $\${currentValue.toFixed(2)}\`);
+      console.log(\`   Gain/Loss: $\${totalGainLoss.toFixed(2)} (\${percentGainLoss.toFixed(2)}%)\`);
+    }
+  }
+}
+
+// 🚨 Alert system observer
+class AlertSystem implements Observer<StockData> {
+  private name: string;
+  private alerts: Map<string, { highThreshold?: number; lowThreshold?: number }> = new Map();
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  getName(): string {
+    return \`AlertSystem(\${this.name})\`;
+  }
+
+  setAlert(symbol: string, highThreshold?: number, lowThreshold?: number): void {
+    this.alerts.set(symbol, { highThreshold, lowThreshold });
+    console.log(\`🚨 \${this.name} set alerts for \${symbol}: High=\${highThreshold || 'none'}, Low=\${lowThreshold || 'none'}\`);
+  }
+
+  update(data: StockData): void {
+    const alert = this.alerts.get(data.symbol);
+    if (alert) {
+      let triggered = false;
+
+      if (alert.highThreshold && data.price >= alert.highThreshold) {
+        console.log(\`🚨🔥 HIGH ALERT: \${data.symbol} hit $\${data.price} (threshold: $\${alert.highThreshold})\`);
+        triggered = true;
+      }
+
+      if (alert.lowThreshold && data.price <= alert.lowThreshold) {
+        console.log(\`🚨❄️ LOW ALERT: \${data.symbol} dropped to $\${data.price} (threshold: $\${alert.lowThreshold})\`);
+        triggered = true;
+      }
+
+      if (!triggered && Math.abs(data.change) > 5) {
+        console.log(\`🚨📊 VOLATILITY ALERT: \${data.symbol} moved \${data.change.toFixed(2)}% to $\${data.price}\`);
+      }
+    }
+  }
+}
+
+// 📊 Analytics observer
+class MarketAnalytics implements Observer<StockData> {
+  private name: string;
+  private priceHistory: Map<string, number[]> = new Map();
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  getName(): string {
+    return \`Analytics(\${this.name})\`;
+  }
+
+  update(data: StockData): void {
+    // Store price history
+    if (!this.priceHistory.has(data.symbol)) {
+      this.priceHistory.set(data.symbol, []);
+    }
+    
+    const history = this.priceHistory.get(data.symbol)!;
+    history.push(data.price);
+    
+    // Keep only last 10 prices
+    if (history.length > 10) {
+      history.shift();
+    }
+
+    // Calculate moving average
+    const movingAvg = history.reduce((sum, price) => sum + price, 0) / history.length;
+    
+    console.log(\`📊 \${this.name} Analytics for \${data.symbol}:\`);
+    console.log(\`   Current: $\${data.price} | Moving Avg: $\${movingAvg.toFixed(2)}\`);
+    console.log(\`   Trend: \${data.price > movingAvg ? '📈 Above average' : '📉 Below average'}\`);
+  }
+
+  getMovingAverage(symbol: string): number | null {
+    const history = this.priceHistory.get(symbol);
+    if (!history || history.length === 0) return null;
+    
+    return history.reduce((sum, price) => sum + price, 0) / history.length;
+  }
+}
+
+// 🏢 News publisher with multiple event types
+interface NewsEvent {
+  type: 'breaking' | 'earnings' | 'merger' | 'general';
+  headline: string;
+  symbol?: string;
+  timestamp: Date;
+  impact: 'positive' | 'negative' | 'neutral';
+}
+
+class NewsPublisher implements Subject<NewsEvent> {
+  private observers: Observer<NewsEvent>[] = [];
+  private newsHistory: NewsEvent[] = [];
+
+  addObserver(observer: Observer<NewsEvent>): void {
+    this.observers.push(observer);
+    console.log(\`📰 \${observer.getName()} subscribed to news\`);
+  }
+
+  removeObserver(observer: Observer<NewsEvent>): void {
+    const index = this.observers.indexOf(observer);
+    if (index > -1) {
+      this.observers.splice(index, 1);
+      console.log(\`📰 \${observer.getName()} unsubscribed from news\`);
+    }
+  }
+
+  notifyObservers(data: NewsEvent): void {
+    console.log(\`📰 Publishing news to \${this.observers.length} subscribers\`);
+    this.newsHistory.push(data);
+    this.observers.forEach(observer => observer.update(data));
+  }
+
+  publishNews(
+    type: NewsEvent['type'], 
+    headline: string, 
+    impact: NewsEvent['impact'], 
+    symbol?: string
+  ): void {
+    const news: NewsEvent = {
+      type,
+      headline,
+      symbol,
+      timestamp: new Date(),
+      impact
+    };
+
+    console.log(\`📰 Breaking: \${headline}\`);
+    this.notifyObservers(news);
+  }
+}
+
+class NewsTrader implements Observer<NewsEvent> {
+  private name: string;
+  private strategy: Map<string, 'aggressive' | 'conservative' | 'ignore'> = new Map();
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  getName(): string {
+    return \`NewsTrader(\${this.name})\`;
+  }
+
+  setStrategy(newsType: NewsEvent['type'], strategy: 'aggressive' | 'conservative' | 'ignore'): void {
+    this.strategy.set(newsType, strategy);
+  }
+
+  update(data: NewsEvent): void {
+    const strategy = this.strategy.get(data.type) || 'conservative';
+    
+    if (strategy === 'ignore') return;
+
+    console.log(\`📰 \${this.name} received \${data.type} news: \${data.headline}\`);
+    
+    if (data.symbol) {
+      const action = this.getAction(data.impact, strategy);
+      console.log(\`   💱 Action for \${data.symbol}: \${action}\`);
+    }
+  }
+
+  private getAction(impact: NewsEvent['impact'], strategy: 'aggressive' | 'conservative'): string {
+    if (impact === 'positive') {
+      return strategy === 'aggressive' ? 'BUY LARGE' : 'buy small';
+    } else if (impact === 'negative') {
+      return strategy === 'aggressive' ? 'SELL ALL' : 'sell some';
+    } else {
+      return 'hold';
+    }
+  }
+}
+
+// 🚀 Testing Observer Pattern
+console.log("=== Observer Pattern Demo ===");
+
+// Create stocks
+const appleStock = new Stock("AAPL", 150.00);
+const googleStock = new Stock("GOOGL", 2800.00);
+
+// Create observers
+const portfolio = new PortfolioTracker("MyPortfolio");
+const alertSystem = new AlertSystem("MainAlerts");
+const analytics = new MarketAnalytics("MarketData");
+
+// Add holdings to portfolio
+portfolio.addHolding("AAPL", 100, 145.00);
+portfolio.addHolding("GOOGL", 10, 2750.00);
+
+// Set up alerts
+alertSystem.setAlert("AAPL", 160.00, 140.00);
+alertSystem.setAlert("GOOGL", 3000.00, 2700.00);
+
+// Subscribe observers to stocks
+console.log("\\n--- Setting up observers ---");
+appleStock.addObserver(portfolio);
+appleStock.addObserver(alertSystem);
+appleStock.addObserver(analytics);
+
+googleStock.addObserver(portfolio);
+googleStock.addObserver(alertSystem);
+googleStock.addObserver(analytics);
+
+// Simulate price changes
+console.log("\\n--- Price updates ---");
+appleStock.setPrice(155.50); // Should trigger portfolio update
+googleStock.setPrice(2720.00); // Should trigger low alert
+
+appleStock.setPrice(162.00); // Should trigger high alert
+googleStock.setPrice(2890.00); // Big jump
+
+// News system
+console.log("\\n--- News System ---");
+const newsPublisher = new NewsPublisher();
+const newsTrader = new NewsTrader("QuickTrades");
+
+newsTrader.setStrategy('breaking', 'aggressive');
+newsTrader.setStrategy('earnings', 'conservative');
+newsTrader.setStrategy('merger', 'aggressive');
+newsTrader.setStrategy('general', 'ignore');
+
+newsPublisher.addObserver(newsTrader);
+
+newsPublisher.publishNews('breaking', 'Apple announces revolutionary new product', 'positive', 'AAPL');
+newsPublisher.publishNews('earnings', 'Google beats earnings expectations', 'positive', 'GOOGL');
+newsPublisher.publishNews('merger', 'Tech merger rumors surface', 'neutral');
+
+// Remove observer
+console.log("\\n--- Removing observer ---");
+appleStock.removeObserver(alertSystem);
+appleStock.setPrice(170.00); // Alert system won't be notified
+
+console.log("\\n=== Observer Pattern Benefits ===");
+console.log("✅ Loose coupling between subject and observers");
+console.log("✅ Dynamic relationships - observers can be added/removed at runtime");
+console.log("✅ Broadcast communication - one-to-many notifications");
+console.log("✅ Open/closed principle - easy to add new observer types");
+console.log("✅ Subject doesn't need to know about specific observer implementations");`}
+</InteractiveCodeBlock>
+
+### Strategy Pattern - Interchangeable Algorithms
+
+**The Problem:** You have multiple ways to perform a task and want to switch between them at runtime without changing the client code.
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// 🎯 Strategy Pattern - Interchangeable algorithms
+
+// Strategy interface
+interface PaymentStrategy {
+  pay(amount: number): string;
+  getPaymentDetails(): object;
+  validate(): boolean;
+}
+
+// Concrete payment strategies
+class CreditCardPayment implements PaymentStrategy {
+  private cardNumber: string;
+  private cvv: string;
+  private expiryDate: string;
+  private cardType: 'visa' | 'mastercard' | 'amex';
+
+  constructor(cardNumber: string, cvv: string, expiryDate: string, cardType: 'visa' | 'mastercard' | 'amex') {
+    this.cardNumber = cardNumber;
+    this.cvv = cvv;
+    this.expiryDate = expiryDate;
+    this.cardType = cardType;
+  }
+
+  validate(): boolean {
+    // Simplified validation
+    const validCardNumber = this.cardNumber.length >= 15;
+    const validCvv = this.cvv.length >= 3;
+    const validExpiry = new Date(this.expiryDate) > new Date();
+    
+    return validCardNumber && validCvv && validExpiry;
+  }
+
+  pay(amount: number): string {
+    if (!this.validate()) {
+      throw new Error("Invalid credit card details");
+    }
+
+    const fee = amount * 0.029; // 2.9% processing fee
+    const total = amount + fee;
+    
+    console.log(\`💳 Processing \${this.cardType.toUpperCase()} payment...\`);
+    console.log(\`   Amount: $\${amount.toFixed(2)}\`);
+    console.log(\`   Processing fee: $\${fee.toFixed(2)}\`);
+    console.log(\`   Total charged: $\${total.toFixed(2)}\`);
+    
+    return \`✅ Credit card payment of $\${total.toFixed(2)} completed\`;
+  }
+
+  getPaymentDetails(): object {
+    return {
+      method: "Credit Card",
+      cardType: this.cardType,
+      lastFourDigits: this.cardNumber.slice(-4),
+      processingFee: "2.9%"
+    };
+  }
+}
+
+class PayPalPayment implements PaymentStrategy {
+  private email: string;
+  private password: string;
+
+  constructor(email: string, password: string) {
+    this.email = email;
+    this.password = password;
+  }
+
+  validate(): boolean {
+    return this.email.includes('@') && this.password.length >= 6;
+  }
+
+  pay(amount: number): string {
+    if (!this.validate()) {
+      throw new Error("Invalid PayPal credentials");
+    }
+
+    const fee = Math.max(0.30, amount * 0.034); // $0.30 or 3.4%, whichever is higher
+    const total = amount + fee;
+
+    console.log(\`💙 Processing PayPal payment...\`);
+    console.log(\`   PayPal account: \${this.email}\`);
+    console.log(\`   Amount: $\${amount.toFixed(2)}\`);
+    console.log(\`   PayPal fee: $\${fee.toFixed(2)}\`);
+    console.log(\`   Total: $\${total.toFixed(2)}\`);
+
+    return \`✅ PayPal payment of $\${amount.toFixed(2)} completed\`;
+  }
+
+  getPaymentDetails(): object {
+    return {
+      method: "PayPal",
+      account: this.email,
+      processingFee: "$0.30 or 3.4%"
+    };
+  }
+}
+
+class BankTransferPayment implements PaymentStrategy {
+  private accountNumber: string;
+  private routingNumber: string;
+  private bankName: string;
+
+  constructor(accountNumber: string, routingNumber: string, bankName: string) {
+    this.accountNumber = accountNumber;
+    this.routingNumber = routingNumber;
+    this.bankName = bankName;
+  }
+
+  validate(): boolean {
+    return this.accountNumber.length >= 8 && this.routingNumber.length === 9;
+  }
+
+  pay(amount: number): string {
+    if (!this.validate()) {
+      throw new Error("Invalid bank account details");
+    }
+
+    // Bank transfers typically have lower fees but take longer
+    const fee = 0.50; // Flat $0.50 fee
+    const total = amount + fee;
+
+    console.log(\`🏦 Initiating bank transfer...\`);
+    console.log(\`   Bank: \${this.bankName}\`);
+    console.log(\`   Amount: $\${amount.toFixed(2)}\`);
+    console.log(\`   Transfer fee: $\${fee.toFixed(2)}\`);
+    console.log(\`   Total: $\${total.toFixed(2)}\`);
+    console.log(\`   ⏰ Processing time: 1-3 business days\`);
+
+    return \`✅ Bank transfer of $\${amount.toFixed(2)} initiated\`;
+  }
+
+  getPaymentDetails(): object {
+    return {
+      method: "Bank Transfer",
+      bank: this.bankName,
+      accountEnding: this.accountNumber.slice(-4),
+      processingFee: "$0.50 flat",
+      processingTime: "1-3 business days"
+    };
+  }
+}
+
+class CryptocurrencyPayment implements PaymentStrategy {
+  private walletAddress: string;
+  private currency: 'BTC' | 'ETH' | 'LTC';
+  private exchangeRate: number;
+
+  constructor(walletAddress: string, currency: 'BTC' | 'ETH' | 'LTC', exchangeRate: number) {
+    this.walletAddress = walletAddress;
+    this.currency = currency;
+    this.exchangeRate = exchangeRate; // USD to crypto rate
+  }
+
+  validate(): boolean {
+    return this.walletAddress.length >= 26 && this.exchangeRate > 0;
+  }
+
+  pay(amount: number): string {
+    if (!this.validate()) {
+      throw new Error("Invalid cryptocurrency wallet details");
+    }
+
+    const cryptoAmount = amount / this.exchangeRate;
+    const networkFee = this.currency === 'BTC' ? 0.0005 : 0.01; // BTC vs ETH/LTC fees
+    const totalCrypto = cryptoAmount + networkFee;
+
+    console.log(\`₿ Processing \${this.currency} payment...\`);
+    console.log(\`   USD Amount: $\${amount.toFixed(2)}\`);
+    console.log(\`   Exchange rate: 1 \${this.currency} = $\${this.exchangeRate.toFixed(2)}\`);
+    console.log(\`   Crypto amount: \${cryptoAmount.toFixed(6)} \${this.currency}\`);
+    console.log(\`   Network fee: \${networkFee} \${this.currency}\`);
+    console.log(\`   Total: \${totalCrypto.toFixed(6)} \${this.currency}\`);
+
+    return \`✅ Cryptocurrency payment of \${totalCrypto.toFixed(6)} \${this.currency} completed\`;
+  }
+
+  getPaymentDetails(): object {
+    return {
+      method: "Cryptocurrency",
+      currency: this.currency,
+      walletAddress: \`\${this.walletAddress.slice(0, 6)}...\${this.walletAddress.slice(-6)}\`,
+      exchangeRate: \`1 \${this.currency} = $\${this.exchangeRate.toFixed(2)}\`
+    };
+  }
+}
+
+// Context class that uses strategies
+class PaymentProcessor {
+  private strategy: PaymentStrategy | null = null;
+  private paymentHistory: Array<{
+    amount: number;
+    method: string;
+    timestamp: Date;
+    status: 'completed' | 'failed';
+  }> = [];
+
+  setPaymentStrategy(strategy: PaymentStrategy): void {
+    this.strategy = strategy;
+    console.log(\`💳 Payment method set to: \${JSON.stringify(strategy.getPaymentDetails())}\`);
+  }
+
+  processPayment(amount: number): string {
+    if (!this.strategy) {
+      throw new Error("No payment strategy set");
+    }
+
+    try {
+      const result = this.strategy.pay(amount);
+      
+      // Log successful payment
+      this.paymentHistory.push({
+        amount,
+        method: this.strategy.getPaymentDetails().method as string,
+        timestamp: new Date(),
+        status: 'completed'
+      });
+
+      return result;
+    } catch (error) {
+      // Log failed payment
+      this.paymentHistory.push({
+        amount,
+        method: this.strategy.getPaymentDetails().method as string,
+        timestamp: new Date(),
+        status: 'failed'
+      });
+
+      throw error;
+    }
+  }
+
+  getCurrentPaymentMethod(): object | null {
+    return this.strategy?.getPaymentDetails() || null;
+  }
+
+  getPaymentHistory(): Array<{amount: number; method: string; timestamp: Date; status: 'completed' | 'failed'}> {
+    return [...this.paymentHistory];
+  }
+
+  getTotalProcessed(): number {
+    return this.paymentHistory
+      .filter(payment => payment.status === 'completed')
+      .reduce((total, payment) => total + payment.amount, 0);
+  }
+}
+
+// 🎯 Sorting strategies example
+interface SortStrategy<T> {
+  sort(data: T[]): T[];
+  getName(): string;
+}
+
+class BubbleSortStrategy implements SortStrategy<number> {
+  sort(data: number[]): number[] {
+    const result = [...data];
+    const n = result.length;
+    let swapped: boolean;
+
+    console.log(\`🫧 Starting Bubble Sort on \${n} elements...\`);
+    
+    for (let i = 0; i < n - 1; i++) {
+      swapped = false;
+      for (let j = 0; j < n - i - 1; j++) {
+        if (result[j] > result[j + 1]) {
+          [result[j], result[j + 1]] = [result[j + 1], result[j]];
+          swapped = true;
+        }
+      }
+      if (!swapped) break;
+    }
+
+    console.log(\`✅ Bubble Sort completed\`);
+    return result;
+  }
+
+  getName(): string {
+    return "Bubble Sort";
+  }
+}
+
+class QuickSortStrategy implements SortStrategy<number> {
+  sort(data: number[]): number[] {
+    console.log(\`⚡ Starting Quick Sort on \${data.length} elements...\`);
+    const result = this.quickSort([...data]);
+    console.log(\`✅ Quick Sort completed\`);
+    return result;
+  }
+
+  private quickSort(arr: number[]): number[] {
+    if (arr.length <= 1) return arr;
+
+    const pivot = arr[Math.floor(arr.length / 2)];
+    const left = arr.filter(x => x < pivot);
+    const middle = arr.filter(x => x === pivot);
+    const right = arr.filter(x => x > pivot);
+
+    return [...this.quickSort(left), ...middle, ...this.quickSort(right)];
+  }
+
+  getName(): string {
+    return "Quick Sort";
+  }
+}
+
+class MergeSortStrategy implements SortStrategy<number> {
+  sort(data: number[]): number[] {
+    console.log(\`🔀 Starting Merge Sort on \${data.length} elements...\`);
+    const result = this.mergeSort([...data]);
+    console.log(\`✅ Merge Sort completed\`);
+    return result;
+  }
+
+  private mergeSort(arr: number[]): number[] {
+    if (arr.length <= 1) return arr;
+
+    const mid = Math.floor(arr.length / 2);
+    const left = this.mergeSort(arr.slice(0, mid));
+    const right = this.mergeSort(arr.slice(mid));
+
+    return this.merge(left, right);
+  }
+
+  private merge(left: number[], right: number[]): number[] {
+    const result: number[] = [];
+    let leftIndex = 0;
+    let rightIndex = 0;
+
+    while (leftIndex < left.length && rightIndex < right.length) {
+      if (left[leftIndex] <= right[rightIndex]) {
+        result.push(left[leftIndex]);
+        leftIndex++;
+      } else {
+        result.push(right[rightIndex]);
+        rightIndex++;
+      }
+    }
+
+    return result.concat(left.slice(leftIndex), right.slice(rightIndex));
+  }
+
+  getName(): string {
+    return "Merge Sort";
+  }
+}
+
+class Sorter<T> {
+  private strategy: SortStrategy<T> | null = null;
+
+  setStrategy(strategy: SortStrategy<T>): void {
+    this.strategy = strategy;
+    console.log(\`🔧 Sorting algorithm set to: \${strategy.getName()}\`);
+  }
+
+  sort(data: T[]): T[] {
+    if (!this.strategy) {
+      throw new Error("No sorting strategy set");
+    }
+
+    console.log(\`📊 Sorting \${data.length} items using \${this.strategy.getName()}\`);
+    return this.strategy.sort(data);
+  }
+}
+
+// 🚀 Testing Strategy Pattern
+console.log("=== Strategy Pattern Demo ===");
+
+// Payment processing
+console.log("\\n--- Payment Processing Strategies ---");
+const paymentProcessor = new PaymentProcessor();
+
+// Credit Card payment
+const creditCard = new CreditCardPayment("1234567890123456", "123", "12/25", "visa");
+paymentProcessor.setPaymentStrategy(creditCard);
+console.log(paymentProcessor.processPayment(100.00));
+
+// PayPal payment
+const paypal = new PayPalPayment("user@example.com", "password123");
+paymentProcessor.setPaymentStrategy(paypal);
+console.log(paymentProcessor.processPayment(75.50));
+
+// Bank transfer
+const bankTransfer = new BankTransferPayment("12345678", "123456789", "First National Bank");
+paymentProcessor.setPaymentStrategy(bankTransfer);
+console.log(paymentProcessor.processPayment(200.00));
+
+// Cryptocurrency payment
+const crypto = new CryptocurrencyPayment("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", "BTC", 45000);
+paymentProcessor.setPaymentStrategy(crypto);
+console.log(paymentProcessor.processPayment(50.00));
+
+// Payment history
+console.log("\\n--- Payment History ---");
+console.log(\`Total processed: $\${paymentProcessor.getTotalProcessed().toFixed(2)}\`);
+paymentProcessor.getPaymentHistory().forEach((payment, index) => {
+  console.log(\`\${index + 1}. \${payment.method}: $\${payment.amount} - \${payment.status} at \${payment.timestamp.toLocaleTimeString()}\`);
+});
+
+// Sorting strategies
+console.log("\\n--- Sorting Strategies ---");
+const sorter = new Sorter<number>();
+const testData = [64, 34, 25, 12, 22, 11, 90, 88, 76, 50, 42];
+
+console.log(\`Original data: [\${testData.join(', ')}]\`);
+
+// Bubble sort
+sorter.setStrategy(new BubbleSortStrategy());
+const bubbleSorted = sorter.sort(testData);
+console.log(\`Bubble sorted: [\${bubbleSorted.join(', ')}]\`);
+
+console.log();
+
+// Quick sort
+sorter.setStrategy(new QuickSortStrategy());
+const quickSorted = sorter.sort(testData);
+console.log(\`Quick sorted: [\${quickSorted.join(', ')}]\`);
+
+console.log();
+
+// Merge sort
+sorter.setStrategy(new MergeSortStrategy());
+const mergeSorted = sorter.sort(testData);
+console.log(\`Merge sorted: [\${mergeSorted.join(', ')}]\`);
+
+// Dynamic strategy selection
+console.log("\\n--- Dynamic Strategy Selection ---");
+class SmartPaymentProcessor extends PaymentProcessor {
+  private strategies: Map<string, PaymentStrategy> = new Map();
+
+  registerStrategy(name: string, strategy: PaymentStrategy): void {
+    this.strategies.set(name, strategy);
+    console.log(\`✅ Registered \${name} payment strategy\`);
+  }
+
+  processSmartPayment(amount: number, preferredMethods: string[]): string {
+    for (const method of preferredMethods) {
+      const strategy = this.strategies.get(method);
+      if (strategy && strategy.validate()) {
+        this.setPaymentStrategy(strategy);
+        return this.processPayment(amount);
+      }
+    }
+    throw new Error("No valid payment method available");
+  }
+
+  getBestPaymentMethod(amount: number): string {
+    // Simple logic to recommend best payment method based on amount
+    if (amount > 1000) {
+      return "bank_transfer"; // Lowest fees for large amounts
+    } else if (amount > 100) {
+      return "paypal"; // Good balance of speed and fees
+    } else {
+      return "credit_card"; // Fast for small amounts
+    }
+  }
+}
+
+const smartProcessor = new SmartPaymentProcessor();
+smartProcessor.registerStrategy("credit_card", creditCard);
+smartProcessor.registerStrategy("paypal", paypal);
+smartProcessor.registerStrategy("bank_transfer", bankTransfer);
+smartProcessor.registerStrategy("crypto", crypto);
+
+console.log("\\nProcessing with fallback methods:");
+try {
+  const result = smartProcessor.processSmartPayment(150, ["paypal", "credit_card", "bank_transfer"]);
+  console.log(result);
+} catch (error) {
+  console.error("Payment failed:", error.message);
+}
+
+const recommendedMethod = smartProcessor.getBestPaymentMethod(150);
+console.log(\`\\nRecommended payment method for $150: \${recommendedMethod}\`);
+
+console.log("\\n=== Strategy Pattern Benefits ===");
+console.log("✅ Algorithms can be switched at runtime");
+console.log("✅ Easy to add new strategies without modifying existing code");
+console.log("✅ Eliminates conditional statements for algorithm selection");
+console.log("✅ Each strategy is encapsulated and testable");
+console.log("✅ Client code is decoupled from specific algorithms");`}
+</InteractiveCodeBlock>
+
+## Key Takeaways
+
+**Design patterns provide:**
+
+1. **Proven Solutions** - Time-tested approaches to common problems
+2. **Common Vocabulary** - Shared language for developers to communicate
+3. **Best Practices** - Learn from experienced developers
+4. **Flexibility** - Easier to adapt to changing requirements
+5. **Maintainability** - Code that's easier to understand and modify
+
+**When to use each pattern:**
+
+- **Singleton**: Database connections, loggers, configuration managers
+- **Factory**: Creating objects based on conditions, UI themes, notifications
+- **Observer**: Event systems, model-view architectures, real-time updates
+- **Strategy**: Payment processing, sorting algorithms, validation rules
+
+**Pattern Categories:**
+
+1. **Creational** - Object creation (Singleton, Factory, Builder)
+2. **Structural** - Object composition (Adapter, Decorator, Facade)
+3. **Behavioral** - Object interaction (Observer, Strategy, Command)
+
+**What's Next?**
+
+You're now equipped with professional-grade design patterns! These patterns form the foundation of robust, scalable applications. Continue exploring:
+
+- **Advanced Patterns** - Command, Decorator, Adapter patterns
+- **Architectural Patterns** - MVC, MVP, MVVM
+- **Real-world Applications** - Applying patterns in React, Node.js, and more
+
+Design patterns are your toolkit for professional software development - master them and you'll write code like a senior developer! 🚀

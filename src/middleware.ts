@@ -1,29 +1,39 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { devMode } from "./lib/services/envService";
+const debugMode = devMode();
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  console.log("Middleware executed for:", pathname);
-
-  // Check for session token in cookies (NextAuth uses different cookie names)
+  if (debugMode) {
+    console.log("Middleware executed for:", pathname);
+  } // Check for session token in cookies (NextAuth uses different cookie names)
   const sessionToken =
     req.cookies.get("next-auth.session-token") ||
     req.cookies.get("__Secure-next-auth.session-token");
 
-  console.log("Session token exists:", !!sessionToken, "for path:", pathname);
-
+  if (debugMode) {
+    console.log("Session token exists:", !!sessionToken, "for path:", pathname);
+  }
   // If we have a session token and user is trying to access signin page, redirect to dashboard
   if (sessionToken && pathname.startsWith("/auth/signin")) {
     const callbackUrl =
       req.nextUrl.searchParams.get("callbackUrl") || "/dashboard";
-    console.log("Redirecting authenticated user from signin to:", callbackUrl);
+    if (debugMode) {
+      console.log(
+        "Redirecting authenticated user from signin to:",
+        callbackUrl
+      );
+    }
     return NextResponse.redirect(new URL(callbackUrl, req.url));
   }
 
   // Check if the route requires authentication
   if (isProtectedRoute(pathname) && !sessionToken) {
-    console.log("Redirecting unauthenticated user to signin for:", pathname);
+    if (debugMode) {
+      console.log("Redirecting unauthenticated user to signin for:", pathname);
+    }
     const signInUrl = new URL("/auth/signin", req.url);
     signInUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(signInUrl);
@@ -36,12 +46,13 @@ export async function middleware(req: NextRequest) {
       pathname,
       req
     );
-    console.log("🔍 Check result:", { limitCheckResult });
-
+    if (debugMode) {
+      console.log("🔍 Check result:", { limitCheckResult });
+    }
     if (!limitCheckResult.hasAccess) {
-      console.log(`🚫 Tutorial access denied: ${limitCheckResult.reason}`);
-
-      // Redirect to subscription upgrade page with context
+      if (debugMode) {
+        console.log(`🚫 Tutorial access denied: ${limitCheckResult.reason}`);
+      } // Redirect to subscription upgrade page with context
       const upgradeUrl = new URL("/subscription/upgrade", req.url);
       upgradeUrl.searchParams.set(
         "reason",
@@ -52,7 +63,9 @@ export async function middleware(req: NextRequest) {
 
       return NextResponse.redirect(upgradeUrl);
     } else {
-      console.log("✅ Tutorial access granted");
+      if (debugMode) {
+        console.log("✅ Tutorial access granted");
+      }
     }
   }
 
@@ -89,8 +102,10 @@ async function checkTutorialAccessLimits(
     const tutorialSlug = pathParts[pathParts.length - 1];
 
     if (!tutorialSlug) {
-      console.log("🔧 No tutorial slug found, allowing category page");
-      return { hasAccess: true }; // Allow category pages
+      if (debugMode) {
+        console.log("🔧 No tutorial slug found, allowing category page");
+        return { hasAccess: true }; // Allow category pages
+      }
     }
 
     // Get user subscription info - use the request origin instead of NEXTAUTH_URL for internal calls

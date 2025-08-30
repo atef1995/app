@@ -6,6 +6,9 @@ import {
   DynamicStudyPlan,
   StudyPlanProgress,
 } from "@/lib/services/studyPlanService";
+import { devMode } from "@/lib/services/envService";
+
+const debugMode = devMode();
 
 interface StudyPlanData {
   studyPlan: DynamicStudyPlan;
@@ -82,16 +85,21 @@ export const useUpdateStepProgress = () => {
     mutationFn: updateStepProgress,
     onSuccess: (data) => {
       // Update the cached study plan data with new progress
-      queryClient.setQueryData(STUDY_PLAN_QUERY_KEY, (oldData: StudyPlanData | undefined) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          userProgress: data.userProgress,
-        };
-      });
-      
+      queryClient.setQueryData(
+        STUDY_PLAN_QUERY_KEY,
+        (oldData: StudyPlanData | undefined) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            userProgress: data.userProgress,
+          };
+        }
+      );
+
       // Optionally show success message
-      console.log(data.message);
+      if (debugMode) {
+        console.log(data.message);
+      }
     },
     onError: (error) => {
       console.error("Error updating progress:", error);

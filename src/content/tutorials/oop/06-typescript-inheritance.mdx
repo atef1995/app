@@ -1,0 +1,1220 @@
+---
+title: "Inheritance in TypeScript - Building Family Trees"
+description: "Master TypeScript inheritance with class hierarchies, method overriding, super keyword, and advanced inheritance patterns"
+difficulty: 3
+estimatedTime: "40 minutes"
+prerequisites: ["typescript-classes", "typescript-interfaces", "typescript-oop"]
+category: "oop"
+---
+
+# Inheritance in TypeScript - Building Family Trees
+
+Welcome to one of the most powerful concepts in object-oriented programming! 🌳 **Inheritance is like creating a family tree for your classes.** You have parent classes that pass down their traits to their children, just like in real families!
+
+**But here's where I want to blow your mind:** What if I told you that with TypeScript inheritance, a child class can not only inherit everything from its parent, but also ADD new abilities AND even change how inherited abilities work?
+
+**Think about real animals for a second:** All animals share some common traits (they have names, they can move, they make sounds), but each specific type of animal has its own unique characteristics. **How do you think we could model this in code?**
+
+## Why Inheritance is Game-Changing 🚀
+
+**Here's what makes inheritance absolutely brilliant:**
+
+- **Code Reuse** ♻️ - Write once, inherit everywhere
+- **Logical Hierarchy** 🏗️ - Model real-world relationships
+- **Polymorphism** 🎭 - Treat different objects the same way
+- **Maintainability** 🔧 - Change parent code, all children benefit
+- **Type Safety** 🛡️ - TypeScript ensures proper inheritance
+
+**The magic:** Children inherit all public and protected properties and methods from their parents, but can add their own unique features!
+
+## Basic Inheritance - Let's Build an Animal Kingdom!
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// 🦴 The parent class - defines what ALL animals have in common
+class Animal {
+  protected name: string;       // Protected so children can access it
+  protected species: string;    // But outside code cannot
+  protected energy: number = 100;
+
+  constructor(name: string, species: string) {
+    this.name = name;
+    this.species = species;
+  }
+
+  // 📢 Basic method that children can override
+  makeSound(): string {
+    return "Some generic animal sound";
+  }
+
+  // 🏃 Movement that all animals share
+  move(): string {
+    this.energy -= 10;
+    return \`\${this.name} is moving (Energy: \${this.energy})\`;
+  }
+
+  // 📝 Description that can be enhanced by children
+  describe(): string {
+    return \`\${this.name} is a \${this.species}\`;
+  }
+
+  // 😴 Rest to regain energy
+  rest(): string {
+    this.energy = Math.min(100, this.energy + 30);
+    return \`\${this.name} is resting (Energy: \${this.energy})\`;
+  }
+
+  // 🔍 Public getter to access protected property
+  get currentEnergy(): number {
+    return this.energy;
+  }
+}
+
+// 🐕 Dog class - inherits from Animal but adds its own personality!
+class Dog extends Animal {
+  private breed: string;
+  private isGoodBoy: boolean = true; // All dogs are good boys/girls!
+
+  constructor(name: string, breed: string) {
+    super(name, "Canine"); // 🔥 Call parent constructor with "Canine"
+    this.breed = breed;
+  }
+
+  // 🔊 Override parent method - dogs bark!
+  makeSound(): string {
+    return "Woof! Woof!";
+  }
+
+  // ✨ Enhance parent description with breed info
+  describe(): string {
+    return \`\${super.describe()} and is a \${this.breed}\`; // super = parent's version
+  }
+
+  // 🎾 New method specific to dogs
+  fetch(): string {
+    if (this.energy < 20) {
+      return \`\${this.name} is too tired to fetch. Maybe later?\`;
+    }
+    this.energy -= 20;
+    return \`\${this.name} is fetching the ball! So fun! (Energy: \${this.energy})\`;
+  }
+
+  // 🐕 Another dog-specific method
+  wagTail(): string {
+    return \`\${this.name} is wagging their tail happily!\`;
+  }
+}
+
+// 🐱 Cat class - also inherits from Animal but very different personality!
+class Cat extends Animal {
+  private isIndoor: boolean;
+  private attitude: string = "independent"; // Cats gonna cat
+
+  constructor(name: string, isIndoor: boolean = true) {
+    super(name, "Feline"); // Call parent with "Feline"
+    this.isIndoor = isIndoor;
+  }
+
+  // 😸 Cats meow (override)
+  makeSound(): string {
+    return "Meow!";
+  }
+
+  // 🧗 Cats are excellent climbers
+  climb(): string {
+    if (this.energy < 15) {
+      return \`\${this.name} looks at the tree but decides to nap instead.\`;
+    }
+    this.energy -= 15;
+    return \`\${this.name} is gracefully climbing (Energy: \${this.energy})\`;
+  }
+
+  // 😴 Cats love to nap (override rest to be more effective)
+  rest(): string {
+    this.energy = 100; // Cats are nap masters!
+    return \`\${this.name} found a sunny spot and is napping blissfully (Energy: Full)\`;
+  }
+
+  // 🐾 Cat-specific behavior
+  purr(): string {
+    return \`\${this.name} is purring contentedly\`;
+  }
+}
+
+// 🚀 Let's test our animal family!
+const buddy = new Dog("Buddy", "Golden Retriever");
+const whiskers = new Cat("Whiskers", true);
+
+console.log("=== Meet our animals ===");
+console.log(buddy.describe());
+console.log(whiskers.describe());
+
+console.log("\\n=== Animal sounds ===");
+console.log(\`Buddy says: \${buddy.makeSound()}\`);
+console.log(\`Whiskers says: \${whiskers.makeSound()}\`);
+
+console.log("\\n=== Movement and activities ===");
+console.log(buddy.move());
+console.log(buddy.fetch());
+console.log(buddy.wagTail());
+
+console.log(whiskers.move());
+console.log(whiskers.climb());
+console.log(whiskers.purr());
+
+console.log("\\n=== Recovery time ===");
+console.log(buddy.rest());
+console.log(whiskers.rest()); // Notice cats rest differently!
+
+console.log("\\n=== The magic of inheritance ===");
+// Both are animals, so we can treat them the same way!
+const animals: Animal[] = [buddy, whiskers];
+animals.forEach(animal => {
+  console.log(\`\${animal.describe()} says: \${animal.makeSound()}\`); // Each makes their own sound!
+});`}
+</InteractiveCodeBlock>
+
+**WHOA! Did you catch all the magic happening there?** Let me quiz you to make sure you're following:
+
+1. **What does `super(name, "Canine")` do in the Dog constructor?**
+   - It calls the parent Animal constructor with the dog's name and "Canine" as the species!
+
+2. **Why can Dog and Cat classes access `this.name` but external code cannot?**
+   - Because `name` is `protected` - children can see it, but strangers cannot!
+
+3. **What's the difference between `super.describe()` and just `describe()` in the Dog class?**
+   - `super.describe()` calls the parent's version, while `describe()` would call the current (Dog's) version!
+
+4. **Why does the Cat's `rest()` method work differently than the Dog's?**
+   - Because Cat overrode the `rest()` method to make cats better at napping (which is totally realistic!)
+
+**The beautiful thing about inheritance:** Both Dog and Cat ARE animals, so they can do anything an animal can do, but they also have their own special abilities!
+
+## Advanced Inheritance Patterns
+
+### Multiple Levels of Inheritance
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// 🎮 Let's build a game character hierarchy!
+
+// 👤 Base character class
+class GameCharacter {
+  protected name: string;
+  protected health: number = 100;
+  protected level: number = 1;
+  protected experience: number = 0;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  // Basic actions all characters can do
+  attack(): string {
+    return \`\${this.name} attacks for 10 damage!\`;
+  }
+
+  takeDamage(damage: number): string {
+    this.health = Math.max(0, this.health - damage);
+    return \`\${this.name} takes \${damage} damage! Health: \${this.health}\`;
+  }
+
+  heal(amount: number): string {
+    this.health = Math.min(100, this.health + amount);
+    return \`\${this.name} heals for \${amount}! Health: \${this.health}\`;
+  }
+
+  gainExperience(exp: number): string {
+    this.experience += exp;
+    if (this.experience >= this.level * 100) {
+      this.levelUp();
+      return \`\${this.name} gained \${exp} XP and leveled up!\`;
+    }
+    return \`\${this.name} gained \${exp} XP!\`;
+  }
+
+  private levelUp(): void {
+    this.level++;
+    this.experience = 0;
+    this.health = 100; // Full heal on level up
+  }
+
+  getStatus(): string {
+    return \`\${this.name} (Lvl \${this.level}) - HP: \${this.health}/100, XP: \${this.experience}/\${this.level * 100}\`;
+  }
+}
+
+// ⚔️ Warrior class - inherits from GameCharacter
+class Warrior extends GameCharacter {
+  protected armor: number = 20;
+  protected rage: number = 0;
+
+  constructor(name: string) {
+    super(name);
+  }
+
+  // Override attack - warriors hit harder!
+  attack(): string {
+    const damage = 15 + Math.floor(this.rage / 10);
+    this.rage = Math.min(100, this.rage + 10);
+    return \`⚔️ Warrior \${this.name} attacks ferociously for \${damage} damage! (Rage: \${this.rage})\`;
+  }
+
+  // Override take damage - armor reduces damage!
+  takeDamage(damage: number): string {
+    const reducedDamage = Math.max(1, damage - Math.floor(this.armor / 5));
+    return super.takeDamage(reducedDamage) + \` (Armor blocked \${damage - reducedDamage} damage!)\`;
+  }
+
+  // Warrior-specific ability
+  berserkerRage(): string {
+    this.rage = 100;
+    return \`🔥 \${this.name} enters BERSERKER RAGE!\`;
+  }
+
+  // Shield bash ability
+  shieldBash(): string {
+    return \`🛡️ \${this.name} bashes with their shield!\`;
+  }
+}
+
+// 🏹 Archer class - also inherits from GameCharacter
+class Archer extends GameCharacter {
+  protected arrows: number = 30;
+  protected accuracy: number = 80;
+
+  constructor(name: string) {
+    super(name);
+  }
+
+  // Override attack - archers have ranged attacks!
+  attack(): string {
+    if (this.arrows <= 0) {
+      return \`🏹 \${this.name} is out of arrows!\`;
+    }
+    
+    this.arrows--;
+    const hit = Math.random() * 100 < this.accuracy;
+    
+    if (hit) {
+      return \`🏹 Archer \${this.name} shoots accurately for 12 damage! (Arrows: \${this.arrows})\`;
+    } else {
+      return \`🏹 Archer \${this.name} misses their shot! (Arrows: \${this.arrows})\`;
+    }
+  }
+
+  // Archer-specific abilities
+  multiShot(): string {
+    if (this.arrows < 3) {
+      return \`🏹 \${this.name} doesn't have enough arrows for multi-shot!\`;
+    }
+    
+    this.arrows -= 3;
+    return \`🏹 \${this.name} fires multiple arrows for massive damage! (Arrows: \${this.arrows})\`;
+  }
+
+  collectArrows(): string {
+    this.arrows = Math.min(30, this.arrows + 10);
+    return \`🏹 \${this.name} collected arrows! Total: \${this.arrows}\`;
+  }
+}
+
+// 🗡️ PALADIN - Inherits from WARRIOR (2nd level inheritance!)
+class Paladin extends Warrior {
+  private holyPower: number = 50;
+  private canHeal: boolean = true;
+
+  constructor(name: string) {
+    super(name);
+    this.armor = 30; // Paladins have better armor than warriors
+  }
+
+  // Override warrior attack to add holy damage!
+  attack(): string {
+    const baseAttack = super.attack(); // Get warrior attack
+    const holyDamage = Math.floor(this.holyPower / 10);
+    this.holyPower = Math.max(0, this.holyPower - 5);
+    return baseAttack + \` Plus \${holyDamage} holy damage! (Holy Power: \${this.holyPower})\`;
+  }
+
+  // Override heal to be more powerful
+  heal(amount: number = 25): string {
+    if (!this.canHeal || this.holyPower < 20) {
+      return \`✨ \${this.name} cannot use holy healing right now!\`;
+    }
+    
+    this.holyPower -= 20;
+    this.canHeal = false;
+    
+    // Heal more than normal characters
+    setTimeout(() => { this.canHeal = true; }, 1000); // Cooldown simulation
+    
+    return \`✨ Paladin \${this.name} uses DIVINE HEALING for \${amount + 10}! (Holy Power: \${this.holyPower})\` + 
+           super.heal(amount + 10);
+  }
+
+  // Paladin-specific ability
+  divineShield(): string {
+    this.holyPower = Math.max(0, this.holyPower - 30);
+    return \`🛡️✨ \${this.name} casts Divine Shield! Immune to damage! (Holy Power: \${this.holyPower})\`;
+  }
+
+  // Restore holy power
+  pray(): string {
+    this.holyPower = Math.min(100, this.holyPower + 25);
+    return \`🙏 \${this.name} prays and restores holy power! (Holy Power: \${this.holyPower})\`;
+  }
+}
+
+// 🚀 Let's test our character hierarchy!
+const warrior = new Warrior("Conan");
+const archer = new Archer("Legolas");
+const paladin = new Paladin("Arthas");
+
+console.log("=== Character Creation ===");
+console.log(warrior.getStatus());
+console.log(archer.getStatus());
+console.log(paladin.getStatus());
+
+console.log("\\n=== Battle Simulation ===");
+console.log(warrior.attack());
+console.log(archer.attack());
+console.log(paladin.attack()); // Notice: Warrior attack + Holy damage!
+
+console.log("\\n=== Taking Damage ===");
+console.log(warrior.takeDamage(25)); // Normal damage with armor
+console.log(paladin.takeDamage(25)); // Better armor than warrior!
+console.log(archer.takeDamage(25));  // No armor, full damage
+
+console.log("\\n=== Special Abilities ===");
+console.log(warrior.berserkerRage());
+console.log(archer.multiShot());
+console.log(paladin.divineShield());
+
+console.log("\\n=== Healing ===");
+console.log(warrior.heal(15));   // Basic healing
+console.log(archer.heal(15));    // Basic healing  
+console.log(paladin.heal());     // Enhanced holy healing!
+
+console.log("\\n=== Polymorphism Magic ===");
+// All are GameCharacters, so we can treat them the same!
+const party: GameCharacter[] = [warrior, archer, paladin];
+party.forEach(character => {
+  console.log(character.gainExperience(50));
+  console.log(character.getStatus());
+});`}
+</InteractiveCodeBlock>
+
+**This is absolutely mind-blowing!** Notice how:
+
+1. **Paladin inherits from Warrior** - which inherits from GameCharacter (3 levels!)
+2. **Method chaining** - Paladin calls Warrior's attack, which could call GameCharacter's methods
+3. **Polymorphism** - All characters can be treated as GameCharacter in the party array
+4. **Specialized behavior** - Each class adds its own unique abilities while maintaining the core character functionality
+
+## Method Overriding vs Method Overloading
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// 🎯 Understanding the difference between overriding and overloading
+
+class Vehicle {
+  protected brand: string;
+  protected speed: number = 0;
+
+  constructor(brand: string) {
+    this.brand = brand;
+  }
+
+  // Method that can be overridden
+  start(): string {
+    return \`\${this.brand} vehicle is starting...\`;
+  }
+
+  // Method overloading - multiple signatures for the same method
+  accelerate(amount: number): string;
+  accelerate(amount: number, duration: number): string;
+  accelerate(amount: number, duration?: number): string {
+    if (duration) {
+      this.speed += amount;
+      return \`\${this.brand} accelerated by \${amount} for \${duration} seconds. Speed: \${this.speed}\`;
+    } else {
+      this.speed += amount;
+      return \`\${this.brand} accelerated by \${amount}. Speed: \${this.speed}\`;
+    }
+  }
+
+  getInfo(): string {
+    return \`\${this.brand} - Current speed: \${this.speed}\`;
+  }
+}
+
+class Car extends Vehicle {
+  private engineType: string;
+
+  constructor(brand: string, engineType: string) {
+    super(brand);
+    this.engineType = engineType;
+  }
+
+  // METHOD OVERRIDE - Replace parent behavior completely
+  start(): string {
+    return \`🚗 \${this.brand} car (\${this.engineType}) engine started with a purr!\`;
+  }
+
+  // METHOD ENHANCEMENT - Use parent method + add more
+  getInfo(): string {
+    return super.getInfo() + \`, Engine: \${this.engineType}\`;
+  }
+
+  // OVERLOAD the parent's accelerate method with car-specific behavior
+  accelerate(amount: number): string;
+  accelerate(amount: number, duration: number): string;
+  accelerate(amount: number, turboBoost: boolean): string;
+  accelerate(amount: number, durationOrTurbo?: number | boolean): string {
+    if (typeof durationOrTurbo === 'boolean' && durationOrTurbo) {
+      // Turbo boost version
+      const boostedAmount = amount * 1.5;
+      this.speed += boostedAmount;
+      return \`🚗💨 \${this.brand} TURBO BOOST! Accelerated by \${boostedAmount}. Speed: \${this.speed}\`;
+    } else if (typeof durationOrTurbo === 'number') {
+      // Duration version
+      return super.accelerate(amount, durationOrTurbo);
+    } else {
+      // Simple version
+      return super.accelerate(amount);
+    }
+  }
+}
+
+class Motorcycle extends Vehicle {
+  private hasWindshield: boolean;
+
+  constructor(brand: string, hasWindshield: boolean) {
+    super(brand);
+    this.hasWindshield = hasWindshield;
+  }
+
+  // METHOD OVERRIDE - Completely different implementation
+  start(): string {
+    return \`🏍️ \${this.brand} motorcycle ROARS to life!\`;
+  }
+
+  // Override accelerate with motorcycle-specific behavior
+  accelerate(amount: number): string;
+  accelerate(amount: number, duration: number): string;
+  accelerate(amount: number, wheelie: boolean): string;
+  accelerate(amount: number, durationOrWheelie?: number | boolean): string {
+    if (typeof durationOrWheelie === 'boolean' && durationOrWheelie) {
+      // Wheelie version!
+      this.speed += amount * 0.8; // Slower acceleration during wheelie
+      return \`🏍️ \${this.brand} pops a WHEELIE while accelerating! Speed: \${this.speed}\`;
+    } else if (typeof durationOrWheelie === 'number') {
+      return super.accelerate(amount, durationOrWheelie);
+    } else {
+      return super.accelerate(amount);
+    }
+  }
+
+  // Motorcycle-specific method
+  leanIntoTurn(): string {
+    return \`🏍️ \${this.brand} leans gracefully into the turn!\`;
+  }
+}
+
+// 🚀 Let's test overriding vs overloading!
+const genericVehicle = new Vehicle("Generic");
+const sportsCar = new Car("Ferrari", "V8");
+const motorcycle = new Motorcycle("Harley", false);
+
+console.log("=== Method Overriding Examples ===");
+console.log("Generic:", genericVehicle.start());
+console.log("Car:", sportsCar.start());        // Overridden behavior
+console.log("Motorcycle:", motorcycle.start()); // Overridden behavior
+
+console.log("\\n=== Method Overloading Examples ===");
+console.log("\\n--- Car Acceleration ---");
+console.log(sportsCar.accelerate(20));           // Basic version
+console.log(sportsCar.accelerate(30, 5));        // With duration
+console.log(sportsCar.accelerate(40, true));     // With turbo boost!
+
+console.log("\\n--- Motorcycle Acceleration ---");
+console.log(motorcycle.accelerate(25));          // Basic version
+console.log(motorcycle.accelerate(30, 3));       // With duration
+console.log(motorcycle.accelerate(35, true));    // With wheelie!
+
+console.log("\\n=== Enhanced Methods (super usage) ===");
+console.log("Generic info:", genericVehicle.getInfo());
+console.log("Car info:", sportsCar.getInfo());   // Enhanced with engine info
+
+console.log("\\n=== Polymorphism in Action ===");
+const vehicles: Vehicle[] = [genericVehicle, sportsCar, motorcycle];
+vehicles.forEach(vehicle => {
+  console.log(vehicle.start()); // Each calls its own overridden version!
+  console.log(vehicle.accelerate(15)); // Each has its own acceleration behavior
+  console.log(vehicle.getInfo());
+  console.log("---");
+});`}
+</InteractiveCodeBlock>
+
+**Key concepts explained:**
+
+1. **Method Overriding** - Child class replaces parent's method entirely
+2. **Method Enhancement** - Child class calls parent's method (`super`) and adds more
+3. **Method Overloading** - Multiple versions of the same method with different parameters
+4. **Polymorphism** - Same method call, different behavior based on actual object type
+
+## Access Modifiers in Inheritance
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// 🔐 Understanding access modifiers in inheritance context
+
+class BankAccount {
+  // 🔒 PRIVATE - Only THIS class can access
+  private accountNumber: string;
+  private pin: string;
+
+  // 🛡️ PROTECTED - This class AND child classes can access
+  protected balance: number;
+  protected transactionHistory: string[] = [];
+  protected accountType: string;
+
+  // 🌐 PUBLIC - Anyone can access
+  public customerName: string;
+  public isActive: boolean = true;
+
+  constructor(customerName: string, accountType: string, initialBalance: number = 0) {
+    this.customerName = customerName;
+    this.accountType = accountType;
+    this.balance = initialBalance;
+    this.accountNumber = this.generateAccountNumber();
+    this.pin = this.generatePIN();
+  }
+
+  // 🔒 PRIVATE method - only BankAccount class can use
+  private generateAccountNumber(): string {
+    return "ACC" + Math.random().toString().substr(2, 8);
+  }
+
+  private generatePIN(): string {
+    return Math.floor(1000 + Math.random() * 9000).toString();
+  }
+
+  private validatePIN(inputPIN: string): boolean {
+    return this.pin === inputPIN;
+  }
+
+  // 🛡️ PROTECTED method - child classes can use this
+  protected logTransaction(type: string, amount: number): void {
+    const timestamp = new Date().toISOString();
+    this.transactionHistory.push(\`\${timestamp}: \${type} $\${amount}\`);
+  }
+
+  protected validateAmount(amount: number): boolean {
+    return amount > 0 && amount <= this.balance;
+  }
+
+  // 🌐 PUBLIC methods - the external interface
+  public deposit(amount: number): string {
+    if (amount <= 0) {
+      return "❌ Invalid deposit amount";
+    }
+    
+    this.balance += amount;
+    this.logTransaction("DEPOSIT", amount);
+    return \`✅ Deposited $\${amount}. New balance: $\${this.balance}\`;
+  }
+
+  public withdraw(amount: number, pin: string): string {
+    if (!this.validatePIN(pin)) {
+      return "❌ Invalid PIN";
+    }
+    
+    if (!this.validateAmount(amount)) {
+      return "❌ Insufficient funds or invalid amount";
+    }
+    
+    this.balance -= amount;
+    this.logTransaction("WITHDRAWAL", amount);
+    return \`✅ Withdrew $\${amount}. New balance: $\${this.balance}\`;
+  }
+
+  public getBalance(pin: string): string {
+    if (!this.validatePIN(pin)) {
+      return "❌ Invalid PIN";
+    }
+    return \`Current balance: $\${this.balance}\`;
+  }
+}
+
+// 💳 Child class - can access protected members
+class SavingsAccount extends BankAccount {
+  private interestRate: number;
+  private minimumBalance: number = 100;
+
+  constructor(customerName: string, initialBalance: number, interestRate: number = 0.02) {
+    super(customerName, "Savings", initialBalance);
+    this.interestRate = interestRate;
+  }
+
+  // ✅ CAN access protected properties and methods
+  public calculateInterest(): string {
+    // Can access this.balance (protected)
+    if (this.balance < this.minimumBalance) {
+      return "❌ Balance too low for interest calculation";
+    }
+
+    const interest = this.balance * this.interestRate;
+    this.balance += interest;
+    
+    // Can call logTransaction (protected method)
+    this.logTransaction("INTEREST", interest);
+    
+    return \`💰 Interest earned: $\${interest.toFixed(2)}. New balance: $\${this.balance}\`;
+  }
+
+  // Override withdraw to check minimum balance
+  public withdraw(amount: number, pin: string): string {
+    // ❌ CANNOT access this.pin or this.validatePIN (private)
+    // But we can call the parent's withdraw method
+    const result = super.withdraw(amount, pin);
+    
+    // Check if withdrawal was successful and we're below minimum
+    if (result.includes("✅") && this.balance < this.minimumBalance) {
+      const fee = 10;
+      this.balance -= fee;
+      this.logTransaction("MINIMUM_BALANCE_FEE", fee);
+      return result + \` Warning: $\${fee} minimum balance fee applied.\`;
+    }
+    
+    return result;
+  }
+
+  // CAN access protected transactionHistory
+  public getTransactionCount(): number {
+    return this.transactionHistory.length;
+  }
+
+  // ❌ This method would cause errors if uncommented:
+  // public getAccountDetails(): string {
+  //   return \`Account: \${this.accountNumber}\`; // ❌ Error: accountNumber is private
+  // }
+}
+
+// 💳 Another child class
+class CheckingAccount extends BankAccount {
+  private overdraftLimit: number;
+  private overdraftFee: number = 35;
+
+  constructor(customerName: string, initialBalance: number, overdraftLimit: number = 500) {
+    super(customerName, "Checking", initialBalance);
+    this.overdraftLimit = overdraftLimit;
+  }
+
+  // Override withdraw to allow overdraft
+  public withdraw(amount: number, pin: string): string {
+    // We need to implement our own PIN validation since validatePIN is private
+    // So we'll use the parent's withdraw first, then handle overdraft
+    const normalResult = super.withdraw(amount, pin);
+    
+    // If normal withdrawal failed due to insufficient funds, try overdraft
+    if (normalResult.includes("Insufficient funds")) {
+      const totalAvailable = this.balance + this.overdraftLimit;
+      
+      if (amount <= totalAvailable) {
+        // Manually handle the overdraft (this is a simplified example)
+        const overdraftAmount = amount - this.balance;
+        this.balance = -overdraftAmount;
+        this.balance -= this.overdraftFee;
+        
+        this.logTransaction("OVERDRAFT_WITHDRAWAL", amount);
+        this.logTransaction("OVERDRAFT_FEE", this.overdraftFee);
+        
+        return \`✅ Overdraft withdrawal: $\${amount}. Balance: $\${this.balance} (includes $\${this.overdraftFee} fee)\`;
+      }
+    }
+    
+    return normalResult;
+  }
+
+  public getOverdraftInfo(): string {
+    const availableOverdraft = this.balance < 0 ? 
+      this.overdraftLimit + this.balance : this.overdraftLimit;
+    return \`Overdraft limit: $\${this.overdraftLimit}, Available: $\${availableOverdraft}\`;
+  }
+}
+
+// 🚀 Let's test access modifiers in inheritance!
+console.log("=== Testing Access Modifiers in Inheritance ===");
+
+const savings = new SavingsAccount("Alice", 1000, 0.03);
+const checking = new CheckingAccount("Bob", 200, 300);
+
+console.log("\\n--- Savings Account ---");
+console.log(savings.deposit(500));
+console.log(savings.calculateInterest()); // Uses protected balance and logTransaction
+console.log("Transaction count:", savings.getTransactionCount()); // Uses protected transactionHistory
+
+console.log("\\n--- Checking Account ---");
+console.log(checking.deposit(100));
+console.log(checking.getOverdraftInfo());
+console.log(checking.withdraw(400, "1234")); // Will fail due to wrong PIN
+// In a real app, you'd need the actual PIN - this is just for demonstration
+
+console.log("\\n--- Public Properties Access ---");
+console.log("Savings customer:", savings.customerName); // ✅ Public property
+console.log("Checking customer:", checking.customerName); // ✅ Public property
+
+console.log("\\n--- What we CANNOT access ---");
+// console.log(savings.balance);         // ❌ Error: balance is protected
+// console.log(checking.accountNumber);  // ❌ Error: accountNumber is private
+// console.log(savings.pin);             // ❌ Error: pin is private
+
+console.log("\\n--- Polymorphism with access control ---");
+const accounts: BankAccount[] = [savings, checking];
+accounts.forEach((account, index) => {
+  console.log(\`Account \${index + 1}: \${account.customerName} (\${account.isActive ? 'Active' : 'Inactive'})\`);
+  // All accounts have the same public interface
+  console.log(account.deposit(50));
+});`}
+</InteractiveCodeBlock>
+
+**Key takeaways about access modifiers in inheritance:**
+
+1. **`private`** - Only the class that declares it can access it (not even child classes!)
+2. **`protected`** - The declaring class AND its children can access it
+3. **`public`** - Everyone can access it (default behavior)
+4. **Inheritance maintains encapsulation** - Children can't break their parent's privacy rules
+5. **Design intention** - Use access modifiers to communicate what's meant to be used by whom
+
+## Real-World Exercise: Content Management System
+
+Let's build a comprehensive CMS using inheritance:
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// 🎯 Building a Content Management System with Inheritance
+
+// 📄 Base content class
+abstract class Content {
+  protected id: string;
+  protected title: string;
+  protected author: string;
+  protected createdAt: Date;
+  protected updatedAt: Date;
+  protected published: boolean = false;
+  protected tags: string[] = [];
+
+  constructor(title: string, author: string) {
+    this.id = this.generateId();
+    this.title = title;
+    this.author = author;
+    this.createdAt = new Date();
+    this.updatedAt = new Date();
+  }
+
+  private generateId(): string {
+    return Math.random().toString(36).substr(2, 9);
+  }
+
+  // Abstract methods - children MUST implement
+  abstract getContentType(): string;
+  abstract getPreview(): string;
+  abstract getWordCount(): number;
+
+  // Concrete methods - available to all children
+  publish(): string {
+    if (this.published) {
+      return \`Content "\${this.title}" is already published\`;
+    }
+    this.published = true;
+    this.updatedAt = new Date();
+    return \`✅ Published: \${this.title}\`;
+  }
+
+  unpublish(): string {
+    if (!this.published) {
+      return \`Content "\${this.title}" is not published\`;
+    }
+    this.published = false;
+    this.updatedAt = new Date();
+    return \`❌ Unpublished: \${this.title}\`;
+  }
+
+  addTag(tag: string): void {
+    if (!this.tags.includes(tag)) {
+      this.tags.push(tag);
+      this.updatedAt = new Date();
+    }
+  }
+
+  removeTag(tag: string): void {
+    const index = this.tags.indexOf(tag);
+    if (index > -1) {
+      this.tags.splice(index, 1);
+      this.updatedAt = new Date();
+    }
+  }
+
+  getMetadata(): object {
+    return {
+      id: this.id,
+      title: this.title,
+      author: this.author,
+      type: this.getContentType(),
+      published: this.published,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      tags: this.tags,
+      wordCount: this.getWordCount()
+    };
+  }
+}
+
+// 📝 Article class - inherits from Content
+class Article extends Content {
+  private body: string;
+  private excerpt: string;
+  private readingTime: number;
+
+  constructor(title: string, author: string, body: string, excerpt?: string) {
+    super(title, author);
+    this.body = body;
+    this.excerpt = excerpt || this.generateExcerpt();
+    this.readingTime = this.calculateReadingTime();
+  }
+
+  // Implement abstract methods
+  getContentType(): string {
+    return "Article";
+  }
+
+  getPreview(): string {
+    return this.excerpt;
+  }
+
+  getWordCount(): number {
+    return this.body.split(/\\s+/).length;
+  }
+
+  // Article-specific methods
+  private generateExcerpt(): string {
+    return this.body.substring(0, 150) + "...";
+  }
+
+  private calculateReadingTime(): number {
+    // Average reading speed: 200 words per minute
+    return Math.ceil(this.getWordCount() / 200);
+  }
+
+  updateBody(newBody: string): void {
+    this.body = newBody;
+    this.excerpt = this.generateExcerpt();
+    this.readingTime = this.calculateReadingTime();
+    this.updatedAt = new Date();
+  }
+
+  getFullContent(): string {
+    return \`# \${this.title}\\n\\nBy: \${this.author}\\nReading time: \${this.readingTime} min\\n\\n\${this.body}\`;
+  }
+}
+
+// 🎥 Video class - also inherits from Content
+class Video extends Content {
+  private videoUrl: string;
+  private duration: number; // in seconds
+  private transcript: string;
+  private thumbnailUrl?: string;
+
+  constructor(title: string, author: string, videoUrl: string, duration: number, transcript: string = "") {
+    super(title, author);
+    this.videoUrl = videoUrl;
+    this.duration = duration;
+    this.transcript = transcript;
+  }
+
+  // Implement abstract methods
+  getContentType(): string {
+    return "Video";
+  }
+
+  getPreview(): string {
+    const minutes = Math.floor(this.duration / 60);
+    const seconds = this.duration % 60;
+    return \`Video: \${minutes}:\${seconds.toString().padStart(2, '0')} - \${this.title}\`;
+  }
+
+  getWordCount(): number {
+    return this.transcript ? this.transcript.split(/\\s+/).length : 0;
+  }
+
+  // Video-specific methods
+  setThumbnail(url: string): void {
+    this.thumbnailUrl = url;
+    this.updatedAt = new Date();
+  }
+
+  updateTranscript(transcript: string): void {
+    this.transcript = transcript;
+    this.updatedAt = new Date();
+  }
+
+  getDurationFormatted(): string {
+    const hours = Math.floor(this.duration / 3600);
+    const minutes = Math.floor((this.duration % 3600) / 60);
+    const seconds = this.duration % 60;
+    
+    if (hours > 0) {
+      return \`\${hours}:\${minutes.toString().padStart(2, '0')}:\${seconds.toString().padStart(2, '0')}\`;
+    }
+    return \`\${minutes}:\${seconds.toString().padStart(2, '0')}\`;
+  }
+
+  getVideoInfo(): object {
+    return {
+      ...this.getMetadata(),
+      videoUrl: this.videoUrl,
+      duration: this.getDurationFormatted(),
+      thumbnailUrl: this.thumbnailUrl,
+      hasTranscript: this.transcript.length > 0
+    };
+  }
+}
+
+// 📚 Tutorial class - inherits from Article but adds interactive elements
+class Tutorial extends Article {
+  private steps: TutorialStep[] = [];
+  private difficulty: 'beginner' | 'intermediate' | 'advanced' = 'beginner';
+  private prerequisites: string[] = [];
+
+  constructor(
+    title: string, 
+    author: string, 
+    body: string, 
+    difficulty: 'beginner' | 'intermediate' | 'advanced' = 'beginner'
+  ) {
+    super(title, author, body);
+    this.difficulty = difficulty;
+  }
+
+  // Override content type
+  getContentType(): string {
+    return "Tutorial";
+  }
+
+  // Tutorial-specific methods
+  addStep(stepTitle: string, stepContent: string, codeExample?: string): void {
+    const step: TutorialStep = {
+      id: this.steps.length + 1,
+      title: stepTitle,
+      content: stepContent,
+      codeExample: codeExample,
+      completed: false
+    };
+    this.steps.push(step);
+    this.updatedAt = new Date();
+  }
+
+  addPrerequisite(prerequisite: string): void {
+    if (!this.prerequisites.includes(prerequisite)) {
+      this.prerequisites.push(prerequisite);
+      this.updatedAt = new Date();
+    }
+  }
+
+  getProgress(): object {
+    const completedSteps = this.steps.filter(step => step.completed).length;
+    const totalSteps = this.steps.length;
+    const progressPercentage = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
+    
+    return {
+      completed: completedSteps,
+      total: totalSteps,
+      percentage: Math.round(progressPercentage)
+    };
+  }
+
+  completeStep(stepId: number): string {
+    const step = this.steps.find(s => s.id === stepId);
+    if (step) {
+      step.completed = true;
+      return \`✅ Step \${stepId} completed: \${step.title}\`;
+    }
+    return \`❌ Step \${stepId} not found\`;
+  }
+
+  getTutorialInfo(): object {
+    return {
+      ...this.getMetadata(),
+      difficulty: this.difficulty,
+      prerequisites: this.prerequisites,
+      steps: this.steps.length,
+      progress: this.getProgress()
+    };
+  }
+}
+
+// Supporting interface for tutorial steps
+interface TutorialStep {
+  id: number;
+  title: string;
+  content: string;
+  codeExample?: string;
+  completed: boolean;
+}
+
+// 🏗️ Content Management System
+class ContentManager {
+  private contents: Map<string, Content> = new Map();
+
+  addContent(content: Content): string {
+    const metadata = content.getMetadata() as any;
+    this.contents.set(metadata.id, content);
+    return \`➕ Added \${content.getContentType()}: \${metadata.title}\`;
+  }
+
+  removeContent(id: string): boolean {
+    return this.contents.delete(id);
+  }
+
+  getContent(id: string): Content | undefined {
+    return this.contents.get(id);
+  }
+
+  publishAll(): string[] {
+    const results: string[] = [];
+    this.contents.forEach(content => {
+      results.push(content.publish());
+    });
+    return results;
+  }
+
+  getContentsByType(type: string): Content[] {
+    return Array.from(this.contents.values())
+      .filter(content => content.getContentType() === type);
+  }
+
+  getContentsByAuthor(author: string): Content[] {
+    return Array.from(this.contents.values())
+      .filter(content => (content.getMetadata() as any).author === author);
+  }
+
+  getAllContentPreview(): string[] {
+    return Array.from(this.contents.values()).map(content => {
+      const meta = content.getMetadata() as any;
+      return \`\${content.getContentType()}: \${meta.title} by \${meta.author} (\${meta.published ? 'Published' : 'Draft'})\`;
+    });
+  }
+}
+
+// 🚀 Let's test our CMS!
+console.log("=== Content Management System Demo ===");
+
+const cms = new ContentManager();
+
+// Create different types of content
+const article = new Article(
+  "TypeScript Inheritance Guide",
+  "Alice Developer",
+  "Inheritance is one of the most powerful features in TypeScript. It allows you to create class hierarchies where child classes inherit properties and methods from their parent classes. This enables code reuse and creates logical relationships between related classes.",
+  "Learn how TypeScript inheritance works with practical examples."
+);
+
+const video = new Video(
+  "TypeScript Classes Tutorial",
+  "Bob Instructor",
+  "https://example.com/video/123",
+  1800, // 30 minutes
+  "Welcome to this comprehensive tutorial on TypeScript classes. Today we'll learn about inheritance, polymorphism, and advanced OOP concepts."
+);
+
+const tutorial = new Tutorial(
+  "Building a Task Manager with TypeScript",
+  "Carol Mentor",
+  "In this hands-on tutorial, you'll build a complete task management application using TypeScript classes, inheritance, and interfaces. We'll start with basic concepts and gradually build up to a full-featured application.",
+  "intermediate"
+);
+
+// Add content to CMS
+console.log(cms.addContent(article));
+console.log(cms.addContent(video));
+console.log(cms.addContent(tutorial));
+
+// Configure content
+article.addTag("typescript");
+article.addTag("programming");
+article.addTag("oop");
+
+video.setThumbnail("https://example.com/thumbs/video123.jpg");
+video.addTag("tutorial");
+video.addTag("video");
+
+tutorial.addPrerequisite("Basic TypeScript knowledge");
+tutorial.addPrerequisite("Understanding of classes");
+tutorial.addStep("Setup Project", "Create a new TypeScript project with proper configuration");
+tutorial.addStep("Define Base Classes", "Create the foundational task and project classes", "class Task { constructor(public title: string) {} }");
+tutorial.addStep("Implement Inheritance", "Extend base classes with specific task types");
+tutorial.addTag("hands-on");
+tutorial.addTag("project");
+
+// Publish some content
+console.log("\\n=== Publishing Content ===");
+console.log(article.publish());
+console.log(tutorial.publish());
+
+// Display content information
+console.log("\\n=== Content Overview ===");
+cms.getAllContentPreview().forEach(preview => console.log(preview));
+
+console.log("\\n=== Article Details ===");
+console.log(article.getMetadata());
+
+console.log("\\n=== Video Details ===");
+console.log(video.getVideoInfo());
+
+console.log("\\n=== Tutorial Progress ===");
+console.log(tutorial.getTutorialInfo());
+console.log(tutorial.completeStep(1));
+console.log("Updated progress:", tutorial.getProgress());
+
+console.log("\\n=== Content by Type ===");
+const articles = cms.getContentsByType("Article");
+const videos = cms.getContentsByType("Video");
+const tutorials = cms.getContentsByType("Tutorial");
+
+console.log(\`Articles: \${articles.length}\`);
+console.log(\`Videos: \${videos.length}\`);
+console.log(\`Tutorials: \${tutorials.length}\`);
+
+console.log("\\n=== Polymorphism in Action ===");
+// All content types can be treated the same way!
+const allContent = [article, video, tutorial];
+allContent.forEach(content => {
+  const meta = content.getMetadata() as any;
+  console.log(\`\${content.getContentType()}: "\${meta.title}" - \${content.getWordCount()} words\`);
+  console.log(\`Preview: \${content.getPreview()}\`);
+  console.log("---");
+});`}
+</InteractiveCodeBlock>
+
+## Key Takeaways
+
+1. **Inheritance creates "is-a" relationships** - A Dog IS an Animal
+2. **`super` keyword** - Call parent constructors and methods
+3. **Method overriding** - Replace parent behavior completely
+4. **Method enhancement** - Use parent method + add more functionality
+5. **Access modifiers** - Control what children can access
+6. **Polymorphism** - Treat different objects the same way
+7. **Abstract classes** - Define templates with some implementation
+8. **Multiple levels** - Classes can inherit from classes that inherit from other classes
+
+**Real-world benefits:**
+- **Code reuse** - Write common functionality once
+- **Maintainability** - Fix bugs in parent class, all children benefit  
+- **Logical structure** - Model real-world relationships
+- **Polymorphism** - Write flexible code that works with multiple types
+
+**What's Next?**
+
+You're now ready to explore:
+- **Abstract Classes** - Templates that force implementation
+- **Design Patterns** - Common solutions using inheritance
+- **Advanced OOP** - Mixins, decorators, and more
+
+Inheritance is the backbone of object-oriented design - master it and you'll write more organized, maintainable code!

@@ -11,6 +11,9 @@ import {
   Question,
 } from "@/types/quiz";
 import { MOODS } from "@/lib/moods";
+import { devMode } from "@/lib/services/envService";
+
+const debugMode = devMode();
 
 // Fisher-Yates shuffle algorithm for randomizing array order
 function shuffleArray<T>(array: T[]): T[] {
@@ -143,8 +146,9 @@ export function useQuiz({ slug, currentMoodId }: UseQuizProps) {
       );
 
       if (result.success) {
-        console.log("Quiz submitted successfully:", result);
-
+        if (debugMode) {
+          console.log("Quiz submitted successfully:", result);
+        }
         toast.success(
           "Quiz submitted successfully!",
           `Score: ${result.score.toPrecision(4)}% - ${

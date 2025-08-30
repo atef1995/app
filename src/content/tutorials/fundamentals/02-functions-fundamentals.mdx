@@ -18,15 +18,17 @@ Imagine you could create your own magic spells that you could cast whenever you 
 
 Functions are exactly like that, but for code. They're reusable blocks of code that perform specific tasks whenever you "call" them.
 
-```javascript
+<InteractiveCodeBlock>
+{`
 function greetUser(name) {
-  return `Hello, ${name}! Welcome to Vibed to Cracked!`;
+  return "Hello, " + name + "! Welcome to Vibed to Cracked!";
 }
 
 // Casting our "spell"! ✨
 let message = greetUser("Alex");
 console.log(message); // "Hello, Alex! Welcome to Vibed to Cracked!"
-```
+`}
+</InteractiveCodeBlock>
 
 **Pretty cool, right?** We wrote that greeting code once, but now we can greet anyone just by calling `greetUser("their name")`. No need to rewrite the greeting every time!
 
@@ -48,11 +50,13 @@ JavaScript gives us two main ways to create functions, and they each have their 
 
 This is the traditional way, and it comes with a superpower called "hoisting":
 
-```javascript
+<InteractiveCodeBlock>
+{`
 function calculateArea(width, height) {
   return width * height;
 }
-```
+`}
+</InteractiveCodeBlock>
 
 **What makes it special:**
 - You can use it **anywhere** in your code, even before you write it (thanks to hoisting!)
@@ -61,14 +65,16 @@ function calculateArea(width, height) {
 
 **Wait, what's this hoisting magic?** Check this out:
 
-```javascript
+<InteractiveCodeBlock>
+{`
 // This actually works! Even though the function is defined below
 console.log(sayHello("World")); // "Hello, World!"
 
 function sayHello(name) {
-  return `Hello, ${name}!`;
+  return "Hello, " + name + "!";
 }
-```
+`}
+</InteractiveCodeBlock>
 
 **Mind = blown?** JavaScript secretly moves all function declarations to the top of your code during execution. It's like JavaScript reads your whole program first and says "Oh, I see you have these functions available" before running anything.
 
@@ -76,11 +82,13 @@ function sayHello(name) {
 
 This is where we store a function inside a variable, like putting a recipe card in a labeled box:
 
-```javascript
+<InteractiveCodeBlock>
+{`
 const calculateArea = function(width, height) {
   return width * height;
 };
-```
+`}
+</InteractiveCodeBlock>
 
 **What makes it different:**
 - No hoisting magic - you must define it before using it
@@ -89,7 +97,8 @@ const calculateArea = function(width, height) {
 
 **Let me show you what I mean:**
 
-```javascript
+<InteractiveCodeBlock>
+{`
 // This breaks! Function expression isn't hoisted
 console.log(multiply(2, 3)); // ❌ Error: Cannot access 'multiply' before initialization
 
@@ -98,7 +107,8 @@ const multiply = function(a, b) {
 };
 
 console.log(multiply(2, 3)); // ✅ Now it works: 6
-```
+`}
+</InteractiveCodeBlock>
 
 **Here's my take:** Function declarations are like having a recipe permanently in your head - you can use them anytime. Function expressions are like writing a recipe on a note card - you need the note card in front of you to use it.
 
@@ -114,7 +124,8 @@ Think of it like this: parameters are the empty slots, arguments are what you pu
 
 ### Basic Parameters - Your Function's Wish List
 
-```javascript
+<InteractiveCodeBlock>
+{`
 function createProfile(name, age, city) {
   return {
     name: name,
@@ -133,7 +144,8 @@ console.log(profile);
 let anotherProfile = createProfile("Mike", 35, "Seattle");
 console.log(anotherProfile);
 // { name: "Mike", age: 35, city: "Seattle", isActive: true }
-```
+`}
+</InteractiveCodeBlock>
 
 **See the magic?** Same function, different results based on what we pass in. It's like having a template that gets customized each time you use it!
 
@@ -143,9 +155,10 @@ What happens if someone forgets to pass in all the ingredients to your recipe? W
 
 Default parameters are like having backup ingredients ready to go:
 
-```javascript
+<InteractiveCodeBlock>
+{`
 function greetUser(name = "Friend", timeOfDay = "day") {
-  return `Good ${timeOfDay}, ${name}!`;
+  return "Good " + timeOfDay + ", " + name + "!";
 }
 
 // Let's test different scenarios:
@@ -155,13 +168,14 @@ console.log(greetUser("Bob", "morning")); // "Good morning, Bob!" - used both ar
 
 // This is super practical:
 function orderCoffee(size = "medium", type = "regular") {
-  return `Here's your ${size} ${type} coffee!`;
+  return "Here's your " + size + " " + type + " coffee!";
 }
 
 console.log(orderCoffee()); // "Here's your medium regular coffee!"
 console.log(orderCoffee("large")); // "Here's your large regular coffee!"
 console.log(orderCoffee("small", "decaf")); // "Here's your small decaf coffee!"
-```
+`}
+</InteractiveCodeBlock>
 
 **This is brilliant because:** You can call the function with any number of arguments, and it'll fill in the blanks with sensible defaults. It's like having a smart barista who knows what you usually want!
 
@@ -171,7 +185,8 @@ Sometimes you don't know how many arguments someone will pass to your function. 
 
 The three dots (`...`) basically mean "gather up all the remaining arguments and put them in an array":
 
-```javascript
+<InteractiveCodeBlock>
+{`
 function calculateTotal(...numbers) {
   console.log("I received these numbers:", numbers); // This will be an array!
   
@@ -190,13 +205,14 @@ console.log(calculateTotal(100)); // 100 (array with one item)
 
 // Real-world example - a shopping cart:
 function addToCart(customerName, ...items) {
-  console.log(`${customerName} is buying: ${items.join(", ")}`);
-  return `Order confirmed for ${customerName}!`;
+  console.log(customerName + " is buying: " + items.join(", "));
+  return "Order confirmed for " + customerName + "!";
 }
 
 console.log(addToCart("Alice", "pizza", "soda", "cookies"));
 // "Alice is buying: pizza, soda, cookies"
-```
+`}
+</InteractiveCodeBlock>
 
 **Here's the brilliant part:** The `...numbers` parameter automatically becomes an array containing all the arguments passed in. So if someone calls `calculateTotal(1, 2, 3)`, then `numbers` becomes `[1, 2, 3]`. If they call it with no arguments, `numbers` becomes an empty array `[]`.
 
@@ -208,7 +224,8 @@ Remember our recipe analogy? Well, `return` is like the moment when you present 
 
 **Here's what's happening:** When a function hits a `return` statement, it immediately stops running and hands back whatever value comes after `return`. Think of it as the function's final answer.
 
-```javascript
+<InteractiveCodeBlock>
+{`
 function multiply(a, b) {
   return a * b; // "My answer is a times b"
 }
@@ -243,13 +260,15 @@ function checkAge(age) {
 console.log(checkAge(25)); // "You're an adult"
 console.log(checkAge(15)); // "You're a minor"
 console.log(checkAge(-5)); // "Age can't be negative!"
-```
+`}
+</InteractiveCodeBlock>
 
 **Here's something important:** Once a function hits `return`, it immediately stops. Any code after the `return` statement won't run - it's like the function just packed up and left!
 
 **But what if a function doesn't return anything?**
 
-```javascript
+<InteractiveCodeBlock>
+{`
 function justSayHi() {
   console.log("Hi there!");
   // No return statement
@@ -259,7 +278,8 @@ let result = justSayHi(); // Logs: "Hi there!"
 console.log("What did the function return?", result); // undefined
 
 // JavaScript's way of saying "The function didn't give me an answer"
-```
+`}
+</InteractiveCodeBlock>
 
 **So remember:** If your function doesn't explicitly return something, JavaScript assumes it returns `undefined`. It's like asking someone a question and they just walk away without answering!
 
@@ -271,7 +291,8 @@ Now let's see how functions solve actual problems you'll encounter when building
 
 You know how clubs have bouncers who check if you're allowed in? Functions can be like bouncers for your data - they check if information is valid before letting it into your app.
 
-```javascript
+<InteractiveCodeBlock>
+{`
 function validateEmail(email) {
   // First, let's check if they even provided an email
   if (!email) {
@@ -281,10 +302,10 @@ function validateEmail(email) {
   
   // A super basic email check - does it have @ and a dot?
   if (email.includes("@") && email.includes(".")) {
-    console.log(`${email} looks like a valid email!`);
+    console.log(email + " looks like a valid email!");
     return true;
   } else {
-    console.log(`${email} doesn't look like an email...`);
+    console.log(email + " doesn't look like an email...");
     return false;
   }
 }
@@ -322,7 +343,8 @@ if (emailOK && passwordOK) {
 console.log("--- Testing with bad email ---");
 validateEmail("not-an-email"); // Will fail the @ and . test
 validatePassword("123"); // Will fail the length test
-```
+`}
+</InteractiveCodeBlock>
 
 **See how functions make this cleaner?** Instead of writing all that validation logic over and over, we wrote it once and can reuse it anywhere. Plus, if we want to make the email validation smarter later, we only have to change it in one place!
 
@@ -330,26 +352,27 @@ validatePassword("123"); // Will fail the length test
 
 Ever been shopping online and seen those prices change when you apply a coupon code? That's functions doing math behind the scenes! Let's build our own shopping cart helpers:
 
-```javascript
+<InteractiveCodeBlock>
+{`
 function formatCurrency(amount, currency = "USD") {
   // .toFixed(2) ensures we always show 2 decimal places
-  return `${currency} $${amount.toFixed(2)}`;
+  return currency + " $" + amount.toFixed(2);
 }
 
 function calculateDiscount(price, discountPercent) {
-  console.log(`Calculating ${discountPercent}% off $${price}`);
+  console.log("Calculating " + discountPercent + "% off $" + price);
   
   const discountAmount = price * (discountPercent / 100);
-  console.log(`Discount amount: $${discountAmount}`);
+  console.log("Discount amount: $" + discountAmount);
   
   const finalPrice = price - discountAmount;
-  console.log(`Final price: $${finalPrice}`);
+  console.log("Final price: $" + finalPrice);
   
   return finalPrice;
 }
 
 function calculateTax(price, taxRate = 8.25) {
-  console.log(`Adding ${taxRate}% tax to $${price}`);
+  console.log("Adding " + taxRate + "% tax to $" + price);
   const tax = price * (taxRate / 100);
   return price + tax;
 }
@@ -361,18 +384,19 @@ const shirtPrice = 29.99;
 const couponDiscount = 15; // 15% off
 const localTaxRate = 7.5; // 7.5% tax
 
-console.log(`Original shirt price: ${formatCurrency(shirtPrice)}`);
+console.log("Original shirt price: " + formatCurrency(shirtPrice));
 
 // Apply the coupon
 const discountedPrice = calculateDiscount(shirtPrice, couponDiscount);
-console.log(`After coupon: ${formatCurrency(discountedPrice)}`);
+console.log("After coupon: " + formatCurrency(discountedPrice));
 
 // Add tax
 const finalPrice = calculateTax(discountedPrice, localTaxRate);
-console.log(`After tax: ${formatCurrency(finalPrice)}`);
+console.log("After tax: " + formatCurrency(finalPrice));
 
-console.log(`You saved: ${formatCurrency(shirtPrice - discountedPrice)} with that coupon!`);
-```
+console.log("You saved: " + formatCurrency(shirtPrice - discountedPrice) + " with that coupon!");
+`}
+</InteractiveCodeBlock>
 
 **This is real e-commerce logic!** Every time you shop online, functions like these are running to calculate your total, apply discounts, and add taxes. Notice how each function has one clear job - that makes the code easy to understand and debug.
 
@@ -380,16 +404,17 @@ console.log(`You saved: ${formatCurrency(shirtPrice - discountedPrice)} with tha
 
 These are like the Swiss Army knife of programming - small, handy functions you'll use over and over again. Once you write them, you'll wonder how you ever lived without them!
 
-```javascript
+<InteractiveCodeBlock>
+{`
 function getRandomNumber(min, max) {
   // Math.random() gives us a decimal between 0 and 1
   // We multiply by the range size and add the minimum
   const randomDecimal = Math.random();
-  console.log(`Random decimal: ${randomDecimal}`);
+  console.log("Random decimal: " + randomDecimal);
   
   const range = max - min + 1;
   const randomInRange = Math.floor(randomDecimal * range) + min;
-  console.log(`Random number between ${min}-${max}: ${randomInRange}`);
+  console.log("Random number between " + min + "-" + max + ": " + randomInRange);
   
   return randomInRange;
 }
@@ -397,30 +422,30 @@ function getRandomNumber(min, max) {
 function capitalizeFirstLetter(str) {
   if (!str) return str; // Handle empty strings gracefully
   
-  console.log(`Original string: "${str}"`);
+  console.log("Original string: \"" + str + "\"");
   const firstChar = str.charAt(0).toUpperCase(); // Get first character, make it uppercase
   const restOfString = str.slice(1); // Get everything from position 1 onwards
   const result = firstChar + restOfString;
-  console.log(`Capitalized: "${result}"`);
+  console.log("Capitalized: \"" + result + "\"");
   
   return result;
 }
 
 function isValidAge(age) {
-  console.log(`Checking if age ${age} is valid...`);
+  console.log("Checking if age " + age + " is valid...");
   const isValid = age >= 0 && age <= 150;
-  console.log(`Result: ${isValid ? "✅ Valid" : "❌ Invalid"}`);
+  console.log("Result: " + (isValid ? "✅ Valid" : "❌ Invalid"));
   return isValid;
 }
 
 function slugify(text) {
   // Convert text to URL-friendly format (like blog post titles)
-  console.log(`Converting "${text}" to URL slug...`);
+  console.log("Converting \"" + text + "\" to URL slug...");
   const slug = text
     .toLowerCase()
     .replace(/\s+/g, '-') // Replace spaces with dashes
     .replace(/[^\w-]/g, ''); // Remove special characters
-  console.log(`Result: "${slug}"`);
+  console.log("Result: \"" + slug + "\"");
   return slug;
 }
 
@@ -443,7 +468,8 @@ isValidAge(200);
 console.log("\n--- URL Slug Creation ---");
 slugify("My First Blog Post!");
 slugify("JavaScript Functions Are Amazing");
-```
+`}
+</InteractiveCodeBlock>
 
 **These functions solve common problems:** Random numbers for games, capitalizing user input, validating data, creating URL-friendly text. You'll be amazed how often you reach for functions like these!
 
@@ -451,7 +477,8 @@ slugify("JavaScript Functions Are Amazing");
 
 ### 1. Use Descriptive Names
 
-```javascript
+<InteractiveCodeBlock>
+{`
 // ❌ Bad
 function calc(x, y) {
   return x * y;
@@ -461,11 +488,13 @@ function calc(x, y) {
 function calculateRectangleArea(width, height) {
   return width * height;
 }
-```
+`}
+</InteractiveCodeBlock>
 
 ### 2. Keep Functions Small and Focused
 
-```javascript
+<InteractiveCodeBlock>
+{`
 // ❌ Bad - does too many things
 function processUserData(userData) {
   // validate data
@@ -494,11 +523,13 @@ function saveUser(userData) {
   // database logic only
   console.log("Saving user:", userData);
 }
-```
+`}
+</InteractiveCodeBlock>
 
 ### 3. Handle Edge Cases
 
-```javascript
+<InteractiveCodeBlock>
+{`
 // ❌ Bad
 function divide(a, b) {
   return a / b;
@@ -514,7 +545,8 @@ function divide(a, b) {
   }
   return a / b;
 }
-```
+`}
+</InteractiveCodeBlock>
 
 ## Time to Build Your Function Arsenal! 💪
 
@@ -614,7 +646,8 @@ console.log("Pi rounded to 4 decimals:", roundToDecimals(3.14159, 4)); // should
 
 ### 1. Forgetting to Return
 
-```javascript
+<InteractiveCodeBlock>
+{`
 // ❌ Bad
 function addNumbers(a, b) {
   a + b; // Missing return!
@@ -628,29 +661,33 @@ function addNumbers(a, b) {
 }
 
 console.log(addNumbers(2, 3)); // 5
-```
+`}
+</InteractiveCodeBlock>
 
 ### 2. Not Handling Missing Parameters
 
-```javascript
+<InteractiveCodeBlock>
+{`
 // ❌ Bad
 function greet(firstName, lastName) {
-  return `Hello, ${firstName} ${lastName}!`;
+  return "Hello, " + firstName + " " + lastName + "!";
 }
 
 console.log(greet("John")); // "Hello, John undefined!"
 
 // ✅ Good
 function greet(firstName, lastName = "") {
-  return `Hello, ${firstName} ${lastName}!`.trim();
+  return ("Hello, " + firstName + " " + lastName + "!").trim();
 }
 
 console.log(greet("John")); // "Hello, John!"
-```
+`}
+</InteractiveCodeBlock>
 
 ### 3. Function Naming Issues
 
-```javascript
+<InteractiveCodeBlock>
+{`
 // ❌ Bad
 function func1() { /* ... */ }
 function doStuff() { /* ... */ }
@@ -660,7 +697,8 @@ function x() { /* ... */ }
 function calculateTotalPrice() { /* ... */ }
 function validateUserInput() { /* ... */ }
 function formatPhoneNumber() { /* ... */ }
-```
+`}
+</InteractiveCodeBlock>
 
 ## Key Takeaways
 
