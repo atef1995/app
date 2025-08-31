@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { executeJavaScriptSimple } from "@/lib/codeRunner";
+import {
+  executeJavaScriptSimple,
+  executeTypeScriptWithCompiler,
+} from "@/lib/codeRunner";
 import Editor from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 import { useTheme } from "@/components/providers/ThemeProvider";
@@ -82,9 +85,18 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
     try {
       const startTime = Date.now();
-      const executionResult = executeJavaScriptSimple(code);
-      const executionTime = Date.now() - startTime;
+      let executionResult;
 
+      if (language === "javascript") {
+        executionResult = executeJavaScriptSimple(code);
+      } else if (language === "typescript") {
+        // Use the official TypeScript compiler for better results
+        executionResult = await executeTypeScriptWithCompiler(code);
+      }
+      const executionTime = Date.now() - startTime;
+      if (!executionResult) {
+        return;
+      }
       setResult({
         output: executionResult.logs,
         errors: executionResult.errors,

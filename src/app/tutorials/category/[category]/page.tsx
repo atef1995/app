@@ -37,7 +37,7 @@ export default function CategoryPage() {
   // const { currentMood } = useMood(); // Removed unused variable
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [itemsPerPage, setItemsPerPage] = useState(6);
   const [navigatingToTutorial, setNavigatingToTutorial] = useState<
     string | null
   >(null);

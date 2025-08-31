@@ -1,0 +1,869 @@
+---
+title: "TypeScript Types - Your Complete Guide to Type Safety"
+description: "Master TypeScript's powerful type system! Learn primitive types, complex types, unions, generics, and advanced type patterns for bulletproof code"
+difficulty: 2
+estimatedTime: "40 minutes"
+prerequisites: ["typescript-oop"]
+category: "oop"
+---
+
+# TypeScript Types - Your Complete Guide to Type Safety
+
+Hey there! Ready to dive into what makes TypeScript absolutely incredible? 🚀 
+
+Think about this for a second: **What if your code could tell you exactly what's wrong BEFORE you even run it?** That's exactly what TypeScript types do - they're like having a super-smart coding buddy who catches your mistakes instantly.
+
+I remember when I first learned TypeScript types, I thought "this seems like extra work." But after my first week of catching bugs before they hit production? I was completely hooked. Let me show you why you will be too.
+
+## Wait, Why Should I Care About Types? 🤔
+
+Great question! Let's see the difference in action:
+
+**Without types (JavaScript):**
+```javascript
+function greetUser(user) {
+  return `Hello, ${user.name}!`;
+}
+
+greetUser("John"); // 💥 BOOM! Runtime error - strings don't have .name
+```
+
+**With types (TypeScript):**
+```typescript
+function greetUser(user: { name: string }) {
+  return `Hello, ${user.name}!`;
+}
+
+greetUser("John"); // ❌ TypeScript catches this IMMEDIATELY
+// Error: Argument of type 'string' is not assignable to parameter...
+```
+
+See that? TypeScript just saved you from a bug that could've crashed your app in production. That's the power we're talking about!
+
+## Let's Start Simple - Primitive Types
+
+Alright, let's get our hands dirty. The primitive types are like the basic building blocks - think of them as the fundamental ingredients in your coding kitchen.
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// Let's explore the basic types together!
+
+// 🔢 Numbers - integers, decimals, even negative numbers
+let userAge: number = 28;
+let productPrice: number = 29.99;
+let temperature: number = -5;
+
+console.log("User age:", userAge);
+console.log("Product price: $" + productPrice);
+console.log("Temperature:", temperature + "°C");
+
+// 📝 Strings - any text you can imagine
+let userName: string = "Sarah";
+let welcomeMessage: string = \`Welcome back, \${userName}!\`;
+let longText: string = \`This is a multi-line string
+that spans several lines
+and keeps all the formatting intact\`;
+
+console.log("\\n=== String Examples ===");
+console.log(welcomeMessage);
+console.log("Long text:", longText);
+
+// ✅/❌ Booleans - true or false, that's it!
+let isLoggedIn: boolean = true;
+let hasCompletedTutorial: boolean = false;
+let canAccessPremium: boolean = userAge >= 18;
+
+console.log("\\n=== Boolean Examples ===");
+console.log("Is logged in?", isLoggedIn);
+console.log("Completed tutorial?", hasCompletedTutorial);
+console.log("Can access premium?", canAccessPremium);`}
+</InteractiveCodeBlock>
+
+**What's happening here?** Notice how each variable has a `: type` annotation. This tells TypeScript exactly what kind of data we expect. Try changing `userAge` to a string like `"twenty-eight"` and see what happens!
+
+**Your turn!** Try this challenge in the code block above:
+1. Create a variable called `favoriteColor` with type `string`
+2. Create a variable called `luckyNumber` with type `number` 
+3. Create a boolean called `lovesTypeScript` (I bet it'll be true!)
+
+## Let's Talk About Arrays - Collections Made Easy
+
+Now, what if you need to store multiple values? That's where arrays come in. But here's the cool part - TypeScript makes sure ALL items in your array are the same type.
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// Arrays in TypeScript - keeping things organized!
+
+// 🎯 Array of numbers - notice the number[] syntax
+let scores: number[] = [85, 92, 78, 96, 88];
+let temperatures: Array<number> = [72, 75, 68, 82]; // Alternative syntax
+
+console.log("Test scores:", scores);
+console.log("Daily temperatures:", temperatures);
+console.log("Average score:", scores.reduce((a, b) => a + b) / scores.length);
+
+// 📚 Array of strings - perfect for lists of names, titles, etc.
+let studentNames: string[] = ["Alice", "Bob", "Charlie", "Diana"];
+let todoItems: Array<string> = ["Buy groceries", "Walk the dog", "Learn TypeScript"];
+
+console.log("\\n=== Students in Class ===");
+studentNames.forEach((name, index) => {
+  console.log(\`\${index + 1}. \${name}\`);
+});
+
+console.log("\\n=== Today's Todo List ===");
+todoItems.forEach(item => console.log("☐", item));
+
+// 🎭 Mixed types? Use union types (we'll cover this more later!)
+let mixedData: (string | number)[] = ["John", 25, "Engineer", 75000];
+console.log("\\n=== Mixed Data ===");
+console.log("Employee info:", mixedData);`}
+</InteractiveCodeBlock>
+
+**What just happened?** We created type-safe arrays! TypeScript ensures you can't accidentally add the wrong type of data. Try adding a string to the `scores` array and watch TypeScript complain.
+
+**Challenge time!** In the code above:
+1. Add your name to the `studentNames` array
+2. Create a new array called `hobbies` with your favorite hobbies
+3. Try adding a number to the `studentNames` array - what error do you get?
+
+## Objects - Where Things Get Really Interesting
+
+Objects are everywhere in JavaScript, and TypeScript makes them so much safer and more predictable. Let me show you how:
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// Let's build a user profile step by step
+
+// 🎯 Simple object typing - define the shape of your data
+let user: {
+  name: string;
+  age: number;
+  isActive: boolean;
+} = {
+  name: "Alex Chen",
+  age: 29,
+  isActive: true
+};
+
+console.log("User profile:", user);
+console.log(\`\${user.name} is \${user.age} years old\`);
+
+// 🏗️ But typing every object like this gets tedious...
+// That's why we use type aliases! Much cleaner:
+
+type Product = {
+  id: number;
+  name: string;
+  price: number;
+  inStock: boolean;
+  tags?: string[];  // The ? means this property is OPTIONAL
+};
+
+let laptop: Product = {
+  id: 1,
+  name: "MacBook Pro",
+  price: 1999,
+  inStock: true,
+  tags: ["electronics", "computers", "apple"]
+};
+
+let book: Product = {
+  id: 2,
+  name: "TypeScript Handbook",
+  price: 29.99,
+  inStock: true
+  // Notice: no tags property - that's fine because it's optional!
+};
+
+console.log("\\n=== Product Catalog ===");
+console.log("Laptop:", laptop.name, "- $" + laptop.price);
+console.log("Book:", book.name, "- $" + book.price);
+console.log("Laptop tags:", laptop.tags?.join(", ") || "No tags");
+
+// 🔒 Readonly properties - data that should never change
+type Config = {
+  readonly appName: string;
+  readonly version: string;
+  debugMode: boolean;  // This one can change
+};
+
+let appConfig: Config = {
+  appName: "My Awesome App",
+  version: "1.0.0",
+  debugMode: true
+};
+
+console.log("\\n=== App Configuration ===");
+console.log("App:", appConfig.appName, "v" + appConfig.version);
+console.log("Debug mode:", appConfig.debugMode ? "ON" : "OFF");
+
+// Try uncommenting this line - TypeScript will stop you!
+// appConfig.version = "2.0.0"; // ❌ Error: Cannot assign to 'version'`}
+</InteractiveCodeBlock>
+
+**What's the magic here?** Notice how we defined the exact "shape" that our objects must have. The `?` makes properties optional, and `readonly` prevents changes. This is like having a blueprint for your data!
+
+**Your mission:** In the code above:
+1. Create a new product (maybe a phone or a game)
+2. Try to change the `appConfig.version` - what happens?
+3. Add a new property to the `Product` type (maybe `category: string`)
+
+## Functions - Making Your Logic Bulletproof
+
+Functions are where TypeScript really shines. You get to specify exactly what goes in and what comes out. No more guessing!
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// Let's master function types together!
+
+// 🎯 Basic function typing - input types and return type
+function addNumbers(a: number, b: number): number {
+  return a + b;
+}
+
+// 🏹 Arrow functions work the same way
+const multiplyNumbers = (x: number, y: number): number => x * y;
+
+console.log("5 + 3 =", addNumbers(5, 3));
+console.log("4 × 7 =", multiplyNumbers(4, 7));
+
+// 🎨 Optional parameters - some inputs aren't always needed
+function createGreeting(name: string, title?: string, enthusiasm: number = 1): string {
+  let greeting = title ? \`Hello, \${title} \${name}\` : \`Hello, \${name}\`;
+  
+  // Add enthusiasm with exclamation marks!
+  greeting += "!".repeat(enthusiasm);
+  
+  return greeting;
+}
+
+console.log("\\n=== Personalized Greetings ===");
+console.log(createGreeting("Sarah"));
+console.log(createGreeting("John", "Dr."));
+console.log(createGreeting("Emma", "Ms.", 3));
+
+// 🔄 Functions that take other functions - this gets exciting!
+type MathOperation = (a: number, b: number) => number;
+
+function calculate(x: number, y: number, operation: MathOperation): number {
+  return operation(x, y);
+}
+
+// Let's create some operations
+const subtract: MathOperation = (a, b) => a - b;
+const divide: MathOperation = (a, b) => b !== 0 ? a / b : 0;
+const power: MathOperation = (a, b) => Math.pow(a, b);
+
+console.log("\\n=== Advanced Calculator ===");
+console.log("10 - 3 =", calculate(10, 3, subtract));
+console.log("15 ÷ 3 =", calculate(15, 3, divide));
+console.log("2^4 =", calculate(2, 4, power));
+
+// 🎪 Rest parameters - when you need flexibility
+function sumAll(...numbers: number[]): number {
+  return numbers.reduce((total, num) => total + num, 0);
+}
+
+console.log("\\n=== Flexible Addition ===");
+console.log("Sum of 1,2,3:", sumAll(1, 2, 3));
+console.log("Sum of 5,10,15,20:", sumAll(5, 10, 15, 20));
+
+// 🎭 Function overloads - same name, different signatures
+function formatValue(value: string): string;
+function formatValue(value: number): string;
+function formatValue(value: boolean): string;
+function formatValue(value: string | number | boolean): string {
+  if (typeof value === "string") {
+    return \`"\${value}"\`;
+  }
+  if (typeof value === "number") {
+    return value.toFixed(2);
+  }
+  return value ? "✅ Yes" : "❌ No";
+}
+
+console.log("\\n=== Smart Formatting ===");
+console.log("String:", formatValue("Hello World"));
+console.log("Number:", formatValue(3.14159));
+console.log("Boolean:", formatValue(true));`}
+</InteractiveCodeBlock>
+
+**This is where it gets fun!** See how TypeScript ensures you call functions with the right types? The `MathOperation` type is a blueprint for any function that takes two numbers and returns a number.
+
+**Time to code!** Try these challenges:
+1. Create a function called `calculateTip` that takes a bill amount and tip percentage
+2. Make the tip percentage optional with a default of 20%
+3. Create a new `MathOperation` function that finds the remainder (hint: use the `%` operator)
+
+## Union Types - When You Need Flexibility
+
+Sometimes your data can be one of several types. That's where union types come to the rescue!
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// Union types - the "this OR that" solution!
+
+// 🤝 Basic union types - combining multiple types
+type ID = string | number;
+type Status = "loading" | "success" | "error";
+
+let userId: ID = "user_123";
+let productId: ID = 456;
+let apiStatus: Status = "loading";
+
+console.log("User ID:", userId, "(type:", typeof userId + ")");
+console.log("Product ID:", productId, "(type:", typeof productId + ")");
+console.log("API Status:", apiStatus);
+
+// 🎭 Smart type checking - TypeScript knows which type you're using!
+function processId(id: ID): string {
+  if (typeof id === "string") {
+    // TypeScript knows id is a string here
+    return \`Processing string ID: \${id.toUpperCase()}\`;
+  } else {
+    // TypeScript knows id is a number here
+    return \`Processing numeric ID: #\${id.toString().padStart(4, '0')}\`;
+  }
+}
+
+console.log("\\n=== Smart ID Processing ===");
+console.log(processId("abc123"));
+console.log(processId(42));
+
+// 🎯 Literal types - super specific values only
+type Theme = "light" | "dark" | "auto";
+type Size = "small" | "medium" | "large" | "xl";
+
+function applyTheme(theme: Theme): string {
+  switch (theme) {
+    case "light":
+      return "☀️ Light theme activated";
+    case "dark":
+      return "🌙 Dark theme activated";
+    case "auto":
+      return "🔄 Auto theme enabled";
+    default:
+      // This should never happen - TypeScript ensures all cases are covered!
+      const exhaustiveCheck: never = theme;
+      return exhaustiveCheck;
+  }
+}
+
+console.log("\\n=== Theme System ===");
+console.log(applyTheme("dark"));
+console.log(applyTheme("light"));
+
+// 🏗️ Discriminated unions - the power combo!
+type LoadingState = {
+  status: "loading";
+  message: string;
+};
+
+type SuccessState = {
+  status: "success";
+  data: string[];
+  count: number;
+};
+
+type ErrorState = {
+  status: "error";
+  message: string;
+  code: number;
+};
+
+type ApiState = LoadingState | SuccessState | ErrorState;
+
+function handleApiResponse(state: ApiState): string {
+  // TypeScript uses the 'status' to know which properties exist!
+  switch (state.status) {
+    case "loading":
+      return \`⏳ \${state.message}\`;
+    
+    case "success":
+      return \`✅ Got \${state.count} items: \${state.data.join(", ")}\`;
+    
+    case "error":
+      return \`❌ Error \${state.code}: \${state.message}\`;
+  }
+}
+
+console.log("\\n=== API Response Handling ===");
+console.log(handleApiResponse({ status: "loading", message: "Fetching data..." }));
+console.log(handleApiResponse({ 
+  status: "success", 
+  data: ["item1", "item2", "item3"], 
+  count: 3 
+}));
+console.log(handleApiResponse({ 
+  status: "error", 
+  message: "Network timeout", 
+  code: 408 
+}));`}
+</InteractiveCodeBlock>
+
+**Mind blown yet?** Union types let you be flexible while staying type-safe. The discriminated union pattern is incredibly powerful - TypeScript knows exactly which properties are available based on the `status` field.
+
+**Challenge yourself:**
+1. Create a union type for different payment methods: "credit" | "debit" | "paypal" | "cash"
+2. Write a function that processes payments differently based on the method
+3. Try adding a new status to `ApiState` - what do you need to update?
+
+## Generics - The Ultimate Type Superpower
+
+Ready for the most powerful feature in TypeScript? Generics let you write code that works with ANY type while staying completely type-safe. It's like having a template that adapts to whatever you need!
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// Generics - write once, use with any type!
+
+// 🎭 Basic generic function - works with any type
+function getFirstItem<T>(items: T[]): T | undefined {
+  return items.length > 0 ? items[0] : undefined;
+}
+
+// Look how it adapts to different types automatically!
+let firstNumber = getFirstItem([10, 20, 30]);     // TypeScript knows this is number | undefined
+let firstName = getFirstItem(["Alice", "Bob"]);   // TypeScript knows this is string | undefined
+let firstBool = getFirstItem([true, false]);      // TypeScript knows this is boolean | undefined
+
+console.log("First number:", firstNumber);
+console.log("First name:", firstName);
+console.log("First boolean:", firstBool);
+
+// 🏗️ Generic classes - reusable data containers
+class DataStore<T> {
+  private items: T[] = [];
+  
+  add(item: T): void {
+    this.items.push(item);
+    console.log(\`Added: \${item}\`);
+  }
+  
+  getAll(): T[] {
+    return [...this.items]; // Return a copy for safety
+  }
+  
+  find(predicate: (item: T) => boolean): T | undefined {
+    return this.items.find(predicate);
+  }
+  
+  count(): number {
+    return this.items.length;
+  }
+}
+
+// Create type-specific data stores
+let numberStore = new DataStore<number>();
+let userStore = new DataStore<{name: string, age: number}>();
+
+console.log("\\n=== Number Store ===");
+numberStore.add(10);
+numberStore.add(25);
+numberStore.add(7);
+console.log("All numbers:", numberStore.getAll());
+console.log("Numbers > 10:", numberStore.find(n => n > 10));
+
+console.log("\\n=== User Store ===");
+userStore.add({name: "Alex", age: 25});
+userStore.add({name: "Sarah", age: 30});
+console.log("All users:", userStore.getAll());
+console.log("User over 28:", userStore.find(user => user.age > 28));
+
+// 🎯 Generic interfaces - flexible contracts
+interface ApiResponse<TData> {
+  success: boolean;
+  data?: TData;
+  error?: string;
+  timestamp: number;
+}
+
+// Now we can use it with different data types!
+let userResponse: ApiResponse<{id: number, name: string}> = {
+  success: true,
+  data: {id: 1, name: "John Doe"},
+  timestamp: Date.now()
+};
+
+let numbersResponse: ApiResponse<number[]> = {
+  success: true,
+  data: [1, 2, 3, 4, 5],
+  timestamp: Date.now()
+};
+
+console.log("\\n=== Generic API Responses ===");
+console.log("User response:", userResponse.data?.name);
+console.log("Numbers response count:", numbersResponse.data?.length);
+
+// 🔗 Generic constraints - "T must be this kind of thing"
+interface Identifiable {
+  id: number;
+}
+
+function updateRecord<T extends Identifiable>(record: T, updates: Partial<T>): T {
+  console.log(\`Updating record with ID: \${record.id}\`);
+  return { ...record, ...updates };
+}
+
+// This works because both have an 'id' property
+let user = { id: 1, name: "Alice", email: "alice@example.com" };
+let product = { id: 2, name: "Laptop", price: 999.99 };
+
+console.log("\\n=== Generic Updates ===");
+let updatedUser = updateRecord(user, { name: "Alice Smith" });
+let updatedProduct = updateRecord(product, { price: 899.99 });
+
+console.log("Updated user:", updatedUser);
+console.log("Updated product:", updatedProduct);`}
+</InteractiveCodeBlock>
+
+**This is where TypeScript becomes magical!** Generics let you write flexible, reusable code that's still completely type-safe. The `<T>` is like saying "I don't know what type this will be yet, but when you use it, TypeScript will figure it out."
+
+**Advanced challenge:**
+1. Create a generic `Pair<T, U>` type that holds two values of different types
+2. Write a generic function `swap<T, U>(pair: Pair<T, U>): Pair<U, T>` that swaps the values
+3. Use your `DataStore` class to store your favorite movies (as strings)
+
+## Utility Types - TypeScript's Built-in Helpers
+
+TypeScript comes with amazing utility types that solve common problems. Think of them as power tools in your TypeScript toolkit!
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// Utility types - TypeScript's built-in superpowers!
+
+// 🏗️ Let's start with a base type
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  age: number;
+  isActive: boolean;
+};
+
+// 🎯 Partial<T> - makes all properties optional (perfect for updates!)
+type UserUpdate = Partial<User>;
+
+function updateUser(id: number, updates: UserUpdate): string {
+  // We can update any combination of properties!
+  const updateFields = Object.keys(updates).join(", ");
+  return \`Updated user \${id}: \${updateFields}\`;
+}
+
+console.log("=== Partial Updates ===");
+console.log(updateUser(1, { name: "New Name" }));
+console.log(updateUser(2, { email: "new@email.com", age: 30 }));
+
+// 🎨 Pick<T, K> - selects only specific properties
+type UserProfile = Pick<User, "name" | "email">;
+type UserStats = Pick<User, "age" | "isActive">;
+
+let publicProfile: UserProfile = { 
+  name: "John Doe", 
+  email: "john@example.com" 
+};
+
+let userStats: UserStats = { 
+  age: 28, 
+  isActive: true 
+};
+
+console.log("\\n=== Picked Properties ===");
+console.log("Public profile:", publicProfile);
+console.log("User stats:", userStats);
+
+// 🚫 Omit<T, K> - excludes specific properties
+type CreateUser = Omit<User, "id">; // New users don't have IDs yet!
+type PublicUser = Omit<User, "email" | "age">; // Hide sensitive info
+
+let newUser: CreateUser = {
+  name: "Jane Smith",
+  email: "jane@example.com",
+  age: 25,
+  isActive: true
+};
+
+let publicInfo: PublicUser = {
+  id: 1,
+  name: "Jane Smith",
+  isActive: true
+};
+
+console.log("\\n=== Omitted Properties ===");
+console.log("New user (no ID yet):", newUser);
+console.log("Public info (no private data):", publicInfo);
+
+// 🔒 Required<T> - makes all properties required
+type Config = {
+  host?: string;
+  port?: number;
+  ssl?: boolean;
+};
+
+type RequiredConfig = Required<Config>;
+
+let defaultConfig: Config = { host: "localhost" }; // Some props missing - that's OK
+let productionConfig: RequiredConfig = {
+  host: "api.myapp.com",
+  port: 443,
+  ssl: true
+}; // All properties required!
+
+console.log("\\n=== Required vs Optional ===");
+console.log("Default config:", defaultConfig);
+console.log("Production config:", productionConfig);
+
+// 🎪 Record<K, T> - creates an object type with specific keys and values
+type UserRole = "admin" | "user" | "guest";
+type Permissions = Record<UserRole, string[]>;
+
+let rolePermissions: Permissions = {
+  admin: ["read", "write", "delete", "manage"],
+  user: ["read", "write"],
+  guest: ["read"]
+};
+
+console.log("\\n=== Role Permissions ===");
+Object.entries(rolePermissions).forEach(([role, perms]) => {
+  console.log(\`\${role}: \${perms.join(", ")}\`);
+});
+
+// 🔄 ReturnType<T> - gets the return type of a function
+function getUserData() {
+  return {
+    id: 1,
+    name: "Alice",
+    preferences: {
+      theme: "dark" as const,
+      notifications: true
+    }
+  };
+}
+
+type UserData = ReturnType<typeof getUserData>;
+// TypeScript automatically figures out this complex type!
+
+let userData: UserData = getUserData();
+console.log("\\n=== Inferred Return Type ===");
+console.log("User data:", userData);
+console.log("Theme preference:", userData.preferences.theme);`}
+</InteractiveCodeBlock>
+
+**These utility types are game-changers!** They save you from writing repetitive type definitions and help you transform types in powerful ways. `Partial` for updates, `Pick` for selecting fields, `Omit` for excluding them - it's like having a Swiss Army knife for types!
+
+**Master these utilities:**
+1. Create a `Product` type with id, name, price, category, and inStock
+2. Use `Pick` to create a `ProductSummary` with just name and price
+3. Use `Record` to create a type that maps product categories to arrays of products
+
+## Real-World Example - Building a Type-Safe Shopping Cart
+
+Let's put everything together with a practical example that you might actually build!
+
+<InteractiveCodeBlock editable={true} language="typescript">
+{`// 🛒 Real-world example: Type-safe shopping cart system
+
+// First, let's define our core types
+type Product = {
+  id: string;
+  name: string;
+  price: number;
+  category: "electronics" | "clothing" | "books" | "food";
+  inStock: boolean;
+};
+
+type CartItem = {
+  product: Product;
+  quantity: number;
+  addedAt: Date;
+};
+
+type Customer = {
+  id: string;
+  name: string;
+  email: string;
+  membershipLevel: "bronze" | "silver" | "gold";
+};
+
+// Generic shopping cart class - reusable and type-safe!
+class ShoppingCart<TCustomer extends Customer = Customer> {
+  private items: CartItem[] = [];
+  private customer: TCustomer | null = null;
+  
+  // Set the customer for this cart
+  setCustomer(customer: TCustomer): void {
+    this.customer = customer;
+    console.log(\`🛒 Cart assigned to \${customer.name} (\${customer.membershipLevel} member)\`);
+  }
+  
+  // Add products to cart with quantity
+  addItem(product: Product, quantity: number = 1): boolean {
+    if (!product.inStock) {
+      console.log(\`❌ \${product.name} is out of stock!\`);
+      return false;
+    }
+    
+    // Check if item already exists
+    const existingItem = this.items.find(item => item.product.id === product.id);
+    
+    if (existingItem) {
+      existingItem.quantity += quantity;
+      console.log(\`📦 Updated \${product.name} quantity to \${existingItem.quantity}\`);
+    } else {
+      this.items.push({
+        product,
+        quantity,
+        addedAt: new Date()
+      });
+      console.log(\`✅ Added \${quantity}x \${product.name} to cart\`);
+    }
+    
+    return true;
+  }
+  
+  // Remove items from cart
+  removeItem(productId: string): boolean {
+    const index = this.items.findIndex(item => item.product.id === productId);
+    
+    if (index !== -1) {
+      const removedItem = this.items.splice(index, 1)[0];
+      console.log(\`🗑️ Removed \${removedItem.product.name} from cart\`);
+      return true;
+    }
+    
+    console.log("❌ Item not found in cart");
+    return false;
+  }
+  
+  // Calculate total with membership discounts
+  getTotal(): { subtotal: number; discount: number; total: number } {
+    const subtotal = this.items.reduce((sum, item) => {
+      return sum + (item.product.price * item.quantity);
+    }, 0);
+    
+    // Apply membership discounts
+    let discountRate = 0;
+    if (this.customer) {
+      switch (this.customer.membershipLevel) {
+        case "bronze": discountRate = 0.05; break; // 5%
+        case "silver": discountRate = 0.10; break; // 10%
+        case "gold": discountRate = 0.15; break;   // 15%
+      }
+    }
+    
+    const discount = subtotal * discountRate;
+    const total = subtotal - discount;
+    
+    return { subtotal, discount, total };
+  }
+  
+  // Get cart summary
+  getSummary(): string {
+    if (this.items.length === 0) {
+      return "🛒 Your cart is empty";
+    }
+    
+    const { subtotal, discount, total } = this.getTotal();
+    const itemCount = this.items.reduce((sum, item) => sum + item.quantity, 0);
+    
+    let summary = \`🛒 Cart Summary (\${itemCount} items):\\n\`;
+    
+    this.items.forEach(item => {
+      const itemTotal = item.product.price * item.quantity;
+      summary += \`  • \${item.quantity}x \${item.product.name} - $\${itemTotal.toFixed(2)}\\n\`;
+    });
+    
+    summary += \`\\nSubtotal: $\${subtotal.toFixed(2)}\`;
+    
+    if (discount > 0) {
+      summary += \`\\nDiscount (\${this.customer?.membershipLevel}): -$\${discount.toFixed(2)}\`;
+    }
+    
+    summary += \`\\nTotal: $\${total.toFixed(2)}\`;
+    
+    return summary;
+  }
+}
+
+// Let's create some products
+const products: Product[] = [
+  { id: "1", name: "MacBook Pro", price: 1999, category: "electronics", inStock: true },
+  { id: "2", name: "TypeScript T-Shirt", price: 25, category: "clothing", inStock: true },
+  { id: "3", name: "Clean Code Book", price: 35, category: "books", inStock: true },
+  { id: "4", name: "Wireless Mouse", price: 45, category: "electronics", inStock: false },
+];
+
+// Create a customer
+const customer: Customer = {
+  id: "cust_001",
+  name: "Alex Johnson",
+  email: "alex@example.com",
+  membershipLevel: "gold"
+};
+
+// Let's test our shopping cart!
+console.log("🚀 Starting shopping cart demo...\\n");
+
+const cart = new ShoppingCart();
+cart.setCustomer(customer);
+
+console.log("\\n--- Adding items to cart ---");
+cart.addItem(products[0]); // MacBook Pro
+cart.addItem(products[1], 2); // 2x T-Shirt
+cart.addItem(products[2]); // Book
+cart.addItem(products[3]); // Out of stock mouse - should fail
+
+console.log("\\n--- Cart Summary ---");
+console.log(cart.getSummary());
+
+console.log("\\n--- Removing an item ---");
+cart.removeItem("2"); // Remove T-Shirt
+
+console.log("\\n--- Final Cart Summary ---");
+console.log(cart.getSummary());`}
+</InteractiveCodeBlock>
+
+**Wow! Look what we built!** This shopping cart uses almost every TypeScript feature we've learned:
+- **Generic classes** for flexibility
+- **Union types** for categories and membership levels
+- **Complex object types** for products and customers
+- **Array methods** with full type safety
+- **Type guards** and conditional logic
+
+**Your final challenge:** Enhance the shopping cart!
+1. Add a `applyPromoCode(code: string)` method that gives additional discounts
+2. Create a `VIPCustomer` type that extends `Customer` with a `joinDate` property
+3. Add a method to get items by category
+
+## What You've Mastered Today 🏆
+
+Congratulations! You've just learned TypeScript's entire type system. Here's what you can now do:
+
+### ✅ **Foundation Skills**
+- Use primitive types confidently (`string`, `number`, `boolean`)
+- Create type-safe arrays and objects
+- Write functions with proper parameter and return types
+- Leverage TypeScript's type inference
+
+### ✅ **Advanced Patterns**
+- Master union types for flexible yet safe code
+- Create discriminated unions for complex state management
+- Use literal types for precise value constraints
+- Build custom type guards for runtime safety
+
+### ✅ **Generic Programming**
+- Write reusable generic functions and classes
+- Create flexible interfaces with type parameters
+- Use constraints to limit generic types appropriately
+- Apply utility types for common transformations
+
+### ✅ **Professional Techniques**
+- Build type-safe APIs and data structures
+- Use branded types for domain-specific values
+- Implement proper error handling patterns
+- Create maintainable, self-documenting code
+
+## Your Next Steps 🚀
+
+You've built an incredibly solid foundation! Now you're ready for:
+
+1. **TypeScript Classes** - Apply your type knowledge to object-oriented programming
+2. **Interfaces** - Define contracts and implement them in your classes
+3. **Advanced OOP Patterns** - Use types in inheritance, polymorphism, and design patterns
+
+Remember: **TypeScript types aren't just about preventing errors** - they're about making your code more readable, maintainable, and enjoyable to work with. You're now equipped with one of the most powerful tools in modern web development!
+
+**Keep practicing, and happy coding!** 🎉
