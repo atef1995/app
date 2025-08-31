@@ -187,7 +187,7 @@ export function StudyPlanRoadmap({
               {/* Phase Header */}
               <button
                 onClick={() => togglePhase(phase.id)}
-                className="w-full p-6 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-xl transition-colors"
+                className="w-full p-6 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-xl transition-colors cursor-pointer"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -339,7 +339,7 @@ export function StudyPlanRoadmap({
                                     <button
                                       onClick={() => onStartStep(step.id)}
                                       disabled={navigatingStepId === step.id}
-                                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-colors flex items-center gap-1"
+                                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-colors flex items-center gap-1 cursor-pointer"
                                     >
                                       {navigatingStepId === step.id ? (
                                         <>
@@ -355,7 +355,7 @@ export function StudyPlanRoadmap({
                                     <button
                                       onClick={() => onViewStep(step.id)}
                                       disabled={navigatingStepId === step.id}
-                                      className="px-3 py-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-colors flex items-center gap-1"
+                                      className="px-3 py-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-colors flex items-center gap-1 cursor-pointer"
                                     >
                                       {navigatingStepId === step.id ? (
                                         <>
@@ -371,7 +371,7 @@ export function StudyPlanRoadmap({
                                     <button
                                       onClick={() => onViewStep(step.id)}
                                       disabled={navigatingStepId === step.id}
-                                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-colors flex items-center gap-1"
+                                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-colors flex items-center gap-1 cursor-pointer"
                                     >
                                       {navigatingStepId === step.id ? (
                                         <>

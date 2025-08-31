@@ -4,7 +4,7 @@ import { ProjectService, ProjectWithCount } from "@/lib/projectService";
 import { ProgressService, CompletionStatus } from "@/lib/progressService";
 import { getAllChallenges, ChallengeWithTests } from "@/lib/challengeService";
 import { SkillService } from "@/lib/services/skillService";
-import { Tutorial, Category, Quiz } from "@prisma/client";
+import { Tutorial, Category, Quiz, Skill } from "@prisma/client";
 
 // Types for tutorials with their relationships
 type TutorialWithCategory = Tutorial & {
@@ -131,6 +131,8 @@ export class StudyPlanService {
     challenges: ChallengeWithTests[],
     projects: ProjectWithCount[]
   ): Promise<DynamicStudyPlanPhase[]> {
+    // Pre-fetch all skills once to avoid multiple database queries
+    const allSkills = await SkillService.getAllSkills();
     // Phase 0: HTML Foundations (prerequisite for JavaScript)
     const htmlPhase = await this.buildPhase(
       "html-foundations",
@@ -143,7 +145,8 @@ export class StudyPlanService {
       tutorials,
       challenges,
       projects,
-      ["html", "elements", "structure", "semantic", "forms"]
+      ["html", "elements", "structure", "semantic", "forms"],
+      allSkills
     );
 
     // Phase 1:
@@ -158,7 +161,8 @@ export class StudyPlanService {
       tutorials,
       challenges,
       projects,
-      ["css"]
+      ["css"],
+      allSkills
     );
 
     // Phase 2: JavaScript Fundamentals
@@ -173,7 +177,8 @@ export class StudyPlanService {
       tutorials,
       challenges,
       projects,
-      ["variables", "functions", "arrays", "objects", "control"]
+      ["variables", "functions", "arrays", "objects", "control"],
+      allSkills
     );
 
     // Phase 3: DOM & Interactivity
@@ -188,7 +193,8 @@ export class StudyPlanService {
       tutorials,
       challenges,
       projects,
-      ["dom", "event", "interactive"]
+      ["dom", "event", "interactive"],
+      allSkills
     );
 
     // Phase 4: Object-Oriented Programming
@@ -203,7 +209,8 @@ export class StudyPlanService {
       tutorials,
       challenges,
       projects,
-      ["class", "object", "inheritance", "encapsulation"]
+      ["class", "object", "inheritance", "encapsulation"],
+      allSkills
     );
 
     // Phase 5: Asynchronous Programming
@@ -218,7 +225,8 @@ export class StudyPlanService {
       tutorials,
       challenges,
       projects,
-      ["async", "promise", "api", "fetch"]
+      ["async", "promise", "api", "fetch"],
+      allSkills
     );
 
     // Phase 6: Advanced Concepts
@@ -233,7 +241,8 @@ export class StudyPlanService {
       tutorials,
       challenges,
       projects,
-      ["advanced", "pattern", "performance", "testing"]
+      ["advanced", "pattern", "performance", "testing"],
+      allSkills
     );
 
     // Phase 7: Data Structures & Algorithms
@@ -248,7 +257,8 @@ export class StudyPlanService {
       tutorials,
       challenges,
       projects,
-      ["algorithm", "data", "structure", "sorting", "search"]
+      ["algorithm", "data", "structure", "sorting", "search"],
+      allSkills
     );
 
     return [
@@ -277,10 +287,34 @@ export class StudyPlanService {
     tutorials: TutorialWithCategory[],
     challenges: ChallengeWithTests[],
     projects: ProjectWithCount[],
-    keywords: string[]
+    keywords: string[],
+    allSkills: Skill[] // Pre-fetched skills to avoid multiple DB queries
   ): Promise<DynamicStudyPlanPhase> {
     const steps: DynamicStudyPlanStep[] = [];
     let order = 1;
+
+    // Local function to extract skills without DB calls
+    const extractSkillsFromContent = (title: string, description: string | null, category: string): string[] => {
+      const categorySkills = allSkills.filter(skill => skill.category === category);
+      const text = `${title} ${description || ""}`.toLowerCase();
+      const matchedSkills: string[] = [];
+
+      for (const skill of categorySkills) {
+        // Check if any of the skill's keywords match the content
+        const keywordMatch = skill.keywords.some((keyword: string) => 
+          text.includes(keyword.toLowerCase())
+        );
+        
+        // Also check if the skill name itself is mentioned
+        const nameMatch = text.includes(skill.name.toLowerCase());
+
+        if (keywordMatch || nameMatch) {
+          matchedSkills.push(skill.name);
+        }
+      }
+
+      return matchedSkills;
+    };
 
     // Filter content by category first (strict category matching)
     const phaseTutorials = tutorials
@@ -340,7 +374,7 @@ export class StudyPlanService {
         difficulty: this.mapDifficulty(tutorial.difficulty),
         category: tutorial.category.slug,
         prerequisites: order === 1 ? [] : [steps[steps.length - 1]?.id],
-        skills: await SkillService.extractSkillsFromContent(
+        skills: extractSkillsFromContent(
           tutorial.title,
           tutorial.description,
           tutorial.category.slug
@@ -364,7 +398,7 @@ export class StudyPlanService {
           difficulty: this.mapDifficulty(tutorial.difficulty),
           category: tutorial.category.slug,
           prerequisites: [`tutorial-${tutorial.slug}`],
-          skills: await SkillService.extractSkillsFromContent(
+          skills: extractSkillsFromContent(
             tutorial.title,
             tutorial.description,
             tutorial.category.slug
@@ -394,7 +428,7 @@ export class StudyPlanService {
           | "advanced",
         category: category,
         prerequisites: steps.length > 0 ? [steps[steps.length - 1]?.id] : [],
-        skills: await SkillService.extractSkillsFromContent(
+        skills: extractSkillsFromContent(
           challenge.title,
           challenge.description,
           category
@@ -407,8 +441,7 @@ export class StudyPlanService {
     }
 
     // Phase projects (separate from steps)
-    const phaseProjectSteps = await Promise.all(
-      phaseProjects.slice(0, 2).map(async (project, index) => ({
+    const phaseProjectSteps = phaseProjects.slice(0, 2).map((project, index) => ({
         id: `project-${project.slug}`,
         title: project.title,
         description: project.description || "",
@@ -419,7 +452,7 @@ export class StudyPlanService {
         difficulty: this.mapDifficulty(project.difficulty || 1),
         category: project.category || category,
         prerequisites: steps.length > 0 ? [steps[steps.length - 1]?.id] : [],
-        skills: await SkillService.extractSkillsFromContent(
+        skills: extractSkillsFromContent(
           project.title,
           project.description || "",
           project.category || category
@@ -428,8 +461,7 @@ export class StudyPlanService {
         order: index + 1,
         isPremium: project.isPremium || false,
         requiredPlan: project.requiredPlan || "FREE",
-      }))
-    );
+    }));
 
     return {
       id,
