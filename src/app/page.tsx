@@ -167,7 +167,7 @@ export default function HomePage() {
                 Start Learning
               </Link>
             </motion.div>
-            <motion.button
+            {/* <motion.button
               onClick={() => {
                 // Scroll to mood selection section
                 document.querySelector("#mood-selection")?.scrollIntoView({
@@ -179,7 +179,7 @@ export default function HomePage() {
               whileTap={{ scale: 0.95 }}
             >
               Watch Demo
-            </motion.button>
+            </motion.button> */}
           </motion.div>
         </motion.div>
 
@@ -427,9 +427,9 @@ export default function HomePage() {
               },
               {
                 icon: Video,
-                title: "Video Explanations",
+                title: "Interactive Challenges",
                 description:
-                  "Creator-made videos that explain concepts in a personal way",
+                  "Hands-on coding challenges that test your skills in real-time",
               },
               {
                 icon: Smartphone,
