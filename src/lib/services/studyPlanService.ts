@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { TutorialService } from "@/lib/tutorialService";
 import { ProjectService, ProjectWithCount } from "@/lib/projectService";
-import { ProgressService } from "@/lib/progressService";
+import { ProgressService, CompletionStatus } from "@/lib/progressService";
 import { getAllChallenges, ChallengeWithTests } from "@/lib/challengeService";
 import { SkillService } from "@/lib/services/skillService";
 import { Tutorial, Category, Quiz } from "@prisma/client";
@@ -542,16 +542,30 @@ export class StudyPlanService {
         ]);
 
       // Map existing progress to study plan steps
-      const completedSteps: string[] = [];
+      // Start with existing completed steps from UserStudyProgress
+      const completedSteps: string[] = [...studyPlan.phases.reduce((steps: string[], phase) => {
+        return [...steps, ...phase.steps.map(s => s.id), ...phase.projects.map(p => p.id)];
+      }, [])].filter(stepId => {
+        // Keep only steps that exist in UserStudyProgress (already synced)
+        return false; // For now, rebuild from individual progress
+      });
 
       // Check completed tutorials
       if (Array.isArray(tutorialProgress)) {
         for (const progress of tutorialProgress) {
-          if (progress.status === "COMPLETED") {
+          // Check for both COMPLETED status and successful quiz completion
+          const isCompleted = progress.status === "COMPLETED" || 
+                            progress.status === CompletionStatus.COMPLETED;
+          const isQuizPassed = progress.quizPassed === true;
+          
+          if (isCompleted || isQuizPassed) {
             const stepId = `tutorial-${progress.tutorial.slug}`;
-            if (
-              studyPlan.phases.some((p) => p.steps.some((s) => s.id === stepId))
-            ) {
+            
+            const stepExists = studyPlan.phases.some((p) => 
+              p.steps.some((s) => s.id === stepId)
+            );
+            
+            if (stepExists && !completedSteps.includes(stepId)) {
               completedSteps.push(stepId);
             }
           }
@@ -643,7 +657,11 @@ export class StudyPlanService {
           },
         },
         update: {
-          ...progressData,
+          currentPhaseId,
+          currentStepId,
+          completedSteps,
+          completedPhases: [],
+          totalProgressPercentage: progressData.totalProgressPercentage,
           lastActivityAt: new Date(),
         },
         create: {

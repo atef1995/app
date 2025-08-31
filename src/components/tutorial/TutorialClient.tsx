@@ -6,9 +6,10 @@ import { useTutorial } from "@/hooks/useTutorial";
 import { useTutorialNavigation } from "@/hooks/useTutorialNavigation";
 import { useSubscription, checkContentAccess } from "@/hooks/useSubscription";
 import { useTutorialStart } from "@/hooks/useTutorialStart";
+import { useTutorialCompletion } from "@/hooks/useTutorialCompletion";
 import { useProgressiveLoading } from "@/hooks/useProgressiveLoading";
 import getMoodColors from "@/lib/getMoodColors";
-import TutorialLoading from "./loading";
+import TutorialLoading from "../../app/tutorials/category/[category]/[slug]/loading";
 
 // Import new components
 import TutorialHeader from "@/components/tutorial/TutorialHeader";
@@ -54,6 +55,12 @@ export default function TutorialClient({
     canAccess: accessCheck.canAccess,
   });
 
+  // Track tutorial completion when user finishes reading
+  const { hasCompletedReading, isCompleting } = useTutorialCompletion({
+    tutorialId: tutorial?.id,
+    canAccess: accessCheck.canAccess,
+  });
+
   // Progressive content loading
   useProgressiveLoading({
     mdxSource: tutorial?.mdxSource,
@@ -61,7 +68,6 @@ export default function TutorialClient({
   });
 
   const moodColors = getMoodColors(currentMood.id);
-
 
   // Handle loading state
   if (isLoading) {

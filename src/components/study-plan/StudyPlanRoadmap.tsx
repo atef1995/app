@@ -1,15 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import { DynamicStudyPlan, DynamicStudyPlanPhase, DynamicStudyPlanStep } from "@/lib/services/studyPlanService";
-import { 
-  Clock, 
-  CheckCircle2, 
-  Circle, 
-  Lock, 
-  Play, 
-  BookOpen, 
-  Code, 
+import {
+  DynamicStudyPlan,
+  DynamicStudyPlanPhase,
+  DynamicStudyPlanStep,
+} from "@/lib/services/studyPlanService";
+import {
+  Clock,
+  CheckCircle2,
+  Circle,
+  Lock,
+  Play,
+  BookOpen,
+  Code,
   Trophy,
   Target,
   ChevronDown,
@@ -22,8 +26,9 @@ import {
   Building,
   Zap,
   Flame,
-  Database
+  Database,
 } from "lucide-react";
+import { devMode } from "@/lib/services/envService";
 
 interface StudyPlanRoadmapProps {
   studyPlan: DynamicStudyPlan;
@@ -37,40 +42,50 @@ interface StudyPlanRoadmapProps {
 // Map icon names to Lucide components
 const getPhaseIcon = (iconName: string) => {
   const iconMap = {
-    'Globe': Globe,
-    'Palette': Palette,
-    'Sprout': Sprout,
-    'MousePointer': MousePointer,
-    'Building': Building,
-    'Zap': Zap,
-    'Flame': Flame,
-    'Database': Database,
+    Globe: Globe,
+    Palette: Palette,
+    Sprout: Sprout,
+    MousePointer: MousePointer,
+    Building: Building,
+    Zap: Zap,
+    Flame: Flame,
+    Database: Database,
   };
-  
+
   const IconComponent = iconMap[iconName as keyof typeof iconMap] || Circle;
   return <IconComponent className="w-6 h-6" />;
 };
 
-export function StudyPlanRoadmap({ 
-  studyPlan, 
-  completedSteps, 
+export function StudyPlanRoadmap({
+  studyPlan,
+  completedSteps,
   currentStepId,
   onStartStep,
   onViewStep,
-  navigatingStepId
+  navigatingStepId,
 }: StudyPlanRoadmapProps) {
   const [expandedPhases, setExpandedPhases] = useState<string[]>([]);
 
   const togglePhase = (phaseId: string) => {
-    setExpandedPhases(prev =>
+    setExpandedPhases((prev) =>
       prev.includes(phaseId)
-        ? prev.filter(id => id !== phaseId)
+        ? prev.filter((id) => id !== phaseId)
         : [...prev, phaseId]
     );
   };
-
+  if (devMode()) {
+    console.log("🗺️ StudyPlanRoadmap Debug:", {
+      totalSteps: studyPlan.phases.reduce(
+        (sum, p) => sum + p.steps.length + p.projects.length,
+        0
+      ),
+      completedCount: completedSteps.length,
+    });
+  }
   const isStepAvailable = (step: DynamicStudyPlanStep): boolean => {
-    return step.prerequisites.every(prereq => completedSteps.includes(prereq));
+    return step.prerequisites.every((prereq) =>
+      completedSteps.includes(prereq)
+    );
   };
 
   const getStepIcon = (step: DynamicStudyPlanStep) => {
@@ -102,7 +117,7 @@ export function StudyPlanRoadmap({
 
   const getStepStatusIcon = (step: DynamicStudyPlanStep) => {
     const status = getStepStatus(step);
-    
+
     switch (status) {
       case "completed":
         return <CheckCircle2 className="w-5 h-5 text-green-500" />;
@@ -119,19 +134,23 @@ export function StudyPlanRoadmap({
 
   const getPhaseProgress = (phase: DynamicStudyPlanPhase) => {
     const allPhaseSteps = [...phase.steps, ...phase.projects];
-    const completedInPhase = allPhaseSteps.filter(step => completedSteps.includes(step.id)).length;
-    return allPhaseSteps.length > 0 ? (completedInPhase / allPhaseSteps.length) * 100 : 0;
+    const completedInPhase = allPhaseSteps.filter((step) =>
+      completedSteps.includes(step.id)
+    ).length;
+    return allPhaseSteps.length > 0
+      ? (completedInPhase / allPhaseSteps.length) * 100
+      : 0;
   };
 
   // Auto-expand current phase
   React.useEffect(() => {
-    const currentPhase = studyPlan.phases.find(phase =>
-      phase.steps.some(step => step.id === currentStepId)
+    const currentPhase = studyPlan.phases.find((phase) =>
+      phase.steps.some((step) => step.id === currentStepId)
     );
     if (currentPhase && !expandedPhases.includes(currentPhase.id)) {
-      setExpandedPhases(prev => [...prev, currentPhase.id]);
+      setExpandedPhases((prev) => [...prev, currentPhase.id]);
     }
-  }, [currentStepId, studyPlan.phases, expandedPhases]);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -140,7 +159,8 @@ export function StudyPlanRoadmap({
           Learning Roadmap
         </h2>
         <div className="text-sm text-gray-600 dark:text-gray-400">
-          {studyPlan.phases.length} phases • {studyPlan.totalWeeks} weeks • {studyPlan.totalHours} hours
+          {studyPlan.phases.length} phases • {studyPlan.totalWeeks} weeks •{" "}
+          {studyPlan.totalHours} hours
         </div>
       </div>
 
@@ -149,8 +169,10 @@ export function StudyPlanRoadmap({
           const isExpanded = expandedPhases.includes(phase.id);
           const progress = getPhaseProgress(phase);
           const isPhaseCompleted = progress === 100;
-          const hasStepsInProgress = phase.steps.some(step => 
-            getStepStatus(step) === "current" || getStepStatus(step) === "available"
+          const hasStepsInProgress = phase.steps.some(
+            (step) =>
+              getStepStatus(step) === "current" ||
+              getStepStatus(step) === "available"
           );
 
           return (
@@ -169,7 +191,9 @@ export function StudyPlanRoadmap({
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${phase.color} flex items-center justify-center text-white`}>
+                    <div
+                      className={`w-12 h-12 rounded-xl bg-gradient-to-r ${phase.color} flex items-center justify-center text-white`}
+                    >
                       {getPhaseIcon(phase.icon)}
                     </div>
                     <div>
@@ -181,8 +205,16 @@ export function StudyPlanRoadmap({
                       </p>
                       <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
                         <span>{phase.estimatedWeeks} weeks</span>
-                        <span>{phase.steps.length + phase.projects.length} items</span>
-                        <span>{[...phase.steps, ...phase.projects].reduce((sum, step) => sum + step.estimatedHours, 0)} hours</span>
+                        <span>
+                          {phase.steps.length + phase.projects.length} items
+                        </span>
+                        <span>
+                          {[...phase.steps, ...phase.projects].reduce(
+                            (sum, step) => sum + step.estimatedHours,
+                            0
+                          )}{" "}
+                          hours
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -192,7 +224,12 @@ export function StudyPlanRoadmap({
                         {Math.round(progress)}%
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">
-                        {[...phase.steps, ...phase.projects].filter(s => completedSteps.includes(s.id)).length} / {phase.steps.length + phase.projects.length}
+                        {
+                          [...phase.steps, ...phase.projects].filter((s) =>
+                            completedSteps.includes(s.id)
+                          ).length
+                        }{" "}
+                        / {phase.steps.length + phase.projects.length}
                       </div>
                     </div>
                     {isExpanded ? (
@@ -218,128 +255,141 @@ export function StudyPlanRoadmap({
               {isExpanded && (
                 <div className="px-6 pb-6">
                   <div className="space-y-3">
-                    {[...phase.steps, ...phase.projects].map((step, stepIndex) => {
-                      const status = getStepStatus(step);
-                      const isLast = stepIndex === phase.steps.length + phase.projects.length - 1;
+                    {[...phase.steps, ...phase.projects].map(
+                      (step, stepIndex) => {
+                        const status = getStepStatus(step);
+                        const isLast =
+                          stepIndex ===
+                          phase.steps.length + phase.projects.length - 1;
 
-                      return (
-                        <div key={step.id} className="flex items-start gap-4">
-                          {/* Connection Line */}
-                          <div className="flex flex-col items-center">
-                            {getStepStatusIcon(step)}
-                            {!isLast && (
-                              <div className="w-px h-8 bg-gray-200 dark:bg-gray-700 mt-2" />
-                            )}
-                          </div>
+                        return (
+                          <div key={step.id} className="flex items-start gap-4">
+                            {/* Connection Line */}
+                            <div className="flex flex-col items-center">
+                              {getStepStatusIcon(step)}
+                              {!isLast && (
+                                <div className="w-px h-8 bg-gray-200 dark:bg-gray-700 mt-2" />
+                              )}
+                            </div>
 
-                          {/* Step Content */}
-                          <div className={`flex-1 p-4 rounded-lg border transition-all ${
-                            status === "current"
-                              ? "border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20"
-                              : status === "available"
-                              ? "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30 hover:bg-gray-100 dark:hover:bg-gray-700/50"
-                              : status === "completed"
-                              ? "border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20"
-                              : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 opacity-60"
-                          }`}>
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  {getStepIcon(step)}
-                                  <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                                    {step.title}
-                                  </h4>
-                                  <span className={`px-2 py-1 rounded text-xs ${
-                                    step.type === "tutorial"
-                                      ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-                                      : step.type === "challenge"
-                                      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
-                                      : step.type === "quiz"
-                                      ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
-                                      : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300"
-                                  }`}>
-                                    {step.type}
-                                  </span>
+                            {/* Step Content */}
+                            <div
+                              className={`flex-1 p-4 rounded-lg border transition-all ${
+                                status === "current"
+                                  ? "border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20"
+                                  : status === "available"
+                                  ? "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30 hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                                  : status === "completed"
+                                  ? "border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20"
+                                  : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 opacity-60"
+                              }`}
+                            >
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    {getStepIcon(step)}
+                                    <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                                      {step.title}
+                                    </h4>
+                                    <span
+                                      className={`px-2 py-1 rounded text-xs ${
+                                        step.type === "tutorial"
+                                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                                          : step.type === "challenge"
+                                          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                                          : step.type === "quiz"
+                                          ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+                                          : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300"
+                                      }`}
+                                    >
+                                      {step.type}
+                                    </span>
+                                  </div>
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                    {step.description}
+                                  </p>
+                                  <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                                    <span className="flex items-center gap-1">
+                                      <Clock className="w-3 h-3" />
+                                      {step.estimatedHours}h
+                                    </span>
+                                    <span
+                                      className={`px-2 py-1 rounded-full ${
+                                        step.difficulty === "beginner"
+                                          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                                          : step.difficulty === "intermediate"
+                                          ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300"
+                                          : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                                      }`}
+                                    >
+                                      {step.difficulty}
+                                    </span>
+                                    {step.skills.length > 0 && (
+                                      <span>
+                                        Skills:{" "}
+                                        {step.skills.slice(0, 2).join(", ")}
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                  {step.description}
-                                </p>
-                                <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                                  <span className="flex items-center gap-1">
-                                    <Clock className="w-3 h-3" />
-                                    {step.estimatedHours}h
-                                  </span>
-                                  <span className={`px-2 py-1 rounded-full ${
-                                    step.difficulty === 'beginner' 
-                                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                                      : step.difficulty === 'intermediate'
-                                      ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
-                                      : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-                                  }`}>
-                                    {step.difficulty}
-                                  </span>
-                                  {step.skills.length > 0 && (
-                                    <span>Skills: {step.skills.slice(0, 2).join(", ")}</span>
+
+                                {/* Action Buttons */}
+                                <div className="flex gap-2 ml-4">
+                                  {status === "available" && onStartStep && (
+                                    <button
+                                      onClick={() => onStartStep(step.id)}
+                                      disabled={navigatingStepId === step.id}
+                                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-colors flex items-center gap-1"
+                                    >
+                                      {navigatingStepId === step.id ? (
+                                        <>
+                                          <Loader2 className="w-3 h-3 animate-spin" />
+                                          Loading...
+                                        </>
+                                      ) : (
+                                        "Start"
+                                      )}
+                                    </button>
+                                  )}
+                                  {status === "completed" && onViewStep && (
+                                    <button
+                                      onClick={() => onViewStep(step.id)}
+                                      disabled={navigatingStepId === step.id}
+                                      className="px-3 py-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-colors flex items-center gap-1"
+                                    >
+                                      {navigatingStepId === step.id ? (
+                                        <>
+                                          <Loader2 className="w-3 h-3 animate-spin" />
+                                          Loading...
+                                        </>
+                                      ) : (
+                                        "Review"
+                                      )}
+                                    </button>
+                                  )}
+                                  {status === "current" && onViewStep && (
+                                    <button
+                                      onClick={() => onViewStep(step.id)}
+                                      disabled={navigatingStepId === step.id}
+                                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-colors flex items-center gap-1"
+                                    >
+                                      {navigatingStepId === step.id ? (
+                                        <>
+                                          <Loader2 className="w-3 h-3 animate-spin" />
+                                          Loading...
+                                        </>
+                                      ) : (
+                                        "Continue"
+                                      )}
+                                    </button>
                                   )}
                                 </div>
                               </div>
-
-                              {/* Action Buttons */}
-                              <div className="flex gap-2 ml-4">
-                                {status === "available" && onStartStep && (
-                                  <button
-                                    onClick={() => onStartStep(step.id)}
-                                    disabled={navigatingStepId === step.id}
-                                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-colors flex items-center gap-1"
-                                  >
-                                    {navigatingStepId === step.id ? (
-                                      <>
-                                        <Loader2 className="w-3 h-3 animate-spin" />
-                                        Loading...
-                                      </>
-                                    ) : (
-                                      'Start'
-                                    )}
-                                  </button>
-                                )}
-                                {status === "completed" && onViewStep && (
-                                  <button
-                                    onClick={() => onViewStep(step.id)}
-                                    disabled={navigatingStepId === step.id}
-                                    className="px-3 py-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-colors flex items-center gap-1"
-                                  >
-                                    {navigatingStepId === step.id ? (
-                                      <>
-                                        <Loader2 className="w-3 h-3 animate-spin" />
-                                        Loading...
-                                      </>
-                                    ) : (
-                                      'Review'
-                                    )}
-                                  </button>
-                                )}
-                                {status === "current" && onViewStep && (
-                                  <button
-                                    onClick={() => onViewStep(step.id)}
-                                    disabled={navigatingStepId === step.id}
-                                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition-colors flex items-center gap-1"
-                                  >
-                                    {navigatingStepId === step.id ? (
-                                      <>
-                                        <Loader2 className="w-3 h-3 animate-spin" />
-                                        Loading...
-                                      </>
-                                    ) : (
-                                      'Continue'
-                                    )}
-                                  </button>
-                                )}
-                              </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      }
+                    )}
                   </div>
                 </div>
               )}

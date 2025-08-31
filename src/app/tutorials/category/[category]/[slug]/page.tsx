@@ -1,9 +1,11 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import TutorialClient from "./TutorialClient";
-import ErrorBoundary, { TutorialErrorFallback } from "@/components/ErrorBoundary";
+import TutorialClient from "../../../../../components/tutorial/TutorialClient";
+import ErrorBoundary, {
+  TutorialErrorFallback,
+} from "@/components/ErrorBoundary";
 
 interface TutorialPageProps {
   params: Promise<{ category: string; slug: string }>;
@@ -12,7 +14,7 @@ interface TutorialPageProps {
 export default async function TutorialPage({ params }: TutorialPageProps) {
   // Server-side session check - no re-renders!
   const session = await getServerSession(authOptions);
-  
+
   if (!session) {
     redirect("/auth/signin");
   }

@@ -158,7 +158,42 @@ export class ProgressService {
         timeSpent: submission.timeSpent,
         completedAt: passed ? new Date() : null,
       },
+      include: {
+        tutorial: true,
+      },
     });
+
+    // Also update study plan progress if quiz passed
+    if (passed) {
+      try {
+        const stepId = `tutorial-${progress.tutorial.slug}`;
+        
+        // Get current study plan progress
+        const studyProgress = await prisma.userStudyProgress.findFirst({
+          where: { userId },
+        });
+
+        if (studyProgress) {
+          // Add the completed step to the array if not already there
+          const completedSteps = [...studyProgress.completedSteps];
+          if (!completedSteps.includes(stepId)) {
+            completedSteps.push(stepId);
+            
+            // Update study plan progress
+            await prisma.userStudyProgress.update({
+              where: { id: studyProgress.id },
+              data: {
+                completedSteps,
+                lastActivityAt: new Date(),
+              },
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error updating study plan progress from quiz:', error);
+        // Don't fail the main operation if study plan update fails
+      }
+    }
 
     // Check for achievements if quiz was passed
     let achievements: Array<{
@@ -523,6 +558,66 @@ export class ProgressService {
         status: CompletionStatus.IN_PROGRESS,
       },
     });
+  }
+
+  /**
+   * Mark tutorial as completed (when user finishes reading)
+   */
+  static async markTutorialCompleted(userId: string, tutorialId: string) {
+    const progressResult = await prisma.tutorialProgress.upsert({
+      where: {
+        userId_tutorialId: {
+          userId,
+          tutorialId,
+        },
+      },
+      update: {
+        status: CompletionStatus.COMPLETED,
+        completedAt: new Date(),
+        updatedAt: new Date(),
+      },
+      create: {
+        userId,
+        tutorialId,
+        status: CompletionStatus.COMPLETED,
+        completedAt: new Date(),
+      },
+      include: {
+        tutorial: true,
+      },
+    });
+
+    // Also update study plan progress
+    try {
+      const stepId = `tutorial-${progressResult.tutorial.slug}`;
+      
+      // Get current study plan progress
+      const studyProgress = await prisma.userStudyProgress.findFirst({
+        where: { userId },
+      });
+
+      if (studyProgress) {
+        // Add the completed step to the array if not already there
+        const completedSteps = [...studyProgress.completedSteps];
+        if (!completedSteps.includes(stepId)) {
+          completedSteps.push(stepId);
+          
+          // Update study plan progress
+          await prisma.userStudyProgress.update({
+            where: { id: studyProgress.id },
+            data: {
+              completedSteps,
+              lastActivityAt: new Date(),
+            },
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error updating study plan progress:', error);
+      // Don't fail the main operation if study plan update fails
+    }
+
+    return progressResult;
   }
 
   /**

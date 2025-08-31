@@ -2,12 +2,18 @@
 
 import React, { Suspense } from "react";
 import { DynamicStudyPlan } from "@/lib/services/studyPlanService";
-import { 
-  Clock, 
-  Target, 
-  BookOpen, 
-  Award, 
-  Play, 
+import {
+  getCurrentStepInfo,
+  getPhaseProgress,
+  getOverallProgress,
+  getSkillsLearned,
+} from "@/lib/studyPlanUtils";
+import {
+  Clock,
+  Target,
+  BookOpen,
+  Award,
+  Play,
   Loader2,
   Globe,
   Palette,
@@ -17,13 +23,20 @@ import {
   Zap,
   Flame,
   Database,
-  Circle
+  Circle,
 } from "lucide-react";
+import {
+  HeaderSkeleton,
+  ProgressSkeleton,
+  SkillsSkeleton,
+  StatsSkeleton,
+} from "./StudyPlanSkeletons";
 
 interface StudyPlanOverviewProps {
   studyPlan: DynamicStudyPlan;
   completedSteps: string[];
   hoursSpent: number;
+  currentStepId?: string;
   onStartStep?: (stepId: string) => void;
   navigatingStepId?: string | null;
 }
@@ -31,100 +44,29 @@ interface StudyPlanOverviewProps {
 // Map icon names to Lucide components
 const getPhaseIcon = (iconName: string) => {
   const iconMap = {
-    'Globe': Globe,
-    'Palette': Palette,
-    'Sprout': Sprout,
-    'MousePointer': MousePointer,
-    'Building': Building,
-    'Zap': Zap,
-    'Flame': Flame,
-    'Database': Database,
+    Globe: Globe,
+    Palette: Palette,
+    Sprout: Sprout,
+    MousePointer: MousePointer,
+    Building: Building,
+    Zap: Zap,
+    Flame: Flame,
+    Database: Database,
   };
-  
+
   const IconComponent = iconMap[iconName as keyof typeof iconMap] || Circle;
   return <IconComponent className="w-6 h-6" />;
 };
 
-// Loading skeletons for individual sections
-const HeaderSkeleton = () => (
-  <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white animate-pulse">
-    <div className="flex items-center justify-between">
-      <div>
-        <div className="h-8 bg-blue-200/20 rounded w-64 mb-2"></div>
-        <div className="h-5 bg-blue-200/20 rounded w-96"></div>
-      </div>
-      <div className="text-right">
-        <div className="h-10 bg-blue-200/20 rounded w-16 mb-1"></div>
-        <div className="h-4 bg-blue-200/20 rounded w-20"></div>
-      </div>
-    </div>
-    <div className="mt-6">
-      <div className="bg-blue-500/30 rounded-full h-3">
-        <div className="bg-white/50 rounded-full h-3 w-1/3"></div>
-      </div>
-    </div>
-  </div>
-);
-
-const StatsSkeleton = () => (
-  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-pulse">
-    {[...Array(4)].map((_, i) => (
-      <div
-        key={i}
-        className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-          <div>
-            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-12 mb-1"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-);
-
-const ProgressSkeleton = () => (
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-pulse">
-    {[...Array(2)].map((_, i) => (
-      <div
-        key={i}
-        className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700"
-      >
-        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-4"></div>
-        <div className="space-y-3">
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-        </div>
-      </div>
-    ))}
-  </div>
-);
-
-const SkillsSkeleton = () => (
-  <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 animate-pulse">
-    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-4"></div>
-    <div className="flex flex-wrap gap-2">
-      {[...Array(8)].map((_, i) => (
-        <div
-          key={i}
-          className="h-8 bg-gray-200 dark:bg-gray-700 rounded-full w-20"
-        ></div>
-      ))}
-    </div>
-  </div>
-);
-
 // Individual section components
-const StudyPlanHeader = ({ studyPlan, completedSteps }: { studyPlan: DynamicStudyPlan, completedSteps: string[] }) => {
-  const totalSteps = studyPlan.phases.reduce(
-    (sum, phase) => sum + phase.steps.length + phase.projects.length, 0
-  );
-  const progressPercentage = totalSteps > 0 
-    ? Math.round((completedSteps.length / totalSteps) * 100) 
-    : 0;
+const StudyPlanHeader = ({
+  studyPlan,
+  completedSteps,
+}: {
+  studyPlan: DynamicStudyPlan;
+  completedSteps: string[];
+}) => {
+  const progressPercentage = getOverallProgress(studyPlan, completedSteps);
 
   return (
     <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
@@ -138,7 +80,7 @@ const StudyPlanHeader = ({ studyPlan, completedSteps }: { studyPlan: DynamicStud
           <div className="text-blue-200">Complete</div>
         </div>
       </div>
-      
+
       <div className="mt-6">
         <div className="bg-blue-500/30 rounded-full h-3">
           <div
@@ -151,19 +93,19 @@ const StudyPlanHeader = ({ studyPlan, completedSteps }: { studyPlan: DynamicStud
   );
 };
 
-const StudyPlanStats = ({ studyPlan, completedSteps, hoursSpent }: { studyPlan: DynamicStudyPlan, completedSteps: string[], hoursSpent: number }) => {
-  const currentPhase = studyPlan.phases.find(phase => {
-    const phaseSteps = [...phase.steps, ...phase.projects].map(s => s.id);
-    const completedInPhase = phaseSteps.filter(stepId => completedSteps.includes(stepId));
-    return completedInPhase.length < phaseSteps.length;
-  }) || studyPlan.phases[studyPlan.phases.length - 1];
-
-  const skillsLearned = Array.from(new Set(
-    studyPlan.phases
-      .flatMap(phase => [...phase.steps, ...phase.projects])
-      .filter(step => completedSteps.includes(step.id))
-      .flatMap(step => step.skills)
-  ));
+const StudyPlanStats = ({
+  studyPlan,
+  completedSteps,
+  hoursSpent,
+  currentStepId,
+}: {
+  studyPlan: DynamicStudyPlan;
+  completedSteps: string[];
+  hoursSpent: number;
+  currentStepId?: string;
+}) => {
+  const { currentPhase } = getCurrentStepInfo(studyPlan, completedSteps, currentStepId);
+  const skillsLearned = getSkillsLearned(studyPlan, completedSteps);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -206,7 +148,9 @@ const StudyPlanStats = ({ studyPlan, completedSteps, hoursSpent }: { studyPlan: 
           </div>
           <div>
             <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {currentPhase?.title.match(/\d+/)?.[0] || studyPlan.phases.findIndex(p => p.id === currentPhase?.id) + 1}
+              {currentPhase?.title.match(/\d+/)?.[0] ||
+                studyPlan.phases.findIndex((p) => p.id === currentPhase?.id) +
+                  1}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">
               Current Phase
@@ -234,22 +178,24 @@ const StudyPlanStats = ({ studyPlan, completedSteps, hoursSpent }: { studyPlan: 
   );
 };
 
-const StudyPlanProgress = ({ studyPlan, completedSteps, onStartStep, navigatingStepId }: { studyPlan: DynamicStudyPlan, completedSteps: string[], onStartStep?: (stepId: string) => void, navigatingStepId?: string | null }) => {
-  const currentPhase = studyPlan.phases.find(phase => {
-    const phaseSteps = [...phase.steps, ...phase.projects].map(s => s.id);
-    const completedInPhase = phaseSteps.filter(stepId => completedSteps.includes(stepId));
-    return completedInPhase.length < phaseSteps.length;
-  }) || studyPlan.phases[studyPlan.phases.length - 1];
-
-  const nextStep = studyPlan.phases
-    .flatMap(phase => [...phase.steps, ...phase.projects])
-    .find(step => {
-      if (completedSteps.includes(step.id)) return false;
-      const prerequisitesMet = step.prerequisites.every(prereq => 
-        completedSteps.includes(prereq)
-      );
-      return prerequisitesMet;
-    });
+const StudyPlanProgress = ({
+  studyPlan,
+  completedSteps,
+  currentStepId,
+  onStartStep,
+  navigatingStepId,
+}: {
+  studyPlan: DynamicStudyPlan;
+  completedSteps: string[];
+  currentStepId?: string;
+  onStartStep?: (stepId: string) => void;
+  navigatingStepId?: string | null;
+}) => {
+  const { currentPhase, nextStep } = getCurrentStepInfo(
+    studyPlan,
+    completedSteps,
+    currentStepId
+  );
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -258,7 +204,9 @@ const StudyPlanProgress = ({ studyPlan, completedSteps, onStartStep, navigatingS
           <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
             Current Phase
           </h3>
-          <div className={`bg-gradient-to-r ${currentPhase.color} rounded-lg p-4 text-white mb-4`}>
+          <div
+            className={`bg-gradient-to-r ${currentPhase.color} rounded-lg p-4 text-white mb-4`}
+          >
             <div className="flex items-center gap-3">
               <div className="text-white">
                 {getPhaseIcon(currentPhase.icon)}
@@ -269,19 +217,26 @@ const StudyPlanProgress = ({ studyPlan, completedSteps, onStartStep, navigatingS
               </div>
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Phase Progress</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Phase Progress
+              </span>
               <span className="font-medium text-gray-900 dark:text-gray-100">
-                {[...currentPhase.steps, ...currentPhase.projects].filter(step => completedSteps.includes(step.id)).length} / {currentPhase.steps.length + currentPhase.projects.length}
+                {
+                  [...currentPhase.steps, ...currentPhase.projects].filter(
+                    (step) => completedSteps.includes(step.id)
+                  ).length
+                }{" "}
+                / {currentPhase.steps.length + currentPhase.projects.length}
               </span>
             </div>
             <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
               <div
                 className={`bg-gradient-to-r ${currentPhase.color} rounded-full h-2 transition-all duration-300`}
                 style={{
-                  width: `${([...currentPhase.steps, ...currentPhase.projects].filter(step => completedSteps.includes(step.id)).length / (currentPhase.steps.length + currentPhase.projects.length)) * 100}%`
+                  width: `${getPhaseProgress(currentPhase, completedSteps)}%`,
                 }}
               />
             </div>
@@ -308,13 +263,15 @@ const StudyPlanProgress = ({ studyPlan, completedSteps, onStartStep, navigatingS
                     <Clock className="w-3 h-3" />
                     {nextStep.estimatedHours}h
                   </span>
-                  <span className={`px-2 py-1 rounded-full ${
-                    nextStep.difficulty === 'beginner' 
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                      : nextStep.difficulty === 'intermediate'
-                      ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
-                      : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-                  }`}>
+                  <span
+                    className={`px-2 py-1 rounded-full ${
+                      nextStep.difficulty === "beginner"
+                        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                        : nextStep.difficulty === "intermediate"
+                        ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300"
+                        : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                    }`}
+                  >
                     {nextStep.difficulty}
                   </span>
                 </div>
@@ -346,13 +303,14 @@ const StudyPlanProgress = ({ studyPlan, completedSteps, onStartStep, navigatingS
   );
 };
 
-const StudyPlanSkills = ({ studyPlan, completedSteps }: { studyPlan: DynamicStudyPlan, completedSteps: string[] }) => {
-  const skillsLearned = Array.from(new Set(
-    studyPlan.phases
-      .flatMap(phase => [...phase.steps, ...phase.projects])
-      .filter(step => completedSteps.includes(step.id))
-      .flatMap(step => step.skills)
-  ));
+const StudyPlanSkills = ({
+  studyPlan,
+  completedSteps,
+}: {
+  studyPlan: DynamicStudyPlan;
+  completedSteps: string[];
+}) => {
+  const skillsLearned = getSkillsLearned(studyPlan, completedSteps);
 
   if (skillsLearned.length === 0) return null;
 
@@ -375,31 +333,40 @@ const StudyPlanSkills = ({ studyPlan, completedSteps }: { studyPlan: DynamicStud
   );
 };
 
-export function StudyPlanOverview({ 
-  studyPlan, 
-  completedSteps, 
+export function StudyPlanOverview({
+  studyPlan,
+  completedSteps,
   hoursSpent,
+  currentStepId,
   onStartStep,
-  navigatingStepId
+  navigatingStepId,
 }: StudyPlanOverviewProps) {
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <Suspense fallback={<HeaderSkeleton />}>
-        <StudyPlanHeader studyPlan={studyPlan} completedSteps={completedSteps} />
+        <StudyPlanHeader
+          studyPlan={studyPlan}
+          completedSteps={completedSteps}
+        />
       </Suspense>
 
       {/* Stats Grid */}
       <Suspense fallback={<StatsSkeleton />}>
-        <StudyPlanStats studyPlan={studyPlan} completedSteps={completedSteps} hoursSpent={hoursSpent} />
+        <StudyPlanStats
+          studyPlan={studyPlan}
+          completedSteps={completedSteps}
+          hoursSpent={hoursSpent}
+          currentStepId={currentStepId}
+        />
       </Suspense>
 
       {/* Current Progress */}
       <Suspense fallback={<ProgressSkeleton />}>
-        <StudyPlanProgress 
-          studyPlan={studyPlan} 
-          completedSteps={completedSteps} 
+        <StudyPlanProgress
+          studyPlan={studyPlan}
+          completedSteps={completedSteps}
+          currentStepId={currentStepId}
           onStartStep={onStartStep}
           navigatingStepId={navigatingStepId}
         />
@@ -407,7 +374,10 @@ export function StudyPlanOverview({
 
       {/* Skills Learned */}
       <Suspense fallback={<SkillsSkeleton />}>
-        <StudyPlanSkills studyPlan={studyPlan} completedSteps={completedSteps} />
+        <StudyPlanSkills
+          studyPlan={studyPlan}
+          completedSteps={completedSteps}
+        />
       </Suspense>
     </div>
   );

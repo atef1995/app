@@ -122,6 +122,7 @@ export default function StudyPlanPage() {
 
   // TanStack Query hooks
   const { data, isLoading, error, refetch } = useStudyPlan();
+  console.log({ data });
 
   // Redirect to signin if not authenticated
   if (status === "unauthenticated") {
@@ -173,7 +174,6 @@ export default function StudyPlanPage() {
     handleStartStep(stepId);
   };
 
-
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -194,7 +194,9 @@ export default function StudyPlanPage() {
             Something went wrong
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            {error instanceof Error ? error.message : "Failed to load study plan. Please try again."}
+            {error instanceof Error
+              ? error.message
+              : "Failed to load study plan. Please try again."}
           </p>
           <button
             onClick={() => refetch()}
@@ -249,6 +251,7 @@ export default function StudyPlanPage() {
                 studyPlan={studyPlan}
                 completedSteps={userProgress.completedSteps}
                 hoursSpent={userProgress.hoursSpent}
+                currentStepId={userProgress.currentStepId}
                 onStartStep={handleStartStep}
                 navigatingStepId={navigatingStepId}
               />
