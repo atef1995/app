@@ -1,28 +1,23 @@
 import { prisma } from "@/lib/prisma";
-import { TutorialService } from "@/lib/tutorialService";
-import { ProjectService, ProjectWithCount } from "@/lib/projectService";
 import { ProgressService, CompletionStatus } from "@/lib/progressService";
-import { getAllChallenges, ChallengeWithTests } from "@/lib/challengeService";
+import { PhaseService, PhaseWithSteps, ContentItem } from "@/lib/services/phaseService";
 import { SkillService } from "@/lib/services/skillService";
-import { Tutorial, Category, Quiz, Skill } from "@prisma/client";
+import { Phase, PhaseStep, Skill } from "@prisma/client";
 
-// Types for tutorials with their relationships
-type TutorialWithCategory = Tutorial & {
-  category: Category;
-  quiz?: Quiz;
-};
+// Updated types to work with Phase schema
 
 export interface DynamicStudyPlanStep {
-  id: string;
+  id: string; // Format: "step-{phaseStepId}" 
+  phaseStepId: string; // Actual PhaseStep ID
   title: string;
   description: string | null;
   type: "tutorial" | "challenge" | "quiz" | "project";
-  resourceId: string;
-  slug?: string;
+  resourceId: string; // Content ID
+  slug: string;
   estimatedHours: number;
   difficulty: "beginner" | "intermediate" | "advanced";
-  category: string;
-  prerequisites: string[];
+  category?: string;
+  prerequisites: string[]; // Array of step IDs that must be completed first
   skills: string[];
   isOptional: boolean;
   order: number;
@@ -31,12 +26,14 @@ export interface DynamicStudyPlanStep {
 }
 
 export interface DynamicStudyPlanPhase {
-  id: string;
+  id: string; // Actual Phase ID from database
+  slug: string;
   title: string;
   description: string;
   color: string;
   icon: string;
   estimatedWeeks: number;
+  prerequisites: string[]; // Array of phase slugs that must be completed first
   steps: DynamicStudyPlanStep[];
   projects: DynamicStudyPlanStep[];
 }
@@ -76,37 +73,39 @@ export interface StudyPlanProgress {
  */
 export class StudyPlanService {
   /**
-   * Get dynamic study plan for web development based on database content
+   * Get dynamic study plan for web development from database phases
    */
   static async getWebDevelopmentStudyPlan(): Promise<DynamicStudyPlan> {
     try {
-      // Fetch all content from database
-      const [tutorials, challenges, projects] = await Promise.all([
-        TutorialService.getAllTutorials(),
-        getAllChallenges(),
-        ProjectService.getAllProjects(),
-      ]);
+      // Fetch all phases with their content from database
+      const phasesWithContent = await PhaseService.getAllPhases();
+      
+      // Pre-fetch skills for optimization
+      const allSkills = await SkillService.getAllSkills();
 
-      // Define phase structure with content mapping
-      const phases = await this.buildWebDevelopmentPhases(
-        tutorials,
-        challenges,
-        projects
+      // Convert database phases to study plan format
+      const phases = await Promise.all(
+        phasesWithContent.map(phase => this.convertPhaseToStudyPlanPhase(phase, allSkills))
       );
 
+      // Calculate total hours
       const totalHours = phases.reduce(
         (sum, phase) =>
           sum +
           phase.steps.reduce(
             (stepSum, step) => stepSum + step.estimatedHours,
             0
+          ) +
+          phase.projects.reduce(
+            (projectSum, project) => projectSum + project.estimatedHours,
+            0
           ),
         0
       );
 
       return {
-        id: "web-development-dynamic-path",
-        language: "web-development",
+        id: "web-development-database-driven",
+        language: "web-development", 
         title: "Web Development: Zero to Expert",
         description:
           "A comprehensive journey from HTML foundations to expert JavaScript developer, covering web fundamentals, modern syntax, advanced concepts, and real-world applications.",
@@ -118,194 +117,33 @@ export class StudyPlanService {
         updatedAt: new Date(),
       };
     } catch (error) {
-      console.error("Error generating dynamic study plan:", error);
+      console.error("Error generating study plan from database:", error);
       throw new Error("Failed to generate study plan");
     }
   }
 
   /**
-   * Build web development learning phases with actual database content
+   * Convert database phase with content to study plan phase format
    */
-  private static async buildWebDevelopmentPhases(
-    tutorials: TutorialWithCategory[],
-    challenges: ChallengeWithTests[],
-    projects: ProjectWithCount[]
-  ): Promise<DynamicStudyPlanPhase[]> {
-    // Pre-fetch all skills once to avoid multiple database queries
-    const allSkills = await SkillService.getAllSkills();
-    // Phase 0: HTML Foundations (prerequisite for JavaScript)
-    const htmlPhase = await this.buildPhase(
-      "html-foundations",
-      "HTML Foundations",
-      "Learn the building blocks of web development with HTML",
-      "from-orange-400 to-red-500",
-      "Globe",
-      2,
-      "html",
-      tutorials,
-      challenges,
-      projects,
-      ["html", "elements", "structure", "semantic", "forms"],
-      allSkills
-    );
-
-    // Phase 1:
-    const cssPhase = await this.buildPhase(
-      "css-foundations",
-      "CSS Foundations",
-      "Learn CSS",
-      "from-blue-400 to-purple-500",
-      "Palette",
-      2,
-      "css",
-      tutorials,
-      challenges,
-      projects,
-      ["css"],
-      allSkills
-    );
-
-    // Phase 2: JavaScript Fundamentals
-    const fundamentalPhase = await this.buildPhase(
-      "foundations",
-      "JavaScript Fundamentals",
-      "Master the core concepts and syntax of JavaScript",
-      "from-green-400 to-blue-500",
-      "Sprout",
-      4,
-      "fundamentals",
-      tutorials,
-      challenges,
-      projects,
-      ["variables", "functions", "arrays", "objects", "control"],
-      allSkills
-    );
-
-    // Phase 3: DOM & Interactivity
-    const domPhase = await this.buildPhase(
-      "dom-interactive",
-      "DOM Manipulation & Interactivity",
-      "Learn to make web pages interactive and dynamic",
-      "from-purple-400 to-pink-500",
-      "MousePointer",
-      3,
-      "dom",
-      tutorials,
-      challenges,
-      projects,
-      ["dom", "event", "interactive"],
-      allSkills
-    );
-
-    // Phase 4: Object-Oriented Programming
-    const oopPhase = await this.buildPhase(
-      "oop-concepts",
-      "Object-Oriented Programming",
-      "Master classes, inheritance, and OOP principles",
-      "from-orange-400 to-red-500",
-      "Building",
-      3,
-      "oop",
-      tutorials,
-      challenges,
-      projects,
-      ["class", "object", "inheritance", "encapsulation"],
-      allSkills
-    );
-
-    // Phase 5: Asynchronous Programming
-    const asyncPhase = await this.buildPhase(
-      "async-programming",
-      "Asynchronous JavaScript",
-      "Master promises, async/await, and API integration",
-      "from-yellow-400 to-orange-500",
-      "Zap",
-      4,
-      "async",
-      tutorials,
-      challenges,
-      projects,
-      ["async", "promise", "api", "fetch"],
-      allSkills
-    );
-
-    // Phase 6: Advanced Concepts
-    const advancedPhase = await this.buildPhase(
-      "advanced-concepts",
-      "Advanced JavaScript",
-      "Deep dive into advanced concepts and patterns",
-      "from-red-400 to-purple-600",
-      "Flame",
-      5,
-      "advanced",
-      tutorials,
-      challenges,
-      projects,
-      ["advanced", "pattern", "performance", "testing"],
-      allSkills
-    );
-
-    // Phase 7: Data Structures & Algorithms
-    const dataStructuresPhase = await this.buildPhase(
-      "data-structures",
-      "Data Structures & Algorithms",
-      "Master computer science fundamentals",
-      "from-blue-400 to-indigo-600",
-      "Database",
-      4,
-      "data-structures",
-      tutorials,
-      challenges,
-      projects,
-      ["algorithm", "data", "structure", "sorting", "search"],
-      allSkills
-    );
-
-    return [
-      htmlPhase,
-      cssPhase,
-      fundamentalPhase,
-      domPhase,
-      oopPhase,
-      asyncPhase,
-      advancedPhase,
-      dataStructuresPhase,
-    ];
-  }
-
-  /**
-   * Build a phase with content from database
-   */
-  private static async buildPhase(
-    id: string,
-    title: string,
-    description: string,
-    color: string,
-    icon: string,
-    estimatedWeeks: number,
-    category: string,
-    tutorials: TutorialWithCategory[],
-    challenges: ChallengeWithTests[],
-    projects: ProjectWithCount[],
-    keywords: string[],
-    allSkills: Skill[] // Pre-fetched skills to avoid multiple DB queries
+  private static async convertPhaseToStudyPlanPhase(
+    phase: PhaseWithSteps,
+    allSkills: Skill[]
   ): Promise<DynamicStudyPlanPhase> {
     const steps: DynamicStudyPlanStep[] = [];
-    let order = 1;
+    const projects: DynamicStudyPlanStep[] = [];
 
     // Local function to extract skills without DB calls
-    const extractSkillsFromContent = (title: string, description: string | null, category: string): string[] => {
-      const categorySkills = allSkills.filter(skill => skill.category === category);
+    const extractSkillsFromContent = (title: string, description: string | null, category?: string): string[] => {
+      const categorySkills = category 
+        ? allSkills.filter(skill => skill.category === category)
+        : allSkills;
       const text = `${title} ${description || ""}`.toLowerCase();
       const matchedSkills: string[] = [];
 
       for (const skill of categorySkills) {
-        // Check if any of the skill's keywords match the content
         const keywordMatch = skill.keywords.some((keyword: string) => 
           text.includes(keyword.toLowerCase())
         );
-        
-        // Also check if the skill name itself is mentioned
         const nameMatch = text.includes(skill.name.toLowerCase());
 
         if (keywordMatch || nameMatch) {
@@ -316,164 +154,53 @@ export class StudyPlanService {
       return matchedSkills;
     };
 
-    // Filter content by category first (strict category matching)
-    const phaseTutorials = tutorials
-      .filter((t) => t.category.slug === category)
-      .sort((a, b) => a.order - b.order);
+    // Process each phase step
+    for (const phaseStep of phase.phaseSteps) {
+      const content = PhaseService.getContentFromStep(phaseStep);
+      
+      if (!content) continue;
 
-    // For challenges, filter by keywords but ensure they're relevant to the phase
-    const phaseChallenges = challenges.filter((c) => {
-      // For HTML phase, only include challenges that specifically mention HTML
-      if (category === "html") {
-        return (
-          c.title.toLowerCase().includes("html") ||
-          c.description.toLowerCase().includes("html")
-        );
-      }
-      // For other phases, use keyword matching
-      return keywords.some(
-        (keyword) =>
-          c.title.toLowerCase().includes(keyword) ||
-          c.description.toLowerCase().includes(keyword)
-      );
-    });
+      const stepData: DynamicStudyPlanStep = {
+        id: `step-${phaseStep.id}`,
+        phaseStepId: phaseStep.id,
+        title: content.title,
+        description: content.description,
+        type: phaseStep.contentType as "tutorial" | "challenge" | "quiz" | "project",
+        resourceId: content.id,
+        slug: content.slug,
+        estimatedHours: phaseStep.estimatedHours,
+        difficulty: this.mapDifficulty(content.difficulty),
+        category: content.category,
+        prerequisites: phaseStep.prerequisites,
+        skills: extractSkillsFromContent(content.title, content.description, content.category),
+        isOptional: phaseStep.isOptional,
+        order: phaseStep.order,
+        isPremium: content.isPremium,
+        requiredPlan: content.requiredPlan,
+      };
 
-    // For projects, filter by category first, then by keywords as secondary
-    const phaseProjects = projects
-      .filter((p) => {
-        // First try exact category match
-        if (p.category === category) return true;
-
-        // For HTML phase, only include projects that specifically mention HTML
-        if (category === "html") {
-          return (
-            p.title.toLowerCase().includes("html") ||
-            (p.description && p.description.toLowerCase().includes("html"))
-          );
-        }
-
-        // For other phases, use keyword matching as fallback
-        return keywords.some(
-          (keyword) =>
-            p.title.toLowerCase().includes(keyword) ||
-            (p.description && p.description.toLowerCase().includes(keyword))
-        );
-      })
-      .sort((a, b) => (a.order || 0) - (b.order || 0));
-
-    // Add tutorials as steps
-    for (const tutorial of phaseTutorials) {
-      steps.push({
-        id: `tutorial-${tutorial.slug}`,
-        title: tutorial.title,
-        description: tutorial.description,
-        type: "tutorial",
-        resourceId: tutorial.slug,
-        slug: tutorial.slug,
-        estimatedHours: this.estimateHours(tutorial.difficulty, "tutorial"),
-        difficulty: this.mapDifficulty(tutorial.difficulty),
-        category: tutorial.category.slug,
-        prerequisites: order === 1 ? [] : [steps[steps.length - 1]?.id],
-        skills: extractSkillsFromContent(
-          tutorial.title,
-          tutorial.description,
-          tutorial.category.slug
-        ),
-        isOptional: false,
-        order: order++,
-        isPremium: tutorial.isPremium,
-        requiredPlan: tutorial.requiredPlan,
-      });
-
-      // Add quiz after tutorial if it exists
-      if (tutorial.quiz) {
-        steps.push({
-          id: `quiz-${tutorial.quiz.slug}`,
-          title: tutorial.quiz.title,
-          description: `Test your understanding of ${tutorial.title}`,
-          type: "quiz",
-          resourceId: tutorial.quiz.slug,
-          slug: tutorial.quiz.slug,
-          estimatedHours: 0.5,
-          difficulty: this.mapDifficulty(tutorial.difficulty),
-          category: tutorial.category.slug,
-          prerequisites: [`tutorial-${tutorial.slug}`],
-          skills: extractSkillsFromContent(
-            tutorial.title,
-            tutorial.description,
-            tutorial.category.slug
-          ),
-          isOptional: false,
-          order: order++,
-          isPremium: tutorial.quiz.isPremium,
-          requiredPlan: tutorial.quiz.requiredPlan,
-        });
+      // Separate projects from regular steps
+      if (phaseStep.contentType === "project") {
+        projects.push(stepData);
+      } else {
+        steps.push(stepData);
       }
     }
-
-    // Add challenges as steps (only if there are relevant challenges)
-    for (const challenge of phaseChallenges.slice(0, 3)) {
-      // Limit to 3 challenges per phase
-      steps.push({
-        id: `challenge-${challenge.slug}`,
-        title: challenge.title,
-        description: challenge.description,
-        type: "challenge",
-        resourceId: challenge.slug,
-        slug: challenge.slug,
-        estimatedHours: this.estimateHours(challenge.difficulty, "challenge"),
-        difficulty: challenge.difficulty as
-          | "beginner"
-          | "intermediate"
-          | "advanced",
-        category: category,
-        prerequisites: steps.length > 0 ? [steps[steps.length - 1]?.id] : [],
-        skills: extractSkillsFromContent(
-          challenge.title,
-          challenge.description,
-          category
-        ),
-        isOptional: false,
-        order: order++,
-        isPremium: challenge.isPremium || false,
-        requiredPlan: challenge.requiredPlan || "FREE",
-      });
-    }
-
-    // Phase projects (separate from steps)
-    const phaseProjectSteps = phaseProjects.slice(0, 2).map((project, index) => ({
-        id: `project-${project.slug}`,
-        title: project.title,
-        description: project.description || "",
-        type: "project" as const,
-        resourceId: project.slug,
-        slug: project.slug,
-        estimatedHours: project.estimatedHours || 8,
-        difficulty: this.mapDifficulty(project.difficulty || 1),
-        category: project.category || category,
-        prerequisites: steps.length > 0 ? [steps[steps.length - 1]?.id] : [],
-        skills: extractSkillsFromContent(
-          project.title,
-          project.description || "",
-          project.category || category
-        ),
-        isOptional: false,
-        order: index + 1,
-        isPremium: project.isPremium || false,
-        requiredPlan: project.requiredPlan || "FREE",
-    }));
 
     return {
-      id,
-      title,
-      description,
-      color,
-      icon,
-      estimatedWeeks,
-      steps,
-      projects: phaseProjectSteps,
+      id: phase.id,
+      slug: phase.slug,
+      title: phase.title,
+      description: phase.description,
+      color: phase.color,
+      icon: phase.icon,
+      estimatedWeeks: phase.estimatedWeeks,
+      prerequisites: phase.prerequisites,
+      steps: steps.sort((a, b) => a.order - b.order),
+      projects: projects.sort((a, b) => a.order - b.order),
     };
   }
+
 
   /**
    * Map numeric difficulty to string
@@ -591,14 +318,13 @@ export class StudyPlanService {
           const isQuizPassed = progress.quizPassed === true;
           
           if (isCompleted || isQuizPassed) {
-            const stepId = `tutorial-${progress.tutorial.slug}`;
+            // Find matching tutorial step by slug
+            const matchingStep = studyPlan.phases
+              .flatMap(p => p.steps)
+              .find(s => s.slug === progress.tutorial.slug && s.type === "tutorial");
             
-            const stepExists = studyPlan.phases.some((p) => 
-              p.steps.some((s) => s.id === stepId)
-            );
-            
-            if (stepExists && !completedSteps.includes(stepId)) {
-              completedSteps.push(stepId);
+            if (matchingStep && !completedSteps.includes(matchingStep.id)) {
+              completedSteps.push(matchingStep.id);
             }
           }
         }
@@ -608,11 +334,13 @@ export class StudyPlanService {
       if (Array.isArray(challengeProgress)) {
         for (const progress of challengeProgress) {
           if (progress.status === "COMPLETED") {
-            const stepId = `challenge-${progress.challenge.slug}`;
-            if (
-              studyPlan.phases.some((p) => p.steps.some((s) => s.id === stepId))
-            ) {
-              completedSteps.push(stepId);
+            // Find matching challenge step by slug
+            const matchingStep = studyPlan.phases
+              .flatMap(p => p.steps)
+              .find(s => s.slug === progress.challenge.slug && s.type === "challenge");
+            
+            if (matchingStep && !completedSteps.includes(matchingStep.id)) {
+              completedSteps.push(matchingStep.id);
             }
           }
         }
@@ -622,13 +350,13 @@ export class StudyPlanService {
       if (Array.isArray(projectProgress)) {
         for (const progress of projectProgress) {
           if (progress.status === "COMPLETED") {
-            const stepId = `project-${progress.project.slug}`;
-            if (
-              studyPlan.phases.some((p) =>
-                p.projects.some((s) => s.id === stepId)
-              )
-            ) {
-              completedSteps.push(stepId);
+            // Find matching project step by slug
+            const matchingStep = studyPlan.phases
+              .flatMap(p => p.projects)
+              .find(s => s.slug === progress.project.slug && s.type === "project");
+            
+            if (matchingStep && !completedSteps.includes(matchingStep.id)) {
+              completedSteps.push(matchingStep.id);
             }
           }
         }
@@ -645,10 +373,11 @@ export class StudyPlanService {
           : 0;
 
       // Find current phase and step
-      let currentPhaseId = studyPlan.phases[0].id;
+      let currentPhaseId = studyPlan.phases[0].slug; // Use slug for phase ID
       let currentStepId = studyPlan.phases[0].steps[0]?.id || "";
 
-      for (const phase of studyPlan.phases) {
+      // Find first incomplete step with met prerequisites
+      outerLoop: for (const phase of studyPlan.phases) {
         for (const step of phase.steps) {
           if (!completedSteps.includes(step.id)) {
             // Check prerequisites
@@ -657,13 +386,12 @@ export class StudyPlanService {
             );
 
             if (prerequisitesMet) {
-              currentPhaseId = phase.id;
+              currentPhaseId = phase.slug; // Use phase slug
               currentStepId = step.id;
-              break;
+              break outerLoop;
             }
           }
         }
-        if (currentStepId !== studyPlan.phases[0].steps[0]?.id) break;
       }
 
       // Create or update progress record

@@ -659,3 +659,42 @@ enum CertificateType {
   TUTORIAL
   CATEGORY
 }
+
+model Phase {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  description     String
+  color           String   // Tailwind gradient class like "from-blue-400 to-purple-500"
+  icon            String   // Icon name for the phase
+  order           Int      @default(0)
+  estimatedWeeks  Int      @default(1)
+  prerequisites   String[] // Array of phase slugs that must be completed first
+  published       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations to content
+  phaseSteps      PhaseStep[]
+  
+  @@map("phases")
+}
+
+model PhaseStep {
+  id              String   @id @default(cuid())
+  phaseId         String
+  contentType     String   // "tutorial", "challenge", "quiz", "project"
+  contentId       String   // References the actual content (tutorial.id, challenge.id, etc.)
+  contentSlug     String   // References the actual content slug for easier lookup
+  order           Int      @default(0)
+  isOptional      Boolean  @default(false)
+  estimatedHours  Float    @default(1.0)
+  prerequisites   String[] // Array of step IDs that must be completed first
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  phase           Phase    @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  
+  @@unique([phaseId, contentType, contentId]) // Prevent duplicate content in same phase
+  @@map("phase_steps")
+}
