@@ -259,7 +259,7 @@ export default function HomePage() {
           <AnimatePresence>
             {showAnimation && selectedMood && (
               <motion.div
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+                className="fixed backdrop-blur-sm inset-0 z-50 flex items-center justify-center bg-black/80 transition-all"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -279,12 +279,12 @@ export default function HomePage() {
                 >
                   {/* Animated Background */}
                   <motion.div
-                    className={`absolute inset-0 rounded-full bg-gradient-to-r ${
+                    className={`absolute  h-full w-full inset-0 rounded-full bg-gradient-to-r ${
                       getMoodAnimation(selectedMood).color
                     } opacity-20`}
                     initial={{ scale: 0 }}
-                    animate={{ scale: [0, 1.2, 1] }}
-                    transition={{ duration: 1, ease: "easeOut" }}
+                    animate={{ scale: [0, 0.5] }}
+                    transition={{ duration: 2, ease: "easeInOut" }}
                   />
 
                   {/* Mood Icon */}
