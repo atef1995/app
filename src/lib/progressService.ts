@@ -167,7 +167,7 @@ export class ProgressService {
     if (passed) {
       try {
         const stepId = `tutorial-${progress.tutorial.slug}`;
-        
+
         // Get current study plan progress
         const studyProgress = await prisma.userStudyProgress.findFirst({
           where: { userId },
@@ -178,7 +178,7 @@ export class ProgressService {
           const completedSteps = [...studyProgress.completedSteps];
           if (!completedSteps.includes(stepId)) {
             completedSteps.push(stepId);
-            
+
             // Update study plan progress
             await prisma.userStudyProgress.update({
               where: { id: studyProgress.id },
@@ -190,7 +190,7 @@ export class ProgressService {
           }
         }
       } catch (error) {
-        console.error('Error updating study plan progress from quiz:', error);
+        console.error("Error updating study plan progress from quiz:", error);
         // Don't fail the main operation if study plan update fails
       }
     }
@@ -216,30 +216,40 @@ export class ProgressService {
       });
 
       // Generate tutorial certificate
-      const tutorialCertificate = await CertificateService.generateTutorialCertificate(
-        userId,
-        submission.tutorialId,
-        {
-          score,
-          timeSpent: submission.timeSpent,
-          difficulty: 1, // Default difficulty, should be fetched from tutorial
-          quizPassed: true,
-          completionPercentage: 100
-        }
-      );
+      const tutorialCertificate =
+        await CertificateService.generateTutorialCertificate(
+          userId,
+          submission.tutorialId,
+          {
+            score,
+            timeSpent: submission.timeSpent,
+            difficulty: 1, // Default difficulty, should be fetched from tutorial
+            quizPassed: true,
+            completionPercentage: 100,
+          }
+        );
 
       // Check if user is now eligible for category certificate
       const tutorial = await prisma.tutorial.findUnique({
         where: { id: submission.tutorialId },
-        select: { categoryId: true }
+        select: { categoryId: true },
       });
-      
+
       if (tutorial?.categoryId) {
-        await CertificateService.generateCategoryCertificate(userId, tutorial.categoryId);
+        await CertificateService.generateCategoryCertificate(
+          userId,
+          tutorial.categoryId
+        );
       }
 
       // Share quiz completion to social feed if user has sharing enabled
-      await this.shareQuizCompletion(userId, submission.tutorialId, score, submission.timeSpent, submission.ChallengeMoodAdaptation.mood);
+      await this.shareQuizCompletion(
+        userId,
+        submission.tutorialId,
+        score,
+        submission.timeSpent,
+        submission.ChallengeMoodAdaptation.mood
+      );
     }
 
     return {
@@ -332,7 +342,12 @@ export class ProgressService {
       });
 
       // Share challenge completion to social feed if user has sharing enabled
-      await this.shareChallengeCompletion(userId, submission.challengeId, submission.timeSpent, submission.ChallengeMoodAdaptation.mood);
+      await this.shareChallengeCompletion(
+        userId,
+        submission.challengeId,
+        submission.timeSpent,
+        submission.ChallengeMoodAdaptation.mood
+      );
     }
 
     return {
@@ -583,14 +598,14 @@ export class ProgressService {
         completedAt: new Date(),
       },
       include: {
-        tutorial: true,
+        tutorial: { include: { category: true } },
       },
     });
 
     // Also update study plan progress
     try {
       const stepId = `tutorial-${progressResult.tutorial.slug}`;
-      
+
       // Get current study plan progress
       const studyProgress = await prisma.userStudyProgress.findFirst({
         where: { userId },
@@ -601,7 +616,7 @@ export class ProgressService {
         const completedSteps = [...studyProgress.completedSteps];
         if (!completedSteps.includes(stepId)) {
           completedSteps.push(stepId);
-          
+
           // Update study plan progress
           await prisma.userStudyProgress.update({
             where: { id: studyProgress.id },
@@ -613,7 +628,7 @@ export class ProgressService {
         }
       }
     } catch (error) {
-      console.error('Error updating study plan progress:', error);
+      console.error("Error updating study plan progress:", error);
       // Don't fail the main operation if study plan update fails
     }
 

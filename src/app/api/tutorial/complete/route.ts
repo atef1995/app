@@ -34,9 +34,7 @@ export async function POST(request: NextRequest) {
       action: "TUTORIAL_COMPLETED",
       metadata: {
         tutorialId,
-        tutorialTitle: progress.tutorial?.title,
-        category: progress.tutorial?.category?.slug,
-      }
+      },
     });
 
     return NextResponse.json({

@@ -4,25 +4,45 @@ export type ContentType = "tutorial" | "quiz" | "challenge" | "project";
 
 export type SubscriptionPlan = "FREE" | "VIBED" | "CRACKED";
 
-export type CompletionStatus = "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
+export type CompletionStatus =
+  | "NOT_STARTED"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "FAILED";
 
-export type ProjectSubmissionStatus = "DRAFT" | "SUBMITTED" | "UNDER_REVIEW" | "REVIEWED" | "APPROVED" | "NEEDS_REVISION";
+export type ProjectSubmissionStatus =
+  | "DRAFT"
+  | "SUBMITTED"
+  | "UNDER_REVIEW"
+  | "REVIEWED"
+  | "APPROVED"
+  | "NEEDS_REVISION";
 
 export type ProjectSubmissionType = "CODE" | "LINK" | "FILE";
 
 export type ProjectReviewType = "PEER" | "INSTRUCTOR" | "SELF" | "AUTO";
 
-export type ProjectReviewStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED" | "OVERDUE";
+export type ProjectReviewStatus =
+  | "PENDING"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "OVERDUE";
 
-export type ReviewAssignmentStatus = "ASSIGNED" | "ACCEPTED" | "DECLINED" | "COMPLETED" | "OVERDUE";
+export type ReviewAssignmentStatus =
+  | "ASSIGNED"
+  | "ACCEPTED"
+  | "DECLINED"
+  | "COMPLETED"
+  | "OVERDUE";
 
-export type AchievementAction = 
-  | "QUIZ_COMPLETED" 
-  | "CHALLENGE_COMPLETED" 
+export type AchievementAction =
+  | "QUIZ_COMPLETED"
+  | "CHALLENGE_COMPLETED"
   | "PROJECT_COMPLETED"
-  | "TUTORIAL_STARTED" 
-  | "STREAK_UPDATED" 
-  | "POINTS_EARNED";
+  | "TUTORIAL_STARTED"
+  | "STREAK_UPDATED"
+  | "POINTS_EARNED"
+  | "TUTORIAL_COMPLETED";
 
 export type RequirementType = "FEATURE" | "TECHNICAL" | "DESIGN" | "TESTING";
 
