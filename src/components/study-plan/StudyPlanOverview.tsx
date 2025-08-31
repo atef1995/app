@@ -104,7 +104,11 @@ const StudyPlanStats = ({
   hoursSpent: number;
   currentStepId?: string;
 }) => {
-  const { currentPhase } = getCurrentStepInfo(studyPlan, completedSteps, currentStepId);
+  const { currentPhase } = getCurrentStepInfo(
+    studyPlan,
+    completedSteps,
+    currentStepId
+  );
   const skillsLearned = getSkillsLearned(studyPlan, completedSteps);
 
   return (
@@ -280,7 +284,7 @@ const StudyPlanProgress = ({
                 <button
                   onClick={() => onStartStep(nextStep.id)}
                   disabled={navigatingStepId === nextStep.id}
-                  className="ml-4 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                  className="ml-4 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer"
                 >
                   {navigatingStepId === nextStep.id ? (
                     <>

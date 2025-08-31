@@ -63,7 +63,7 @@ function SignInContent() {
   // If authenticated, middleware will handle redirect, but show message just in case
   if (status === "authenticated") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 dark:from-blue-500 via-indigo-50 dark:via-indigo-500 to-purple-50 dark:to-purple-500 flex items-center justify-center">
         <div className="text-center max-w-md w-full">
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <div className="text-green-600 mb-4 flex justify-center">
@@ -94,7 +94,7 @@ function SignInContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 dark:from-blue-500 via-indigo-50 dark:via-indigo-500 to-purple-50 dark:to-purple-500 before:absolute before:bottom-1/4 before:right-0 before:rounded-full before:animate-pulse before:duration-1000 before:blur-3xl before:h-full before:w-40 before:dark:bg-blue-500/50 after:absolute after:left-0 after:rounded-full after:animate-pulse after:duration-[10000ms] transition-all after:blur-2xl after:h-full after:w-40 after:dark:bg-purple-500/30 flex items-center justify-center">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
