@@ -38,11 +38,133 @@ export async function executeJavaScript(code: string) {
   try {
     const webcontainer = await initWebContainer();
 
+    // Industry-proven approach: Monitor event loop and capture all async output
+    const wrappedCode = `
+const util = require('util');
+
+// Console capture system
+const logs = [];
+const originalLog = console.log;
+const originalError = console.error;
+const originalWarn = console.warn;
+
+const captureLog = (type, args) => {
+  const timestamp = Date.now();
+  const message = args.map(arg => 
+    typeof arg === 'object' ? util.inspect(arg, { depth: 2, colors: false }) : String(arg)
+  ).join(' ');
+  
+  logs.push({ type, message, timestamp });
+  
+  // Also output immediately for real-time feedback
+  if (type === 'error') {
+    originalError(\`[\${timestamp}] ERROR: \${message}\`);
+  } else if (type === 'warn') {
+    originalWarn(\`[\${timestamp}] WARN: \${message}\`);
+  } else {
+    originalLog(\`[\${timestamp}] \${message}\`);
+  }
+};
+
+console.log = (...args) => captureLog('log', args);
+console.error = (...args) => captureLog('error', args);
+console.warn = (...args) => captureLog('warn', args);
+
+// Event loop monitoring - this is the key to async support
+let pendingOperations = 0;
+let executionComplete = false;
+let finalTimeout;
+
+// Track async operations
+const originalSetTimeout = global.setTimeout;
+const originalSetInterval = global.setInterval;
+const originalSetImmediate = global.setImmediate;
+
+global.setTimeout = (fn, delay, ...args) => {
+  pendingOperations++;
+  return originalSetTimeout(() => {
+    try {
+      fn(...args);
+    } catch (error) {
+      console.error('Async error in setTimeout:', error);
+    }
+    pendingOperations--;
+    checkCompletion();
+  }, delay);
+};
+
+global.setInterval = (fn, delay, ...args) => {
+  // For intervals, we'll let them run but not track them for completion
+  return originalSetInterval(fn, delay, ...args);
+};
+
+if (originalSetImmediate) {
+  global.setImmediate = (fn, ...args) => {
+    pendingOperations++;
+    return originalSetImmediate(() => {
+      try {
+        fn(...args);
+      } catch (error) {
+        console.error('Async error in setImmediate:', error);
+      }
+      pendingOperations--;
+      checkCompletion();
+    }, ...args);
+  };
+}
+
+// Check if execution is complete
+const checkCompletion = () => {
+  if (executionComplete && pendingOperations === 0) {
+    finishExecution();
+  }
+};
+
+const finishExecution = () => {
+  clearTimeout(finalTimeout);
+  
+  // Output all logs in order
+  originalLog('__EXECUTION_START__');
+  logs.sort((a, b) => a.timestamp - b.timestamp).forEach(log => {
+    originalLog(\`\${log.type.toUpperCase()}: \${log.message}\`);
+  });
+  originalLog('__EXECUTION_END__');
+  
+  process.exit(0);
+};
+
+// Fallback timeout to prevent infinite hanging
+finalTimeout = setTimeout(() => {
+  originalLog('__EXECUTION_TIMEOUT__');
+  logs.sort((a, b) => a.timestamp - b.timestamp).forEach(log => {
+    originalLog(\`\${log.type.toUpperCase()}: \${log.message}\`);
+  });
+  originalLog('__EXECUTION_END__');
+  process.exit(0);
+}, 5000);
+
+// Execute user code
+try {
+  ${code}
+  
+  // Mark synchronous execution as complete
+  executionComplete = true;
+  
+  // Check immediately in case there are no async operations
+  process.nextTick(checkCompletion);
+  
+} catch (error) {
+  console.error('Execution error:', error.message);
+  executionComplete = true;
+  setTimeout(finishExecution, 100);
+}
+    `.trim();
+
     // Create a simple JavaScript file to execute
     const files = {
       "script.js": {
         file: {
-          contents: code,
+          contents: wrappedCode,
         },
       },
       "package.json": {
@@ -62,38 +184,86 @@ export async function executeJavaScript(code: string) {
     const process = await webcontainer.spawn("node", ["script.js"]);
 
     let output = "";
-    let error = "";
+    const error = "";
 
-    // Capture stdout
+    // Collect output from the process
     process.output.pipeTo(
       new WritableStream({
         write(data) {
-          output += data;
+          // WebContainer already provides text, no need to decode
+          output += typeof data === 'string' ? data : new TextDecoder().decode(data);
         },
       })
     );
 
-    // Capture stderr
-    process.output.pipeTo(
-      new WritableStream({
-        write(data) {
-          error += data;
-        },
-      })
-    );
-
-    // Wait for execution to complete with timeout
+    // Wait for the process to complete with extended timeout for async operations
     const exitCode = await Promise.race([
       process.exit,
-      new Promise<number>((_, reject) =>
-        setTimeout(() => reject(new Error("Execution timeout")), 5000)
+      new Promise<number>(
+        (_, reject) =>
+          setTimeout(() => reject(new Error("Execution timeout")), 15000) // Extended timeout
       ),
     ]);
 
+    // Parse the output to extract user logs
+    const logStartMarker = "__EXECUTION_START__";
+    const logEndMarker = "__EXECUTION_END__";
+
+    let userOutput = "";
+    let executionError = "";
+
+    if (output.includes(logStartMarker) && output.includes(logEndMarker)) {
+      const startIndex = output.indexOf(logStartMarker) + logStartMarker.length;
+      const endIndex = output.indexOf(logEndMarker);
+      const logsSection = output.substring(startIndex, endIndex).trim();
+
+      // Process logs and separate errors
+      const processedLogs = logsSection
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
+        .map((line) => {
+          // Remove timestamp prefixes from logs
+          const cleanLine = line.replace(/^\[\d+\]\s*/, "");
+
+          if (cleanLine.startsWith("ERROR: ")) {
+            executionError += cleanLine.substring(7) + "\n";
+            return null;
+          } else if (cleanLine.startsWith("WARN: ")) {
+            return "⚠️ " + cleanLine.substring(6);
+          } else if (cleanLine.startsWith("LOG: ")) {
+            return cleanLine.substring(5);
+          }
+          return cleanLine;
+        })
+        .filter((line) => line !== null);
+
+      userOutput = processedLogs.join("\n");
+    } else if (output.includes("__EXECUTION_TIMEOUT__")) {
+      // Handle timeout case
+      const timeoutIndex = output.indexOf("__EXECUTION_TIMEOUT__");
+      const afterTimeout = output
+        .substring(timeoutIndex + "__EXECUTION_TIMEOUT__".length)
+        .trim();
+      userOutput = afterTimeout
+        .split("\n")
+        .filter(
+          (line) =>
+            line.trim().length > 0 && !line.includes("__EXECUTION_END__")
+        )
+        .map((line) => line.replace(/^\[\d+\]\s*/, ""))
+        .join("\n");
+      executionError =
+        "Execution timeout - some async operations may not have completed";
+    } else {
+      // Fallback to raw output if markers aren't found
+      userOutput = output.trim();
+    }
+
     return {
       success: exitCode === 0,
-      output: output.trim(),
-      error: error.trim(),
+      output: userOutput,
+      error: executionError.trim() || error.trim(),
       exitCode,
     };
   } catch (error) {
@@ -173,22 +343,32 @@ export async function executeTypeScript(code: string) {
       "ES2020",
     ]);
 
-    let compileOutput = "";
     let compileError = "";
 
-    compileProcess.output.pipeTo(
-      new WritableStream({
-        write(data) {
-          if (data.includes("error")) {
-            compileError += data;
-          } else {
-            compileOutput += data;
-          }
-        },
-      })
-    );
+    // Read compile process output
+    const compileReader = compileProcess.output.getReader();
+    const readCompileOutput = async () => {
+      try {
+        while (true) {
+          const { done, value } = await compileReader.read();
+          if (done) break;
 
-    const compileExitCode = await compileProcess.exit;
+          const text = typeof value === 'string' ? value : new TextDecoder().decode(value);
+          if (text.includes("error")) {
+            compileError += text;
+          }
+        }
+      } finally {
+        compileReader.releaseLock();
+      }
+    };
+
+    const compileOutputPromise = readCompileOutput();
+
+    const [compileExitCode] = await Promise.all([
+      compileProcess.exit,
+      compileOutputPromise,
+    ]);
 
     if (compileExitCode !== 0) {
       return {
@@ -204,20 +384,38 @@ export async function executeTypeScript(code: string) {
     const runProcess = await webcontainer.spawn("node", ["dist/script.js"]);
 
     let output = "";
-    const error = "";
+    let error = "";
 
-    runProcess.output.pipeTo(
-      new WritableStream({
-        write(data) {
-          output += data;
-        },
-      })
-    );
+    // Read run process output
+    const runReader = runProcess.output.getReader();
+    const readRunOutput = async () => {
+      try {
+        while (true) {
+          const { done, value } = await runReader.read();
+          if (done) break;
+
+          const text = typeof value === 'string' ? value : new TextDecoder().decode(value);
+          if (
+            text.includes("Error") ||
+            text.includes("error") ||
+            text.includes("TypeError")
+          ) {
+            error += text;
+          } else {
+            output += text;
+          }
+        }
+      } finally {
+        runReader.releaseLock();
+      }
+    };
+
+    const runOutputPromise = readRunOutput();
 
     // Wait for execution to complete with timeout
-    const exitCode = await Promise.race([
-      runProcess.exit,
-      new Promise<number>((_, reject) =>
+    const [exitCode] = await Promise.race([
+      Promise.all([runProcess.exit, runOutputPromise]),
+      new Promise<[number]>((_, reject) =>
         setTimeout(() => reject(new Error("Execution timeout")), 10000)
       ),
     ]);
@@ -480,15 +678,6 @@ export function executeTypeScriptSimple(code: string) {
     // Let's provide more helpful debugging info
     const errorMessage =
       error instanceof Error ? error.message : "Unknown TypeScript error";
-    const debugInfo = `
-Original TypeScript code:
-${code}
-
-Transpiled JavaScript:
-${jsCode || "Failed to transpile"}
-
-Error: ${errorMessage}
-    `.trim();
 
     // Log to browser console for debugging
     console.error("TypeScript execution failed:");
@@ -508,6 +697,133 @@ Error: ${errorMessage}
 }
 
 // Simplified console.log capture for basic JavaScript evaluation
+// Improved async-aware JavaScript execution
+export async function executeJavaScriptAsync(code: string): Promise<{
+  success: boolean;
+  output: string;
+  error: string;
+  logs: string[];
+  errors: string[];
+}> {
+  return new Promise((resolve) => {
+    const logs: string[] = [];
+    const errors: string[] = [];
+    const timeouts: NodeJS.Timeout[] = [];
+    let completedTimeouts = 0;
+    let totalTimeouts = 0;
+
+    // Override console methods
+    const mockConsole = {
+      log: (...args: unknown[]) => {
+        logs.push(
+          args
+            .map((arg) =>
+              typeof arg === "object"
+                ? JSON.stringify(arg, null, 2)
+                : String(arg)
+            )
+            .join(" ")
+        );
+      },
+      error: (...args: unknown[]) => {
+        errors.push(
+          args
+            .map((arg) =>
+              typeof arg === "object"
+                ? JSON.stringify(arg, null, 2)
+                : String(arg)
+            )
+            .join(" ")
+        );
+      },
+      warn: (...args: unknown[]) => {
+        logs.push(
+          "⚠️ " +
+            args
+              .map((arg) =>
+                typeof arg === "object"
+                  ? JSON.stringify(arg, null, 2)
+                  : String(arg)
+              )
+              .join(" ")
+        );
+      },
+    };
+
+    // Override setTimeout to track async operations
+    const originalSetTimeout = setTimeout;
+    const mockSetTimeout = (callback: () => void, delay: number) => {
+      totalTimeouts++;
+      const timeout = originalSetTimeout(() => {
+        try {
+          callback();
+        } catch (error) {
+          errors.push(`Async error: ${error}`);
+        }
+        completedTimeouts++;
+
+        // Check if all async operations are done
+        if (completedTimeouts === totalTimeouts) {
+          // Wait a bit more for any additional async operations
+          originalSetTimeout(() => {
+            resolve({
+              success: errors.length === 0,
+              output: logs.join("\n"),
+              error: errors.join("\n"),
+              logs,
+              errors,
+            });
+          }, 100);
+        }
+      }, delay);
+
+      timeouts.push(timeout);
+      return timeout;
+    };
+
+    try {
+      // Create function with mocked globals
+      const func = new Function("console", "setTimeout", "Promise", code);
+
+      // Execute the code with native Promise support
+      func(mockConsole, mockSetTimeout, Promise);
+
+      // If no timeouts were created, resolve immediately
+      if (totalTimeouts === 0) {
+        resolve({
+          success: errors.length === 0,
+          output: logs.join("\n"),
+          error: errors.join("\n"),
+          logs,
+          errors,
+        });
+      } else {
+        // Set a maximum timeout for the entire execution
+        originalSetTimeout(() => {
+          // Clear any remaining timeouts
+          timeouts.forEach((t) => clearTimeout(t));
+          resolve({
+            success: errors.length === 0,
+            output: logs.join("\n"),
+            error: errors.join("\n"),
+            logs,
+            errors,
+          });
+        }, 15000); // 15 second maximum
+      }
+    } catch (error) {
+      errors.push(String(error));
+      resolve({
+        success: false,
+        output: logs.join("\n"),
+        error: errors.join("\n"),
+        logs,
+        errors,
+      });
+    }
+  });
+}
+
 export function executeJavaScriptSimple(code: string) {
   try {
     // Create a sandbox environment

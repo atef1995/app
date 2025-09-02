@@ -97,7 +97,7 @@ export default function ProjectsPage() {
 
   const projects = projectsQuery.data || [];
   const categories = categoriesQuery.data?.data || [];
-  
+
   // Group projects by category for stats
   const projectsByCategory = projects.reduce((acc, project) => {
     if (!acc[project.category]) {
@@ -132,21 +132,27 @@ export default function ProjectsPage() {
             From Learning to Building
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
-            Complete hands-on projects after finishing each learning module. 
-            Get constructive feedback from your peers and showcase your work.
+            Complete hands-on projects after finishing each learning module. Get
+            constructive feedback from your peers and showcase your work.
           </p>
           <div className="flex flex-wrap justify-center gap-6 text-sm">
             <div className="flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-blue-500" />
-              <span className="text-gray-600 dark:text-gray-400">Real-world applications</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Real-world applications
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <Users className="w-5 h-5 text-green-500" />
-              <span className="text-gray-600 dark:text-gray-400">Peer code reviews</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Peer code reviews
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <Trophy className="w-5 h-5 text-yellow-500" />
-              <span className="text-gray-600 dark:text-gray-400">Public showcase</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                Public showcase
+              </span>
             </div>
           </div>
         </div>
@@ -157,11 +163,17 @@ export default function ProjectsPage() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-gray-400" />
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Category:</span>
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              Category:
+            </span>
           </div>
           <select
+            title={selectedCategory as string}
             value={selectedCategory || ""}
-            onChange={(e) => setSelectedCategory(e.target.value || null)}
+            onChange={(e) => {
+              e.preventDefault();
+              setSelectedCategory(e.target.value || null);
+            }}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
               bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
               focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -175,7 +187,7 @@ export default function ProjectsPage() {
           </select>
         </div>
 
-        <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+        {/* <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
           <button
             onClick={() => setViewMode("grid")}
             className={`p-2 rounded-md transition-colors ${
@@ -198,7 +210,7 @@ export default function ProjectsPage() {
           >
             <List className="w-4 h-4" />
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* Projects Grid */}
@@ -209,10 +221,9 @@ export default function ProjectsPage() {
             No Projects Available
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            {selectedCategory 
+            {selectedCategory
               ? `No projects found in the ${selectedCategory} category.`
-              : "Projects are coming soon! Complete tutorials to unlock project assignments."
-            }
+              : "Projects are coming soon! Complete tutorials to unlock project assignments."}
           </p>
           <Link
             href="/tutorials"
@@ -251,7 +262,7 @@ export default function ProjectsPage() {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                {projects.filter(p => !p.isPremium).length}
+                {projects.filter((p) => !p.isPremium).length}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
                 Free Projects
@@ -267,7 +278,10 @@ export default function ProjectsPage() {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
-                {projects.reduce((sum, p) => sum + (p._count?.submissions || 0), 0)}
+                {projects.reduce(
+                  (sum, p) => sum + (p._count?.submissions || 0),
+                  0
+                )}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
                 Total Submissions

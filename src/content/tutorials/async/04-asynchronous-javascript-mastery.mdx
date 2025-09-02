@@ -28,7 +28,7 @@ Before we dive into code, let's clear up something that confuses everyone initia
 
 Think of it like this: **You're a chef in a kitchen (single-threaded), but you can put multiple dishes in different ovens and check on them periodically without standing around waiting for each one to finish.**
 
-<InteractiveCodeBlock editable={true} language="javascript">
+<InteractiveCodeBlock editable={true} language="javascript" useWebContainer={true}>
 {`// Let's see the event loop in action! This might surprise you...
 
 console.log('1 - I run first (synchronous)');
@@ -59,7 +59,7 @@ console.log('4 - I run before the async stuff (synchronous)');
 
 Let me show you why async programming isn't just cool - it's essential:
 
-<InteractiveCodeBlock editable={true} language="javascript">
+<InteractiveCodeBlock editable={true} language="javascript" >
 {`// 🚨 DON'T DO THIS - Blocking approach (simulated)
 function fetchDataBlocking() {
   console.log("🔄 Starting to fetch data...");
@@ -112,7 +112,7 @@ Before Promises existed, we had callbacks. They're still important to understand
 
 **A callback is simply a function you pass to another function, saying "hey, call this when you're done."**
 
-<InteractiveCodeBlock editable={true} language="javascript">
+<InteractiveCodeBlock editable={true} language="javascript"  >
 {`// Let's build a simple callback system from scratch!
 
 // First, let's create a function that simulates fetching user data
@@ -163,7 +163,7 @@ console.log("This runs while we wait for the user data!");
 
 What happens when you need to fetch user data, then their posts, then comments on those posts? Let's see:
 
-<InteractiveCodeBlock editable={true} language="javascript">
+<InteractiveCodeBlock editable={true} language="javascript" >
 {`// Oh no... callback hell is real! 😰
 
 function fetchUser(userId, callback) {
@@ -241,7 +241,7 @@ A Promise has three states:
 - **Fulfilled**: "Success! Here's your result!"
 - **Rejected**: "Sorry, something went wrong."
 
-<InteractiveCodeBlock editable={true} language="javascript">
+<InteractiveCodeBlock editable={true} language="javascript" >
 {`// Let's create our first Promise from scratch!
 
 // This function returns a Promise instead of using callbacks
@@ -304,7 +304,7 @@ console.log("This runs immediately while the Promise is pending!");
 
 Remember our callback hell example? Let's fix it with Promises:
 
-<InteractiveCodeBlock editable={true} language="javascript">
+<InteractiveCodeBlock editable={true} language="javascript" >
 {`// Let's rebuild our data fetching with Promises!
 
 function fetchUserPromise(userId) {
@@ -371,7 +371,7 @@ console.log("Beautiful! No more nested callbacks!");`}
 
 JavaScript gives us some amazing Promise utilities. Let's explore them:
 
-<InteractiveCodeBlock editable={true} language="javascript">
+<InteractiveCodeBlock editable={true} language="javascript" >
 {`// Let's explore the Promise utility methods!
 
 // Simulate different API endpoints
@@ -471,7 +471,7 @@ setTimeout(() => {
 
 Now for the game-changer! **Async/await makes asynchronous code look and feel like regular synchronous code.** It's like magic!
 
-<InteractiveCodeBlock editable={true} language="javascript">
+<InteractiveCodeBlock editable={true} language="javascript" >
 {`// Let's see async/await in action!
 
 // First, let's create some Promise-based functions
@@ -572,7 +572,7 @@ console.log("This runs immediately while async operations are pending!");`}
 
 Let me show you the same operation written both ways:
 
-<InteractiveCodeBlock editable={true} language="javascript">
+<InteractiveCodeBlock editable={true} language="javascript" >
 {`// Let's compare Promise chains vs async/await for the SAME task
 
 // Our helper functions
@@ -670,7 +670,7 @@ getUserDataAsync(2).then(result => {
 
 Here's a crucial concept that trips up many developers:
 
-<InteractiveCodeBlock editable={true} language="javascript">
+<InteractiveCodeBlock editable={true} language="javascript" >
 {`// Understanding parallel vs sequential execution
 
 function slowTask(name, delay) {
@@ -775,7 +775,7 @@ console.log("This runs while all the tasks are happening!");`}
 
 Now let's tackle real HTTP requests! The Fetch API is how modern JavaScript talks to servers.
 
-<InteractiveCodeBlock editable={true} language="javascript">
+<InteractiveCodeBlock editable={true} language="javascript" >
 {`// Let's master the Fetch API!
 
 // Basic GET request - the foundation
@@ -913,7 +913,7 @@ console.log("API calls are running in the background...");`}
 
 Let's build some robust, production-ready fetch utilities:
 
-<InteractiveCodeBlock editable={true} language="javascript">
+<InteractiveCodeBlock editable={true} language="javascript" >
 {`// Advanced fetch patterns for real applications!
 
 // Fetch with timeout - don't wait forever!
@@ -1132,7 +1132,7 @@ console.log("Advanced fetch patterns are running...");`}
 
 Let's dive deep into robust error handling patterns:
 
-<InteractiveCodeBlock editable={true} language="javascript">
+<InteractiveCodeBlock editable={true} language="javascript" >
 {`// Advanced error handling patterns
 
 // Custom error classes for different scenarios
@@ -1346,7 +1346,7 @@ console.log("\\nError handling demo is running...");`}
 
 Let's create some patterns you'll use in real applications:
 
-<InteractiveCodeBlock editable={true} language="javascript">
+<InteractiveCodeBlock editable={true} language="javascript" >
 {`// Real-world async patterns you'll actually use!
 
 // Pattern 1: Debounced Search (like Google's search suggestions)
@@ -1664,7 +1664,7 @@ console.log("Real-world patterns are running...");`}
 
 Let's explore some advanced performance patterns:
 
-<InteractiveCodeBlock editable={true} language="javascript">
+<InteractiveCodeBlock editable={true} language="javascript" >
 {`// Advanced performance optimization techniques!
 
 // Pattern 1: Request Deduplication

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { useProgressSync } from "@/hooks/useProgressSync";
 import { Achievement, Progress } from "@prisma/client";
 
 interface UseTutorialCompletionParams {
@@ -38,15 +39,13 @@ export function useTutorialCompletion({
   canAccess,
 }: UseTutorialCompletionParams) {
   const [hasCompletedReading, setHasCompletedReading] = useState(false);
-  const queryClient = useQueryClient();
+  const { syncProgress } = useProgressSync();
 
   const completionMutation = useMutation({
     mutationFn: completeTutorial,
-    onSuccess: (data) => {
-      // Invalidate relevant queries
-      queryClient.invalidateQueries({ queryKey: ["tutorial-progress"] });
-      queryClient.invalidateQueries({ queryKey: ["study-plan"] });
-      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    onSuccess: async (data) => {
+      // Sync all progress-related data
+      await syncProgress();
 
       // Show achievements if any
       if (data.achievements && data.achievements.length > 0) {

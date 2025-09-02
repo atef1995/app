@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useToastContext } from "@/components/providers/ToastProvider";
+import { useProgressSync } from "@/hooks/useProgressSync";
 import { submitQuizAction } from "@/lib/actions";
 import {
   Quiz,
@@ -32,6 +33,7 @@ interface UseQuizProps {
 
 export function useQuiz({ slug, currentMoodId }: UseQuizProps) {
   const toast = useToastContext();
+  const { syncProgress, forceRefresh } = useProgressSync();
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [loadingQuiz, setLoadingQuiz] = useState(true);
   const [tutorialNavigation, setTutorialNavigation] =
@@ -149,6 +151,15 @@ export function useQuiz({ slug, currentMoodId }: UseQuizProps) {
         if (debugMode) {
           console.log("Quiz submitted successfully:", result);
         }
+        
+        // Immediately sync all progress-related data
+        await syncProgress();
+        
+        // Force immediate refresh of critical components if quiz was passed
+        if (result.passed) {
+          await forceRefresh();
+        }
+        
         toast.success(
           "Quiz submitted successfully!",
           `Score: ${result.score.toPrecision(4)}% - ${
@@ -204,6 +215,8 @@ export function useQuiz({ slug, currentMoodId }: UseQuizProps) {
     quizState.answers,
     toast,
     submitError,
+    syncProgress,
+    forceRefresh,
   ]);
 
   const handleAnswerSelect = useCallback(

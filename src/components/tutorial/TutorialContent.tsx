@@ -7,7 +7,6 @@ import { DOMInteractiveBlock } from "@/components/ui/DOMInteractiveBlock";
 import { HTMLPreviewWindow } from "@/components/ui/HTMLPreviewWindow";
 import { HTMLEditorPreview } from "@/components/ui/HTMLEditorPreview";
 import { SeparatedEditorPreview } from "@/components/ui/SeparatedEditorPreview";
-import SyntaxHighlighter from "@/components/SyntaxHighlighter";
 import TableOfContents from "@/components/TableOfContents";
 import { type TutorialData } from "@/hooks/useTutorial";
 
@@ -128,6 +127,8 @@ const mdxComponents = {
   ),
   code: (props: React.HTMLAttributes<HTMLElement>) => {
     // Check if this is an inline code or a code block
+    console.log({ className: props.className });
+
     const isInline = !props.className;
 
     if (isInline) {
@@ -144,9 +145,9 @@ const mdxComponents = {
       const codeContent =
         typeof props.children === "string" ? props.children : "";
       return (
-        <SyntaxHighlighter className={props.className}>
+        <InteractiveCodeBlock height={"300px"} language={props.className}>
           {codeContent}
-        </SyntaxHighlighter>
+        </InteractiveCodeBlock>
       );
     }
   },
@@ -161,12 +162,7 @@ const mdxComponents = {
       return <>{props.children}</>;
     } else {
       // Regular pre block
-      return (
-        <pre
-          className="m-2 shadow-inner bg-gray-900/20 dark:bg-gray-950/20 text-gray-300 p-4 rounded-lg overflow-x-auto text-sm font-mono whitespace-pre-wrap"
-          {...props}
-        />
-      );
+      return <pre {...props} />;
     }
   },
   ul: (props: React.HTMLAttributes<HTMLUListElement>) => (

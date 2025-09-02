@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import {
   Eye,
   EyeOff,
@@ -12,20 +12,7 @@ import {
   Copy,
   Check,
 } from "lucide-react";
-
-// Importing Prism grammars
-import { Editor, PrismEditor } from "prism-react-editor";
-
-import "prism-react-editor/prism/languages/css";
-import "prism-react-editor/languages/html";
-import "prism-react-editor/languages/jsx";
-
-import "prism-react-editor/layout.css";
-import "prism-react-editor/scrollbar.css";
-import "prism-react-editor/invisibles.css";
-import "prism-react-editor/themes/github-dark.css";
-import "prism-react-editor/search.css";
-import MyExtensions from "./MyExtensions";
+import CodeEditor from "../CodeEditor";
 
 interface SeparatedEditorPreviewProps {
   initialHtml: string;
@@ -54,8 +41,6 @@ export function SeparatedEditorPreview({
   const [isVisible, setIsVisible] = useState(true);
   const [copied, setCopied] = useState(false);
   const [resetKey, setResetKey] = useState(0);
-  const htmlEditorRef = useRef<PrismEditor | null>(null);
-  const cssEditorRef = useRef<PrismEditor | null>(null);
 
   const generatePreviewHTML = () => {
     return `<!DOCTYPE html>
@@ -121,14 +106,14 @@ ${css}
           <div className="flex items-center gap-2">
             <button
               onClick={handleReset}
-              className="text-white/80 hover:text-white transition-colors p-1.5 rounded hover:bg-white/10"
+              className="text-white/80 hover:text-white transition-colors p-1.5 rounded hover:bg-white/10 cursor-pointer"
               title="Reset to original"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
             <button
               onClick={handleCopy}
-              className="text-white/80 hover:text-white transition-colors p-1.5 rounded hover:bg-white/10"
+              className="text-white/80 hover:text-white transition-colors p-1.5 rounded hover:bg-white/10 cursor-pointer"
               title="Copy code"
             >
               {copied ? (
@@ -139,7 +124,7 @@ ${css}
             </button>
             <button
               onClick={() => setIsVisible(!isVisible)}
-              className="text-white/80 hover:text-white transition-colors p-1.5 rounded hover:bg-white/10"
+              className="text-white/80 hover:text-white transition-colors p-1.5 rounded hover:bg-white/10 cursor-pointer"
               title={isVisible ? "Hide preview" : "Show preview"}
             >
               {isVisible ? (
@@ -184,7 +169,7 @@ ${css}
           {showHtmlEditor && (
             <button
               onClick={() => setActiveTab("html")}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
                 activeTab === "html"
                   ? "border-blue-500 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800"
                   : "border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
@@ -197,7 +182,7 @@ ${css}
           {showCssEditor && (
             <button
               onClick={() => setActiveTab("css")}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
                 activeTab === "css"
                   ? "border-purple-500 text-purple-600 dark:text-purple-400 bg-white dark:bg-gray-800"
                   : "border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
@@ -209,7 +194,7 @@ ${css}
           )}
           <button
             onClick={() => setActiveTab("preview")}
-            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
               activeTab === "preview"
                 ? "border-green-500 text-green-600 dark:text-green-400 bg-white dark:bg-gray-800"
                 : "border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
@@ -226,37 +211,24 @@ ${css}
         {/* HTML Editor */}
         {activeTab === "html" && showHtmlEditor && (
           <div className="h-[30rem]">
-            <Editor
-              className="h-[30rem]"
+            <CodeEditor
               key={`html-${resetKey}`}
-              onUpdate={(value) => setHtml(value)}
               language="html"
-              value={initialHtml}
-            >
-              {(editor) => {
-                htmlEditorRef.current = editor;
-                return <MyExtensions editor={editor} />;
-              }}
-            </Editor>
+              initialCode={html}
+              onCodeChange={(code) => setHtml(code)}
+            ></CodeEditor>
           </div>
         )}
 
         {/* CSS Editor */}
         {activeTab === "css" && showCssEditor && (
           <div className="h-[30rem]">
-            <Editor
-              className="h-[30rem] max-h-dvh"
+            <CodeEditor
               key={`css-${resetKey}`}
-              wordWrap
-              onUpdate={(value) => setCss(value)}
               language="css"
-              value={initialCss}
-            >
-              {(editor) => {
-                cssEditorRef.current = editor;
-                return <MyExtensions editor={editor} />;
-              }}
-            </Editor>
+              initialCode={css}
+              onCodeChange={(code) => setCss(code)}
+            ></CodeEditor>
           </div>
         )}
 

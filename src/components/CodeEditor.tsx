@@ -2,12 +2,33 @@
 
 import React, { useState } from "react";
 import {
-  executeJavaScriptSimple,
+  executeJavaScriptAsync,
   executeTypeScriptWithCompiler,
+  executeJavaScript,
+  executeTypeScript,
 } from "@/lib/codeRunner";
 import Editor from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 import { useTheme } from "@/components/providers/ThemeProvider";
+
+interface ExecutionResult {
+  output: string[];
+  errors: string[];
+  executionTime: number;
+  isComplete?: boolean;
+}
+
+// Type for the execution functions
+interface CodeExecutionResult {
+  success: boolean;
+  output?: string;
+  error?: string;
+  logs?: string[];
+  errors?: string[];
+  exitCode?: number;
+  compiled?: boolean;
+  transpiledCode?: string;
+}
 
 interface CodeEditorProps {
   initialCode?: string;
@@ -17,12 +38,7 @@ interface CodeEditorProps {
   onCodeChange?: (code: string) => void;
   canRun?: boolean;
   language?: string;
-}
-
-interface ExecutionResult {
-  output: string[];
-  errors: string[];
-  executionTime: number;
+  useWebContainer?: boolean; // WebContainer execution (has CORS issues)
 }
 
 const CodeEditor: React.FC<CodeEditorProps> = ({
@@ -33,11 +49,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   onCodeChange,
   canRun = true,
   language = "javascript",
+  useWebContainer = false, // WebContainer has CORS issues
 }) => {
   const [code, setCode] = useState(initialCode);
   const [result, setResult] = useState<ExecutionResult | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [forceUpdateCounter, setForceUpdateCounter] = useState(0);
   const { resolvedTheme } = useTheme();
   const editorRef = React.useRef<editor.IStandaloneCodeEditor | null>(null);
 
@@ -81,34 +99,86 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     if (!code.trim() || isRunning) return;
 
     setIsRunning(true);
-    setResult(null);
+    setResult({
+      output: [],
+      errors: [],
+      executionTime: 0,
+      isComplete: false,
+    });
 
     try {
       const startTime = Date.now();
-      let executionResult;
+      let executionResult: CodeExecutionResult | undefined;
 
-      if (language === "javascript") {
-        executionResult = executeJavaScriptSimple(code);
-      } else if (language === "typescript") {
-        // Use the official TypeScript compiler for better results
-        executionResult = await executeTypeScriptWithCompiler(code);
+      if (useWebContainer) {
+        // WebContainer execution for reliable async logging
+        setResult({
+          output: ["Executing code..."],
+          errors: [],
+          executionTime: 0,
+          isComplete: false,
+        });
+
+        if (language === "javascript") {
+          executionResult = await executeJavaScript(code);
+        } else if (language === "typescript") {
+          executionResult = await executeTypeScript(code);
+        }
+
+        if (executionResult) {
+          const executionTime = Date.now() - startTime;
+          requestAnimationFrame(() => {
+            setResult({
+              output: executionResult?.output
+                ? executionResult.output
+                    .split("\n")
+                    .filter((line: string) => line.trim())
+                : [],
+              errors: executionResult?.error
+                ? executionResult.error
+                    .split("\n")
+                    .filter((line: string) => line.trim())
+                : [],
+              executionTime,
+              isComplete: true,
+            });
+            setForceUpdateCounter((prev) => prev + 1);
+          });
+        }
+      } else {
+        // Use async-aware execution for better Promise/setTimeout handling
+        if (language === "javascript") {
+          setResult({
+            output: ["🚀 Executing JavaScript..."],
+            errors: [],
+            executionTime: 0,
+            isComplete: false,
+          });
+
+          executionResult = await executeJavaScriptAsync(code);
+        } else if (language === "typescript") {
+          executionResult = await executeTypeScriptWithCompiler(code);
+        }
+
+        if (executionResult) {
+          const executionTime = Date.now() - startTime;
+          setResult({
+            output: executionResult.logs || [],
+            errors: executionResult.errors || [],
+            executionTime,
+            isComplete: true,
+          });
+        }
       }
-      const executionTime = Date.now() - startTime;
-      if (!executionResult) {
-        return;
-      }
-      setResult({
-        output: executionResult.logs,
-        errors: executionResult.errors,
-        executionTime,
-      });
     } catch (error) {
+      console.error("Execution error:", error);
       setResult({
         output: [],
         errors: [
           error instanceof Error ? error.message : "Unknown error occurred",
         ],
         executionTime: 0,
+        isComplete: true,
       });
     } finally {
       setIsRunning(false);
@@ -137,7 +207,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="px-2 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-xs rounded border border-gray-300 dark:border-gray-500 transition-colors flex items-center gap-1"
+              className="px-2 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-xs rounded border border-gray-300 dark:border-gray-500 transition-colors flex items-center gap-1 cursor-pointer"
               title={
                 isExpanded
                   ? "Exit fullscreen (ESC)"
@@ -160,7 +230,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
               <button
                 onClick={handleRunCode}
                 disabled={isRunning || !code.trim()}
-                className="px-3 py-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white text-sm rounded font-medium transition-colors"
+                className="px-3 py-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white text-sm rounded font-medium transition-colors cursor-pointer"
               >
                 {isRunning ? "⏳" : "▶"} Run
               </button>
@@ -182,7 +252,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             </span>
             <button
               onClick={() => setIsExpanded(false)}
-              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-sm rounded border border-gray-300 dark:border-gray-500 transition-colors flex items-center gap-1"
+              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-sm rounded border border-gray-300 dark:border-gray-500 transition-colors flex items-center gap-1 cursor-pointer"
               title="Exit fullscreen (ESC)"
             >
               <span>✕</span>
@@ -293,21 +363,35 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             <div className="bg-black text-green-400 p-3 rounded font-mono text-sm overflow-y-auto text-balance h-full">
               {result.output.length > 0 ? (
                 result.output.map((log, index) => (
-                  <div key={index} className="mb-1 my-1">
+                  <div
+                    key={`output-${index}-${result.executionTime}-${forceUpdateCounter}`}
+                    className="mb-1 my-1"
+                  >
                     {">"} {log}
                   </div>
                 ))
               ) : (
-                <div className="text-gray-500">No output</div>
+                <div className="text-gray-500">
+                  {result.isComplete === false ? "Running..." : "No output"}
+                </div>
               )}
 
               {result.errors.length > 0 && (
                 <div className="mt-2">
                   {result.errors.map((error, index) => (
-                    <div key={index} className="text-red-400 mb-1">
+                    <div
+                      key={`error-${index}-${result.executionTime}-${forceUpdateCounter}`}
+                      className="text-red-400 mb-1"
+                    >
                       ❌ {error}
                     </div>
                   ))}
+                </div>
+              )}
+
+              {!result.isComplete && result.output.length > 0 && (
+                <div className="mt-2 text-yellow-400 text-xs">
+                  ⏳ Waiting for async operations to complete...
                 </div>
               )}
             </div>

@@ -236,7 +236,7 @@ export default function ProjectCard({
                   View Progress
                 </span>
               ) : (
-                <span className={`text-xs font-medium ${moodColors.accent}`}>
+                <span className={`text-xs font-medium ${moodColors.text}`}>
                   Start Project
                 </span>
               )}

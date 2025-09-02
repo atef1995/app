@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { ChallengeMoodAdaptation } from "@prisma/client";
 import { AchievementService } from "./achievementService";
 import { CertificateService } from "./certificateService";
+import { StudyPlanService } from "./services/studyPlanService";
 import { MoodId } from "@/types/mood";
 import { AchievementAction, AchievementMetadata } from "@/types/common";
 
@@ -163,35 +164,18 @@ export class ProgressService {
       },
     });
 
-    // Also update study plan progress if quiz passed
+    // Update study plan progress if quiz passed
     if (passed) {
-      try {
-        const stepId = `tutorial-${progress.tutorial.slug}`;
-
-        // Get current study plan progress
-        const studyProgress = await prisma.userStudyProgress.findFirst({
-          where: { userId },
-        });
-
-        if (studyProgress) {
-          // Add the completed step to the array if not already there
-          const completedSteps = [...studyProgress.completedSteps];
-          if (!completedSteps.includes(stepId)) {
-            completedSteps.push(stepId);
-
-            // Update study plan progress
-            await prisma.userStudyProgress.update({
-              where: { id: studyProgress.id },
-              data: {
-                completedSteps,
-                lastActivityAt: new Date(),
-              },
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error updating study plan progress from quiz:", error);
-        // Don't fail the main operation if study plan update fails
+      const quiz = await prisma.quiz.findUnique({
+        where: { id: submission.quizId },
+      });
+      
+      if (quiz?.slug) {
+        await StudyPlanService.updateStudyPlanProgressOnCompletion(
+          userId,
+          "quiz",
+          quiz.slug
+        );
       }
     }
 
@@ -216,18 +200,17 @@ export class ProgressService {
       });
 
       // Generate tutorial certificate
-      const tutorialCertificate =
-        await CertificateService.generateTutorialCertificate(
-          userId,
-          submission.tutorialId,
-          {
-            score,
-            timeSpent: submission.timeSpent,
-            difficulty: 1, // Default difficulty, should be fetched from tutorial
-            quizPassed: true,
-            completionPercentage: 100,
-          }
-        );
+      await CertificateService.generateTutorialCertificate(
+        userId,
+        submission.tutorialId,
+        {
+          score,
+          timeSpent: submission.timeSpent,
+          difficulty: 1, // Default difficulty, should be fetched from tutorial
+          quizPassed: true,
+          completionPercentage: 100,
+        }
+      );
 
       // Check if user is now eligible for category certificate
       const tutorial = await prisma.tutorial.findUnique({
@@ -322,7 +305,7 @@ export class ProgressService {
       },
     });
 
-    // Check for achievements if challenge was passed
+    // Check for achievements and update study plan if challenge was passed
     let achievements: Array<{
       achievement: {
         id: string;
@@ -340,6 +323,20 @@ export class ProgressService {
           mood: submission.ChallengeMoodAdaptation.mood as MoodId,
         },
       });
+
+      // Update study plan progress
+      const challenge = await prisma.challenge.findUnique({
+        where: { id: submission.challengeId },
+        select: { slug: true },
+      });
+      
+      if (challenge?.slug) {
+        await StudyPlanService.updateStudyPlanProgressOnCompletion(
+          userId,
+          "challenge",
+          challenge.slug
+        );
+      }
 
       // Share challenge completion to social feed if user has sharing enabled
       await this.shareChallengeCompletion(
@@ -602,35 +599,12 @@ export class ProgressService {
       },
     });
 
-    // Also update study plan progress
-    try {
-      const stepId = `tutorial-${progressResult.tutorial.slug}`;
-
-      // Get current study plan progress
-      const studyProgress = await prisma.userStudyProgress.findFirst({
-        where: { userId },
-      });
-
-      if (studyProgress) {
-        // Add the completed step to the array if not already there
-        const completedSteps = [...studyProgress.completedSteps];
-        if (!completedSteps.includes(stepId)) {
-          completedSteps.push(stepId);
-
-          // Update study plan progress
-          await prisma.userStudyProgress.update({
-            where: { id: studyProgress.id },
-            data: {
-              completedSteps,
-              lastActivityAt: new Date(),
-            },
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error updating study plan progress:", error);
-      // Don't fail the main operation if study plan update fails
-    }
+    // Update study plan progress
+    await StudyPlanService.updateStudyPlanProgressOnCompletion(
+      userId,
+      "tutorial",
+      progressResult.tutorial.slug
+    );
 
     return progressResult;
   }
@@ -719,7 +693,7 @@ export class ProgressService {
       },
     });
 
-    // Check for achievements if project was completed
+    // Check for achievements and update study plan if project was completed
     let achievements: Array<{
       achievement: {
         id: string;
@@ -739,6 +713,20 @@ export class ProgressService {
           projectId: submission.projectId,
         } as AchievementMetadata,
       });
+
+      // Update study plan progress
+      const project = await prisma.project.findUnique({
+        where: { id: submission.projectId },
+        select: { slug: true },
+      });
+      
+      if (project?.slug) {
+        await StudyPlanService.updateStudyPlanProgressOnCompletion(
+          userId,
+          "project",
+          project.slug
+        );
+      }
     }
 
     return {

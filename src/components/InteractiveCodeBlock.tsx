@@ -11,6 +11,7 @@ interface InteractiveCodeBlockProps {
   title?: string;
   description?: string;
   language?: string;
+  height?: string;
 }
 
 const InteractiveCodeBlock: React.FC<InteractiveCodeBlockProps> = ({
@@ -18,9 +19,15 @@ const InteractiveCodeBlock: React.FC<InteractiveCodeBlockProps> = ({
   initialCode,
   editable = true,
   title,
+  height = "450px",
   description,
   language = "javascript",
 }) => {
+  language = language?.replace(/language-/, "") || "javascript";
+
+  if (language === "html") {
+    editable = false;
+  }
   // Extract code from children if provided
   const codeFromChildren = React.useMemo(() => {
     if (typeof children === "string") {
@@ -87,7 +94,7 @@ const InteractiveCodeBlock: React.FC<InteractiveCodeBlockProps> = ({
         language={language}
         initialCode={code}
         readOnly={!editable}
-        height="450px"
+        height={height}
         placeholder={
           editable
             ? "// Try modifying this code and click Run!"

@@ -1,10 +1,14 @@
 import { prisma } from "@/lib/prisma";
-import { ProgressService, CompletionStatus } from "@/lib/progressService";
-import { PhaseService, PhaseWithSteps, ContentItem } from "@/lib/services/phaseService";
+import { CompletionStatus } from "@/lib/progressService";
+import { PhaseService, PhaseWithSteps } from "@/lib/services/phaseService";
 import { SkillService } from "@/lib/services/skillService";
-import { Phase, PhaseStep, Skill } from "@prisma/client";
+import { IdService } from "@/lib/services/idService";
+import { Skill, PhaseStep } from "@prisma/client";
 
 // Updated types to work with Phase schema
+
+// Type for phase steps used in ID service
+type PhaseStepForIdService = Pick<PhaseStep, 'id' | 'contentType' | 'contentSlug'>;
 
 export interface DynamicStudyPlanStep {
   id: string; // Format: "step-{phaseStepId}" 
@@ -85,7 +89,7 @@ export class StudyPlanService {
 
       // Convert database phases to study plan format
       const phases = await Promise.all(
-        phasesWithContent.map(phase => this.convertPhaseToStudyPlanPhase(phase, allSkills))
+        phasesWithContent.map(phase => this.convertPhaseToStudyPlanPhase(phase, allSkills, phasesWithContent))
       );
 
       // Calculate total hours
@@ -127,32 +131,11 @@ export class StudyPlanService {
    */
   private static async convertPhaseToStudyPlanPhase(
     phase: PhaseWithSteps,
-    allSkills: Skill[]
+    allSkills: Skill[],
+    allPhases?: PhaseWithSteps[]
   ): Promise<DynamicStudyPlanPhase> {
     const steps: DynamicStudyPlanStep[] = [];
     const projects: DynamicStudyPlanStep[] = [];
-
-    // Local function to extract skills without DB calls
-    const extractSkillsFromContent = (title: string, description: string | null, category?: string): string[] => {
-      const categorySkills = category 
-        ? allSkills.filter(skill => skill.category === category)
-        : allSkills;
-      const text = `${title} ${description || ""}`.toLowerCase();
-      const matchedSkills: string[] = [];
-
-      for (const skill of categorySkills) {
-        const keywordMatch = skill.keywords.some((keyword: string) => 
-          text.includes(keyword.toLowerCase())
-        );
-        const nameMatch = text.includes(skill.name.toLowerCase());
-
-        if (keywordMatch || nameMatch) {
-          matchedSkills.push(skill.name);
-        }
-      }
-
-      return matchedSkills;
-    };
 
     // Process each phase step
     for (const phaseStep of phase.phaseSteps) {
@@ -160,8 +143,16 @@ export class StudyPlanService {
       
       if (!content) continue;
 
+      // Use IdService for consistent step ID creation
+      const stepId = IdService.createStepId(phaseStep.id);
+      
+      // Get all phase steps for prerequisite resolution
+      const allPhaseSteps: PhaseStepForIdService[] = allPhases ? 
+        allPhases.flatMap(p => p.phaseSteps.map(ps => ({ id: ps.id, contentType: ps.contentType, contentSlug: ps.contentSlug }))) : 
+        [{ id: phaseStep.id, contentType: phaseStep.contentType, contentSlug: phaseStep.contentSlug }];
+      
       const stepData: DynamicStudyPlanStep = {
-        id: `step-${phaseStep.id}`,
+        id: stepId,
         phaseStepId: phaseStep.id,
         title: content.title,
         description: content.description,
@@ -171,13 +162,22 @@ export class StudyPlanService {
         estimatedHours: phaseStep.estimatedHours,
         difficulty: this.mapDifficulty(content.difficulty),
         category: content.category,
-        prerequisites: phaseStep.prerequisites,
-        skills: extractSkillsFromContent(content.title, content.description, content.category),
+        // Use IdService for consistent prerequisite handling
+        prerequisites: await IdService.normalizePrerequisites(
+          phaseStep.prerequisites,
+          allPhaseSteps
+        ),
+        skills: this.extractSkillsFromContent(content.title, content.description, content.category, allSkills),
         isOptional: phaseStep.isOptional,
         order: phaseStep.order,
         isPremium: content.isPremium,
         requiredPlan: content.requiredPlan,
       };
+      
+      // Validate step data in development
+      if (process.env.NODE_ENV === 'development') {
+        this.validateStepData(stepData);
+      }
 
       // Separate projects from regular steps
       if (phaseStep.contentType === "project") {
@@ -186,6 +186,18 @@ export class StudyPlanService {
         steps.push(stepData);
       }
     }
+
+    // Sort steps and projects by order, then by type to ensure quizzes come after tutorials
+    const sortedSteps = steps.sort((a, b) => {
+      if (a.order !== b.order) {
+        return a.order - b.order;
+      }
+      // If same order, tutorials come before quizzes
+      const typeOrder: Record<string, number> = { tutorial: 1, quiz: 2, challenge: 3, project: 4 };
+      return (typeOrder[a.type] || 5) - (typeOrder[b.type] || 5);
+    });
+    
+    const sortedProjects = projects.sort((a, b) => a.order - b.order);
 
     return {
       id: phase.id,
@@ -196,8 +208,8 @@ export class StudyPlanService {
       icon: phase.icon,
       estimatedWeeks: phase.estimatedWeeks,
       prerequisites: phase.prerequisites,
-      steps: steps.sort((a, b) => a.order - b.order),
-      projects: projects.sort((a, b) => a.order - b.order),
+      steps: sortedSteps,
+      projects: sortedProjects,
     };
   }
 
@@ -221,31 +233,167 @@ export class StudyPlanService {
   }
 
   /**
-   * Estimate hours based on content type and difficulty
+   * Extract skills from content without making additional DB calls
    */
-  private static estimateHours(
-    difficulty: number | string,
-    type: string
-  ): number {
-    const difficultyMultiplier =
-      typeof difficulty === "number"
-        ? difficulty
-        : difficulty === "easy"
-        ? 1
-        : difficulty === "medium"
-        ? 2
-        : 3;
+  private static extractSkillsFromContent(
+    title: string, 
+    description: string | null, 
+    category: string | undefined,
+    allSkills: Skill[]
+  ): string[] {
+    const categorySkills = category 
+      ? allSkills.filter(skill => skill.category === category)
+      : allSkills;
+    const text = `${title} ${description || ""}`.toLowerCase();
+    const matchedSkills: string[] = [];
 
-    const baseHours = {
-      tutorial: 3,
-      challenge: 2,
-      quiz: 0.5,
-      project: 8,
-    };
+    for (const skill of categorySkills) {
+      const keywordMatch = skill.keywords.some((keyword: string) => 
+        text.includes(keyword.toLowerCase())
+      );
+      const nameMatch = text.includes(skill.name.toLowerCase());
 
-    return (
-      (baseHours[type as keyof typeof baseHours] || 3) * difficultyMultiplier
-    );
+      if (keywordMatch || nameMatch) {
+        matchedSkills.push(skill.name);
+      }
+    }
+
+    return matchedSkills;
+  }
+
+  /**
+   * Validate step data for consistency (development only)
+   */
+  private static validateStepData(step: DynamicStudyPlanStep): void {
+    // Validate step ID format
+    if (!IdService.isValidStepId(step.id)) {
+      console.error(`Invalid step ID format: ${step.id}`);
+      throw new Error(`Invalid step ID format: ${step.id}`);
+    }
+
+    // Validate prerequisites
+    step.prerequisites.forEach(prereq => {
+      if (!IdService.isValidStepId(prereq)) {
+        console.error(`Invalid prerequisite format: ${prereq} for step ${step.id}`);
+        throw new Error(`Invalid prerequisite format: ${prereq}`);
+      }
+    });
+
+    console.log(`✅ Step validation passed for: ${step.id} (${step.title})`);
+  }
+
+  /**
+   * Update study plan progress when content is completed
+   */
+  static async updateStudyPlanProgressOnCompletion(
+    userId: string,
+    contentType: "tutorial" | "quiz" | "challenge" | "project",
+    contentSlug: string
+  ): Promise<void> {
+    try {
+      // Get current study plan progress
+      const studyProgress = await prisma.userStudyProgress.findFirst({
+        where: { userId },
+      });
+
+      if (!studyProgress) return;
+
+      // Find the corresponding phase step
+      const phaseStep = await prisma.phaseStep.findFirst({
+        where: {
+          contentType,
+          contentSlug,
+        },
+      });
+
+      if (!phaseStep) return;
+
+      // Use IdService for consistent step ID creation
+      const stepId = IdService.createStepId(phaseStep.id);
+      const completedSteps = [...studyProgress.completedSteps];
+      
+      // Add step if not already completed
+      if (!completedSteps.includes(stepId)) {
+        completedSteps.push(stepId);
+        
+        // Check if phase is now complete
+        const phase = await prisma.phase.findUnique({
+          where: { id: phaseStep.phaseId },
+          include: { phaseSteps: true },
+        });
+        
+        const completedPhases = [...studyProgress.completedPhases];
+        
+        if (phase) {
+          const requiredSteps = phase.phaseSteps.filter(s => !s.isOptional);
+          const completedRequiredSteps = requiredSteps.filter(s => 
+            completedSteps.includes(`step-${s.id}`)
+          );
+          
+          // Mark phase as complete if all required steps are done
+          if (completedRequiredSteps.length === requiredSteps.length && 
+              !completedPhases.includes(phase.id)) {
+            completedPhases.push(phase.id);
+          }
+        }
+
+        // Calculate new current step after completion
+        let newCurrentStepId = studyProgress.currentStepId;
+        let newCurrentPhaseId = studyProgress.currentPhaseId;
+        
+        // Get the study plan to find the next step
+        const studyPlan = await StudyPlanService.getWebDevelopmentStudyPlan();
+        
+        // Find first incomplete step with met prerequisites
+        outerLoop: for (const phase of studyPlan.phases) {
+          for (const step of [...phase.steps, ...phase.projects]) {
+            if (!completedSteps.includes(step.id)) {
+              // Check if prerequisites are met
+              const prerequisitesMet = step.prerequisites.every(prereq =>
+                completedSteps.includes(prereq)
+              );
+              
+              if (prerequisitesMet) {
+                newCurrentPhaseId = phase.id;
+                newCurrentStepId = step.id;
+                break outerLoop;
+              }
+            }
+          }
+        }
+        
+        // If no incomplete step found, user completed everything
+        if (newCurrentStepId === studyProgress.currentStepId) {
+          // Check if current step is now completed
+          if (completedSteps.includes(studyProgress.currentStepId)) {
+            newCurrentStepId = "completed";
+          }
+        }
+        
+        // Calculate total progress percentage
+        const totalSteps = studyPlan.phases.reduce(
+          (sum, phase) => sum + phase.steps.length + phase.projects.length,
+          0
+        );
+        const totalProgressPercentage = totalSteps > 0 ? 
+          Math.round((completedSteps.length / totalSteps) * 100) : 0;
+        
+        // Update progress with new current step
+        await prisma.userStudyProgress.update({
+          where: { id: studyProgress.id },
+          data: {
+            completedSteps,
+            completedPhases,
+            currentStepId: newCurrentStepId,
+            currentPhaseId: newCurrentPhaseId,
+            totalProgressPercentage,
+            lastActivityAt: new Date(),
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Error updating study plan progress:", error);
+    }
   }
 
   /**
@@ -292,123 +440,150 @@ export class StudyPlanService {
     studyPlan: DynamicStudyPlan
   ): Promise<StudyPlanProgress> {
     try {
-      // Get existing progress from different tables
-      const [tutorialProgress, challengeProgress, projectProgress] =
+      // Get existing completed items from database using proper status checking
+      const [tutorialProgress, challengeProgress, projectProgress, quizAttempts] =
         await Promise.all([
-          ProgressService.getTutorialProgress(userId),
-          ProgressService.getChallengeProgress(userId),
-          ProgressService.getProjectProgress(userId),
+          prisma.tutorialProgress.findMany({
+            where: { 
+              userId, 
+              OR: [
+                { status: CompletionStatus.COMPLETED },
+                { quizPassed: true }
+              ]
+            },
+            include: { tutorial: true },
+          }),
+          prisma.challengeProgress.findMany({
+            where: { 
+              userId, 
+              status: CompletionStatus.COMPLETED 
+            },
+            include: { challenge: true },
+          }),
+          prisma.projectProgress.findMany({
+            where: { 
+              userId, 
+              status: CompletionStatus.COMPLETED 
+            },
+            include: { project: true },
+          }),
+          prisma.quizAttempt.findMany({
+            where: { userId, passed: true },
+            include: { quiz: true },
+          }),
         ]);
 
-      // Map existing progress to study plan steps
-      // Start with existing completed steps from UserStudyProgress
-      const completedSteps: string[] = [...studyPlan.phases.reduce((steps: string[], phase) => {
-        return [...steps, ...phase.steps.map(s => s.id), ...phase.projects.map(p => p.id)];
-      }, [])].filter(stepId => {
-        // Keep only steps that exist in UserStudyProgress (already synced)
-        return false; // For now, rebuild from individual progress
-      });
+      // Build completed steps from actual database progress
+      const completedSteps: string[] = [];
+      
+      // Process completed tutorials
+      for (const progress of tutorialProgress) {
+        const matchingStep = studyPlan.phases
+          .flatMap(p => p.steps)
+          .find(s => s.slug === progress.tutorial.slug && s.type === "tutorial");
+        
+        if (matchingStep) {
+          completedSteps.push(matchingStep.id);
+        }
+      }
 
-      // Check completed tutorials
-      if (Array.isArray(tutorialProgress)) {
-        for (const progress of tutorialProgress) {
-          // Check for both COMPLETED status and successful quiz completion
-          const isCompleted = progress.status === "COMPLETED" || 
-                            progress.status === CompletionStatus.COMPLETED;
-          const isQuizPassed = progress.quizPassed === true;
+      // Process completed challenges
+      for (const progress of challengeProgress) {
+        const matchingStep = studyPlan.phases
+          .flatMap(p => p.steps)
+          .find(s => s.slug === progress.challenge.slug && s.type === "challenge");
+        
+        if (matchingStep) {
+          completedSteps.push(matchingStep.id);
+        }
+      }
+
+      // Process completed projects
+      for (const progress of projectProgress) {
+        const matchingStep = studyPlan.phases
+          .flatMap(p => [...p.steps, ...p.projects])
+          .find(s => s.slug === progress.project.slug && s.type === "project");
+        
+        if (matchingStep) {
+          completedSteps.push(matchingStep.id);
+        }
+      }
+
+      // Process completed quizzes
+      for (const attempt of quizAttempts) {
+        if (attempt.quiz?.slug) {
+          const matchingStep = studyPlan.phases
+            .flatMap(p => p.steps)
+            .find(s => s.slug === attempt.quiz.slug && s.type === "quiz");
           
-          if (isCompleted || isQuizPassed) {
-            // Find matching tutorial step by slug
-            const matchingStep = studyPlan.phases
-              .flatMap(p => p.steps)
-              .find(s => s.slug === progress.tutorial.slug && s.type === "tutorial");
-            
-            if (matchingStep && !completedSteps.includes(matchingStep.id)) {
-              completedSteps.push(matchingStep.id);
-            }
+          if (matchingStep) {
+            completedSteps.push(matchingStep.id);
           }
         }
       }
 
-      // Check completed challenges
-      if (Array.isArray(challengeProgress)) {
-        for (const progress of challengeProgress) {
-          if (progress.status === "COMPLETED") {
-            // Find matching challenge step by slug
-            const matchingStep = studyPlan.phases
-              .flatMap(p => p.steps)
-              .find(s => s.slug === progress.challenge.slug && s.type === "challenge");
-            
-            if (matchingStep && !completedSteps.includes(matchingStep.id)) {
-              completedSteps.push(matchingStep.id);
-            }
+      // Use IdService to clean and validate completed steps
+      const uniqueCompletedSteps = IdService.validateAndCleanStepIds([...new Set(completedSteps)]);
+
+      // Calculate completed phases
+      const completedPhases: string[] = [];
+      for (const phase of studyPlan.phases) {
+        const allPhaseSteps = [...phase.steps, ...phase.projects];
+        const requiredSteps = allPhaseSteps.filter(step => !step.isOptional);
+        
+        if (requiredSteps.length > 0) {
+          const completedRequiredSteps = requiredSteps.filter(step => 
+            uniqueCompletedSteps.includes(step.id)
+          );
+          
+          // Mark phase as complete if all required steps are done
+          if (completedRequiredSteps.length === requiredSteps.length) {
+            completedPhases.push(phase.id);
           }
         }
       }
 
-      // Check completed projects
-      if (Array.isArray(projectProgress)) {
-        for (const progress of projectProgress) {
-          if (progress.status === "COMPLETED") {
-            // Find matching project step by slug
-            const matchingStep = studyPlan.phases
-              .flatMap(p => p.projects)
-              .find(s => s.slug === progress.project.slug && s.type === "project");
-            
-            if (matchingStep && !completedSteps.includes(matchingStep.id)) {
-              completedSteps.push(matchingStep.id);
-            }
-          }
-        }
-      }
-
-      // Calculate progress
+      // Calculate progress percentage
       const totalSteps = studyPlan.phases.reduce(
         (sum, phase) => sum + phase.steps.length + phase.projects.length,
         0
       );
-      const progressPercentage =
-        totalSteps > 0
-          ? Math.round((completedSteps.length / totalSteps) * 100)
-          : 0;
+      const progressPercentage = totalSteps > 0 ? 
+        Math.round((uniqueCompletedSteps.length / totalSteps) * 100) : 0;
 
       // Find current phase and step
-      let currentPhaseId = studyPlan.phases[0].slug; // Use slug for phase ID
-      let currentStepId = studyPlan.phases[0].steps[0]?.id || "";
+      let currentPhaseId = studyPlan.phases[0]?.id || "";
+      let currentStepId = "";
 
-      // Find first incomplete step with met prerequisites
-      outerLoop: for (const phase of studyPlan.phases) {
-        for (const step of phase.steps) {
-          if (!completedSteps.includes(step.id)) {
-            // Check prerequisites
-            const prerequisitesMet = step.prerequisites.every((prereq) =>
-              completedSteps.includes(prereq)
-            );
-
-            if (prerequisitesMet) {
-              currentPhaseId = phase.slug; // Use phase slug
-              currentStepId = step.id;
-              break outerLoop;
+      // Find first incomplete phase and step
+      for (const phase of studyPlan.phases) {
+        if (!completedPhases.includes(phase.id)) {
+          currentPhaseId = phase.id;
+          
+          // Find first incomplete step in this phase
+          for (const step of [...phase.steps, ...phase.projects]) {
+            if (!uniqueCompletedSteps.includes(step.id)) {
+              // Check if prerequisites are met
+              const prerequisitesMet = step.prerequisites.every(prereq =>
+                uniqueCompletedSteps.includes(prereq)
+              );
+              
+              if (prerequisitesMet) {
+                currentStepId = step.id;
+                break;
+              }
             }
           }
+          break;
         }
       }
 
-      // Create or update progress record
-      const progressData = {
-        userId,
-        studyPlanId: studyPlan.id,
-        currentPhaseId,
-        currentStepId,
-        completedSteps,
-        completedPhases: [],
-        totalProgressPercentage: progressPercentage,
-        hoursSpent: 0,
-        estimatedCompletionDate: new Date(
-          Date.now() + 24 * 7 * 24 * 60 * 60 * 1000
-        ),
-      };
+      // If no current step found, user has completed everything
+      if (!currentStepId && completedPhases.length === studyPlan.phases.length) {
+        currentStepId = "completed";
+      }
 
+      // Create or update progress record
       const userProgress = await prisma.userStudyProgress.upsert({
         where: {
           userId_studyPlanId: {
@@ -419,14 +594,24 @@ export class StudyPlanService {
         update: {
           currentPhaseId,
           currentStepId,
-          completedSteps,
-          completedPhases: [],
-          totalProgressPercentage: progressData.totalProgressPercentage,
+          completedSteps: uniqueCompletedSteps,
+          completedPhases,
+          totalProgressPercentage: progressPercentage,
           lastActivityAt: new Date(),
         },
         create: {
-          ...progressData,
+          userId,
+          studyPlanId: studyPlan.id,
+          currentPhaseId,
+          currentStepId,
+          completedSteps: uniqueCompletedSteps,
+          completedPhases,
+          totalProgressPercentage: progressPercentage,
+          hoursSpent: 0,
           startedAt: new Date(),
+          estimatedCompletionDate: new Date(
+            Date.now() + Math.max(studyPlan.totalWeeks, 1) * 7 * 24 * 60 * 60 * 1000
+          ),
           lastActivityAt: new Date(),
         },
       });

@@ -80,6 +80,34 @@ export function StudyPlanRoadmap({
         0
       ),
       completedCount: completedSteps.length,
+      completedSteps,
+      currentStepId,
+    });
+
+    // Debug step availability
+    studyPlan.phases.forEach((phase) => {
+      [...phase.steps, ...phase.projects].forEach((step) => {
+        const isCompleted = completedSteps.includes(step.id);
+        const isAvailable = step.prerequisites.every((prereq) =>
+          completedSteps.includes(prereq)
+        );
+        const isCurrent = step.id === currentStepId;
+
+        if (!isCompleted && (!isAvailable || isCurrent)) {
+          console.log(`🔍 Step Debug - ${step.title}:`, {
+            stepId: step.id,
+            type: step.type,
+            prerequisites: step.prerequisites,
+            isCompleted,
+            isAvailable,
+            isCurrent,
+            prerequisitesStatus: step.prerequisites.map((prereq) => ({
+              id: prereq,
+              completed: completedSteps.includes(prereq),
+            })),
+          });
+        }
+      });
     });
   }
   const isStepAvailable = (step: DynamicStudyPlanStep): boolean => {
@@ -311,7 +339,7 @@ export function StudyPlanRoadmap({
                                   <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                                     <span className="flex items-center gap-1">
                                       <Clock className="w-3 h-3" />
-                                      {step.estimatedHours}h
+                                      {step.estimatedHours.toPrecision(1)}h
                                     </span>
                                     <span
                                       className={`px-2 py-1 rounded-full ${

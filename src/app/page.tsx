@@ -149,7 +149,7 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            The only JavaScript learning platform that adapts to your mood.
+            The only programming learning platform that adapts to your mood.
             Whether you&apos;re chilling, rushing, or grinding - we&apos;ve got
             the perfect learning experience for you.
           </motion.p>

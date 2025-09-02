@@ -70,10 +70,11 @@ export const useStudyPlan = () => {
     queryKey: STUDY_PLAN_QUERY_KEY,
     queryFn: fetchStudyPlan,
     enabled: status === "authenticated", // Only fetch when authenticated
-    staleTime: 2 * 60 * 1000, // 2 minutes - study plan data changes less frequently
+    staleTime: 30 * 1000, // 30 seconds - refresh more frequently to catch progress updates
     gcTime: 5 * 60 * 1000, // 5 minutes cache time
     retry: 2,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true, // Refetch when user comes back to tab
+    refetchOnMount: "always", // Always refetch when component mounts
   });
 };
 
@@ -115,16 +116,30 @@ export const useStudyPlanUtils = () => {
     queryClient.invalidateQueries({ queryKey: STUDY_PLAN_QUERY_KEY });
   };
 
+  const refetchStudyPlan = () => {
+    queryClient.refetchQueries({ queryKey: STUDY_PLAN_QUERY_KEY });
+  };
+
   const prefetchStudyPlan = () => {
     queryClient.prefetchQuery({
       queryKey: STUDY_PLAN_QUERY_KEY,
       queryFn: fetchStudyPlan,
-      staleTime: 2 * 60 * 1000,
+      staleTime: 30 * 1000,
+    });
+  };
+
+  // Force refresh study plan immediately
+  const forceRefreshStudyPlan = async () => {
+    await queryClient.refetchQueries({ 
+      queryKey: STUDY_PLAN_QUERY_KEY,
+      type: 'active'
     });
   };
 
   return {
     invalidateStudyPlan,
+    refetchStudyPlan,
     prefetchStudyPlan,
+    forceRefreshStudyPlan,
   };
 };
