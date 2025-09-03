@@ -123,7 +123,7 @@ const StudyPlanStats = ({
               {hoursSpent}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">
-              of {studyPlan.totalHours} hours
+              of {Math.round(studyPlan.totalHours)} hours
             </div>
           </div>
         </div>

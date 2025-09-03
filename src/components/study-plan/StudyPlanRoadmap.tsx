@@ -188,7 +188,7 @@ export function StudyPlanRoadmap({
         </h2>
         <div className="text-sm text-gray-600 dark:text-gray-400">
           {studyPlan.phases.length} phases • {studyPlan.totalWeeks} weeks •{" "}
-          {studyPlan.totalHours} hours
+          {Math.round(studyPlan.totalHours * 10) / 10} hours
         </div>
       </div>
 
@@ -237,10 +237,12 @@ export function StudyPlanRoadmap({
                           {phase.steps.length + phase.projects.length} items
                         </span>
                         <span>
-                          {[...phase.steps, ...phase.projects].reduce(
-                            (sum, step) => sum + step.estimatedHours,
-                            0
-                          )}{" "}
+                          {Math.round(
+                            [...phase.steps, ...phase.projects].reduce(
+                              (sum, step) => sum + step.estimatedHours,
+                              0
+                            ) * 10
+                          ) / 10}{" "}
                           hours
                         </span>
                       </div>
@@ -339,7 +341,7 @@ export function StudyPlanRoadmap({
                                   <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                                     <span className="flex items-center gap-1">
                                       <Clock className="w-3 h-3" />
-                                      {step.estimatedHours.toPrecision(1)}h
+                                      {Math.round(step.estimatedHours * 10) / 10}h
                                     </span>
                                     <span
                                       className={`px-2 py-1 rounded-full ${

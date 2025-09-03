@@ -13,72 +13,73 @@ export interface CurrentStepInfo {
 
 /**
  * Get current phase, current step, and next step based on user progress
- * Uses the backend-provided currentStepId as the source of truth
  */
 export function getCurrentStepInfo(
   studyPlan: DynamicStudyPlan, 
   completedSteps: string[],
   currentStepId?: string
 ): CurrentStepInfo {
-  // If we have a currentStepId from backend, use it as source of truth
+  // Find the first incomplete step with prerequisites met
+  const nextStep = findNextAvailableStep(studyPlan, completedSteps);
+  
+  // If we have a currentStepId, find its phase for current context
+  let currentPhase: DynamicStudyPlanPhase | null = null;
+  let currentStep: DynamicStudyPlanStep | null = null;
+  
   if (currentStepId) {
     for (const phase of studyPlan.phases) {
       const allSteps = [...phase.steps, ...phase.projects];
-      const currentStep = allSteps.find(step => step.id === currentStepId);
-      
-      if (currentStep) {
-        const nextStep = findNextAvailableStep(studyPlan, completedSteps, currentStep);
-        return {
-          currentPhase: phase,
-          currentStep,
-          nextStep
-        };
+      const step = allSteps.find(step => step.id === currentStepId);
+      if (step) {
+        currentPhase = phase;
+        currentStep = step;
+        break;
       }
     }
   }
-
-  // Fallback: Find the first incomplete step with prerequisites met
-  const nextStep = findNextAvailableStep(studyPlan, completedSteps);
-  const currentPhase = nextStep ? findPhaseForStep(studyPlan, nextStep) : studyPlan.phases[0];
+  
+  // If no current step or phase found, use the phase containing the next step
+  if (!currentPhase && nextStep) {
+    currentPhase = findPhaseForStep(studyPlan, nextStep);
+  }
+  
+  // Default to first phase if still no phase found
+  if (!currentPhase) {
+    currentPhase = studyPlan.phases[0];
+  }
   
   return {
     currentPhase,
-    currentStep: nextStep,
+    currentStep,
     nextStep
   };
 }
 
 /**
  * Find the next available step that the user can start
+ * Searches through phases in order, then steps within each phase
  */
 export function findNextAvailableStep(
   studyPlan: DynamicStudyPlan, 
-  completedSteps: string[],
-  afterStep?: DynamicStudyPlanStep
+  completedSteps: string[]
 ): DynamicStudyPlanStep | null {
-  const allSteps = studyPlan.phases.flatMap(phase => [...phase.steps, ...phase.projects]);
-  
-  // If afterStep is provided, start searching after that step
-  let startIndex = 0;
-  if (afterStep) {
-    const afterIndex = allSteps.findIndex(step => step.id === afterStep.id);
-    startIndex = afterIndex + 1;
-  }
-  
-  // Find the first step that:
-  // 1. Is not completed
-  // 2. Has all prerequisites met
-  for (let i = startIndex; i < allSteps.length; i++) {
-    const step = allSteps[i];
+  // Go through phases in order
+  for (const phase of studyPlan.phases) {
+    const allSteps = [...phase.steps, ...phase.projects].sort((a, b) => a.order - b.order);
     
-    if (completedSteps.includes(step.id)) continue;
-    
-    const prerequisitesMet = step.prerequisites.every(prereq => 
-      completedSteps.includes(prereq)
-    );
-    
-    if (prerequisitesMet) {
-      return step;
+    // Find first incomplete step with prerequisites met
+    for (const step of allSteps) {
+      // Skip if already completed
+      if (completedSteps.includes(step.id)) continue;
+      
+      // Check if all prerequisites are met
+      const prerequisitesMet = step.prerequisites.every(prereq => 
+        completedSteps.includes(prereq)
+      );
+      
+      if (prerequisitesMet) {
+        return step;
+      }
     }
   }
   
