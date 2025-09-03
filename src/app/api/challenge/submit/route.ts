@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { ProgressService } from "@/lib/progressService";
+import { StudyPlanService } from "@/lib/services/studyPlanService";
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,6 +32,20 @@ export async function POST(request: NextRequest) {
         ChallengeMoodAdaptation: session.user.mood || "CHILL",
       }
     );
+
+    // Update study plan progress if challenge was passed
+    if (passed && challengeId) {
+      try {
+        await StudyPlanService.updateStudyPlanProgressOnCompletion(
+          session.user.id,
+          "challenge",
+          challengeId
+        );
+      } catch (error) {
+        console.warn("Failed to update study plan progress:", error);
+        // Don't fail the whole request if study plan update fails
+      }
+    }
 
     return NextResponse.json({
       success: true,

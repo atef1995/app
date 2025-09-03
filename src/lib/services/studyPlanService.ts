@@ -378,7 +378,15 @@ export class StudyPlanService {
         const totalProgressPercentage = totalSteps > 0 ? 
           Math.round((completedSteps.length / totalSteps) * 100) : 0;
         
-        // Update progress with new current step
+        // Find the completed step to get its estimated hours
+        const completedStep = studyPlan.phases
+          .flatMap(p => [...p.steps, ...p.projects])
+          .find(s => s.id === stepId);
+        
+        const hoursToAdd = completedStep?.estimatedHours || 0;
+        const newHoursSpent = Math.max(studyProgress.hoursSpent + hoursToAdd, 0);
+        
+        // Update progress with new current step and hours
         await prisma.userStudyProgress.update({
           where: { id: studyProgress.id },
           data: {
@@ -387,6 +395,7 @@ export class StudyPlanService {
             currentStepId: newCurrentStepId,
             currentPhaseId: newCurrentPhaseId,
             totalProgressPercentage,
+            hoursSpent: newHoursSpent,
             lastActivityAt: new Date(),
           },
         });

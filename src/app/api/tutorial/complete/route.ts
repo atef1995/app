@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { ProgressService } from "@/lib/progressService";
 import { AchievementService } from "@/lib/achievementService";
+import { StudyPlanService } from "@/lib/services/studyPlanService";
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,6 +28,18 @@ export async function POST(request: NextRequest) {
       session.user.id,
       tutorialId
     );
+
+    // Update study plan progress with time tracking
+    try {
+      await StudyPlanService.updateStudyPlanProgressOnCompletion(
+        session.user.id,
+        "tutorial", 
+        tutorialId
+      );
+    } catch (error) {
+      console.warn("Failed to update study plan progress:", error);
+      // Don't fail the whole request if study plan update fails
+    }
 
     // Check for tutorial completion achievements
     const achievements = await AchievementService.checkAndUnlockAchievements({
