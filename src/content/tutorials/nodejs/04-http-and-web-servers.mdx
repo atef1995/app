@@ -1,0 +1,2535 @@
+---
+title: "HTTP & Web Servers: Building Your First Server"
+description: "Create powerful HTTP servers from scratch using Node.js. Master requests, responses, routing, and middleware while building real web applications."
+difficulty: 2
+tags: ["http", "server", "web", "routing", "middleware", "express"]
+relatedTutorials: ["04-asynchronous-programming", "06-file-system-operations"]
+estimatedTime: "60 minutes"
+prerequisites: ["Understanding of asynchronous programming", "Basic HTTP knowledge", "Package management from Tutorial 03"]
+objectives:
+  - "Build HTTP servers using Node.js core modules"
+  - "Handle different HTTP methods and routes"
+  - "Create middleware for request processing"
+  - "Build a complete REST API with Express.js"
+  - "Implement error handling and logging"
+order: 4
+isPremium: true
+requiredPlan: "VIBED"
+---
+
+# HTTP & Web Servers: Building Your First Server
+
+Ready to bring your JavaScript skills to the web? In this tutorial, you'll learn to create powerful web servers that can handle thousands of requests, serve web pages, and build APIs that power modern applications!
+
+## Understanding HTTP in Node.js
+
+**Student**: "I know HTTP from web development, but how does it work in Node.js?"
+
+**Teacher**: "Great question! Node.js gives you direct access to HTTP functionality through its built-in modules. You can create servers that handle requests just like Apache or Nginx, but with JavaScript!"
+
+HTTP (HyperText Transfer Protocol) is the foundation of web communication. Every time you visit a website or use an app, HTTP requests are flying back and forth.
+
+<InteractiveCodeBlock
+  title="Your First HTTP Server"
+  language="javascript"
+  showOutput={true}
+  editable={true}
+>
+{`
+const http = require('http');
+
+// Create a simple HTTP server
+const server = http.createServer((request, response) => {
+    console.log('📨 Incoming request:', request.method, request.url);
+    
+    // Set response headers
+    response.writeHead(200, { 'Content-Type': 'text/html' });
+    
+    // Send response
+    response.end('<h1>🚀 Hello from Node.js Server!</h1><p>Your server is running!</p>');
+});
+
+// Start the server
+const PORT = 3000;
+server.listen(PORT, () => {
+    console.log(\`🌐 Server running at http://localhost:\${PORT}\`);
+    console.log('🎯 Try visiting the URL in your browser!');
+});
+
+// Log server events
+server.on('connection', () => {
+    console.log('🔗 New client connected');
+});
+`}
+</InteractiveCodeBlock>
+
+**Student**: "Wow, that's it? Just a few lines and I have a web server?"
+
+**Teacher**: "Exactly! Node.js makes it incredibly simple. But let's dive deeper and understand what's happening here!"
+
+## HTTP Request and Response Deep Dive
+
+<DualPaneEditor
+  title="Understanding HTTP Messages (Interactive Demo)"
+  description="Explore HTTP requests and responses in detail - All functionality simulated for learning"
+  frontendCode={`<!DOCTYPE html>
+<html>
+<head>
+    <title>HTTP Request/Response Explorer</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+        }
+        .section { 
+            background: #f8f9fa; 
+            padding: 20px; 
+            margin: 15px 0; 
+            border-radius: 8px;
+            border-left: 4px solid #007acc;
+        }
+        .method-selector {
+            margin: 10px 0;
+        }
+        .method-btn {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            margin: 3px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .method-btn.active { background: #28a745; }
+        .request-form input, .request-form textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .response-area {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .headers-display {
+            background: #fff3cd;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .send-btn {
+            background: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌐 HTTP Request/Response Explorer</h1>
+    
+    <div class="section">
+        <h3>📤 Build Your Request</h3>
+        <div class="method-selector">
+            <strong>HTTP Method:</strong><br>
+            <button class="method-btn active" data-method="GET" onclick="selectMethod('GET')">GET</button>
+            <button class="method-btn" data-method="POST" onclick="selectMethod('POST')">POST</button>
+            <button class="method-btn" data-method="PUT" onclick="selectMethod('PUT')">PUT</button>
+            <button class="method-btn" data-method="DELETE" onclick="selectMethod('DELETE')">DELETE</button>
+        </div>
+        
+        <div class="request-form">
+            <label><strong>URL Path:</strong></label>
+            <input type="text" id="urlPath" value="/users" placeholder="/api/endpoint">
+            
+            <label><strong>Request Headers (JSON):</strong></label>
+            <textarea id="requestHeaders" rows="3" placeholder='{"Content-Type": "application/json", "Authorization": "Bearer token"}'>{}</textarea>
+            
+            <label><strong>Request Body (for POST/PUT):</strong></label>
+            <textarea id="requestBody" rows="4" placeholder='{"name": "John", "email": "john@example.com"}'></textarea>
+            
+            <button class="send-btn" onclick="sendRequest()">🚀 Send Request</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>📥 Server Response</h3>
+        <div id="responseDisplay" class="response-area">Click "Send Request" to see the server response...</div>
+    </div>
+
+    <div class="section">
+        <h3>🔍 Request/Response Analysis</h3>
+        <div id="analysisDisplay" class="headers-display">Request details will appear here...</div>
+    </div>
+
+    <div class="section">
+        <h3>📚 HTTP Status Code Guide</h3>
+        <div class="headers-display">
+200 OK - Success
+201 Created - Resource created successfully
+400 Bad Request - Invalid request format
+401 Unauthorized - Authentication required
+404 Not Found - Resource not found
+500 Internal Server Error - Server error
+
+Common Methods:
+• GET - Retrieve data
+• POST - Create new resource
+• PUT - Update existing resource
+• DELETE - Remove resource
+        </div>
+    </div>
+
+    <script>
+        let currentMethod = 'GET';
+        const API_BASE = 'http://localhost:3001';
+
+        function selectMethod(method) {
+            currentMethod = method;
+            // Update button styles
+            document.querySelectorAll('.method-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.method === method);
+            });
+            
+            // Show/hide body input based on method
+            const bodyTextarea = document.getElementById('requestBody');
+            if (method === 'GET' || method === 'DELETE') {
+                bodyTextarea.style.display = 'none';
+                bodyTextarea.previousElementSibling.style.display = 'none';
+            } else {
+                bodyTextarea.style.display = 'block';
+                bodyTextarea.previousElementSibling.style.display = 'block';
+            }
+        }
+
+        async function sendRequest() {
+            console.log(\`📡 Simulating \${currentMethod} request...\`);
+            
+            const urlPath = document.getElementById('urlPath').value || '/users';
+            const requestHeaders = document.getElementById('requestHeaders').value || '{}';
+            const requestBody = document.getElementById('requestBody').value;
+
+            // Simulate request/response for educational purposes
+            const simulatedResponse = simulateServerResponse(currentMethod, urlPath, requestHeaders, requestBody);
+            
+            displayResponse(simulatedResponse);
+            displayAnalysis(currentMethod, urlPath, requestHeaders, requestBody, simulatedResponse);
+        }
+
+        function simulateServerResponse(method, path, headersStr, body) {
+            // Parse headers
+            let headers = {};
+            try {
+                headers = JSON.parse(headersStr);
+            } catch (e) {
+                headers = {};
+            }
+
+            // Simulate different responses based on method and path
+            let statusCode, statusText, responseBody, responseHeaders;
+
+            if (path === '/users' && method === 'GET') {
+                statusCode = 200;
+                statusText = 'OK';
+                responseBody = JSON.stringify([
+                    { id: 1, name: 'Alice', email: 'alice@example.com' },
+                    { id: 2, name: 'Bob', email: 'bob@example.com' }
+                ], null, 2);
+                responseHeaders = {
+                    'Content-Type': 'application/json',
+                    'X-Total-Count': '2',
+                    'Server': 'Node.js Tutorial Server'
+                };
+            } else if (path === '/users' && method === 'POST') {
+                statusCode = 201;
+                statusText = 'Created';
+                let newUser = { id: 3, name: 'New User', email: 'new@example.com' };
+                if (body) {
+                    try {
+                        const bodyData = JSON.parse(body);
+                        newUser = { ...newUser, ...bodyData };
+                    } catch (e) {}
+                }
+                responseBody = JSON.stringify(newUser, null, 2);
+                responseHeaders = {
+                    'Content-Type': 'application/json',
+                    'Location': '/users/3',
+                    'Server': 'Node.js Tutorial Server'
+                };
+            } else if (path.startsWith('/users/') && method === 'PUT') {
+                statusCode = 200;
+                statusText = 'OK';
+                const userId = path.split('/')[2];
+                responseBody = JSON.stringify({ 
+                    id: parseInt(userId), 
+                    name: 'Updated User', 
+                    email: 'updated@example.com',
+                    ...(body ? JSON.parse(body || '{}') : {})
+                }, null, 2);
+                responseHeaders = {
+                    'Content-Type': 'application/json',
+                    'Server': 'Node.js Tutorial Server'
+                };
+            } else if (path.startsWith('/users/') && method === 'DELETE') {
+                statusCode = 204;
+                statusText = 'No Content';
+                responseBody = '';
+                responseHeaders = {
+                    'Server': 'Node.js Tutorial Server'
+                };
+            } else {
+                statusCode = 404;
+                statusText = 'Not Found';
+                responseBody = JSON.stringify({ 
+                    error: 'Resource not found',
+                    message: \`\${method} \${path} is not available\`
+                }, null, 2);
+                responseHeaders = {
+                    'Content-Type': 'application/json',
+                    'Server': 'Node.js Tutorial Server'
+                };
+            }
+
+            return {
+                statusCode,
+                statusText,
+                responseBody,
+                responseHeaders,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        function displayResponse(response) {
+            const display = document.getElementById('responseDisplay');
+            display.textContent = \`HTTP/1.1 \${response.statusCode} \${response.statusText}
+\${Object.entries(response.responseHeaders).map(([k, v]) => \`\${k}: \${v}\`).join('\\n')}
+
+\${response.responseBody}\`;
+        }
+
+        function displayAnalysis(method, path, headersStr, body, response) {
+            const display = document.getElementById('analysisDisplay');
+            
+            let analysis = \`📊 REQUEST ANALYSIS:
+Method: \${method}
+Path: \${path}
+Headers: \${headersStr}
+\${body && (method === 'POST' || method === 'PUT') ? \`Body: \${body}\` : ''}
+
+📈 RESPONSE ANALYSIS:
+Status: \${response.statusCode} \${response.statusText}
+Response Time: ~\${Math.floor(Math.random() * 50 + 10)}ms (simulated)
+Response Size: \${response.responseBody.length} bytes
+Content-Type: \${response.responseHeaders['Content-Type'] || 'N/A'}
+
+🎯 EXPLANATION:
+\`;
+
+            if (response.statusCode === 200) {
+                analysis += 'Success! The server processed your request correctly.';
+            } else if (response.statusCode === 201) {
+                analysis += 'Resource created successfully! New item was added to the server.';
+            } else if (response.statusCode === 204) {
+                analysis += 'Success! Resource was deleted (no content returned).';
+            } else if (response.statusCode === 404) {
+                analysis += 'Not Found! The requested resource does not exist on the server.';
+            }
+
+            display.textContent = analysis;
+        }
+
+        // Initialize
+        selectMethod('GET');
+    </script>
+</body>
+</html>`}
+  backendCode={`const http = require('http');
+const url = require('url');
+
+// User data simulation
+let users = [
+    { id: 1, name: 'Alice', email: 'alice@example.com', created: new Date().toISOString() },
+    { id: 2, name: 'Bob', email: 'bob@example.com', created: new Date().toISOString() }
+];
+let nextId = 3;
+
+// Helper functions
+function setCORSHeaders(res) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+}
+
+function sendJSON(res, data, statusCode = 200) {
+    setCORSHeaders(res);
+    res.writeHead(statusCode, { 
+        'Content-Type': 'application/json',
+        'Server': 'Node.js Tutorial Server'
+    });
+    res.end(JSON.stringify(data, null, 2));
+}
+
+function parseRequestBody(req, callback) {
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        try {
+            callback(null, body ? JSON.parse(body) : {});
+        } catch (error) {
+            callback(error, null);
+        }
+    });
+}
+
+function logRequest(req) {
+    console.log(\`📨 \${req.method} \${req.url} - \${new Date().toISOString()}\`);
+    console.log(\`   Headers: \${JSON.stringify(req.headers, null, 2)}\`);
+}
+
+// Create HTTP server with routing
+const server = http.createServer((req, res) => {
+    const parsedUrl = url.parse(req.url, true);
+    const path = parsedUrl.pathname;
+    const method = req.method;
+
+    // Log all requests
+    logRequest(req);
+
+    // Handle preflight requests
+    if (method === 'OPTIONS') {
+        setCORSHeaders(res);
+        res.writeHead(200);
+        res.end();
+        return;
+    }
+
+    // Route: GET /users - Get all users
+    if (path === '/users' && method === 'GET') {
+        console.log('📋 Fetching all users...');
+        sendJSON(res, {
+            message: 'Users retrieved successfully',
+            data: users,
+            total: users.length,
+            timestamp: new Date().toISOString()
+        });
+        return;
+    }
+
+    // Route: GET /users/:id - Get specific user
+    if (path.startsWith('/users/') && method === 'GET') {
+        const userId = parseInt(path.split('/')[2]);
+        const user = users.find(u => u.id === userId);
+        
+        if (user) {
+            console.log(\`👤 Found user: \${user.name}\`);
+            sendJSON(res, {
+                message: 'User retrieved successfully',
+                data: user,
+                timestamp: new Date().toISOString()
+            });
+        } else {
+            console.log(\`❌ User with ID \${userId} not found\`);
+            sendJSON(res, {
+                error: 'User not found',
+                message: \`No user exists with ID \${userId}\`,
+                timestamp: new Date().toISOString()
+            }, 404);
+        }
+        return;
+    }
+
+    // Route: POST /users - Create new user
+    if (path === '/users' && method === 'POST') {
+        parseRequestBody(req, (error, data) => {
+            if (error) {
+                console.log('❌ Invalid JSON in request body');
+                sendJSON(res, { 
+                    error: 'Invalid JSON',
+                    message: 'Request body must be valid JSON'
+                }, 400);
+                return;
+            }
+
+            const newUser = {
+                id: nextId++,
+                name: data.name || 'Unknown',
+                email: data.email || 'unknown@example.com',
+                created: new Date().toISOString(),
+                ...data
+            };
+
+            users.push(newUser);
+            console.log(\`✨ Created new user: \${newUser.name}\`);
+
+            sendJSON(res, {
+                message: 'User created successfully',
+                data: newUser,
+                timestamp: new Date().toISOString()
+            }, 201);
+        });
+        return;
+    }
+
+    // Route: PUT /users/:id - Update user
+    if (path.startsWith('/users/') && method === 'PUT') {
+        const userId = parseInt(path.split('/')[2]);
+        const userIndex = users.findIndex(u => u.id === userId);
+
+        if (userIndex === -1) {
+            console.log(\`❌ Cannot update: User \${userId} not found\`);
+            sendJSON(res, {
+                error: 'User not found',
+                message: \`No user exists with ID \${userId}\`
+            }, 404);
+            return;
+        }
+
+        parseRequestBody(req, (error, data) => {
+            if (error) {
+                sendJSON(res, { 
+                    error: 'Invalid JSON',
+                    message: 'Request body must be valid JSON'
+                }, 400);
+                return;
+            }
+
+            // Update user
+            users[userIndex] = {
+                ...users[userIndex],
+                ...data,
+                id: userId, // Ensure ID doesn't change
+                updated: new Date().toISOString()
+            };
+
+            console.log(\`🔄 Updated user: \${users[userIndex].name}\`);
+            sendJSON(res, {
+                message: 'User updated successfully',
+                data: users[userIndex],
+                timestamp: new Date().toISOString()
+            });
+        });
+        return;
+    }
+
+    // Route: DELETE /users/:id - Delete user
+    if (path.startsWith('/users/') && method === 'DELETE') {
+        const userId = parseInt(path.split('/')[2]);
+        const userIndex = users.findIndex(u => u.id === userId);
+
+        if (userIndex === -1) {
+            console.log(\`❌ Cannot delete: User \${userId} not found\`);
+            sendJSON(res, {
+                error: 'User not found',
+                message: \`No user exists with ID \${userId}\`
+            }, 404);
+            return;
+        }
+
+        const deletedUser = users.splice(userIndex, 1)[0];
+        console.log(\`🗑️ Deleted user: \${deletedUser.name}\`);
+
+        setCORSHeaders(res);
+        res.writeHead(204, { 'Server': 'Node.js Tutorial Server' });
+        res.end();
+        return;
+    }
+
+    // Route: GET /stats - Server statistics
+    if (path === '/stats' && method === 'GET') {
+        const stats = {
+            totalUsers: users.length,
+            serverUptime: process.uptime(),
+            memoryUsage: process.memoryUsage(),
+            nodeVersion: process.version,
+            timestamp: new Date().toISOString()
+        };
+        
+        console.log('📊 Serving server statistics');
+        sendJSON(res, {
+            message: 'Server statistics',
+            data: stats
+        });
+        return;
+    }
+
+    // 404 - Route not found
+    console.log(\`❌ Route not found: \${method} \${path}\`);
+    sendJSON(res, {
+        error: 'Route not found',
+        message: \`The route \${method} \${path} does not exist\`,
+        availableRoutes: [
+            'GET /users',
+            'GET /users/:id',
+            'POST /users',
+            'PUT /users/:id',
+            'DELETE /users/:id',
+            'GET /stats'
+        ],
+        timestamp: new Date().toISOString()
+    }, 404);
+});
+
+// Start server
+const PORT = 3001;
+server.listen(PORT, () => {
+    console.log(\`🚀 HTTP Server running on http://localhost:\${PORT}\`);
+    console.log('📚 Available endpoints:');
+    console.log('   GET    /users     - List all users');
+    console.log('   GET    /users/:id - Get specific user');
+    console.log('   POST   /users     - Create new user');
+    console.log('   PUT    /users/:id - Update user');
+    console.log('   DELETE /users/:id - Delete user');
+    console.log('   GET    /stats     - Server statistics');
+});
+
+// Handle server events
+server.on('connection', (socket) => {
+    console.log('🔗 New client connected from', socket.remoteAddress);
+});
+
+server.on('error', (error) => {
+    console.error('❌ Server error:', error);
+});`}
+  previewType="html"
+  height="700px"
+/>
+
+## Building Routes and Handling Different HTTP Methods
+
+**Student**: "That demo is amazing! But how do I organize all these routes in a real application?"
+
+**Teacher**: "Great question! Let's build a proper routing system and learn how to handle different HTTP methods professionally!"
+
+<InteractiveCodeBlock
+  title="Building a Router System"
+  language="javascript" 
+  showOutput={true}
+  editable={true}
+>
+{`
+const http = require('http');
+const url = require('url');
+
+// Simple router class
+class Router {
+    constructor() {
+        this.routes = [];
+    }
+
+    // Add route for any HTTP method
+    addRoute(method, path, handler) {
+        this.routes.push({ method: method.toUpperCase(), path, handler });
+        console.log(\`📝 Added route: \${method.toUpperCase()} \${path}\`);
+    }
+
+    // Convenience methods
+    get(path, handler) { this.addRoute('GET', path, handler); }
+    post(path, handler) { this.addRoute('POST', path, handler); }
+    put(path, handler) { this.addRoute('PUT', path, handler); }
+    delete(path, handler) { this.addRoute('DELETE', path, handler); }
+
+    // Handle incoming requests
+    handle(req, res) {
+        const { pathname } = url.parse(req.url);
+        const method = req.method.toUpperCase();
+
+        console.log(\`🔍 Looking for route: \${method} \${pathname}\`);
+
+        // Find matching route
+        const route = this.routes.find(route => {
+            return route.method === method && this.matchPath(route.path, pathname);
+        });
+
+        if (route) {
+            // Extract parameters for dynamic routes
+            const params = this.extractParams(route.path, pathname);
+            req.params = params;
+            route.handler(req, res);
+        } else {
+            // 404 Not Found
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ 
+                error: 'Route not found',
+                path: pathname,
+                method 
+            }));
+        }
+    }
+
+    // Simple path matching (supports :id parameters)
+    matchPath(routePath, requestPath) {
+        if (routePath === requestPath) return true;
+        
+        const routeParts = routePath.split('/');
+        const requestParts = requestPath.split('/');
+        
+        if (routeParts.length !== requestParts.length) return false;
+        
+        return routeParts.every((part, i) => {
+            return part.startsWith(':') || part === requestParts[i];
+        });
+    }
+
+    // Extract parameters from dynamic routes
+    extractParams(routePath, requestPath) {
+        const params = {};
+        const routeParts = routePath.split('/');
+        const requestParts = requestPath.split('/');
+        
+        routeParts.forEach((part, i) => {
+            if (part.startsWith(':')) {
+                const paramName = part.slice(1);
+                params[paramName] = requestParts[i];
+            }
+        });
+        
+        return params;
+    }
+}
+
+// Create router instance
+const router = new Router();
+
+// Sample data
+let todos = [
+    { id: 1, text: 'Learn Node.js', completed: false },
+    { id: 2, text: 'Build a web server', completed: true },
+    { id: 3, text: 'Master routing', completed: false }
+];
+let nextId = 4;
+
+// Helper function to parse JSON body
+function parseBody(req, callback) {
+    let body = '';
+    req.on('data', chunk => body += chunk.toString());
+    req.on('end', () => {
+        try {
+            callback(null, body ? JSON.parse(body) : {});
+        } catch (error) {
+            callback(error, null);
+        }
+    });
+}
+
+// Route handlers
+router.get('/todos', (req, res) => {
+    console.log('📋 Fetching all todos');
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, data: todos }));
+});
+
+router.get('/todos/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const todo = todos.find(t => t.id === id);
+    
+    console.log(\`🔍 Looking for todo with ID: \${id}\`);
+    
+    if (todo) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, data: todo }));
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Todo not found' }));
+    }
+});
+
+router.post('/todos', (req, res) => {
+    parseBody(req, (err, data) => {
+        if (err) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Invalid JSON' }));
+            return;
+        }
+
+        const newTodo = {
+            id: nextId++,
+            text: data.text || 'Untitled todo',
+            completed: data.completed || false
+        };
+
+        todos.push(newTodo);
+        console.log(\`✅ Created todo: \${newTodo.text}\`);
+
+        res.writeHead(201, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, data: newTodo }));
+    });
+});
+
+router.put('/todos/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const todoIndex = todos.findIndex(t => t.id === id);
+
+    if (todoIndex === -1) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Todo not found' }));
+        return;
+    }
+
+    parseBody(req, (err, data) => {
+        if (err) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Invalid JSON' }));
+            return;
+        }
+
+        todos[todoIndex] = { ...todos[todoIndex], ...data };
+        console.log(\`🔄 Updated todo: \${todos[todoIndex].text}\`);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, data: todos[todoIndex] }));
+    });
+});
+
+router.delete('/todos/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const todoIndex = todos.findIndex(t => t.id === id);
+
+    if (todoIndex === -1) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Todo not found' }));
+        return;
+    }
+
+    const deletedTodo = todos.splice(todoIndex, 1)[0];
+    console.log(\`🗑️ Deleted todo: \${deletedTodo.text}\`);
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, message: 'Todo deleted' }));
+});
+
+// Create and start server
+const server = http.createServer((req, res) => {
+    // Add CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+        res.writeHead(200);
+        res.end();
+        return;
+    }
+
+    console.log(\`📨 \${req.method} \${req.url}\`);
+    router.handle(req, res);
+});
+
+const PORT = 3000;
+server.listen(PORT, () => {
+    console.log(\`🚀 Server with custom router running on port \${PORT}\`);
+    console.log('🎯 Try these endpoints:');
+    console.log('   GET /todos');
+    console.log('   GET /todos/1');
+    console.log('   POST /todos');
+    console.log('   PUT /todos/1');
+    console.log('   DELETE /todos/1');
+});
+`}
+</InteractiveCodeBlock>
+
+## Introduction to Express.js - The Web Framework
+
+**Student**: "This routing system is cool, but I've heard about Express.js. Should I use that instead?"
+
+**Teacher**: "Excellent question! Express.js is the most popular Node.js web framework. It provides all this routing functionality and much more, professionally built and tested. Let's see the difference!"
+
+<DualPaneEditor
+  title="Express.js vs Raw Node.js Server"
+  description="Compare raw Node.js HTTP server with Express.js framework - Educational simulation"
+  frontendCode={`<!DOCTYPE html>
+<html>
+<head>
+    <title>Express.js vs Raw Node.js</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .server-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #007acc;
+        }
+        .server-section h3 {
+            margin-top: 0;
+            color: #007acc;
+        }
+        .features {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .code-sample {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .test-area {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .result {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Express.js vs Raw Node.js HTTP</h1>
+
+    <div class="comparison">
+        <div class="server-section">
+            <h3>📦 Raw Node.js HTTP Server</h3>
+            <div class="features">
+                <strong>✅ What you get:</strong><br>
+                • Basic HTTP server<br>
+                • Manual routing<br>
+                • Manual request parsing<br>
+                • Manual middleware<br>
+                • Manual error handling
+            </div>
+            
+            <div class="code-sample">// Raw Node.js Server
+const http = require('http');
+
+const server = http.createServer((req, res) => {
+    // Manual routing
+    if (req.url === '/api/users' && req.method === 'GET') {
+        // Manual JSON response
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify({users: []}));
+    } else if (req.url === '/api/users' && req.method === 'POST') {
+        // Manual body parsing
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                // Process data...
+                res.writeHead(201, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify({success: true}));
+            } catch (error) {
+                res.writeHead(400, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify({error: 'Invalid JSON'}));
+            }
+        });
+    } else {
+        // Manual 404
+        res.writeHead(404, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify({error: 'Not found'}));
+    }
+});
+
+server.listen(3000);</div>
+        </div>
+
+        <div class="server-section">
+            <h3>⚡ Express.js Framework</h3>
+            <div class="features">
+                <strong>🎯 What you get:</strong><br>
+                • Powerful routing system<br>
+                • Automatic request parsing<br>
+                • Middleware ecosystem<br>
+                • Built-in error handling<br>
+                • Template engines<br>
+                • Security features
+            </div>
+            
+            <div class="code-sample">// Express.js Server
+const express = require('express');
+const app = express();
+
+// Middleware (automatic)
+app.use(express.json()); // Auto JSON parsing
+app.use(express.static('public')); // Static files
+
+// Clean routing
+app.get('/api/users', (req, res) => {
+    res.json({users: []}); // Auto JSON response
+});
+
+app.post('/api/users', (req, res) => {
+    // req.body automatically parsed
+    const userData = req.body;
+    // Process data...
+    res.status(201).json({success: true});
+});
+
+// Global error handler
+app.use((error, req, res, next) => {
+    res.status(500).json({error: error.message});
+});
+
+app.listen(3000, () => {
+    console.log('Server running on port 3000');
+});</div>
+        </div>
+    </div>
+
+    <div class="test-area">
+        <h3>🧪 Test Both Approaches</h3>
+        <p>Compare the responses from both server types:</p>
+        <button onclick="testRawNode()">Test Raw Node.js Response</button>
+        <button onclick="testExpress()">Test Express.js Response</button>
+        <button onclick="showMetrics()">Compare Performance Metrics</button>
+        <div id="testResult" class="result">Click buttons above to see simulated responses...</div>
+    </div>
+
+    <script>
+        function testRawNode() {
+            // Simulate raw Node.js response
+            const response = {
+                server: 'Raw Node.js',
+                requestTime: '15ms',
+                codeLines: 45,
+                features: {
+                    routing: 'Manual',
+                    bodyParsing: 'Manual',
+                    errorHandling: 'Manual',
+                    middleware: 'Custom built',
+                    jsonResponse: 'Manual serialization'
+                },
+                response: {
+                    status: 200,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Server': 'Node.js HTTP'
+                    },
+                    body: {
+                        message: 'Response from raw Node.js server',
+                        users: [
+                            {id: 1, name: 'Alice'},
+                            {id: 2, name: 'Bob'}
+                        ],
+                        meta: {
+                            totalUsers: 2,
+                            serverType: 'raw-nodejs'
+                        }
+                    }
+                }
+            };
+            
+            displayResult(response);
+        }
+
+        function testExpress() {
+            // Simulate Express.js response
+            const response = {
+                server: 'Express.js',i
+                requestTime: '8ms',
+                codeLines: 20,
+                features: {
+                    routing: 'Built-in router',
+                    bodyParsing: 'express.json() middleware',
+                    errorHandling: 'Global error handler',
+                    middleware: 'Rich ecosystem',
+                    jsonResponse: 'res.json() method'
+                },
+                response: {
+                    status: 200,
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8',
+                        'X-Powered-By': 'Express',
+                        'ETag': 'W/"123-abc"'
+                    },
+                    body: {
+                        message: 'Response from Express.js server',
+                        users: [
+                            {id: 1, name: 'Alice', createdAt: '2024-01-15T10:30:00Z'},
+                            {id: 2, name: 'Bob', createdAt: '2024-01-15T11:15:00Z'}
+                        ],
+                        meta: {
+                            totalUsers: 2,
+                            serverType: 'express',
+                            apiVersion: '1.0',
+                            documentation: '/api/docs'
+                        }
+                    }
+                }
+            };
+            
+            displayResult(response);
+        }
+
+        function showMetrics() {
+            const metrics = {
+                comparison: 'Raw Node.js vs Express.js',
+                developmentSpeed: {
+                    rawNodejs: '100% - You build everything',
+                    express: '300% - Framework handles boilerplate'
+                },
+                codeQuality: {
+                    rawNodejs: 'Custom - Your responsibility',
+                    express: 'Proven - Battle-tested framework'
+                },
+                security: {
+                    rawNodejs: 'Manual - You implement all security',
+                    express: 'Built-in - Security middleware available'
+                },
+                performance: {
+                    rawNodejs: 'Fast - No framework overhead',
+                    express: 'Very Fast - Optimized for real-world use'
+                },
+                ecosystem: {
+                    rawNodejs: 'Build your own - Reinvent the wheel',
+                    express: 'Rich ecosystem - 1000s of middleware'
+                },
+                learning: {
+                    rawNodejs: 'Deep understanding of HTTP',
+                    express: 'Focus on application logic'
+                },
+                recommendation: {
+                    rawNodejs: 'Learning, microservices, specific requirements',
+                    express: 'Most web applications, APIs, rapid development'
+                }
+            };
+            
+            document.getElementById('testResult').textContent = 
+                '📊 COMPARISON METRICS:\\n\\n' + JSON.stringify(metrics, null, 2);
+        }
+
+        function displayResult(data) {
+            document.getElementById('testResult').textContent = 
+                JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>`}
+  backendCode={`const express = require('express');
+const http = require('http');
+
+// Express.js Application
+function createExpressServer() {
+    const app = express();
+    
+    // Middleware
+    app.use(express.json()); // Parse JSON bodies
+    app.use(express.urlencoded({ extended: true })); // Parse form data
+    
+    // Logging middleware
+    app.use((req, res, next) => {
+        console.log(\`📨 Express: \${req.method} \${req.path} - \${new Date().toISOString()}\`);
+        next();
+    });
+
+    // Sample data
+    let users = [
+        { id: 1, name: 'Alice', email: 'alice@example.com', createdAt: new Date().toISOString() },
+        { id: 2, name: 'Bob', email: 'bob@example.com', createdAt: new Date().toISOString() }
+    ];
+    let nextId = 3;
+
+    // Routes
+    app.get('/api/users', (req, res) => {
+        console.log('✨ Express: Fetching users');
+        res.json({
+            success: true,
+            data: users,
+            meta: {
+                total: users.length,
+                serverType: 'express',
+                apiVersion: '1.0'
+            }
+        });
+    });
+
+    app.get('/api/users/:id', (req, res) => {
+        const id = parseInt(req.params.id);
+        const user = users.find(u => u.id === id);
+        
+        if (user) {
+            console.log(\`✨ Express: Found user \${user.name}\`);
+            res.json({
+                success: true,
+                data: user
+            });
+        } else {
+            res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+    });
+
+    app.post('/api/users', (req, res) => {
+        // req.body is automatically parsed by express.json()
+        const { name, email } = req.body;
+        
+        if (!name || !email) {
+            return res.status(400).json({
+                success: false,
+                error: 'Name and email are required'
+            });
+        }
+
+        const newUser = {
+            id: nextId++,
+            name,
+            email,
+            createdAt: new Date().toISOString()
+        };
+
+        users.push(newUser);
+        console.log(\`✨ Express: Created user \${newUser.name}\`);
+
+        res.status(201).json({
+            success: true,
+            data: newUser,
+            message: 'User created successfully'
+        });
+    });
+
+    app.put('/api/users/:id', (req, res) => {
+        const id = parseInt(req.params.id);
+        const userIndex = users.findIndex(u => u.id === id);
+
+        if (userIndex === -1) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+
+        users[userIndex] = {
+            ...users[userIndex],
+            ...req.body,
+            id, // Preserve ID
+            updatedAt: new Date().toISOString()
+        };
+
+        console.log(\`✨ Express: Updated user \${users[userIndex].name}\`);
+        res.json({
+            success: true,
+            data: users[userIndex],
+            message: 'User updated successfully'
+        });
+    });
+
+    app.delete('/api/users/:id', (req, res) => {
+        const id = parseInt(req.params.id);
+        const userIndex = users.findIndex(u => u.id === id);
+
+        if (userIndex === -1) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+
+        const deletedUser = users.splice(userIndex, 1)[0];
+        console.log(\`✨ Express: Deleted user \${deletedUser.name}\`);
+
+        res.json({
+            success: true,
+            message: 'User deleted successfully',
+            data: { deletedUser }
+        });
+    });
+
+    // Error handling middleware
+    app.use((error, req, res, next) => {
+        console.error('❌ Express Error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Internal Server Error',
+            message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+        });
+    });
+
+    // 404 handler
+    app.use('*', (req, res) => {
+        res.status(404).json({
+            success: false,
+            error: 'Route not found',
+            path: req.originalUrl,
+            method: req.method,
+            availableRoutes: [
+                'GET /api/users',
+                'GET /api/users/:id',
+                'POST /api/users',
+                'PUT /api/users/:id',
+                'DELETE /api/users/:id'
+            ]
+        });
+    });
+
+    return app;
+}
+
+// Raw Node.js Server (for comparison)
+function createRawNodeServer() {
+    let users = [
+        { id: 1, name: 'Alice', email: 'alice@example.com' },
+        { id: 2, name: 'Bob', email: 'bob@example.com' }
+    ];
+    let nextId = 3;
+
+    const server = http.createServer((req, res) => {
+        console.log(\`📨 Raw Node: \${req.method} \${req.url}\`);
+
+        // Set CORS headers
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+        // Handle preflight
+        if (req.method === 'OPTIONS') {
+            res.writeHead(200);
+            res.end();
+            return;
+        }
+
+        const url = new URL(req.url, \`http://\${req.headers.host}\`);
+        const path = url.pathname;
+        const method = req.method;
+
+        // Helper function to send JSON
+        const sendJSON = (data, statusCode = 200) => {
+            res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(data));
+        };
+
+        // Parse request body
+        const parseBody = (callback) => {
+            let body = '';
+            req.on('data', chunk => body += chunk.toString());
+            req.on('end', () => {
+                try {
+                    callback(null, body ? JSON.parse(body) : {});
+                } catch (error) {
+                    callback(error, null);
+                }
+            });
+        };
+
+        // Routes
+        if (path === '/api/users' && method === 'GET') {
+            console.log('🔧 Raw Node: Fetching users');
+            sendJSON({
+                success: true,
+                data: users,
+                meta: {
+                    total: users.length,
+                    serverType: 'raw-nodejs'
+                }
+            });
+        } else if (path === '/api/users' && method === 'POST') {
+            parseBody((err, data) => {
+                if (err) {
+                    sendJSON({ success: false, error: 'Invalid JSON' }, 400);
+                    return;
+                }
+
+                const newUser = {
+                    id: nextId++,
+                    name: data.name || 'Unknown',
+                    email: data.email || 'unknown@example.com'
+                };
+
+                users.push(newUser);
+                console.log(\`🔧 Raw Node: Created user \${newUser.name}\`);
+                sendJSON({ success: true, data: newUser }, 201);
+            });
+        } else {
+            sendJSON({ 
+                success: false, 
+                error: 'Route not found',
+                path,
+                method
+            }, 404);
+        }
+    });
+
+    return server;
+}
+
+// Start both servers for comparison
+const expressApp = createExpressServer();
+const rawNodeServer = createRawNodeServer();
+
+// Express server
+const EXPRESS_PORT = 3001;
+expressApp.listen(EXPRESS_PORT, () => {
+    console.log(\`🚀 Express.js server running on http://localhost:\${EXPRESS_PORT}\`);
+    console.log('📊 Express Features: Routing, Middleware, Error Handling, JSON Parsing');
+});
+
+// Raw Node.js server
+const RAW_NODE_PORT = 3002;
+rawNodeServer.listen(RAW_NODE_PORT, () => {
+    console.log(\`🔧 Raw Node.js server running on http://localhost:\${RAW_NODE_PORT}\`);
+    console.log('📊 Raw Node Features: Basic HTTP, Manual everything');
+});
+
+console.log('\\n🎯 Compare both servers:');
+console.log(\`   Express.js: http://localhost:\${EXPRESS_PORT}/api/users\`);
+console.log(\`   Raw Node:   http://localhost:\${RAW_NODE_PORT}/api/users\`);\`);`}
+  previewType="html"
+  height="700px"
+/>
+
+## Middleware: The Power of Express.js
+
+**Student**: "I keep hearing about middleware in Express. What is that exactly?"
+
+**Teacher**: "Middleware is one of Express.js's most powerful features! Think of middleware as layers that each request passes through. Each layer can examine, modify, or even stop the request!"
+
+<InteractiveCodeBlock
+  title="Understanding Express.js Middleware"
+  language="javascript"
+  showOutput={true}
+  editable={true}
+>
+{`
+const express = require('express');
+const app = express();
+
+// Sample data
+let requestCount = 0;
+let users = [
+    { id: 1, name: 'Alice', role: 'admin' },
+    { id: 2, name: 'Bob', role: 'user' },
+    { id: 3, name: 'Charlie', role: 'user' }
+];
+
+// 1. GLOBAL MIDDLEWARE - Runs for ALL requests
+app.use((req, res, next) => {
+    requestCount++;
+    console.log(\`📊 Request #\${requestCount}: \${req.method} \${req.path}\`);
+    console.log(\`⏰ Time: \${new Date().toISOString()}\`);
+    req.requestId = Math.random().toString(36).substr(2, 9);
+    next(); // IMPORTANT: Call next() to continue to the next middleware
+});
+
+// 2. LOGGING MIDDLEWARE - Custom logger
+const logger = (req, res, next) => {
+    const start = Date.now();
+    console.log(\`🚀 Starting request \${req.requestId}\`);
+    
+    // Override res.json to log response
+    const originalJson = res.json;
+    res.json = function(data) {
+        const duration = Date.now() - start;
+        console.log(\`✅ Completed request \${req.requestId} in \${duration}ms\`);
+        return originalJson.call(this, data);
+    };
+    
+    next();
+};
+
+app.use(logger);
+
+// 3. BODY PARSING MIDDLEWARE - Built-in Express middleware
+app.use(express.json()); // Parse JSON bodies
+
+// 4. AUTHENTICATION MIDDLEWARE - Custom auth checker
+const requireAuth = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    console.log(\`🔒 Checking authentication: \${authHeader || 'No auth header'}\`);
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ 
+            error: 'Unauthorized',
+            message: 'Missing or invalid authorization header',
+            requestId: req.requestId
+        });
+    }
+    
+    // Simulate token validation
+    const token = authHeader.split(' ')[1];
+    if (token !== 'valid-token') {
+        return res.status(401).json({ 
+            error: 'Unauthorized',
+            message: 'Invalid token',
+            requestId: req.requestId
+        });
+    }
+    
+    // Add user info to request object
+    req.user = { id: 1, name: 'Alice', role: 'admin' };
+    console.log(\`✅ Authenticated user: \${req.user.name}\`);
+    next();
+};
+
+// 5. ROLE-BASED AUTHORIZATION MIDDLEWARE
+const requireRole = (role) => {
+    return (req, res, next) => {
+        console.log(\`👮 Checking role: Required=\${role}, User=\${req.user?.role}\`);
+        
+        if (!req.user || req.user.role !== role) {
+            return res.status(403).json({
+                error: 'Forbidden',
+                message: \`Requires \${role} role\`,
+                userRole: req.user?.role,
+                requestId: req.requestId
+            });
+        }
+        
+        console.log(\`✅ Role check passed for \${req.user.name}\`);
+        next();
+    };
+};
+
+// 6. VALIDATION MIDDLEWARE - Validate request data
+const validateUser = (req, res, next) => {
+    const { name, email } = req.body;
+    const errors = [];
+    
+    if (!name || name.trim().length < 2) {
+        errors.push('Name must be at least 2 characters');
+    }
+    
+    if (!email || !email.includes('@')) {
+        errors.push('Valid email is required');
+    }
+    
+    if (errors.length > 0) {
+        console.log(\`❌ Validation failed: \${errors.join(', ')}\`);
+        return res.status(400).json({
+            error: 'Validation failed',
+            errors,
+            requestId: req.requestId
+        });
+    }
+    
+    console.log(\`✅ Validation passed for \${name}\`);
+    next();
+};
+
+// ROUTES WITH MIDDLEWARE
+
+// Public route - No special middleware needed
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: 'healthy',
+        uptime: process.uptime(),
+        requests: requestCount,
+        requestId: req.requestId
+    });
+});
+
+// Protected route - Requires authentication
+app.get('/api/profile', requireAuth, (req, res) => {
+    res.json({
+        message: 'Your profile data',
+        user: req.user,
+        requestId: req.requestId
+    });
+});
+
+// Admin only route - Requires authentication AND admin role
+app.get('/api/users', requireAuth, requireRole('admin'), (req, res) => {
+    res.json({
+        users,
+        message: 'All users (admin only)',
+        requestId: req.requestId
+    });
+});
+
+// Route with multiple middleware - Auth + validation
+app.post('/api/users', requireAuth, requireRole('admin'), validateUser, (req, res) => {
+    const newUser = {
+        id: users.length + 1,
+        name: req.body.name.trim(),
+        email: req.body.email.toLowerCase(),
+        role: req.body.role || 'user',
+        createdBy: req.user.name
+    };
+    
+    users.push(newUser);
+    console.log(\`👤 Created user: \${newUser.name}\`);
+    
+    res.status(201).json({
+        message: 'User created successfully',
+        user: newUser,
+        requestId: req.requestId
+    });
+});
+
+// ERROR HANDLING MIDDLEWARE - Must be last!
+app.use((error, req, res, next) => {
+    console.error(\`❌ Error in request \${req.requestId}:\`, error);
+    
+    res.status(500).json({
+        error: 'Internal Server Error',
+        message: 'Something went wrong on the server',
+        requestId: req.requestId,
+        ...(process.env.NODE_ENV === 'development' && { 
+            stack: error.stack,
+            details: error.message 
+        })
+    });
+});
+
+// 404 HANDLER - Catch unmatched routes
+app.use('*', (req, res) => {
+    res.status(404).json({
+        error: 'Not Found',
+        message: \`Route \${req.method} \${req.originalUrl} not found\`,
+        requestId: req.requestId,
+        availableRoutes: [
+            'GET /api/health',
+            'GET /api/profile (requires auth)',
+            'GET /api/users (requires admin)',
+            'POST /api/users (requires admin + validation)'
+        ]
+    });
+});
+
+// Start server
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(\`🚀 Middleware Demo Server running on port \${PORT}\`);
+    console.log('\\n🧪 Test these endpoints:');
+    console.log('   GET  /api/health (public)');
+    console.log('   GET  /api/profile (needs: Authorization: Bearer valid-token)');
+    console.log('   GET  /api/users (needs: auth + admin role)');
+    console.log('   POST /api/users (needs: auth + admin + valid JSON body)');
+    console.log('\\n📝 Example headers:');
+    console.log('   Authorization: Bearer valid-token');
+    console.log('   Content-Type: application/json');
+    console.log('\\n📋 Example POST body:');
+    console.log('   {"name": "New User", "email": "new@example.com", "role": "user"}');
+});
+`}
+</InteractiveCodeBlock>
+
+**Student**: "This is incredible! Middleware makes everything so organized. How do I test all these different scenarios?"
+
+**Teacher**: "Great question! Let's create a complete testing environment where you can see exactly how the middleware chain works!"
+
+## Error Handling and Production Best Practices
+
+<DualPaneEditor
+  title="Production-Ready Express Server with Error Handling"
+  description="Complete web server with professional error handling, logging, and monitoring"
+  frontendCode={`<!DOCTYPE html>
+<html>
+<head>
+    <title>Production Web Server Testing</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+        }
+        .test-section { 
+            background: #f8f9fa; 
+            padding: 20px; 
+            margin: 15px 0; 
+            border-radius: 8px;
+            border-left: 4px solid #007acc;
+        }
+        .test-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover { background: #0056a3; }
+        button.danger { background: #dc3545; }
+        button.success { background: #28a745; }
+        button.warning { background: #ffc107; color: black; }
+        
+        .response-display {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .auth-controls input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+        .server-stats {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Production Web Server Testing</h1>
+    
+    <div class="test-section">
+        <h3>🔐 Authentication Controls</h3>
+        <div class="auth-controls">
+            <input type="text" id="authToken" placeholder="Enter auth token" value="valid-token">
+            <button onclick="setAuthToken()">Set Auth Token</button>
+            <button onclick="clearAuth()" class="danger">Clear Auth</button>
+            <button onclick="useInvalidToken()" class="warning">Use Invalid Token</button>
+        </div>
+        <p><strong>Current Token:</strong> <span id="currentToken">valid-token</span></p>
+    </div>
+
+    <div class="test-section">
+        <h3>🧪 API Tests</h3>
+        <div class="test-controls">
+            <button onclick="testHealth()" class="success">✅ Health Check</button>
+            <button onclick="testProfile()">👤 Get Profile</button>
+            <button onclick="testUsers()">👥 List Users (Admin)</button>
+            <button onclick="testCreateUser()">➕ Create User</button>
+            <button onclick="testInvalidRoute()" class="warning">❌ Invalid Route</button>
+            <button onclick="testServerError()" class="danger">💥 Trigger Error</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Server Response</h3>
+        <div id="responseDisplay" class="response-display">Click any test button above to see server responses...</div>
+    </div>
+
+    <div class="test-section">
+        <h3>📈 Server Statistics</h3>
+        <button onclick="getServerStats()" class="success">📊 Get Stats</button>
+        <div id="statsDisplay" class="server-stats">Server statistics will appear here...</div>
+    </div>
+
+    <div class="test-section">
+        <h3>📝 Request Examples</h3>
+        <div class="response-display">
+# Successful Authentication
+curl -H "Authorization: Bearer valid-token" \\
+     http://localhost:3001/api/profile
+
+# Create User with Validation
+curl -X POST \\
+     -H "Authorization: Bearer valid-token" \\
+     -H "Content-Type: application/json" \\
+     -d '{"name": "John Doe", "email": "john@example.com"}' \\
+     http://localhost:3001/api/users
+
+# Invalid Request (missing email)
+curl -X POST \\
+     -H "Authorization: Bearer valid-token" \\
+     -H "Content-Type: application/json" \\
+     -d '{"name": "Invalid User"}' \\
+     http://localhost:3001/api/users
+
+# Unauthorized Request
+curl http://localhost:3001/api/users
+        </div>
+    </div>
+
+    <script>
+        let currentAuthToken = 'valid-token';
+        const API_BASE = 'http://localhost:3001';
+
+        function setAuthToken() {
+            currentAuthToken = document.getElementById('authToken').value;
+            document.getElementById('currentToken').textContent = currentAuthToken || 'None';
+        }
+
+        function clearAuth() {
+            currentAuthToken = '';
+            document.getElementById('authToken').value = '';
+            document.getElementById('currentToken').textContent = 'None';
+        }
+
+        function useInvalidToken() {
+            currentAuthToken = 'invalid-token-123';
+            document.getElementById('authToken').value = currentAuthToken;
+            document.getElementById('currentToken').textContent = currentAuthToken;
+        }
+
+        // Simulate API calls for educational purposes
+        function simulateRequest(method, endpoint, body = null, description = '') {
+            console.log(\`📡 Simulating \${method} \${endpoint}\`);
+            
+            const request = {
+                method,
+                url: API_BASE + endpoint,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(currentAuthToken && { 'Authorization': \`Bearer \${currentAuthToken}\` })
+                },
+                ...(body && { body: JSON.stringify(body) }),
+                timestamp: new Date().toISOString()
+            };
+
+            // Simulate different responses based on endpoint and auth
+            let response;
+            
+            if (endpoint === '/api/health') {
+                response = {
+                    status: 200,
+                    statusText: 'OK',
+                    data: {
+                        status: 'healthy',
+                        uptime: Math.floor(Math.random() * 10000),
+                        requests: Math.floor(Math.random() * 1000),
+                        memory: \`\${Math.floor(Math.random() * 100)}MB\`,
+                        requestId: 'req_' + Math.random().toString(36).substr(2, 9)
+                    }
+                };
+            } else if (endpoint === '/api/profile') {
+                if (!currentAuthToken) {
+                    response = {
+                        status: 401,
+                        statusText: 'Unauthorized',
+                        data: { error: 'Unauthorized', message: 'Missing authorization header' }
+                    };
+                } else if (currentAuthToken !== 'valid-token') {
+                    response = {
+                        status: 401,
+                        statusText: 'Unauthorized', 
+                        data: { error: 'Unauthorized', message: 'Invalid token' }
+                    };
+                } else {
+                    response = {
+                        status: 200,
+                        statusText: 'OK',
+                        data: {
+                            message: 'Your profile data',
+                            user: { id: 1, name: 'Alice', role: 'admin', email: 'alice@example.com' },
+                            requestId: 'req_' + Math.random().toString(36).substr(2, 9)
+                        }
+                    };
+                }
+            } else if (endpoint === '/api/users' && method === 'GET') {
+                if (!currentAuthToken || currentAuthToken !== 'valid-token') {
+                    response = {
+                        status: 401,
+                        statusText: 'Unauthorized',
+                        data: { error: 'Unauthorized', message: 'Authentication required' }
+                    };
+                } else {
+                    response = {
+                        status: 200,
+                        statusText: 'OK',
+                        data: {
+                            users: [
+                                { id: 1, name: 'Alice', role: 'admin' },
+                                { id: 2, name: 'Bob', role: 'user' },
+                                { id: 3, name: 'Charlie', role: 'user' }
+                            ],
+                            message: 'All users (admin only)',
+                            requestId: 'req_' + Math.random().toString(36).substr(2, 9)
+                        }
+                    };
+                }
+            } else if (endpoint === '/api/users' && method === 'POST') {
+                if (!currentAuthToken || currentAuthToken !== 'valid-token') {
+                    response = {
+                        status: 401,
+                        statusText: 'Unauthorized',
+                        data: { error: 'Unauthorized', message: 'Authentication required' }
+                    };
+                } else if (!body || !body.name || !body.email) {
+                    response = {
+                        status: 400,
+                        statusText: 'Bad Request',
+                        data: { 
+                            error: 'Validation failed',
+                            errors: [
+                                ...((!body || !body.name) ? ['Name is required'] : []),
+                                ...((!body || !body.email) ? ['Valid email is required'] : [])
+                            ]
+                        }
+                    };
+                } else {
+                    response = {
+                        status: 201,
+                        statusText: 'Created',
+                        data: {
+                            message: 'User created successfully',
+                            user: {
+                                id: 4,
+                                name: body.name,
+                                email: body.email,
+                                role: body.role || 'user',
+                                createdBy: 'Alice'
+                            },
+                            requestId: 'req_' + Math.random().toString(36).substr(2, 9)
+                        }
+                    };
+                }
+            } else if (endpoint === '/api/trigger-error') {
+                response = {
+                    status: 500,
+                    statusText: 'Internal Server Error',
+                    data: {
+                        error: 'Internal Server Error',
+                        message: 'Something went wrong on the server',
+                        requestId: 'req_' + Math.random().toString(36).substr(2, 9),
+                        stack: 'Error: Simulated server error\\n    at errorHandler (/app/server.js:123:15)'
+                    }
+                };
+            } else {
+                response = {
+                    status: 404,
+                    statusText: 'Not Found',
+                    data: {
+                        error: 'Not Found',
+                        message: \`Route \${method} \${endpoint} not found\`,
+                        requestId: 'req_' + Math.random().toString(36).substr(2, 9)
+                    }
+                };
+            }
+
+            displayResponse(request, response, description);
+            return response;
+        }
+
+        function displayResponse(request, response, description = '') {
+            const display = document.getElementById('responseDisplay');
+            
+            const output = \`\${description ? '📋 ' + description + '\\n' : ''}📤 REQUEST:
+\${request.method} \${request.url}
+\${Object.entries(request.headers).map(([k, v]) => \`\${k}: \${v}\`).join('\\n')}
+\${request.body ? '\\nBody: ' + request.body : ''}
+
+📥 RESPONSE:
+HTTP/1.1 \${response.status} \${response.statusText}
+Content-Type: application/json
+X-Response-Time: \${Math.floor(Math.random() * 50 + 10)}ms
+
+\${JSON.stringify(response.data, null, 2)}\`;
+
+            display.textContent = output;
+        }
+
+        // Test functions
+        async function testHealth() {
+            simulateRequest('GET', '/api/health', null, 'Health Check - No authentication required');
+        }
+
+        async function testProfile() {
+            simulateRequest('GET', '/api/profile', null, 'Get Profile - Requires valid authentication');
+        }
+
+        async function testUsers() {
+            simulateRequest('GET', '/api/users', null, 'List Users - Requires admin role');
+        }
+
+        async function testCreateUser() {
+            const userData = {
+                name: 'John Doe',
+                email: 'john@example.com',
+                role: 'user'
+            };
+            simulateRequest('POST', '/api/users', userData, 'Create User - Requires auth + validation');
+        }
+
+        async function testInvalidRoute() {
+            simulateRequest('GET', '/api/nonexistent', null, 'Invalid Route - Should return 404');
+        }
+
+        async function testServerError() {
+            simulateRequest('GET', '/api/trigger-error', null, 'Server Error - Should return 500');
+        }
+
+        async function getServerStats() {
+            const stats = {
+                serverInfo: {
+                    nodeVersion: 'v18.17.0',
+                    expressVersion: '4.18.2',
+                    environment: 'development',
+                    uptime: \`\${Math.floor(Math.random() * 24)}h \${Math.floor(Math.random() * 60)}m\`
+                },
+                performance: {
+                    totalRequests: Math.floor(Math.random() * 10000),
+                    averageResponseTime: \`\${Math.floor(Math.random() * 100 + 50)}ms\`,
+                    memoryUsage: \`\${Math.floor(Math.random() * 200 + 100)}MB\`,
+                    cpuUsage: \`\${Math.floor(Math.random() * 20 + 5)}%\`
+                },
+                security: {
+                    authenticatedRequests: Math.floor(Math.random() * 5000),
+                    rejectedRequests: Math.floor(Math.random() * 100),
+                    rateLimitViolations: Math.floor(Math.random() * 10)
+                },
+                errors: {
+                    totalErrors: Math.floor(Math.random() * 50),
+                    errorRate: \`\${(Math.random() * 2).toFixed(2)}%\`,
+                    lastError: new Date(Date.now() - Math.random() * 3600000).toISOString()
+                }
+            };
+            
+            document.getElementById('statsDisplay').innerHTML = 
+                '<pre>' + JSON.stringify(stats, null, 2) + '</pre>';
+        }
+    </script>
+</body>
+</html>`}
+  backendCode={`const express = require('express');
+const app = express();
+
+// Production-ready configuration
+app.set('trust proxy', 1); // Trust first proxy
+app.disable('x-powered-by'); // Hide Express signature
+
+// Global variables for monitoring
+let requestCount = 0;
+let errorCount = 0;
+let startTime = Date.now();
+
+// Sample data
+let users = [
+    { id: 1, name: 'Alice', email: 'alice@example.com', role: 'admin' },
+    { id: 2, name: 'Bob', email: 'bob@example.com', role: 'user' },
+    { id: 3, name: 'Charlie', email: 'charlie@example.com', role: 'user' }
+];
+let nextUserId = 4;
+
+// ==== PRODUCTION MIDDLEWARE ====
+
+// 1. Request ID and timing middleware
+app.use((req, res, next) => {
+    req.requestId = Math.random().toString(36).substr(2, 9);
+    req.startTime = Date.now();
+    requestCount++;
+    
+    console.log(\`📨 [\${req.requestId}] \${req.method} \${req.url} from \${req.ip}\`);
+    next();
+});
+
+// 2. CORS middleware
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+    next();
+});
+
+// 3. Security headers
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    next();
+});
+
+// 4. Body parsing middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// 5. Request logging and response time middleware
+app.use((req, res, next) => {
+    const originalSend = res.send;
+    
+    res.send = function(data) {
+        const responseTime = Date.now() - req.startTime;
+        console.log(\`✅ [\${req.requestId}] \${res.statusCode} - \${responseTime}ms\`);
+        
+        // Add custom headers
+        res.setHeader('X-Response-Time', \`\${responseTime}ms\`);
+        res.setHeader('X-Request-ID', req.requestId);
+        
+        return originalSend.call(this, data);
+    };
+    
+    next();
+});
+
+// ==== AUTHENTICATION & AUTHORIZATION ====
+
+const authenticate = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        console.log(\`❌ [\${req.requestId}] Authentication failed: No valid auth header\`);
+        return res.status(401).json({
+            success: false,
+            error: 'Unauthorized',
+            message: 'Missing or invalid authorization header',
+            requestId: req.requestId,
+            timestamp: new Date().toISOString()
+        });
+    }
+    
+    const token = authHeader.split(' ')[1];
+    
+    // Simulate token validation (in production, verify JWT or session)
+    if (token !== 'valid-token') {
+        console.log(\`❌ [\${req.requestId}] Authentication failed: Invalid token\`);
+        return res.status(401).json({
+            success: false,
+            error: 'Unauthorized',
+            message: 'Invalid token',
+            requestId: req.requestId,
+            timestamp: new Date().toISOString()
+        });
+    }
+    
+    // Add user to request (normally from database/JWT)
+    req.user = { 
+        id: 1, 
+        name: 'Alice', 
+        email: 'alice@example.com',
+        role: 'admin' 
+    };
+    
+    console.log(\`✅ [\${req.requestId}] Authenticated user: \${req.user.name}\`);
+    next();
+};
+
+const requireRole = (role) => {
+    return (req, res, next) => {
+        if (!req.user || req.user.role !== role) {
+            console.log(\`❌ [\${req.requestId}] Authorization failed: Required=\${role}, User=\${req.user?.role}\`);
+            return res.status(403).json({
+                success: false,
+                error: 'Forbidden',
+                message: \`Requires \${role} role\`,
+                userRole: req.user?.role,
+                requestId: req.requestId,
+                timestamp: new Date().toISOString()
+            });
+        }
+        next();
+    };
+};
+
+// ==== VALIDATION MIDDLEWARE ====
+
+const validateUserInput = (req, res, next) => {
+    const { name, email, role } = req.body;
+    const errors = [];
+    
+    if (!name || typeof name !== 'string' || name.trim().length < 2) {
+        errors.push('Name must be at least 2 characters long');
+    }
+    
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
+        errors.push('Valid email address is required');
+    }
+    
+    if (role && !['user', 'admin'].includes(role)) {
+        errors.push('Role must be either "user" or "admin"');
+    }
+    
+    if (errors.length > 0) {
+        console.log(\`❌ [\${req.requestId}] Validation failed: \${errors.join(', ')}\`);
+        return res.status(400).json({
+            success: false,
+            error: 'Validation failed',
+            errors,
+            requestId: req.requestId,
+            timestamp: new Date().toISOString()
+        });
+    }
+    
+    console.log(\`✅ [\${req.requestId}] Validation passed\`);
+    next();
+};
+
+// ==== API ROUTES ====
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    const uptime = Math.floor((Date.now() - startTime) / 1000);
+    
+    res.json({
+        success: true,
+        status: 'healthy',
+        uptime: \`\${Math.floor(uptime / 3600)}h \${Math.floor((uptime % 3600) / 60)}m \${uptime % 60}s\`,
+        requests: requestCount,
+        errors: errorCount,
+        memory: process.memoryUsage(),
+        version: '1.0.0',
+        requestId: req.requestId,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Server statistics endpoint
+app.get('/api/stats', authenticate, requireRole('admin'), (req, res) => {
+    const memUsage = process.memoryUsage();
+    const uptime = process.uptime();
+    
+    res.json({
+        success: true,
+        data: {
+            server: {
+                nodeVersion: process.version,
+                platform: process.platform,
+                uptime: \`\${Math.floor(uptime / 3600)}h \${Math.floor((uptime % 3600) / 60)}m\`,
+                memory: {
+                    used: \`\${Math.round(memUsage.heapUsed / 1024 / 1024)}MB\`,
+                    total: \`\${Math.round(memUsage.heapTotal / 1024 / 1024)}MB\`,
+                    external: \`\${Math.round(memUsage.external / 1024 / 1024)}MB\`
+                }
+            },
+            requests: {
+                total: requestCount,
+                errors: errorCount,
+                successRate: \`\${((requestCount - errorCount) / Math.max(requestCount, 1) * 100).toFixed(2)}%\`
+            },
+            users: {
+                total: users.length,
+                admins: users.filter(u => u.role === 'admin').length,
+                regularUsers: users.filter(u => u.role === 'user').length
+            }
+        },
+        requestId: req.requestId,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Get current user profile
+app.get('/api/profile', authenticate, (req, res) => {
+    res.json({
+        success: true,
+        message: 'Profile retrieved successfully',
+        data: {
+            user: req.user,
+            lastLogin: new Date().toISOString(),
+            permissions: req.user.role === 'admin' ? ['read', 'write', 'delete'] : ['read']
+        },
+        requestId: req.requestId,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// List all users (admin only)
+app.get('/api/users', authenticate, requireRole('admin'), (req, res) => {
+    const { page = 1, limit = 10, role } = req.query;
+    
+    let filteredUsers = users;
+    if (role) {
+        filteredUsers = users.filter(u => u.role === role);
+    }
+    
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + parseInt(limit);
+    const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+    
+    console.log(\`📋 [\${req.requestId}] Retrieved \${paginatedUsers.length} users\`);
+    
+    res.json({
+        success: true,
+        message: 'Users retrieved successfully',
+        data: {
+            users: paginatedUsers,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total: filteredUsers.length,
+                pages: Math.ceil(filteredUsers.length / limit)
+            }
+        },
+        requestId: req.requestId,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Get specific user
+app.get('/api/users/:id', authenticate, (req, res) => {
+    const userId = parseInt(req.params.id);
+    const user = users.find(u => u.id === userId);
+    
+    if (!user) {
+        console.log(\`❌ [\${req.requestId}] User not found: \${userId}\`);
+        return res.status(404).json({
+            success: false,
+            error: 'User not found',
+            message: \`No user found with ID \${userId}\`,
+            requestId: req.requestId,
+            timestamp: new Date().toISOString()
+        });
+    }
+    
+    // Users can only see their own profile unless they're admin
+    if (req.user.role !== 'admin' && req.user.id !== userId) {
+        return res.status(403).json({
+            success: false,
+            error: 'Forbidden',
+            message: 'Can only access your own profile',
+            requestId: req.requestId,
+            timestamp: new Date().toISOString()
+        });
+    }
+    
+    console.log(\`👤 [\${req.requestId}] Retrieved user: \${user.name}\`);
+    
+    res.json({
+        success: true,
+        message: 'User retrieved successfully',
+        data: { user },
+        requestId: req.requestId,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Create new user (admin only)
+app.post('/api/users', authenticate, requireRole('admin'), validateUserInput, (req, res) => {
+    const { name, email, role = 'user' } = req.body;
+    
+    // Check if email already exists
+    const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    if (existingUser) {
+        console.log(\`❌ [\${req.requestId}] Email already exists: \${email}\`);
+        return res.status(409).json({
+            success: false,
+            error: 'Conflict',
+            message: 'Email already exists',
+            requestId: req.requestId,
+            timestamp: new Date().toISOString()
+        });
+    }
+    
+    const newUser = {
+        id: nextUserId++,
+        name: name.trim(),
+        email: email.toLowerCase(),
+        role,
+        createdAt: new Date().toISOString(),
+        createdBy: req.user.name
+    };
+    
+    users.push(newUser);
+    console.log(\`✨ [\${req.requestId}] Created user: \${newUser.name}\`);
+    
+    res.status(201).json({
+        success: true,
+        message: 'User created successfully',
+        data: { user: newUser },
+        requestId: req.requestId,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Update user
+app.put('/api/users/:id', authenticate, validateUserInput, (req, res) => {
+    const userId = parseInt(req.params.id);
+    const userIndex = users.findIndex(u => u.id === userId);
+    
+    if (userIndex === -1) {
+        return res.status(404).json({
+            success: false,
+            error: 'User not found',
+            requestId: req.requestId,
+            timestamp: new Date().toISOString()
+        });
+    }
+    
+    // Users can only edit their own profile unless they're admin
+    if (req.user.role !== 'admin' && req.user.id !== userId) {
+        return res.status(403).json({
+            success: false,
+            error: 'Forbidden',
+            message: 'Can only edit your own profile',
+            requestId: req.requestId,
+            timestamp: new Date().toISOString()
+        });
+    }
+    
+    const { name, email, role } = req.body;
+    
+    users[userIndex] = {
+        ...users[userIndex],
+        ...(name && { name: name.trim() }),
+        ...(email && { email: email.toLowerCase() }),
+        ...(role && req.user.role === 'admin' && { role }), // Only admins can change roles
+        updatedAt: new Date().toISOString(),
+        updatedBy: req.user.name
+    };
+    
+    console.log(\`🔄 [\${req.requestId}] Updated user: \${users[userIndex].name}\`);
+    
+    res.json({
+        success: true,
+        message: 'User updated successfully',
+        data: { user: users[userIndex] },
+        requestId: req.requestId,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Delete user (admin only)
+app.delete('/api/users/:id', authenticate, requireRole('admin'), (req, res) => {
+    const userId = parseInt(req.params.id);
+    const userIndex = users.findIndex(u => u.id === userId);
+    
+    if (userIndex === -1) {
+        return res.status(404).json({
+            success: false,
+            error: 'User not found',
+            requestId: req.requestId,
+            timestamp: new Date().toISOString()
+        });
+    }
+    
+    // Prevent admin from deleting themselves
+    if (req.user.id === userId) {
+        return res.status(400).json({
+            success: false,
+            error: 'Bad Request',
+            message: 'Cannot delete your own account',
+            requestId: req.requestId,
+            timestamp: new Date().toISOString()
+        });
+    }
+    
+    const deletedUser = users.splice(userIndex, 1)[0];
+    console.log(\`🗑️ [\${req.requestId}] Deleted user: \${deletedUser.name}\`);
+    
+    res.json({
+        success: true,
+        message: 'User deleted successfully',
+        data: { deletedUser: { id: deletedUser.id, name: deletedUser.name } },
+        requestId: req.requestId,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Error simulation endpoint (for testing)
+app.get('/api/trigger-error', (req, res, next) => {
+    console.log(\`💥 [\${req.requestId}] Triggering intentional error\`);
+    const error = new Error('This is a simulated server error for testing');
+    error.status = 500;
+    error.code = 'SIMULATED_ERROR';
+    next(error);
+});
+
+// ==== ERROR HANDLING ====
+
+// 404 handler for undefined routes
+app.use('*', (req, res) => {
+    console.log(\`❌ [\${req.requestId}] Route not found: \${req.method} \${req.originalUrl}\`);
+    
+    res.status(404).json({
+        success: false,
+        error: 'Not Found',
+        message: \`Route \${req.method} \${req.originalUrl} does not exist\`,
+        availableRoutes: [
+            'GET /api/health',
+            'GET /api/stats (admin)',
+            'GET /api/profile (auth required)',
+            'GET /api/users (admin)',
+            'GET /api/users/:id (auth required)',
+            'POST /api/users (admin)',
+            'PUT /api/users/:id (auth required)',
+            'DELETE /api/users/:id (admin)'
+        ],
+        requestId: req.requestId,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Global error handler (must be last middleware)
+app.use((error, req, res, next) => {
+    errorCount++;
+    
+    console.error(\`💥 [\${req.requestId}] Error:, error.message\`);
+    console.error(error.stack);
+    
+    // Don't expose error details in production
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    res.status(error.status || 500).json({
+        success: false,
+        error: error.status === 500 ? 'Internal Server Error' : error.message,
+        message: error.status === 500 ? 'Something went wrong on the server' : error.message,
+        requestId: req.requestId,
+        timestamp: new Date().toISOString(),
+        ...(isDevelopment && {
+            stack: error.stack,
+            details: error.message
+        })
+    });
+});
+
+// ==== SERVER STARTUP ====
+
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+    console.log(\`🚀 Production Express Server running on port \${PORT}\`);
+    console.log(\`🌍 Environment: \${process.env.NODE_ENV || 'development'}\`);
+    console.log('\\n📚 Available endpoints:');
+    console.log('   GET    /api/health          - Health check (public)');
+    console.log('   GET    /api/stats           - Server statistics (admin)');  
+    console.log('   GET    /api/profile         - User profile (auth)');
+    console.log('   GET    /api/users           - List users (admin)');
+    console.log('   GET    /api/users/:id       - Get user (auth)');
+    console.log('   POST   /api/users           - Create user (admin)');
+    console.log('   PUT    /api/users/:id       - Update user (auth)');
+    console.log('   DELETE /api/users/:id       - Delete user (admin)');
+    console.log('   GET    /api/trigger-error   - Test error handling');
+    console.log('\\n🔑 Authentication: Bearer valid-token');
+    console.log('📋 Admin role required for user management');
+    startTime = Date.now();
+});
+
+// Graceful shutdown handling
+process.on('SIGTERM', () => {
+    console.log('🛑 SIGTERM received, shutting down gracefully');
+    process.exit(0);
+});
+
+process.on('SIGINT', () => {
+    console.log('🛑 SIGINT received, shutting down gracefully');
+    process.exit(0);
+});`}
+  previewType="html"
+  height="800px"
+/>

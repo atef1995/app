@@ -1,0 +1,1373 @@
+---
+title: "Database Integration: Building Data-Driven APIs"
+description: "Connect your Express.js APIs to real databases. Master PostgreSQL, Prisma ORM, data modeling, relationships, and build production-ready data-driven applications."
+difficulty: 3
+tags: ["database", "postgresql", "prisma", "orm", "sql", "data-modeling"]
+relatedTutorials: ["06-rest-api-development", "08-authentication-authorization", "09-testing-and-deployment"]
+estimatedTime: "100 minutes"
+prerequisites: ["REST API development from Tutorial 06", "Express.js middleware knowledge", "Basic SQL understanding", "Understanding of data relationships"]
+objectives:
+  - "Understand database fundamentals and why databases matter"
+  - "Set up PostgreSQL and connect it to Express.js applications"
+  - "Master Prisma ORM for type-safe database operations"
+  - "Design proper database schemas with relationships"
+  - "Implement CRUD operations with real data persistence"
+order: 7
+isPremium: true
+requiredPlan: "VIBED"
+---
+
+# Database Integration: Building Data-Driven APIs
+
+Welcome to the world of persistent data! If REST APIs are the highways of web applications, then databases are the warehouses where all the valuable information lives. In this tutorial, we'll transform your in-memory APIs into production-ready, data-driven applications that can store, retrieve, and manage data reliably.
+
+## Why Databases Matter
+
+**Student**: "We built great APIs in the last tutorial, but the data disappears when we restart the server. How do we make it permanent?"
+
+**Teacher**: "Excellent observation! That's exactly why we need databases. Think of your previous APIs as a notepad - great for quick notes, but everything disappears when you close it. A database is like a filing cabinet that keeps everything organized and safe, even when the power goes out!"
+
+### The Problem with In-Memory Data:
+- **Volatile**: Data disappears when server restarts
+- **Not Scalable**: Limited by server memory
+- **No Concurrency**: Multiple requests can corrupt data
+- **No Backup**: One crash = data loss
+- **No Relationships**: Hard to model complex data
+
+### What Databases Provide:
+- **Persistence**: Data survives server restarts
+- **ACID Properties**: Atomicity, Consistency, Isolation, Durability
+- **Concurrent Access**: Multiple users can safely access data
+- **Relationships**: Model complex real-world data structures
+- **Performance**: Optimized for fast queries and large datasets
+- **Backup & Recovery**: Built-in data protection
+
+## Database Types Overview
+
+Before diving into implementation, let's understand the database landscape:
+
+### Relational Databases (SQL):
+- **PostgreSQL** ⭐ (Our choice - powerful, reliable, open-source)
+- **MySQL** (Popular, web-friendly)
+- **SQLite** (Lightweight, file-based)
+- **SQL Server** (Microsoft ecosystem)
+
+**Best for**: Complex relationships, ACID compliance, reporting, financial data
+
+### NoSQL Databases:
+- **MongoDB** (Document-based, flexible schemas)
+- **Redis** (Key-value store, caching)
+- **Cassandra** (Wide-column, high scalability)
+
+**Best for**: Flexible schemas, horizontal scaling, real-time applications
+
+**Student**: "Why are we using PostgreSQL instead of something simpler like SQLite?"
+
+**Teacher**: "Great question! While SQLite is perfect for learning and small applications, PostgreSQL gives you production-grade features you'll need in real applications: advanced data types (JSON, arrays), full-text search, excellent performance, and it's what most companies use. Learning PostgreSQL now means you're ready for professional development!"
+
+## Setting Up Your Database Environment
+
+Let's start by setting up a proper database environment for development.
+
+<InteractiveCodeBlock
+  title="Database Setup and Connection"
+  language="nodejs"
+  showOutput={true}
+  editable={true}
+>
+{`
+// First, let's understand what we need for database integration
+console.log('🗄️ Database Integration Requirements:');
+console.log('');
+console.log('1. Database Server (PostgreSQL)');
+console.log('   - Stores and manages our data');
+console.log('   - Handles concurrent connections');
+console.log('   - Provides ACID guarantees');
+console.log('');
+console.log('2. Database Client/Driver');
+console.log('   - Connects Node.js to PostgreSQL');
+console.log('   - Translates JavaScript to SQL');
+console.log('   - Handles connection pooling');
+console.log('');
+console.log('3. ORM (Object-Relational Mapping)');
+console.log('   - Maps database tables to JavaScript objects');
+console.log('   - Provides type safety and validation');
+console.log('   - Generates and runs SQL queries');
+console.log('');
+console.log('4. Schema Management');
+console.log('   - Defines database structure');
+console.log('   - Manages database migrations');
+console.log('   - Keeps database in sync across environments');
+console.log('');
+
+// Let's simulate the setup process
+console.log('🚀 Setting up Database Environment:');
+console.log('');
+
+// Step 1: Install dependencies
+console.log('📦 Step 1: Install Required Packages');
+console.log('npm install prisma @prisma/client');
+console.log('npm install --save-dev prisma');
+console.log('');
+
+// Step 2: Initialize Prisma
+console.log('🔧 Step 2: Initialize Prisma ORM');
+console.log('npx prisma init');
+console.log('✅ Created prisma/schema.prisma');
+console.log('✅ Created .env file for database URL');
+console.log('');
+
+// Step 3: Database URL explanation
+console.log('🔗 Step 3: Configure Database Connection');
+console.log('DATABASE_URL format:');
+console.log('postgresql://username:password@host:port/database_name');
+console.log('');
+console.log('Example for local development:');
+console.log('DATABASE_URL="postgresql://user:password@localhost:5432/myapp_dev"');
+console.log('');
+
+// Step 4: Basic Prisma Schema
+console.log('📋 Step 4: Basic Prisma Schema Structure');
+console.log('');
+console.log('// prisma/schema.prisma');
+console.log('generator client {');
+console.log('  provider = "prisma-client-js"');
+console.log('}');
+console.log('');
+console.log('datasource db {');
+console.log('  provider = "postgresql"');
+console.log('  url      = env("DATABASE_URL")');
+console.log('}');
+console.log('');
+console.log('model User {');
+console.log('  id        Int      @id @default(autoincrement())');
+console.log('  email     String   @unique');
+console.log('  name      String?');
+console.log('  createdAt DateTime @default(now())');
+console.log('  updatedAt DateTime @updatedAt');
+console.log('}');
+console.log('');
+
+console.log('✅ Database environment setup complete!');
+console.log('');
+console.log('🎯 What we accomplished:');
+console.log('   ✓ Installed Prisma ORM');
+console.log('   ✓ Generated schema file');
+console.log('   ✓ Configured database connection');
+console.log('   ✓ Defined first data model');
+`}
+</InteractiveCodeBlock>
+
+## Understanding Prisma ORM
+
+Prisma is our chosen ORM (Object-Relational Mapping) tool. It bridges the gap between JavaScript objects and database tables, providing type safety and an intuitive API.
+
+**Student**: "What makes Prisma different from other ORMs? Why not just write SQL directly?"
+
+**Teacher**: "Excellent question! While you *can* write raw SQL, Prisma gives us superpowers: automatic TypeScript types, compile-time error checking, auto-completion in your IDE, and protection against SQL injection. It's like having a smart assistant that speaks both JavaScript and SQL fluently!"
+
+### Prisma's Key Benefits:
+
+**🔒 Type Safety**: Automatically generates TypeScript types from your schema
+**🚀 Developer Experience**: Excellent IDE support with auto-completion
+**🛡️ Security**: Built-in protection against SQL injection
+**🔄 Migrations**: Version control for your database schema
+**📊 Query Performance**: Optimized query generation
+**🧪 Testing**: Easy database seeding and testing utilities
+
+<InteractiveCodeBlock
+  title="Prisma Schema Deep Dive"
+  language="nodejs"
+  showOutput={true}
+  editable={true}
+>
+{`
+// Let's explore Prisma schema syntax and data modeling
+console.log('📊 Prisma Schema Deep Dive');
+console.log('');
+
+// Basic data types in Prisma
+console.log('🔤 Basic Data Types:');
+console.log('');
+console.log('String    - Text data (VARCHAR)');
+console.log('Int       - Integer numbers');
+console.log('Float     - Decimal numbers');
+console.log('Boolean   - true/false values');
+console.log('DateTime  - Timestamps');
+console.log('Json      - JSON objects (PostgreSQL specific)');
+console.log('');
+
+// Prisma attributes explained
+console.log('🏷️ Important Attributes:');
+console.log('');
+console.log('@id                    - Primary key');
+console.log('@unique               - Unique constraint');
+console.log('@default(value)       - Default value');
+console.log('@default(autoincrement()) - Auto-incrementing ID');
+console.log('@default(now())       - Current timestamp');
+console.log('@updatedAt           - Auto-update on changes');
+console.log('@relation            - Define relationships');
+console.log('');
+
+// Let's design a comprehensive blog schema
+console.log('📝 Example: Blog Database Schema');
+console.log('');
+console.log('// Complete blog application schema');
+console.log('model User {');
+console.log('  id        Int      @id @default(autoincrement())');
+console.log('  email     String   @unique');
+console.log('  username  String   @unique');
+console.log('  name      String');
+console.log('  bio       String?  // Optional field');
+console.log('  avatar    String?');
+console.log('  role      UserRole @default(AUTHOR)');
+console.log('  createdAt DateTime @default(now())');
+console.log('  updatedAt DateTime @updatedAt');
+console.log('  ');
+console.log('  // Relationships');
+console.log('  posts     Post[]');
+console.log('  comments  Comment[]');
+console.log('  profile   Profile?');
+console.log('}');
+console.log('');
+console.log('model Post {');
+console.log('  id          Int      @id @default(autoincrement())');
+console.log('  title       String');
+console.log('  slug        String   @unique');
+console.log('  content     String');
+console.log('  summary     String?');
+console.log('  published   Boolean  @default(false)');
+console.log('  publishedAt DateTime?');
+console.log('  createdAt   DateTime @default(now())');
+console.log('  updatedAt   DateTime @updatedAt');
+console.log('  ');
+console.log('  // Foreign key');
+console.log('  authorId    Int');
+console.log('  categoryId  Int?');
+console.log('  ');
+console.log('  // Relationships');
+console.log('  author      User     @relation(fields: [authorId], references: [id])');
+console.log('  category    Category? @relation(fields: [categoryId], references: [id])');
+console.log('  comments    Comment[]');
+console.log('  tags        TagOnPost[]');
+console.log('}');
+console.log('');
+console.log('model Comment {');
+console.log('  id        Int      @id @default(autoincrement())');
+console.log('  content   String');
+console.log('  createdAt DateTime @default(now())');
+console.log('  ');
+console.log('  postId    Int');
+console.log('  authorId  Int');
+console.log('  ');
+console.log('  post      Post @relation(fields: [postId], references: [id], onDelete: Cascade)');
+console.log('  author    User @relation(fields: [authorId], references: [id])');
+console.log('}');
+console.log('');
+console.log('model Category {');
+console.log('  id          Int    @id @default(autoincrement())');
+console.log('  name        String @unique');
+console.log('  description String?');
+console.log('  color       String @default("#3B82F6")');
+console.log('  ');
+console.log('  posts       Post[]');
+console.log('}');
+console.log('');
+console.log('model Tag {');
+console.log('  id    Int    @id @default(autoincrement())');
+console.log('  name  String @unique');
+console.log('  ');
+console.log('  posts TagOnPost[]');
+console.log('}');
+console.log('');
+console.log('// Many-to-many relationship table');
+console.log('model TagOnPost {');
+console.log('  postId Int');
+console.log('  tagId  Int');
+console.log('  ');
+console.log('  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)');
+console.log('  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)');
+console.log('  ');
+console.log('  @@id([postId, tagId])');
+console.log('}');
+console.log('');
+console.log('model Profile {');
+console.log('  id         Int     @id @default(autoincrement())');
+console.log('  website    String?');
+console.log('  company    String?');
+console.log('  location   String?');
+console.log('  github     String?');
+console.log('  twitter    String?');
+console.log('  ');
+console.log('  userId     Int     @unique');
+console.log('  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)');
+console.log('}');
+console.log('');
+console.log('// Enum for user roles');
+console.log('enum UserRole {');
+console.log('  ADMIN');
+console.log('  EDITOR');
+console.log('  AUTHOR');
+console.log('  READER');
+console.log('}');
+console.log('');
+
+console.log('🎯 Schema Analysis:');
+console.log('   ✓ User management with roles');
+console.log('   ✓ Post creation with categories');
+console.log('   ✓ Comment system');
+console.log('   ✓ Many-to-many tags');
+console.log('   ✓ Optional user profiles');
+console.log('   ✓ Proper foreign key relationships');
+console.log('   ✓ Cascade deletion where appropriate');
+
+console.log('');
+console.log('🔄 Next Steps:');
+console.log('1. npx prisma db push     - Apply schema to database');
+console.log('2. npx prisma generate    - Generate Prisma client');
+console.log('3. npx prisma studio      - Visual database browser');
+`}
+</InteractiveCodeBlock>
+
+## Database Migrations and Schema Management
+
+Understanding how to manage database schema changes is crucial for production applications. Let's explore Prisma's migration system.
+
+**Student**: "What happens when I need to change my database schema after I have data in production?"
+
+**Teacher**: "That's the million-dollar question! This is where migrations come in. Think of migrations as a recipe book for your database - each migration is a step-by-step instruction for how to safely transform your data from one structure to another, without losing any information."
+
+<InteractiveCodeBlock
+  title="Database Migrations with Prisma"
+  language="nodejs"
+  showOutput={true}
+  editable={true}
+>
+{`
+const express = require('express');
+const { PrismaClient } = require('@prisma/client');
+
+// Initialize Prisma Client
+const prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'], // Enable logging for learning
+});
+
+console.log('🔄 Database Migration Workflow');
+console.log('');
+
+// Simulate the migration process
+console.log('📋 Step 1: Define Your Schema Changes');
+console.log('');
+console.log('// Before: Simple user model');
+console.log('model User {');
+console.log('  id    Int    @id @default(autoincrement())');
+console.log('  email String @unique');
+console.log('  name  String');
+console.log('}');
+console.log('');
+console.log('// After: Enhanced user model with new fields');
+console.log('model User {');
+console.log('  id        Int      @id @default(autoincrement())');
+console.log('  email     String   @unique');
+console.log('  name      String');
+console.log('  username  String   @unique  // NEW FIELD');
+console.log('  avatar    String?           // NEW OPTIONAL FIELD');
+console.log('  isActive  Boolean  @default(true) // NEW FIELD WITH DEFAULT');
+console.log('  createdAt DateTime @default(now()) // NEW FIELD');
+console.log('  updatedAt DateTime @updatedAt     // NEW FIELD');
+console.log('}');
+console.log('');
+
+console.log('🚀 Step 2: Create Migration');
+console.log('npx prisma migrate dev --name add_user_enhancements');
+console.log('');
+console.log('✅ What this command does:');
+console.log('   1. Compares current schema with database');
+console.log('   2. Generates SQL migration file');
+console.log('   3. Applies migration to development database');
+console.log('   4. Regenerates Prisma client with new types');
+console.log('');
+
+console.log('📄 Generated Migration File (example):');
+console.log('-- AddUserEnhancements migration');
+console.log('-- Created at: 2024-01-15 10:30:00');
+console.log('');
+console.log('ALTER TABLE "User" ADD COLUMN "username" TEXT;');
+console.log('ALTER TABLE "User" ADD COLUMN "avatar" TEXT;');
+console.log('ALTER TABLE "User" ADD COLUMN "isActive" BOOLEAN DEFAULT true;');
+console.log('ALTER TABLE "User" ADD COLUMN "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP;');
+console.log('ALTER TABLE "User" ADD COLUMN "updatedAt" TIMESTAMP(3);');
+console.log('');
+console.log('-- Make username unique and required');
+console.log('UPDATE "User" SET "username" = "email" WHERE "username" IS NULL;');
+console.log('ALTER TABLE "User" ALTER COLUMN "username" SET NOT NULL;');
+console.log('CREATE UNIQUE INDEX "User_username_key" ON "User"("username");');
+console.log('');
+
+console.log('🔧 Step 3: Review and Apply Migration');
+console.log('');
+console.log('Migration commands:');
+console.log('• npx prisma migrate dev    - Apply to development');
+console.log('• npx prisma migrate deploy - Apply to production');
+console.log('• npx prisma migrate status - Check migration status');
+console.log('• npx prisma migrate reset  - Reset database (dev only)');
+console.log('');
+
+// Demonstrate database operations with migration
+async function demonstrateMigration() {
+  try {
+    console.log('📊 Testing Database Operations After Migration');
+    console.log('');
+    
+    // This would work with a real database connection
+    console.log('// Creating user with new fields:');
+    console.log('const newUser = await prisma.user.create({');
+    console.log('  data: {');
+    console.log('    email: "alice@example.com",');
+    console.log('    name: "Alice Johnson",');
+    console.log('    username: "alice_dev", // New field');
+    console.log('    avatar: "https://example.com/avatar.jpg", // New optional field');
+    console.log('    isActive: true // New field with default');
+    console.log('  }');
+    console.log('});');
+    console.log('');
+    
+    // Simulate the created user
+    const simulatedUser = {
+      id: 1,
+      email: "alice@example.com",
+      name: "Alice Johnson",
+      username: "alice_dev",
+      avatar: "https://example.com/avatar.jpg",
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    console.log('✅ Created user:', JSON.stringify(simulatedUser, null, 2));
+    
+  } catch (error) {
+    console.log('⚠️ Database operation simulation:', error.message);
+  }
+}
+
+// Run the demonstration
+demonstrateMigration();
+
+console.log('');
+console.log('🛡️ Migration Best Practices:');
+console.log('');
+console.log('1. Always backup production before major migrations');
+console.log('2. Test migrations on staging environment first');
+console.log('3. Use descriptive migration names');
+console.log('4. Review generated SQL before applying');
+console.log('5. Plan for rollback strategies');
+console.log('6. Consider data migration scripts for complex changes');
+console.log('');
+
+console.log('⚡ Common Migration Scenarios:');
+console.log('');
+console.log('• Adding new fields (safe)');
+console.log('• Making optional fields required (needs data migration)');
+console.log('• Renaming columns (needs custom migration)');
+console.log('• Dropping columns (irreversible - be careful!)');
+console.log('• Adding indexes (improves performance)');
+console.log('• Changing data types (complex - test thoroughly)');
+`}
+</InteractiveCodeBlock>
+
+## CRUD Operations with Prisma
+
+Now let's implement the core database operations: Create, Read, Update, and Delete. Prisma makes these operations type-safe and intuitive.
+
+**Student**: "I understand the theory, but how do I actually write data to the database and get it back out?"
+
+**Teacher**: "Perfect timing! Let's build a complete task management API that demonstrates all CRUD operations. You'll see how Prisma transforms complex SQL operations into simple JavaScript method calls, while keeping everything type-safe."
+
+<InteractiveCodeBlock
+  title="Complete CRUD Operations with Task Management API"
+  language="nodejs"
+  showOutput={true}
+  editable={true}
+>
+{`
+const express = require('express');
+const { PrismaClient } = require('@prisma/client');
+
+// Initialize Express and Prisma
+const app = express();
+const prisma = new PrismaClient({
+  log: ['query'] // See the SQL queries Prisma generates
+});
+
+app.use(express.json());
+
+console.log('📝 Task Management API with Database Integration');
+console.log('');
+
+// Simulate database schema for tasks
+console.log('🗃️ Database Schema:');
+console.log('');
+console.log('model Task {');
+console.log('  id          Int      @id @default(autoincrement())');
+console.log('  title       String');
+console.log('  description String?');
+console.log('  completed   Boolean  @default(false)');
+console.log('  priority    Priority @default(MEDIUM)');
+console.log('  dueDate     DateTime?');
+console.log('  createdAt   DateTime @default(now())');
+console.log('  updatedAt   DateTime @updatedAt');
+console.log('  userId      Int');
+console.log('  user        User     @relation(fields: [userId], references: [id])');
+console.log('}');
+console.log('');
+console.log('enum Priority { LOW, MEDIUM, HIGH, URGENT }');
+console.log('');
+
+// 1. CREATE Operations
+console.log('🆕 1. CREATE Operations (POST /tasks)');
+console.log('');
+
+// Simulate creating a task
+async function createTaskExample() {
+  console.log('// Create a new task');
+  console.log('app.post("/tasks", async (req, res) => {');
+  console.log('  try {');
+  console.log('    const { title, description, priority, dueDate, userId } = req.body;');
+  console.log('    ');
+  console.log('    const newTask = await prisma.task.create({');
+  console.log('      data: {');
+  console.log('        title,');
+  console.log('        description,');
+  console.log('        priority,');
+  console.log('        dueDate: dueDate ? new Date(dueDate) : null,');
+  console.log('        userId');
+  console.log('      },');
+  console.log('      include: {');
+  console.log('        user: true // Include related user data');
+  console.log('      }');
+  console.log('    });');
+  console.log('    ');
+  console.log('    res.status(201).json({');
+  console.log('      success: true,');
+  console.log('      data: newTask');
+  console.log('    });');
+  console.log('  } catch (error) {');
+  console.log('    res.status(400).json({');
+  console.log('      success: false,');
+  console.log('      error: error.message');
+  console.log('    });');
+  console.log('  }');
+  console.log('});');
+  console.log('');
+  
+  // Simulate the created task
+  const mockTask = {
+    id: 1,
+    title: "Complete Node.js tutorial",
+    description: "Learn database integration with Prisma",
+    completed: false,
+    priority: "HIGH",
+    dueDate: "2024-02-15T10:00:00Z",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    userId: 1,
+    user: {
+      id: 1,
+      email: "student@example.com",
+      name: "Alex Developer"
+    }
+  };
+  
+  console.log('✅ Created task:', JSON.stringify(mockTask, null, 2));
+  console.log('');
+}
+
+// 2. READ Operations
+console.log('📖 2. READ Operations (GET /tasks)');
+console.log('');
+
+async function readTasksExample() {
+  console.log('// Get all tasks with filtering and pagination');
+  console.log('app.get("/tasks", async (req, res) => {');
+  console.log('  try {');
+  console.log('    const { completed, priority, userId, page = 1, limit = 10 } = req.query;');
+  console.log('    ');
+  console.log('    const where = {};');
+  console.log('    if (completed !== undefined) where.completed = completed === "true";');
+  console.log('    if (priority) where.priority = priority;');
+  console.log('    if (userId) where.userId = parseInt(userId);');
+  console.log('    ');
+  console.log('    const tasks = await prisma.task.findMany({');
+  console.log('      where,');
+  console.log('      include: {');
+  console.log('        user: {');
+  console.log('          select: { id: true, name: true, email: true }');
+  console.log('        }');
+  console.log('      },');
+  console.log('      orderBy: { createdAt: "desc" },');
+  console.log('      skip: (page - 1) * limit,');
+  console.log('      take: parseInt(limit)');
+  console.log('    });');
+  console.log('    ');
+  console.log('    const totalTasks = await prisma.task.count({ where });');
+  console.log('    ');
+  console.log('    res.json({');
+  console.log('      success: true,');
+  console.log('      data: tasks,');
+  console.log('      pagination: {');
+  console.log('        page: parseInt(page),');
+  console.log('        limit: parseInt(limit),');
+  console.log('        total: totalTasks,');
+  console.log('        pages: Math.ceil(totalTasks / limit)');
+  console.log('      }');
+  console.log('    });');
+  console.log('  } catch (error) {');
+  console.log('    res.status(500).json({');
+  console.log('      success: false,');
+  console.log('      error: error.message');
+  console.log('    });');
+  console.log('  }');
+  console.log('});');
+  console.log('');
+  
+  // Simulate response
+  const mockTasks = [
+    {
+      id: 1,
+      title: "Complete Node.js tutorial",
+      description: "Learn database integration",
+      completed: false,
+      priority: "HIGH",
+      createdAt: "2024-01-15T10:00:00Z",
+      user: { id: 1, name: "Alex Developer", email: "alex@example.com" }
+    },
+    {
+      id: 2,
+      title: "Review API documentation",
+      description: "Check REST API endpoints",
+      completed: true,
+      priority: "MEDIUM",
+      createdAt: "2024-01-14T15:30:00Z",
+      user: { id: 1, name: "Alex Developer", email: "alex@example.com" }
+    }
+  ];
+  
+  console.log('📋 Retrieved tasks:', JSON.stringify(mockTasks, null, 2));
+  console.log('');
+  
+  console.log('// Get single task by ID');
+  console.log('app.get("/tasks/:id", async (req, res) => {');
+  console.log('  try {');
+  console.log('    const task = await prisma.task.findUnique({');
+  console.log('      where: { id: parseInt(req.params.id) },');
+  console.log('      include: { user: true }');
+  console.log('    });');
+  console.log('    ');
+  console.log('    if (!task) {');
+  console.log('      return res.status(404).json({');
+  console.log('        success: false,');
+  console.log('        error: "Task not found"');
+  console.log('      });');
+  console.log('    }');
+  console.log('    ');
+  console.log('    res.json({ success: true, data: task });');
+  console.log('  } catch (error) {');
+  console.log('    res.status(500).json({');
+  console.log('      success: false,');
+  console.log('      error: error.message');
+  console.log('    });');
+  console.log('  }');
+  console.log('});');
+  console.log('');
+}
+
+// 3. UPDATE Operations
+console.log('🔄 3. UPDATE Operations (PUT/PATCH /tasks/:id)');
+console.log('');
+
+async function updateTaskExample() {
+  console.log('// Update a task');
+  console.log('app.put("/tasks/:id", async (req, res) => {');
+  console.log('  try {');
+  console.log('    const taskId = parseInt(req.params.id);');
+  console.log('    const { title, description, completed, priority, dueDate } = req.body;');
+  console.log('    ');
+  console.log('    // Check if task exists');
+  console.log('    const existingTask = await prisma.task.findUnique({');
+  console.log('      where: { id: taskId }');
+  console.log('    });');
+  console.log('    ');
+  console.log('    if (!existingTask) {');
+  console.log('      return res.status(404).json({');
+  console.log('        success: false,');
+  console.log('        error: "Task not found"');
+  console.log('      });');
+  console.log('    }');
+  console.log('    ');
+  console.log('    // Update the task');
+  console.log('    const updatedTask = await prisma.task.update({');
+  console.log('      where: { id: taskId },');
+  console.log('      data: {');
+  console.log('        title,');
+  console.log('        description,');
+  console.log('        completed,');
+  console.log('        priority,');
+  console.log('        dueDate: dueDate ? new Date(dueDate) : null');
+  console.log('      },');
+  console.log('      include: { user: true }');
+  console.log('    });');
+  console.log('    ');
+  console.log('    res.json({');
+  console.log('      success: true,');
+  console.log('      data: updatedTask');
+  console.log('    });');
+  console.log('  } catch (error) {');
+  console.log('    res.status(400).json({');
+  console.log('      success: false,');
+  console.log('      error: error.message');
+  console.log('    });');
+  console.log('  }');
+  console.log('});');
+  console.log('');
+  
+  // Partial updates with PATCH
+  console.log('// Partial update with PATCH');
+  console.log('app.patch("/tasks/:id", async (req, res) => {');
+  console.log('  try {');
+  console.log('    const taskId = parseInt(req.params.id);');
+  console.log('    ');
+  console.log('    // Only update provided fields');
+  console.log('    const updateData = {};');
+  console.log('    if (req.body.title !== undefined) updateData.title = req.body.title;');
+  console.log('    if (req.body.completed !== undefined) updateData.completed = req.body.completed;');
+  console.log('    if (req.body.priority !== undefined) updateData.priority = req.body.priority;');
+  console.log('    ');
+  console.log('    const updatedTask = await prisma.task.update({');
+  console.log('      where: { id: taskId },');
+  console.log('      data: updateData,');
+  console.log('      include: { user: true }');
+  console.log('    });');
+  console.log('    ');
+  console.log('    res.json({ success: true, data: updatedTask });');
+  console.log('  } catch (error) {');
+  console.log('    if (error.code === "P2025") {');
+  console.log('      res.status(404).json({');
+  console.log('        success: false,');
+  console.log('        error: "Task not found"');
+  console.log('      });');
+  console.log('    } else {');
+  console.log('      res.status(400).json({');
+  console.log('        success: false,');
+  console.log('        error: error.message');
+  console.log('      });');
+  console.log('    }');
+  console.log('  }');
+  console.log('});');
+  console.log('');
+  
+  const mockUpdatedTask = {
+    id: 1,
+    title: "Complete Node.js tutorial",
+    description: "Learn database integration with Prisma",
+    completed: true, // Changed from false to true
+    priority: "HIGH",
+    createdAt: "2024-01-15T10:00:00Z",
+    updatedAt: new Date().toISOString(), // Updated timestamp
+    user: { id: 1, name: "Alex Developer", email: "alex@example.com" }
+  };
+  
+  console.log('✅ Updated task:', JSON.stringify(mockUpdatedTask, null, 2));
+  console.log('');
+}
+
+// 4. DELETE Operations
+console.log('🗑️ 4. DELETE Operations (DELETE /tasks/:id)');
+console.log('');
+
+async function deleteTaskExample() {
+  console.log('// Delete a task');
+  console.log('app.delete("/tasks/:id", async (req, res) => {');
+  console.log('  try {');
+  console.log('    const taskId = parseInt(req.params.id);');
+  console.log('    ');
+  console.log('    // Check if task exists and get it before deletion');
+  console.log('    const task = await prisma.task.findUnique({');
+  console.log('      where: { id: taskId }');
+  console.log('    });');
+  console.log('    ');
+  console.log('    if (!task) {');
+  console.log('      return res.status(404).json({');
+  console.log('        success: false,');
+  console.log('        error: "Task not found"');
+  console.log('      });');
+  console.log('    }');
+  console.log('    ');
+  console.log('    // Delete the task');
+  console.log('    await prisma.task.delete({');
+  console.log('      where: { id: taskId }');
+  console.log('    });');
+  console.log('    ');
+  console.log('    res.json({');
+  console.log('      success: true,');
+  console.log('      message: "Task deleted successfully",');
+  console.log('      data: task');
+  console.log('    });');
+  console.log('  } catch (error) {');
+  console.log('    if (error.code === "P2025") {');
+  console.log('      res.status(404).json({');
+  console.log('        success: false,');
+  console.log('        error: "Task not found"');
+  console.log('      });');
+  console.log('    } else {');
+  console.log('      res.status(500).json({');
+  console.log('        success: false,');
+  console.log('        error: error.message');
+  console.log('      });');
+  console.log('    }');
+  console.log('  }');
+  console.log('});');
+  console.log('');
+  
+  console.log('// Bulk delete tasks');
+  console.log('app.delete("/tasks", async (req, res) => {');
+  console.log('  try {');
+  console.log('    const { completed, userId } = req.query;');
+  console.log('    ');
+  console.log('    const where = {};');
+  console.log('    if (completed !== undefined) where.completed = completed === "true";');
+  console.log('    if (userId) where.userId = parseInt(userId);');
+  console.log('    ');
+  console.log('    const deletedCount = await prisma.task.deleteMany({');
+  console.log('      where');
+  console.log('    });');
+  console.log('    ');
+  console.log('    res.json({');
+  console.log('      success: true,');
+  console.log('      message: \`Deleted \${deletedCount.count} tasks\`,');
+  console.log('      count: deletedCount.count');
+  console.log('    });');
+  console.log('  } catch (error) {');
+  console.log('    res.status(500).json({');
+  console.log('      success: false,');
+  console.log('      error: error.message');
+  console.log('    });');
+  console.log('  }');
+  console.log('});');
+  console.log('');
+  
+  console.log('✅ Task deleted successfully');
+  console.log('');
+}
+
+// Advanced operations
+console.log('🚀 Advanced Database Operations');
+console.log('');
+
+function advancedOperationsExample() {
+  console.log('// Aggregate operations');
+  console.log('app.get("/tasks/stats", async (req, res) => {');
+  console.log('  try {');
+  console.log('    const stats = await prisma.task.aggregate({');
+  console.log('      _count: {');
+  console.log('        id: true,');
+  console.log('        completed: true');
+  console.log('      },');
+  console.log('      _avg: {');
+  console.log('        userId: true');
+  console.log('      },');
+  console.log('      where: {');
+  console.log('        createdAt: {');
+  console.log('          gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // Last 30 days');
+  console.log('        }');
+  console.log('      }');
+  console.log('    });');
+  console.log('    ');
+  console.log('    res.json({ success: true, data: stats });');
+  console.log('  } catch (error) {');
+  console.log('    res.status(500).json({ success: false, error: error.message });');
+  console.log('  }');
+  console.log('});');
+  console.log('');
+  
+  console.log('// Group by operations');
+  console.log('app.get("/tasks/by-priority", async (req, res) => {');
+  console.log('  try {');
+  console.log('    const tasksByPriority = await prisma.task.groupBy({');
+  console.log('      by: ["priority"],');
+  console.log('      _count: {');
+  console.log('        id: true');
+  console.log('      },');
+  console.log('      _avg: {');
+  console.log('        userId: true');
+  console.log('      },');
+  console.log('      orderBy: {');
+  console.log('        _count: {');
+  console.log('          id: "desc"');
+  console.log('        }');
+  console.log('      }');
+  console.log('    });');
+  console.log('    ');
+  console.log('    res.json({ success: true, data: tasksByPriority });');
+  console.log('  } catch (error) {');
+  console.log('    res.status(500).json({ success: false, error: error.message });');
+  console.log('  }');
+  console.log('});');
+  console.log('');
+}
+
+// Run all examples
+await createTaskExample();
+await readTasksExample();
+await updateTaskExample();
+await deleteTaskExample();
+advancedOperationsExample();
+
+console.log('🎯 CRUD Operations Summary:');
+console.log('   ✓ CREATE: Add new tasks with validation');
+console.log('   ✓ READ: Retrieve with filtering, pagination, and relations');
+console.log('   ✓ UPDATE: Full and partial updates with error handling');
+console.log('   ✓ DELETE: Single and bulk deletion');
+console.log('   ✓ ADVANCED: Aggregations and grouping');
+console.log('');
+
+console.log('🛡️ Error Handling Patterns:');
+console.log('   • P2025: Record not found');
+console.log('   • P2002: Unique constraint violation');
+console.log('   • P2003: Foreign key constraint violation');
+console.log('   • Always return consistent error format');
+console.log('   • Use appropriate HTTP status codes');
+
+// Cleanup
+await prisma.$disconnect();
+`}
+</InteractiveCodeBlock>
+
+## Complete Setup Guide: Database Integration on Your Local Machine
+
+**Student**: "This all looks great in theory, but how do I actually set this up on my computer? Can I get step-by-step instructions I can follow?"
+
+**Teacher**: "Absolutely! Let's create a complete, copy-paste guide that you can follow to set up database integration from scratch. This will get you from zero to a working database-powered API in minutes."
+
+### Step 1: Project Setup
+
+First, create a new project directory and initialize it:
+
+```bash
+# Create project directory
+mkdir task-manager-api
+cd task-manager-api
+
+# Initialize npm project
+npm init -y
+
+# Install required dependencies
+npm install express @prisma/client
+npm install --save-dev prisma nodemon typescript @types/node @types/express ts-node
+
+# Initialize Prisma
+npx prisma init
+```
+
+### Step 2: Environment Configuration
+
+Create or update your `.env` file:
+
+```env
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/taskmanager_dev"
+
+# Server
+PORT=3000
+NODE_ENV=development
+```
+
+### Step 3: Database Schema
+
+Replace the contents of `prisma/schema.prisma`:
+
+```prisma
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  username  String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  tasks     Task[]
+}
+
+model Task {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  completed   Boolean  @default(false)
+  priority    Priority @default(MEDIUM)
+  dueDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+```
+
+### Step 4: Database Migration
+
+Run these commands to set up your database:
+
+```bash
+# Create and apply migration
+npx prisma migrate dev --name init
+
+# Generate Prisma client
+npx prisma generate
+
+# (Optional) Open Prisma Studio to view your database
+npx prisma studio
+```
+
+### Step 5: Express Server with Database Integration
+
+Create `src/server.ts`:
+
+```typescript
+import express from 'express';
+import { PrismaClient } from '@prisma/client';
+
+const app = express();
+const prisma = new PrismaClient();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(express.json());
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Server is running' });
+});
+
+// Get all users
+app.get('/users', async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      include: { tasks: true }
+    });
+    res.json({ success: true, data: users });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Create a new user
+app.post('/users', async (req, res) => {
+  try {
+    const { email, name, username } = req.body;
+    
+    const user = await prisma.user.create({
+      data: { email, name, username }
+    });
+    
+    res.status(201).json({ success: true, data: user });
+  } catch (error) {
+    if (error.code === 'P2002') {
+      res.status(400).json({ 
+        success: false, 
+        error: 'User with this email or username already exists' 
+      });
+    } else {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+});
+
+// Get all tasks with filtering
+app.get('/tasks', async (req, res) => {
+  try {
+    const { completed, priority, userId } = req.query;
+    
+    const where: any = {};
+    if (completed !== undefined) where.completed = completed === 'true';
+    if (priority) where.priority = priority;
+    if (userId) where.userId = parseInt(userId as string);
+    
+    const tasks = await prisma.task.findMany({
+      where,
+      include: { user: true },
+      orderBy: { createdAt: 'desc' }
+    });
+    
+    res.json({ success: true, data: tasks });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Create a new task
+app.post('/tasks', async (req, res) => {
+  try {
+    const { title, description, priority, dueDate, userId } = req.body;
+    
+    const task = await prisma.task.create({
+      data: {
+        title,
+        description,
+        priority,
+        dueDate: dueDate ? new Date(dueDate) : null,
+        userId
+      },
+      include: { user: true }
+    });
+    
+    res.status(201).json({ success: true, data: task });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+// Update a task
+app.put('/tasks/:id', async (req, res) => {
+  try {
+    const taskId = parseInt(req.params.id);
+    const { title, description, completed, priority, dueDate } = req.body;
+    
+    const task = await prisma.task.update({
+      where: { id: taskId },
+      data: {
+        title,
+        description,
+        completed,
+        priority,
+        dueDate: dueDate ? new Date(dueDate) : null
+      },
+      include: { user: true }
+    });
+    
+    res.json({ success: true, data: task });
+  } catch (error) {
+    if (error.code === 'P2025') {
+      res.status(404).json({ success: false, error: 'Task not found' });
+    } else {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  }
+});
+
+// Delete a task
+app.delete('/tasks/:id', async (req, res) => {
+  try {
+    const taskId = parseInt(req.params.id);
+    
+    await prisma.task.delete({
+      where: { id: taskId }
+    });
+    
+    res.json({ success: true, message: 'Task deleted successfully' });
+  } catch (error) {
+    if (error.code === 'P2025') {
+      res.status(404).json({ success: false, error: 'Task not found' });
+    } else {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+});
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('Shutting down gracefully...');
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`📊 Prisma Studio: npx prisma studio`);
+});
+```
+
+### Step 6: Package.json Scripts
+
+Update your `package.json` scripts section:
+
+```json
+{
+  "scripts": {
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "db:migrate": "npx prisma migrate dev",
+    "db:generate": "npx prisma generate",
+    "db:studio": "npx prisma studio",
+    "db:seed": "ts-node prisma/seed.ts"
+  }
+}
+```
+
+### Step 7: TypeScript Configuration
+
+Create `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": ["ES2020"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+### Step 8: Database Seeding (Optional)
+
+Create `prisma/seed.ts`:
+
+```typescript
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+async function main() {
+  // Create users
+  const user1 = await prisma.user.create({
+    data: {
+      email: 'alice@example.com',
+      name: 'Alice Johnson',
+      username: 'alice_dev'
+    }
+  });
+
+  const user2 = await prisma.user.create({
+    data: {
+      email: 'bob@example.com',
+      name: 'Bob Smith', 
+      username: 'bob_coder'
+    }
+  });
+
+  // Create tasks
+  await prisma.task.createMany({
+    data: [
+      {
+        title: 'Learn Node.js',
+        description: 'Complete Node.js tutorial series',
+        priority: 'HIGH',
+        userId: user1.id
+      },
+      {
+        title: 'Build REST API',
+        description: 'Create a production-ready API',
+        priority: 'MEDIUM',
+        userId: user1.id
+      },
+      {
+        title: 'Database Integration',
+        description: 'Connect API to PostgreSQL database',
+        priority: 'URGENT',
+        userId: user2.id
+      }
+    ]
+  });
+
+  console.log('✅ Database seeded successfully!');
+}
+
+main()
+  .catch((e) => {
+    console.error('❌ Error seeding database:', e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
+```
+
+### Step 9: Running Your Application
+
+```bash
+# Start development server
+npm run dev
+
+# In another terminal, seed the database (optional)
+npm run db:seed
+
+# View your database in Prisma Studio (optional)
+npm run db:studio
+```
+
+### Step 10: Testing Your API
+
+Use these curl commands or test in Postman:
+
+```bash
+# Create a user
+curl -X POST http://localhost:3000/users \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","name":"Test User","username":"testuser"}'
+
+# Get all users
+curl http://localhost:3000/users
+
+# Create a task (replace userId with actual user ID)
+curl -X POST http://localhost:3000/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title":"My First Task","description":"Testing the API","priority":"HIGH","userId":1}'
+
+# Get all tasks
+curl http://localhost:3000/tasks
+
+# Update a task (replace ID)
+curl -X PUT http://localhost:3000/tasks/1 \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Updated Task","completed":true}'
+
+# Delete a task (replace ID)
+curl -X DELETE http://localhost:3000/tasks/1
+```
+
+### Troubleshooting Tips
+
+**Database Connection Issues:**
+- Make sure PostgreSQL is running on your machine
+- Verify the DATABASE_URL in your .env file
+- Check database credentials and database name
+
+**Prisma Issues:**
+- Run `npx prisma generate` after schema changes
+- Use `npx prisma migrate reset` to reset database if needed
+- Check Prisma Studio with `npx prisma studio`
+
+**TypeScript Errors:**
+- Ensure all types are properly imported from @prisma/client
+- Run `npm run build` to check for compilation errors
+
+🎉 **Congratulations!** You now have a fully functional database-integrated API running locally. You can extend this by adding authentication, validation middleware, and more complex relationships!

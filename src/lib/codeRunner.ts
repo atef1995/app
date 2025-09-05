@@ -1,5 +1,12 @@
 // Code runner utilities
 import { WebContainer } from "@webcontainer/api";
+import {
+  type PackageRequirement,
+  detectRequiredPackages,
+  createPackageJson,
+  getTutorialPackages,
+} from "./packageManager";
+import { generateCompatibilityShims } from "./compatibilityShims";
 
 // TypeScript compiler API for browser-based transpilation
 interface TypeScriptCompiler {
@@ -20,6 +27,81 @@ declare global {
 
 let webcontainerInstance: WebContainer | null = null;
 
+// Execute code with specific tutorial context (automatically includes relevant packages)
+export async function executeCodeForTutorial(
+  code: string,
+  tutorialType:
+    | "basic"
+    | "security"
+    | "database"
+    | "testing"
+    | "realtime" = "basic",
+  language: string = "javascript",
+  onOutput?: (output: string) => void
+) {
+  const customPackages = getTutorialPackages(tutorialType);
+
+  if (onOutput) {
+    return executeJavaScriptStream(
+      code,
+      language,
+      onOutput,
+      (result) => {
+        // Handle completion
+      },
+      customPackages
+    );
+  } else {
+    return executeJavaScript(code, language, customPackages);
+  }
+}
+
+// Install additional packages at runtime
+export async function installPackages(
+  packages: string[],
+  webcontainer?: WebContainer
+): Promise<{ success: boolean; output: string; error?: string }> {
+  try {
+    const container = webcontainer || (await initWebContainer());
+
+    console.log("Installing additional packages:", packages.join(", "));
+    const installProcess = await container.spawn("npm", [
+      "install",
+      ...packages,
+    ]);
+
+    let output = "";
+    let error = "";
+
+    installProcess.output.pipeTo(
+      new WritableStream({
+        write(data) {
+          const text =
+            typeof data === "string" ? data : new TextDecoder().decode(data);
+          output += text;
+          if (text.toLowerCase().includes("error")) {
+            error += text;
+          }
+        },
+      })
+    );
+
+    const exitCode = await installProcess.exit;
+
+    return {
+      success: exitCode === 0,
+      output,
+      error: error || undefined,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      output: "",
+      error: err instanceof Error ? err.message : "Package installation failed",
+    };
+  }
+}
+
 export async function initWebContainer() {
   if (webcontainerInstance) {
     return webcontainerInstance;
@@ -34,13 +116,181 @@ export async function initWebContainer() {
   }
 }
 
-export async function executeJavaScript(code: string) {
+// Enhanced streaming version with dynamic package detection
+export async function executeJavaScriptStream(
+  code: string,
+  language: string = "javascript",
+  onOutput: (output: string) => void,
+  onComplete: (result: {
+    success: boolean;
+    output: string;
+    error?: string;
+    logs: string[];
+    errors: string[];
+  }) => void,
+  customPackages: Record<string, string> = {}
+) {
   try {
     const webcontainer = await initWebContainer();
 
-    // Industry-proven approach: Monitor event loop and capture all async output
-    const wrappedCode = `
-const util = require('util');
+    const useCommonJS = language === "nodejs" || language === "node";
+
+    // Detect required packages from code
+    const detectedPackages = detectRequiredPackages(code);
+    const wrappedCode = createWrapperCode(
+      code,
+      useCommonJS,
+      true,
+      detectedPackages
+    );
+
+    // Create package.json with dynamic dependencies
+    const packageJson = createPackageJson(
+      useCommonJS,
+      detectedPackages,
+      customPackages
+    );
+
+    onOutput(
+      "🔍 Detected packages: " + detectedPackages.map((p) => p.name).join(", ")
+    );
+
+    const files = {
+      "script.js": {
+        file: {
+          contents: wrappedCode,
+        },
+      },
+      "package.json": {
+        file: {
+          contents: JSON.stringify(packageJson, null, 2),
+        },
+      },
+    };
+
+    await webcontainer.mount(files);
+
+    // Install dependencies first - only if there are non-default packages
+    const hasAdditionalPackages = detectedPackages.length > 0 || Object.keys(customPackages).length > 0;
+    
+    if (hasAdditionalPackages) {
+      onOutput("📦 Installing dependencies...");
+      const installProcess = await webcontainer.spawn("npm", ["install"]);
+      await installProcess.exit;
+      onOutput("✅ Dependencies installed");
+    } else {
+      onOutput("ℹ️ No additional dependencies to install, using defaults");
+    }
+
+    const process = await webcontainer.spawn("node", ["script.js"]);
+
+    let output = "";
+    const processedLogs: string[] = [];
+    const processedErrors: string[] = [];
+
+    // Stream output in real-time
+    process.output.pipeTo(
+      new WritableStream({
+        write(data) {
+          const chunk =
+            typeof data === "string" ? data : new TextDecoder().decode(data);
+          output += chunk;
+
+          // Process each line as it comes
+          const lines = chunk.split("\n");
+
+          for (const line of lines) {
+            if (line.trim()) {
+              // Skip execution markers
+              if (
+                line.includes("__EXECUTION_END__") ||
+                line.includes("__EXECUTION_START__")
+              ) {
+                continue;
+              }
+
+              // Parse log format: [timestamp] TYPE: message (handle \r\n line endings)
+              const logMatch = line.match(
+                /^\[(\d+)\] (LOG|ERROR|WARN): (.*)\r?$/
+              );
+
+              if (logMatch) {
+                const [, , type, message] = logMatch;
+
+                if (type === "ERROR" || type === "WARN") {
+                  processedErrors.push(message);
+                } else {
+                  processedLogs.push(message);
+                }
+
+                // Stream the output immediately
+                onOutput(message);
+              } else {
+                // Handle lines that don't match our log format
+                // These might be raw console.log output or other output
+                const cleanLine = line.trim();
+                if (
+                  cleanLine &&
+                  !cleanLine.includes("undefined") &&
+                  !cleanLine.match(/^\s*$/)
+                ) {
+                  processedLogs.push(cleanLine);
+                  onOutput(cleanLine);
+                }
+              }
+            }
+          }
+        },
+      })
+    );
+
+    // Set up timeout
+    const timeoutPromise = new Promise<number>((_, reject) =>
+      setTimeout(() => reject(new Error("Execution timeout")), 10000)
+    );
+
+    try {
+      await Promise.race([process.exit, timeoutPromise]);
+
+      onComplete({
+        success: true,
+        output: processedLogs.join("\n"),
+        logs: processedLogs,
+        errors: processedErrors,
+      });
+    } catch (error) {
+      onComplete({
+        success: false,
+        output: processedLogs.join("\n"),
+        error: error instanceof Error ? error.message : "Unknown error",
+        logs: processedLogs,
+        errors: processedErrors,
+      });
+    }
+  } catch (error) {
+    onComplete({
+      success: false,
+      output: "",
+      error: error instanceof Error ? error.message : "Unknown error",
+      logs: [],
+      errors: [error instanceof Error ? error.message : "Unknown error"],
+    });
+  }
+}
+
+// Helper function to create wrapper code
+function createWrapperCode(
+  code: string,
+  useCommonJS: boolean,
+  streaming: boolean = false,
+  detectedPackages: PackageRequirement[] = []
+) {
+  const compatibilityShims = generateCompatibilityShims(detectedPackages);
+
+  return `
+${useCommonJS ? "const util = require('util');" : "import util from 'util';"}
+
+${compatibilityShims}
 
 // Console capture system
 const logs = [];
@@ -56,13 +306,13 @@ const captureLog = (type, args) => {
   
   logs.push({ type, message, timestamp });
   
-  // Also output immediately for real-time feedback
+  // ${streaming ? "Stream output immediately" : "Buffer for batch output"}
   if (type === 'error') {
     originalError(\`[\${timestamp}] ERROR: \${message}\`);
   } else if (type === 'warn') {
     originalWarn(\`[\${timestamp}] WARN: \${message}\`);
   } else {
-    originalLog(\`[\${timestamp}] \${message}\`);
+    originalLog(\`[\${timestamp}] LOG: \${message}\`);
   }
 };
 
@@ -70,7 +320,7 @@ console.log = (...args) => captureLog('log', args);
 console.error = (...args) => captureLog('error', args);
 console.warn = (...args) => captureLog('warn', args);
 
-// Event loop monitoring - this is the key to async support
+// Event loop monitoring
 let pendingOperations = 0;
 let executionComplete = false;
 let finalTimeout;
@@ -94,7 +344,6 @@ global.setTimeout = (fn, delay, ...args) => {
 };
 
 global.setInterval = (fn, delay, ...args) => {
-  // For intervals, we'll let them run but not track them for completion
   return originalSetInterval(fn, delay, ...args);
 };
 
@@ -113,52 +362,76 @@ if (originalSetImmediate) {
   };
 }
 
-// Check if execution is complete
 const checkCompletion = () => {
-  if (executionComplete && pendingOperations === 0) {
-    finishExecution();
+  if (executionComplete && pendingOperations <= 0) {
+    setTimeout(() => {
+      finishExecution();
+    }, 50);
   }
 };
 
 const finishExecution = () => {
   clearTimeout(finalTimeout);
-  
-  // Output all logs in order
-  originalLog('__EXECUTION_START__');
-  logs.sort((a, b) => a.timestamp - b.timestamp).forEach(log => {
-    originalLog(\`\${log.type.toUpperCase()}: \${log.message}\`);
-  });
   originalLog('__EXECUTION_END__');
-  
   process.exit(0);
 };
 
-// Fallback timeout to prevent infinite hanging
 finalTimeout = setTimeout(() => {
-  originalLog('__EXECUTION_TIMEOUT__');
-  logs.sort((a, b) => a.timestamp - b.timestamp).forEach(log => {
-    originalLog(\`\${log.type.toUpperCase()}: \${log.message}\`);
-  });
   originalLog('__EXECUTION_END__');
   process.exit(0);
-}, 5000);
+}, 8000);
 
 // Execute user code
-try {
-  ${code}
-  
-  // Mark synchronous execution as complete
-  executionComplete = true;
-  
-  // Check immediately in case there are no async operations
-  process.nextTick(checkCompletion);
-  
-} catch (error) {
-  console.error('Execution error:', error.message);
-  executionComplete = true;
-  setTimeout(finishExecution, 100);
+async function runUserCode() {
+  try {
+    await (async () => {
+      ${code}
+    })();
+    
+    executionComplete = true;
+    setTimeout(() => {
+      checkCompletion();
+    }, 100);
+    
+  } catch (error) {
+    console.error('Execution error:', error.message);
+    executionComplete = true;
+    setTimeout(() => {
+      checkCompletion();
+    }, 100);
+  }
 }
-    `.trim();
+
+runUserCode();
+  `.trim();
+}
+
+export async function executeJavaScript(
+  code: string,
+  language: string = "javascript",
+  customPackages: Record<string, string> = {}
+) {
+  try {
+    const webcontainer = await initWebContainer();
+
+    // Determine module system based on language parameter
+    const useCommonJS = language === "nodejs" || language === "node";
+
+    // Detect required packages from code
+    const detectedPackages = detectRequiredPackages(code);
+    const wrappedCode = createWrapperCode(
+      code,
+      useCommonJS,
+      false,
+      detectedPackages
+    );
+
+    // Create package.json with dynamic dependencies
+    const packageJson = createPackageJson(
+      useCommonJS,
+      detectedPackages,
+      customPackages
+    );
 
     // Create a simple JavaScript file to execute
     const files = {
@@ -169,16 +442,25 @@ try {
       },
       "package.json": {
         file: {
-          contents: JSON.stringify({
-            name: "js-runner",
-            type: "module",
-            dependencies: {},
-          }),
+          contents: JSON.stringify(packageJson, null, 2),
         },
       },
     };
 
     await webcontainer.mount(files);
+
+    // Install dependencies first - only if there are non-default packages
+    if (detectedPackages.length > 0 || Object.keys(customPackages).length > 0) {
+      console.log(
+        "Installing dependencies:",
+        [
+          ...detectedPackages.map((p) => p.name),
+          ...Object.keys(customPackages),
+        ].join(", ")
+      );
+      const installProcess = await webcontainer.spawn("npm", ["install"]);
+      await installProcess.exit;
+    }
 
     // Execute the JavaScript code
     const process = await webcontainer.spawn("node", ["script.js"]);
@@ -191,7 +473,8 @@ try {
       new WritableStream({
         write(data) {
           // WebContainer already provides text, no need to decode
-          output += typeof data === 'string' ? data : new TextDecoder().decode(data);
+          output +=
+            typeof data === "string" ? data : new TextDecoder().decode(data);
         },
       })
     );
@@ -201,7 +484,7 @@ try {
       process.exit,
       new Promise<number>(
         (_, reject) =>
-          setTimeout(() => reject(new Error("Execution timeout")), 15000) // Extended timeout
+          setTimeout(() => reject(new Error("Execution timeout")), 10000) // Extended timeout
       ),
     ]);
 
@@ -240,7 +523,7 @@ try {
 
       userOutput = processedLogs.join("\n");
     } else if (output.includes("__EXECUTION_TIMEOUT__")) {
-      // Handle timeout case
+      // Handle timeout case - but only if there were actually pending operations
       const timeoutIndex = output.indexOf("__EXECUTION_TIMEOUT__");
       const afterTimeout = output
         .substring(timeoutIndex + "__EXECUTION_TIMEOUT__".length)
@@ -253,8 +536,12 @@ try {
         )
         .map((line) => line.replace(/^\[\d+\]\s*/, ""))
         .join("\n");
-      executionError =
-        "Execution timeout - some async operations may not have completed";
+
+      // Only show timeout error if output suggests there were actual issues
+      if (userOutput.length === 0 || output.includes("pending")) {
+        executionError =
+          "Execution timeout - some async operations may not have completed";
+      }
     } else {
       // Fallback to raw output if markers aren't found
       userOutput = output.trim();
@@ -293,14 +580,24 @@ export async function executeTypeScript(code: string) {
         file: {
           contents: JSON.stringify({
             name: "ts-runner",
-            type: "module",
+            type: "commonjs",
             dependencies: {
               typescript: "^5.0.0",
               "@types/node": "^18.0.0",
+              express: "^4.18.2",
+              "@types/express": "^4.17.21",
+              lodash: "^4.17.21",
+              "@types/lodash": "^4.14.202",
+              axios: "^1.6.0",
+              moment: "^2.29.4",
+              uuid: "^9.0.1",
+              "@types/uuid": "^9.0.7",
+              chalk: "^4.1.2",
+              dotenv: "^16.3.1",
             },
             scripts: {
               build:
-                "tsc script.ts --outDir ./dist --target ES2020 --module ES2020 --moduleResolution node --allowJs --strict false",
+                "tsc script.ts --outDir ./dist --target ES2020 --module CommonJS --moduleResolution node --allowJs --strict false",
             },
           }),
         },
@@ -310,7 +607,7 @@ export async function executeTypeScript(code: string) {
           contents: JSON.stringify({
             compilerOptions: {
               target: "ES2020",
-              module: "ES2020",
+              module: "CommonJS",
               moduleResolution: "node",
               outDir: "./dist",
               allowJs: true,
@@ -340,7 +637,7 @@ export async function executeTypeScript(code: string) {
       "--target",
       "ES2020",
       "--module",
-      "ES2020",
+      "CommonJS",
     ]);
 
     let compileError = "";
@@ -353,7 +650,8 @@ export async function executeTypeScript(code: string) {
           const { done, value } = await compileReader.read();
           if (done) break;
 
-          const text = typeof value === 'string' ? value : new TextDecoder().decode(value);
+          const text =
+            typeof value === "string" ? value : new TextDecoder().decode(value);
           if (text.includes("error")) {
             compileError += text;
           }
@@ -394,7 +692,8 @@ export async function executeTypeScript(code: string) {
           const { done, value } = await runReader.read();
           if (done) break;
 
-          const text = typeof value === 'string' ? value : new TextDecoder().decode(value);
+          const text =
+            typeof value === "string" ? value : new TextDecoder().decode(value);
           if (
             text.includes("Error") ||
             text.includes("error") ||

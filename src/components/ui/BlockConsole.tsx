@@ -26,9 +26,12 @@ const BlockConsole = memo(({ blockId }: { blockId: string }) => {
           setIsVisible(true);
         }
       } else if (event.data.type === "dom-console-clear") {
-        setMessages([]);
-        setIsVisible(false);
-        seenIds.current.clear();
+        // If no blockId is specified in clear message, or it matches this block
+        if (!event.data.blockId || event.data.blockId === blockId) {
+          setMessages([]);
+          setIsVisible(false);
+          seenIds.current.clear();
+        }
       }
     };
 

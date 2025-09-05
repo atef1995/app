@@ -1,0 +1,1026 @@
+---
+title: "Package Management & npm Ecosystem"
+description: "Master npm, semantic versioning, and package creation. Learn to navigate the vast Node.js ecosystem and create your own publishable packages."
+difficulty: "beginner"
+tags: ["npm", "packages", "modules", "versioning", "publishing"]
+relatedTutorials: ["02-modules-and-npm", "04-asynchronous-programming"]
+estimatedTime: "45 minutes"
+prerequisites: ["Basic Node.js knowledge", "Understanding of modules from Tutorial 02"]
+objectives:
+  - "Master npm package management and ecosystem"
+  - "Understand semantic versioning principles"
+  - "Create and configure npm scripts"
+  - "Build and publish your own npm package"
+  - "Implement proper dependency management"
+---
+
+# Package Management & npm Ecosystem
+
+Welcome to the world of npm - Node Package Manager! In this tutorial, you'll discover how to leverage the massive JavaScript ecosystem and even contribute your own packages to the community.
+
+## What is npm and Why Does it Matter?
+
+**Student**: "I keep hearing about npm everywhere. What exactly is it?"
+
+**Teacher**: "Great question! Think of npm like a massive library where developers share code. Instead of writing everything from scratch, you can use packages (pre-built code) that others have created and tested. npm has over 2 million packages!"
+
+npm serves three main purposes:
+1. **Package Registry**: A massive online database of JavaScript packages
+2. **Command Line Tool**: For installing, updating, and managing packages  
+3. **Package Manager**: Handles dependencies and versions automatically
+
+Let's explore this ecosystem hands-on!
+
+## Understanding package.json - Your Project's Blueprint
+
+Every Node.js project needs a `package.json` file - it's like your project's ID card and instruction manual combined.
+
+<InteractiveCodeBlock
+  title="Creating Your First package.json"
+  language="bash"
+  showOutput={false}
+  editable={false}
+>
+{`
+# Create a new project directory
+mkdir my-awesome-package
+cd my-awesome-package
+
+# Initialize a new npm package
+npm init -y
+
+# This creates a package.json file with default values
+cat package.json
+`}
+</InteractiveCodeBlock>
+
+**Student**: "What do all these fields mean?"
+
+**Teacher**: "Let me break down the most important ones for you!"
+
+<InteractiveCodeBlock
+  title="Understanding package.json Structure"
+  language="json"
+  showOutput={false}
+  editable={false}
+>
+{`
+{
+  "name": "my-awesome-package",           // Unique package name
+  "version": "1.0.0",                     // Current version (semantic versioning)
+  "description": "",                      // What does your package do?
+  "main": "index.js",                     // Entry point file
+  "scripts": {                            // Custom commands you can run
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],                         // Help people find your package
+  "author": "",                           // Your name
+  "license": "ISC",                       // Legal license
+  "dependencies": {},                     // Packages needed in production
+  "devDependencies": {}                   // Packages needed only during development
+}
+`}
+</InteractiveCodeBlock>
+
+## Semantic Versioning - The Version Number System
+
+**Student**: "I see version numbers like 1.2.3 everywhere. What do these numbers mean?"
+
+**Teacher**: "Those follow 'semantic versioning' - a standardized way to communicate what changed in each version!"
+
+The format is: `MAJOR.MINOR.PATCH`
+
+- **MAJOR**: Breaking changes (1.0.0 → 2.0.0)
+- **MINOR**: New features, backwards compatible (1.0.0 → 1.1.0) 
+- **PATCH**: Bug fixes, no new features (1.0.0 → 1.0.1)
+
+<InteractiveCodeBlock
+  title="Version Range Examples"
+  language="json"
+  showOutput={false}
+  editable={false}
+>
+{`
+{
+  "dependencies": {
+    "express": "^4.18.0",        // Compatible with 4.18.0, allows minor updates
+    "lodash": "~3.2.0",          // Compatible with 3.2.x, allows patch updates only
+    "moment": "2.29.4",          // Exact version only
+    "axios": ">=1.0.0 <2.0.0",   // Range specification
+    "chalk": "*"                 // Latest version (dangerous!)
+  }
+}
+`}
+</InteractiveCodeBlock>
+
+**Student**: "What's the difference between ^ and ~?"
+
+**Teacher**: "Great question! ^ allows minor version updates (safer), while ~ only allows patch updates (most conservative). Let's see this in action!"
+
+## Installing and Managing Dependencies
+
+<DualPaneEditor
+  title="Package Installation Demo (Simulated)"
+  description="Learn different ways to install packages - API responses are simulated for educational purposes"
+  frontendCode={`<!DOCTYPE html>
+<html>
+<head>
+    <title>Package Management Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .package-info { 
+            background: #f0f8ff; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+        }
+        button { 
+            background: #4CAF50; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📦 Package Installation Demo</h1>
+    <button onclick="showPackageInfo()">Check Installed Packages</button>
+    <button onclick="showVersions()">Show Version Examples</button>
+    <div id="output"></div>
+
+    <script>
+        function showPackageInfo() {
+            // Simulate package information response
+            console.log('📦 Simulating package information request...');
+            
+            const simulatedData = {
+                message: 'Package information retrieved successfully',
+                packages: {
+                    installedPackages: {
+                        "lodash": {
+                            version: "4.17.21",
+                            description: "A modern JavaScript utility library",
+                            installType: "production",
+                            size: "1.4MB"
+                        },
+                        "express": {
+                            version: "4.18.2", 
+                            description: "Fast, unopinionated, minimalist web framework",
+                            installType: "production",
+                            size: "208KB"
+                        },
+                        "nodemon": {
+                            version: "3.0.1",
+                            description: "Simple monitor script for use during development",
+                            installType: "development",
+                            size: "1.2MB"
+                        }
+                    },
+                    totalPackages: 3,
+                    diskSpaceUsed: "2.8MB",
+                    lastUpdated: new Date().toISOString()
+                },
+                npmCommands: {
+                    install: 'npm install <package-name>',
+                    installDev: 'npm install --save-dev <package-name>',
+                    update: 'npm update',
+                    list: 'npm list',
+                    outdated: 'npm outdated'
+                }
+            };
+            
+            document.getElementById('output').innerHTML = 
+                '<div class="package-info"><h3>📋 Simulated Installed Packages:</h3><pre>' 
+                + JSON.stringify(simulatedData, null, 2) + '</pre></div>';
+        }
+
+        function showVersions() {
+            const versions = {
+                "Production Dependencies": {
+                    "lodash": "^4.17.21",
+                    "express": "^4.18.2",
+                    "axios": "~1.4.0"
+                },
+                "Development Dependencies": {
+                    "nodemon": "^3.0.1",
+                    "jest": "^29.5.0",
+                    "@types/node": "^20.3.0"
+                }
+            };
+            
+            document.getElementById('output').innerHTML = 
+                '<div class="package-info"><h3>📊 Version Examples:</h3><pre>' 
+                + JSON.stringify(versions, null, 2) + '</pre></div>';
+        }
+    </script>
+</body>
+</html>`}
+  backendCode={`const http = require('http');
+const fs = require('fs');
+const path = require('path');
+
+// Simulate package information (in real project, this would read from package.json and node_modules)
+const packageInfo = {
+    installedPackages: {
+        "lodash": {
+            version: "4.17.21",
+            description: "A modern JavaScript utility library",
+            installType: "production",
+            size: "1.4MB"
+        },
+        "express": {
+            version: "4.18.2", 
+            description: "Fast, unopinionated, minimalist web framework",
+            installType: "production",
+            size: "208KB"
+        },
+        "nodemon": {
+            version: "3.0.1",
+            description: "Simple monitor script for use during development",
+            installType: "development",
+            size: "1.2MB"
+        }
+    },
+    totalPackages: 3,
+    diskSpaceUsed: "2.8MB",
+    lastUpdated: new Date().toISOString()
+};
+
+// CORS helper
+function setCORSHeaders(res) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
+const server = http.createServer((req, res) => {
+    setCORSHeaders(res);
+    
+    if (req.method === 'OPTIONS') {
+        res.writeHead(200);
+        res.end();
+        return;
+    }
+
+    const url = new URL(req.url, 'http://localhost:3001');
+
+    if (url.pathname === '/packages' && req.method === 'GET') {
+        console.log('📦 Fetching package information...');
+        
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            message: 'Package information retrieved successfully',
+            packages: packageInfo,
+            npmCommands: {
+                install: 'npm install <package-name>',
+                installDev: 'npm install --save-dev <package-name>',
+                update: 'npm update',
+                list: 'npm list',
+                outdated: 'npm outdated'
+            }
+        }));
+        return;
+    }
+
+    // Default response
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Endpoint not found' }));
+});
+
+const PORT = 3001;
+server.listen(PORT, () => {
+    console.log(\`🚀 Package Management Demo Server running on http://localhost:\${PORT}\`);
+    console.log('📦 Available endpoints:');
+    console.log('   GET /packages - View installed packages');
+});`}
+  previewType="html"
+  height="500px"
+/>
+
+## npm Scripts - Your Automation Powerhouse
+
+**Student**: "I keep seeing commands like `npm start` and `npm test`. How do these work?"
+
+**Teacher**: "Those are npm scripts! They're custom commands defined in your package.json that automate common tasks. Let's create some useful ones!"
+
+<InteractiveCodeBlock
+  title="Powerful npm Scripts Examples"
+  language="json"
+  showOutput={false}
+  editable={false}
+>
+{`
+{
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "build": "webpack --mode production",
+    "lint": "eslint src/**/*.js",
+    "lint:fix": "eslint src/**/*.js --fix",
+    "clean": "rm -rf dist node_modules",
+    "fresh-install": "npm run clean && npm install",
+    "deploy": "npm run build && npm run test && git push heroku main",
+    "docs": "jsdoc src -d docs",
+    "size": "bundlesize",
+    "security": "npm audit",
+    "outdated": "npm outdated",
+    "update-deps": "npm update && npm audit fix"
+  }
+}
+`}
+</InteractiveCodeBlock>
+
+**Student**: "Wow, these look really useful! Can I run multiple commands in one script?"
+
+**Teacher**: "Absolutely! You can chain commands with `&&` (run sequentially) or `&` (run parallel). You can also call other npm scripts with `npm run <script-name>`!"
+
+## Creating Your Own npm Package
+
+Now for the exciting part - let's create and publish your own npm package! We'll build a useful utility that other developers can use.
+
+<DualPaneEditor
+  title="Building Your First npm Package (Simulated)"
+  description="Create a utility package for common string operations - All functionality is simulated for demonstration"
+  frontendCode={`<!DOCTYPE html>
+<html>
+<head>
+    <title>String Utilities Package Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .demo-section { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            margin: 15px 0; 
+            border-radius: 8px;
+            border-left: 4px solid #007acc;
+        }
+        input { 
+            width: 300px; 
+            padding: 8px; 
+            margin: 5px; 
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button { 
+            background: #007acc; 
+            color: white; 
+            padding: 10px 15px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        .result { 
+            background: #e8f5e8; 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 4px;
+            min-height: 20px;
+        }
+        .package-info {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 String Utilities Package Demo</h1>
+    
+    <div class="package-info">
+        <h3>📦 Package: awesome-string-utils</h3>
+        <p>A collection of useful string manipulation utilities</p>
+        <p><strong>Version:</strong> 1.0.0 | <strong>Author:</strong> You!</p>
+    </div>
+
+    <div class="demo-section">
+        <h3>🔧 Try the String Utilities:</h3>
+        <input type="text" id="textInput" placeholder="Enter text to transform..." value="Hello World JavaScript">
+        <br>
+        <button onclick="testCapitalize()">Capitalize Words</button>
+        <button onclick="testSlugify()">Slugify</button>
+        <button onclick="testTruncate()">Truncate (10 chars)</button>
+        <button onclick="testWordCount()">Count Words</button>
+        <br>
+        <button onclick="testReverse()">Reverse</button>
+        <button onclick="testCamelCase()">camelCase</button>
+        <button onclick="testKebabCase()">kebab-case</button>
+        <div id="result" class="result">Results will appear here...</div>
+    </div>
+
+    <div class="demo-section">
+        <h3>📋 Package Information:</h3>
+        <button onclick="getPackageInfo()">View Package Details</button>
+        <div id="packageInfo" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001';
+
+        // Simulate API responses since HTTP requests don't work in tutorial environment
+        function makeRequest(endpoint, data = null) {
+            console.log("📡 Simulating " + data ? 'POST' : 'GET' + "request to " + endpoint);
+            
+            // Simulate the string utilities
+            if (endpoint.includes('/string-utils/')) {
+                const operation = endpoint.split('/')[2];
+                const text = data?.text || 'Hello World JavaScript';
+                
+                switch (operation) {
+                    case 'capitalize':
+                        return Promise.resolve({ 
+                            result: text.split(' ').map(word => 
+                                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                            ).join(' '),
+                            operation,
+                            input: text,
+                            package: 'awesome-string-utils v1.0.0'
+                        });
+                    case 'slugify':
+                        return Promise.resolve({ 
+                            result: text.toLowerCase().trim()
+                                .replace(/[^\\w\\s-]/g, '')
+                                .replace(/[\\s_-]+/g, '-')
+                                .replace(/^-+|-+$/g, ''),
+                            operation,
+                            input: text,
+                            package: 'awesome-string-utils v1.0.0'
+                        });
+                    case 'truncate':
+                        const length = data?.length || 10;
+                        return Promise.resolve({ 
+                            result: text.length > length ? text.substring(0, length) + '...' : text,
+                            operation,
+                            input: text,
+                            package: 'awesome-string-utils v1.0.0'
+                        });
+                    case 'word-count':
+                        return Promise.resolve({ 
+                            count: text.trim().split(/\\s+/).filter(word => word.length > 0).length,
+                            text,
+                            operation,
+                            package: 'awesome-string-utils v1.0.0'
+                        });
+                    case 'reverse':
+                        return Promise.resolve({ 
+                            result: text.split('').reverse().join(''),
+                            operation,
+                            input: text,
+                            package: 'awesome-string-utils v1.0.0'
+                        });
+                    case 'camel-case':
+                        return Promise.resolve({ 
+                            result: text.replace(/[-_\\s]+(.)?/g, (_, char) => char ? char.toUpperCase() : ''),
+                            operation,
+                            input: text,
+                            package: 'awesome-string-utils v1.0.0'
+                        });
+                    case 'kebab-case':
+                        return Promise.resolve({ 
+                            result: text.replace(/([a-z])([A-Z])/g, '$1-$2')
+                                .replace(/[\\s_]+/g, '-').toLowerCase(),
+                            operation,
+                            input: text,
+                            package: 'awesome-string-utils v1.0.0'
+                        });
+                    default:
+                        return Promise.resolve({ error: 'Unknown operation' });
+                }
+            }
+            
+            // Simulate package info
+            if (endpoint === '/package-info') {
+                return Promise.resolve({
+                    name: 'awesome-string-utils',
+                    version: '1.0.0',
+                    description: 'A comprehensive string utilities package for JavaScript',
+                    author: 'Student Developer',
+                    license: 'MIT',
+                    keywords: ['string', 'utilities', 'text', 'manipulation'],
+                    main: 'index.js',
+                    functions: ['capitalize', 'slugify', 'truncate', 'wordCount', 'reverse', 'toCamelCase', 'toKebabCase'],
+                    usage: {
+                        install: 'npm install awesome-string-utils',
+                        import: "const StringUtils = require('awesome-string-utils');",
+                        example: "StringUtils.capitalize('hello world') // 'Hello World'"
+                    }
+                });
+            }
+            
+            return Promise.resolve({ error: 'Endpoint not found' });
+        }
+
+        async function testCapitalize() {
+            const text = document.getElementById('textInput').value;
+            const result = await makeRequest('/string-utils/capitalize', { text });
+            displayResult('Capitalize Words', text, result.result || result.error);
+        }
+
+        async function testSlugify() {
+            const text = document.getElementById('textInput').value;
+            const result = await makeRequest('/string-utils/slugify', { text });
+            displayResult('Slugify', text, result.result || result.error);
+        }
+
+        async function testTruncate() {
+            const text = document.getElementById('textInput').value;
+            const result = await makeRequest('/string-utils/truncate', { text, length: 10 });
+            displayResult('Truncate (10 chars)', text, result.result || result.error);
+        }
+
+        async function testWordCount() {
+            const text = document.getElementById('textInput').value;
+            const result = await makeRequest('/string-utils/word-count', { text });
+            displayResult('Word Count', text, \`\${result.count} words\` || result.error);
+        }
+
+        async function testReverse() {
+            const text = document.getElementById('textInput').value;
+            const result = await makeRequest('/string-utils/reverse', { text });
+            displayResult('Reverse', text, result.result || result.error);
+        }
+
+        async function testCamelCase() {
+            const text = document.getElementById('textInput').value;
+            const result = await makeRequest('/string-utils/camel-case', { text });
+            displayResult('camelCase', text, result.result || result.error);
+        }
+
+        async function testKebabCase() {
+            const text = document.getElementById('textInput').value;
+            const result = await makeRequest('/string-utils/kebab-case', { text });
+            displayResult('kebab-case', text, result.result || result.error);
+        }
+
+        function displayResult(operation, input, output) {
+            document.getElementById('result').innerHTML = 
+                \`<strong>\${operation}:</strong><br>Input: "\${input}"<br>Output: "\${output}"\`;
+        }
+
+        async function getPackageInfo() {
+            const info = await makeRequest('/package-info');
+            document.getElementById('packageInfo').innerHTML = 
+                \`<pre>\${JSON.stringify(info, null, 2)}</pre>\`;
+        }
+    </script>
+</body>
+</html>`}
+  backendCode={`const http = require('http');
+
+// Our awesome string utilities package
+class StringUtils {
+    static capitalize(str) {
+        return str.split(' ')
+                  .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                  .join(' ');
+    }
+    
+    static slugify(str) {
+        return str.toLowerCase()
+                  .trim()
+                  .replace(/[^\\w\\s-]/g, '')
+                  .replace(/[\\s_-]+/g, '-')
+                  .replace(/^-+|-+$/g, '');
+    }
+    
+    static truncate(str, length = 50, ending = '...') {
+        return str.length > length ? str.substring(0, length) + ending : str;
+    }
+    
+    static wordCount(str) {
+        return str.trim().split(/\\s+/).filter(word => word.length > 0).length;
+    }
+    
+    static reverse(str) {
+        return str.split('').reverse().join('');
+    }
+    
+    static toCamelCase(str) {
+        return str.replace(/[-_\\s]+(.)?/g, (_, char) => char ? char.toUpperCase() : '');
+    }
+    
+    static toKebabCase(str) {
+        return str.replace(/([a-z])([A-Z])/g, '$1-$2')
+                  .replace(/[\\s_]+/g, '-')
+                  .toLowerCase();
+    }
+}
+
+// Package information
+const packageInfo = {
+    name: 'awesome-string-utils',
+    version: '1.0.0',
+    description: 'A comprehensive string utilities package for JavaScript',
+    author: 'Student Developer',
+    license: 'MIT',
+    keywords: ['string', 'utilities', 'text', 'manipulation'],
+    main: 'index.js',
+    functions: [
+        'capitalize', 'slugify', 'truncate', 'wordCount', 
+        'reverse', 'toCamelCase', 'toKebabCase'
+    ],
+    dependencies: {},
+    devDependencies: {
+        'jest': '^29.5.0',
+        'eslint': '^8.42.0'
+    },
+    scripts: {
+        'test': 'jest',
+        'lint': 'eslint *.js',
+        'build': 'echo "No build step needed"',
+        'publish': 'npm publish'
+    }
+};
+
+// Helper functions
+function setCORSHeaders(res) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
+function sendJSON(res, data, statusCode = 200) {
+    setCORSHeaders(res);
+    res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(data));
+}
+
+function parseRequestBody(req, callback) {
+    let body = '';
+    req.on('data', chunk => body += chunk.toString());
+    req.on('end', () => {
+        try {
+            callback(null, body ? JSON.parse(body) : {});
+        } catch (error) {
+            callback(error, null);
+        }
+    });
+}
+
+const server = http.createServer((req, res) => {
+    const url = new URL(req.url, 'http://localhost:3001');
+    const method = req.method;
+
+    console.log(\`📝 \${method} \${url.pathname}\`);
+
+    if (method === 'OPTIONS') {
+        setCORSHeaders(res);
+        res.writeHead(200);
+        res.end();
+        return;
+    }
+
+    // Package info endpoint
+    if (url.pathname === '/package-info' && method === 'GET') {
+        console.log('📦 Serving package information');
+        sendJSON(res, {
+            ...packageInfo,
+            usage: {
+                install: 'npm install awesome-string-utils',
+                import: "const StringUtils = require('awesome-string-utils');",
+                example: "StringUtils.capitalize('hello world') // 'Hello World'"
+            }
+        });
+        return;
+    }
+
+    // String utilities endpoints
+    if (url.pathname.startsWith('/string-utils/') && method === 'POST') {
+        parseRequestBody(req, (error, data) => {
+            if (error) {
+                sendJSON(res, { error: 'Invalid JSON' }, 400);
+                return;
+            }
+
+            const operation = url.pathname.split('/')[2];
+            const { text, length } = data;
+
+            if (!text) {
+                sendJSON(res, { error: 'Text parameter required' }, 400);
+                return;
+            }
+
+            let result;
+            
+            try {
+                switch (operation) {
+                    case 'capitalize':
+                        result = StringUtils.capitalize(text);
+                        console.log(\`✨ Capitalized: "\${text}" → "\${result}"\`);
+                        break;
+                    case 'slugify':
+                        result = StringUtils.slugify(text);
+                        console.log(\`🔗 Slugified: "\${text}" → "\${result}"\`);
+                        break;
+                    case 'truncate':
+                        result = StringUtils.truncate(text, length || 50);
+                        console.log(\`✂️ Truncated: "\${text}" → "\${result}"\`);
+                        break;
+                    case 'word-count':
+                        const count = StringUtils.wordCount(text);
+                        console.log(\`📊 Word count for "\${text}": \${count}\`);
+                        sendJSON(res, { count, text });
+                        return;
+                    case 'reverse':
+                        result = StringUtils.reverse(text);
+                        console.log(\`🔄 Reversed: "\${text}" → "\${result}"\`);
+                        break;
+                    case 'camel-case':
+                        result = StringUtils.toCamelCase(text);
+                        console.log(\`🐪 CamelCased: "\${text}" → "\${result}"\`);
+                        break;
+                    case 'kebab-case':
+                        result = StringUtils.toKebabCase(text);
+                        console.log(\`🍖 Kebab-cased: "\${text}" → "\${result}"\`);
+                        break;
+                    default:
+                        sendJSON(res, { error: 'Unknown operation' }, 400);
+                        return;
+                }
+
+                sendJSON(res, { 
+                    operation, 
+                    input: text, 
+                    result,
+                    package: 'awesome-string-utils v1.0.0'
+                });
+            } catch (err) {
+                sendJSON(res, { error: err.message }, 500);
+            }
+        });
+        return;
+    }
+
+    // 404
+    sendJSON(res, { error: 'Endpoint not found' }, 404);
+});
+
+const PORT = 3001;
+server.listen(PORT, () => {
+    console.log(\`🚀 String Utils Package Demo running on http://localhost:\${PORT}\`);
+    console.log('📦 Your npm package "awesome-string-utils" is ready to test!');
+    console.log('🎯 Available string operations:');
+    console.log('   • capitalize - Capitalize each word');
+    console.log('   • slugify - Create URL-friendly slugs');
+    console.log('   • truncate - Limit string length');
+    console.log('   • word-count - Count words in text');
+    console.log('   • reverse - Reverse string characters');
+    console.log('   • camel-case - Convert to camelCase');
+    console.log('   • kebab-case - Convert to kebab-case');
+});`}
+  previewType="html"
+  height="600px"
+/>
+
+## Package Publishing Process
+
+**Student**: "This is awesome! How do I actually publish this so others can use it?"
+
+**Teacher**: "Great question! Publishing to npm is straightforward, but let's make sure we do it right!"
+
+<InteractiveCodeBlock
+  title="Publishing Your Package Step-by-Step"
+  language="bash"
+  showOutput={false}
+  editable={false}
+>
+{`
+# 1. Create an account on npmjs.com (if you haven't)
+# 2. Login to npm from command line
+npm login
+
+# 3. Verify your package.json is properly configured
+npm run lint    # Check code quality
+npm test        # Run your tests
+
+# 4. Check what files will be published
+npm pack --dry-run
+
+# 5. Publish your package!
+npm publish
+
+# 6. View your published package
+npm view awesome-string-utils
+
+# 7. Test installing your own package
+npm install awesome-string-utils
+`}
+</InteractiveCodeBlock>
+
+## Advanced Package Management
+
+**Student**: "What about managing different versions and keeping packages secure?"
+
+**Teacher**: "Excellent question! Let's cover the professional-level package management techniques!"
+
+<InteractiveCodeBlock
+  title="Professional Package Management Commands"
+  language="bash"
+  showOutput={false}
+  editable={false}
+>
+{`
+# Security and maintenance
+npm audit              # Check for security vulnerabilities  
+npm audit fix          # Automatically fix security issues
+npm outdated           # See which packages have updates
+npm update             # Update packages within version ranges
+
+# Package investigation
+npm list               # Show installed package tree
+npm list --depth=0     # Show only direct dependencies
+npm info lodash        # Get detailed info about a package
+npm view lodash versions --json  # See all available versions
+
+# Advanced installation options
+npm install lodash@4.17.20  # Install specific version
+npm install lodash@latest   # Install latest version
+npm install lodash --save-exact  # Lock to exact version
+
+# Working with different registries
+npm install --registry https://registry.npmjs.org/
+npm config set registry https://registry.npmjs.org/
+
+# Local package development
+npm link               # Create global symlink for local development
+npm unlink             # Remove global symlink
+
+# Package maintenance
+npm deprecate awesome-string-utils@1.0.0 "Use version 2.0.0 instead"
+npm unpublish awesome-string-utils@1.0.0 --force
+`}
+</InteractiveCodeBlock>
+
+## Best Practices for Package Management
+
+**Student**: "This is a lot to remember! What are the most important best practices?"
+
+**Teacher**: "Here are the essential rules that will make you a package management pro!"
+
+### 🎯 Essential Best Practices:
+
+1. **Version Management**
+   - Use semantic versioning strictly
+   - Lock major versions with `^` for safety
+   - Test before upgrading dependencies
+
+2. **Security First**  
+   - Run `npm audit` regularly
+   - Keep dependencies updated
+   - Use `npm ci` in production builds
+
+3. **Package.json Hygiene**
+   - Clear, descriptive package names
+   - Proper keywords for discoverability  
+   - Include examples in README
+
+4. **Dependency Classification**
+   - Production deps in `dependencies`
+   - Build tools in `devDependencies`
+   - Minimize dependency count
+
+<InteractiveCodeBlock
+  title="Production-Ready package.json Example"
+  language="json"
+  showOutput={false}
+  editable={false}
+>
+{`
+{
+  "name": "awesome-string-utils",
+  "version": "1.2.3",
+  "description": "Comprehensive string manipulation utilities for JavaScript",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "babel src -d lib",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.js",
+    "lint:fix": "eslint src/**/*.js --fix",
+    "prepublishOnly": "npm run build && npm run test",
+    "semantic-release": "semantic-release"
+  },
+  "keywords": [
+    "string",
+    "utilities", 
+    "text-manipulation",
+    "javascript"
+  ],
+  "author": {
+    "name": "Your Name",
+    "email": "your.email@example.com",
+    "url": "https://yourwebsite.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/awesome-string-utils.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/awesome-string-utils/issues"
+  },
+  "homepage": "https://github.com/yourusername/awesome-string-utils#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/cli": "^7.22.0",
+    "@babel/core": "^7.22.0", 
+    "@babel/preset-env": "^7.22.0",
+    "eslint": "^8.42.0",
+    "jest": "^29.5.0",
+    "semantic-release": "^21.0.0"
+  }
+}
+`}
+</InteractiveCodeBlock>
+
+## Common Package Management Pitfalls
+
+**Student**: "What mistakes should I avoid?"
+
+**Teacher**: "Great question! Here are the most common traps and how to avoid them:"
+
+### ⚠️ Common Mistakes:
+
+1. **Version Lock Hell**: Using exact versions everywhere
+   - **Problem**: No security updates, harder maintenance
+   - **Solution**: Use `^` for minor updates, `~` for patches
+
+2. **Bloated Dependencies**: Installing everything globally or in production
+   - **Problem**: Slow installs, security risks
+   - **Solution**: Use `--save-dev` for development tools
+
+3. **Ignoring Security**: Not running audits
+   - **Problem**: Vulnerable dependencies in production
+   - **Solution**: Regular `npm audit` and automated security updates
+
+4. **Poor Naming**: Generic or unclear package names
+   - **Problem**: Hard to discover, naming conflicts
+   - **Solution**: Descriptive, unique names with good keywords
+
+## Practice Challenge: Create Your Own Utility Package
+
+**Student**: "I want to practice! What should I build?"
+
+**Teacher**: "Perfect! Let's create a practice package together. Choose one of these ideas and implement it:"
+
+### 🎯 Practice Projects:
+
+1. **Date Utilities Package**
+   - Format dates in different styles
+   - Calculate age, time differences
+   - Parse various date formats
+
+2. **Array Helper Package**
+   - Chunk arrays, remove duplicates
+   - Find intersections, differences
+   - Statistical functions (mean, median)
+
+3. **Validation Package**
+   - Email, phone, URL validation
+   - Credit card number validation
+   - Password strength checking
+
+4. **Color Utilities Package**
+   - Convert between color formats (hex, rgb, hsl)
+   - Generate color palettes
+   - Calculate color contrast
+
+Try implementing one of these, then test the publishing process to a test registry!
+
+## Summary
+
+🎉 **Congratulations!** You've mastered npm package management! You now know how to:
+
+- ✅ Navigate the npm ecosystem confidently
+- ✅ Understand semantic versioning and dependency management
+- ✅ Create powerful npm scripts for automation
+- ✅ Build and publish your own packages
+- ✅ Follow professional best practices
+- ✅ Avoid common pitfalls and security issues
+
+**Student**: "This opens up so many possibilities! I can use millions of existing packages AND contribute my own!"
+
+**Teacher**: "Exactly! You're now part of the global JavaScript community. The npm ecosystem is your oyster - use it wisely, contribute positively, and keep learning!"
+
+### 🚀 Next Steps:
+- Practice creating and publishing a package
+- Explore popular packages in your area of interest
+- Contribute to open-source projects
+- Learn about monorepos and workspace management
+
+The JavaScript ecosystem awaits your contributions! 📦✨

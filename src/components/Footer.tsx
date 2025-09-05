@@ -1,7 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { Github, Twitter, Mail, Heart, Code, BookOpen, Users, Bug } from "lucide-react";
+import {
+  Github,
+  Twitter,
+  Mail,
+  Heart,
+  Code,
+  BookOpen,
+  Users,
+  Bug,
+} from "lucide-react";
 import { useMood } from "@/components/providers/MoodProvider";
 import getMoodColors from "@/lib/getMoodColors";
 
@@ -19,7 +28,7 @@ export function Footer() {
         { name: "Practice", href: "/practice", icon: Code },
         { name: "Quizzes", href: "/quizzes", icon: BookOpen },
         { name: "Projects", href: "/projects", icon: Code },
-      ]
+      ],
     },
     {
       title: "Platform",
@@ -28,7 +37,7 @@ export function Footer() {
         { name: "Study Plan", href: "/study-plan", icon: BookOpen },
         { name: "Achievements", href: "/achievements", icon: BookOpen },
         { name: "Social", href: "/social", icon: Users },
-      ]
+      ],
     },
     {
       title: "Account",
@@ -37,7 +46,7 @@ export function Footer() {
         { name: "Pricing", href: "/pricing", icon: BookOpen },
         { name: "Certificates", href: "/certificates", icon: BookOpen },
         { name: "Subscription", href: "/subscription/upgrade", icon: BookOpen },
-      ]
+      ],
     },
     {
       title: "Support",
@@ -46,14 +55,14 @@ export function Footer() {
         { name: "Bug Report", href: "/bug-report", icon: Bug },
         { name: "Help Center", href: "#", icon: BookOpen },
         { name: "Status", href: "#", icon: BookOpen },
-      ]
-    }
+      ],
+    },
   ];
 
   const socialLinks = [
-    { name: "GitHub", href: "https://github.com", icon: Github },
-    { name: "Twitter", href: "https://twitter.com", icon: Twitter },
-    { name: "Email", href: "mailto:hello@vibedtocracked.com", icon: Mail },
+    // { name: "GitHub", href: "https://github.com", icon: Github },
+    // { name: "Twitter", href: "https://twitter.com", icon: Twitter },
+    { name: "Email", href: "mailto:atef@vibed-to-cracked.com", icon: Mail },
   ];
 
   return (
@@ -68,11 +77,14 @@ export function Footer() {
                 Vibed to Cracked
               </h3>
               <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                Master JavaScript at your own pace with mood-driven learning. Choose your vibe, code your way.
+                Master JavaScript at your own pace with mood-driven learning.
+                Choose your vibe, code your way.
               </p>
-              
+
               {/* Current Mood Indicator */}
-              <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm ${moodColors.accent} text-white`}>
+              <div
+                className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm ${moodColors.accent} text-white`}
+              >
                 <span>{currentMood.emoji}</span>
                 <span>Currently {currentMood.id.toUpperCase()}</span>
               </div>
@@ -156,9 +168,12 @@ export function Footer() {
           {/* Mood-based Quote */}
           <div className="mt-6 text-center">
             <p className={`text-sm italic ${moodColors.text}`}>
-              {currentMood.id === "chill" && "\"Take it easy, code flows better when you&apos;re relaxed. 🌊\""}
-              {currentMood.id === "rush" && "\"Fast-paced learning, maximum momentum! ⚡\""}
-              {currentMood.id === "grind" && "\"Focus deep, code harder, level up faster. 💪\""}
+              {currentMood.id === "chill" &&
+                '"Take it easy, code flows better when you\'re relaxed. 🌊"'}
+              {currentMood.id === "rush" &&
+                '"Fast-paced learning, maximum momentum! ⚡"'}
+              {currentMood.id === "grind" &&
+                '"Focus deep, code harder, level up faster. 💪"'}
             </p>
           </div>
         </div>

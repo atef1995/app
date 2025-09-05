@@ -6,6 +6,24 @@ const nextConfig: NextConfig = {
   experimental: {
     mdxRs: true,
   },
+  // Add headers required for WebContainer (SharedArrayBuffer support)
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'require-corp',
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin',
+          },
+        ],
+      },
+    ];
+  },
   // Exclude scripts and seed files from build
   webpack: (config) => {
     config.resolve.alias = {

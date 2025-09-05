@@ -1,0 +1,2041 @@
+---
+title: "RESTful API Development: Building Production-Ready APIs"
+description: "Master REST API design principles and build robust, scalable APIs with Express.js. Learn CRUD operations, validation, error handling, and professional API documentation."
+difficulty: 3
+tags: ["rest", "api", "crud", "validation", "documentation", "http-methods"]
+relatedTutorials: ["05-express-framework", "07-database-integration", "08-authentication-authorization"]
+estimatedTime: "90 minutes"
+prerequisites: ["Express.js fundamentals from Tutorial 05", "HTTP methods and status codes", "JSON data handling", "Basic understanding of web architecture"]
+objectives:
+  - "Understand REST architectural principles and constraints"
+  - "Design and implement CRUD operations with proper HTTP methods"
+  - "Master request validation and data sanitization techniques"
+  - "Implement comprehensive error handling and response formatting"
+  - "Create professional API documentation and testing interfaces"
+order: 6
+isPremium: true
+requiredPlan: "VIBED"
+---
+
+# RESTful API Development: Building Production-Ready APIs
+
+Welcome to the world of REST API development! If Express.js gave you the tools to build web applications, this tutorial will teach you how to architect and build APIs that power modern web and mobile applications. REST APIs are the backbone of most web services today - from social media platforms to e-commerce sites.
+
+## Understanding REST: The Foundation of Modern APIs
+
+**Student**: "I keep hearing about REST APIs everywhere. What exactly is REST, and why is it so important?"
+
+**Teacher**: "Excellent question! REST stands for **Representational State Transfer**. Think of it as a set of architectural principles that make APIs predictable, scalable, and easy to use. Just like how traffic rules make driving predictable and safe, REST principles make API interactions consistent and reliable."
+
+REST isn't a technology or protocol - it's a architectural style with six key principles:
+
+### The Six REST Principles
+
+**1. Client-Server Architecture**
+- Clear separation between client (frontend) and server (backend)
+- Clients don't need to know about server implementation details
+- Servers don't need to know about client UI concerns
+
+**2. Stateless**
+- Each request contains all information needed to process it
+- Server doesn't store client context between requests
+- Makes APIs more scalable and reliable
+
+**3. Cacheable**
+- Responses should indicate if they can be cached
+- Improves performance and reduces server load
+- Examples: GET requests are typically cacheable, POST requests are not
+
+**4. Uniform Interface**
+- Consistent way to interact with resources
+- Uses standard HTTP methods (GET, POST, PUT, DELETE)
+- Resources identified by URLs
+- Self-descriptive messages
+
+**5. Layered System**
+- Architecture can have multiple layers (load balancers, caches, etc.)
+- Client doesn't know which layer it's communicating with
+- Improves scalability and security
+
+**6. Code on Demand** (Optional)
+- Server can send executable code to client
+- Rarely used in practice (like JavaScript in web pages)
+
+<InteractiveCodeBlock
+  title="REST Principles in Action: Resource-Based URLs"
+  language="nodejs"
+  showOutput={true}
+  editable={true}
+>
+{`
+const express = require('express');
+const app = express();
+
+// Sample data representing a collection of books
+let books = [
+    { id: 1, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', year: 1925, genre: 'Fiction' },
+    { id: 2, title: '1984', author: 'George Orwell', year: 1949, genre: 'Dystopian' },
+    { id: 3, title: 'To Kill a Mockingbird', author: 'Harper Lee', year: 1960, genre: 'Fiction' }
+];
+
+app.use(express.json());
+
+// RESTful URL Structure Demonstration
+// Notice how URLs represent RESOURCES, not actions
+
+// ✅ GOOD: Resource-based URLs
+// Collection: /books (represents all books)
+// Resource: /books/:id (represents a specific book)
+
+console.log('📚 RESTful API Design Principles Demo');
+console.log('');
+console.log('🎯 Resource-Based URLs:');
+console.log('   GET    /books      - Get all books (Collection)');
+console.log('   GET    /books/:id  - Get specific book (Resource)');
+console.log('   POST   /books      - Create new book');
+console.log('   PUT    /books/:id  - Update entire book');
+console.log('   PATCH  /books/:id  - Update part of book');
+console.log('   DELETE /books/:id  - Delete book');
+console.log('');
+
+// ❌ BAD Examples (Non-RESTful):
+console.log('❌ Non-RESTful URLs to avoid:');
+console.log('   /getAllBooks');
+console.log('   /getBook');
+console.log('   /createNewBook');
+console.log('   /deleteBookById');
+console.log('   /book/update');
+console.log('');
+
+// REST Principle #4: Uniform Interface
+// Same URL, different HTTP methods = different operations
+
+// GET /books - Retrieve collection
+app.get('/books', (req, res) => {
+    console.log('📖 GET /books - Retrieving all books');
+    
+    // RESTful response format
+    res.json({
+        success: true,
+        data: books,
+        meta: {
+            total: books.length,
+            resource: 'books'
+        }
+    });
+});
+
+// GET /books/:id - Retrieve specific resource
+app.get('/books/:id', (req, res) => {
+    const bookId = parseInt(req.params.id);
+    const book = books.find(b => b.id === bookId);
+    
+    console.log(\`📖 GET /books/\${bookId} - Retrieving specific book\`);
+    
+    if (!book) {
+        // HTTP 404 - Resource not found
+        return res.status(404).json({
+            success: false,
+            error: 'Resource not found',
+            message: \`Book with ID \${bookId} does not exist\`
+        });
+    }
+    
+    res.json({
+        success: true,
+        data: book
+    });
+});
+
+// POST /books - Create new resource
+app.post('/books', (req, res) => {
+    console.log('✨ POST /books - Creating new book');
+    console.log('Request body:', req.body);
+    
+    const { title, author, year, genre } = req.body;
+    
+    // Basic validation
+    if (!title || !author || !year) {
+        // HTTP 400 - Bad Request
+        return res.status(400).json({
+            success: false,
+            error: 'Validation failed',
+            message: 'Title, author, and year are required'
+        });
+    }
+    
+    const newBook = {
+        id: Math.max(...books.map(b => b.id)) + 1,
+        title: title.trim(),
+        author: author.trim(),
+        year: parseInt(year),
+        genre: genre?.trim() || 'Unknown'
+    };
+    
+    books.push(newBook);
+    
+    // HTTP 201 - Created (resource successfully created)
+    res.status(201).json({
+        success: true,
+        data: newBook,
+        message: 'Book created successfully'
+    });
+});
+
+// Demonstrate different HTTP status codes
+app.get('/status-demo/:code', (req, res) => {
+    const code = parseInt(req.params.code);
+    console.log(\`🚦 Demonstrating HTTP status code: \${code}\`);
+    
+    const statusExamples = {
+        200: { message: 'OK - Request successful', data: { example: 'data' } },
+        201: { message: 'Created - Resource created successfully' },
+        400: { error: 'Bad Request - Invalid data provided' },
+        401: { error: 'Unauthorized - Authentication required' },
+        403: { error: 'Forbidden - Access denied' },
+        404: { error: 'Not Found - Resource does not exist' },
+        422: { error: 'Unprocessable Entity - Validation failed' },
+        500: { error: 'Internal Server Error - Something went wrong' }
+    };
+    
+    const response = statusExamples[code] || { 
+        error: 'Unknown status code', 
+        validCodes: Object.keys(statusExamples) 
+    };
+    
+    res.status(code || 400).json({
+        statusCode: code,
+        ...response
+    });
+});
+
+// Start server
+app.listen(3000, () => {
+    console.log('🚀 RESTful API server running on port 3000');
+    console.log('');
+    console.log('🧪 Test these endpoints:');
+    console.log('   GET  http://localhost:3000/books');
+    console.log('   GET  http://localhost:3000/books/1');
+    console.log('   POST http://localhost:3000/books');
+    console.log('   GET  http://localhost:3000/status-demo/404');
+    console.log('');
+    console.log('💡 Notice how:');
+    console.log('   - URLs represent RESOURCES (books), not actions');
+    console.log('   - HTTP methods determine the OPERATION');
+    console.log('   - Status codes communicate RESULTS');
+    console.log('   - Responses have consistent structure');
+});
+`}
+</InteractiveCodeBlock>
+
+**Student**: "I see how REST makes APIs more predictable! But what's the difference between all these HTTP methods?"
+
+**Teacher**: "Great observation! HTTP methods are like verbs in a sentence - they tell you what action to perform on the resource (noun). Let me break down the most important ones and when to use each."
+
+## HTTP Methods and CRUD Operations
+
+CRUD stands for **Create, Read, Update, Delete** - the four basic operations you can perform on data. REST maps these operations to specific HTTP methods:
+
+### HTTP Methods Overview:
+
+**🟢 GET** - **Read/Retrieve** resources
+- Purpose: Get data without changing anything
+- Safe: ✅ Yes (read-only)
+- Idempotent: ✅ Yes (same result every time)
+- Example: `GET /users/123` to get user details
+
+**🔵 POST** - **Create** new resources  
+- Purpose: Create something new on the server
+- Safe: ❌ No (modifies server state)
+- Idempotent: ❌ No (creates new resource each time)
+- Example: `POST /users` with user data to create new user
+
+**🟡 PUT** - **Replace** entire resource
+- Purpose: Replace/update entire resource with new data
+- Safe: ❌ No (modifies server state)
+- Idempotent: ✅ Yes (same result if called multiple times)
+- Example: `PUT /users/123` with complete user object
+
+**🟠 PATCH** - **Update** part of resource
+- Purpose: Update only specific fields of a resource
+- Safe: ❌ No (modifies server state)  
+- Idempotent: ⚠️ Usually No* (depends on implementation)
+- Example: `PATCH /users/123` with `{"email": "new@email.com"}`
+
+**🔴 DELETE** - **Remove** resource
+- Purpose: Delete/remove a resource from the server
+- Safe: ❌ No (modifies server state)
+- Idempotent: ✅ Yes (deleting same resource multiple times = same result)
+- Example: `DELETE /users/123` to remove user
+
+---
+
+**Key Concepts:**
+- **Safe**: Method doesn't modify server state (read-only operations)
+- **Idempotent**: Same result when called multiple times
+- **\*PATCH**: Can be idempotent depending on implementation
+
+<InteractiveCodeBlock
+  title="Complete CRUD Operations with HTTP Methods"
+  language="nodejs"
+  showOutput={true}
+  editable={true}
+>
+{`
+const express = require('express');
+const app = express();
+
+app.use(express.json());
+
+// Sample data: Task Management System
+let tasks = [
+    { 
+        id: 1, 
+        title: 'Complete REST API tutorial', 
+        description: 'Learn about RESTful API design principles and implementation',
+        status: 'in-progress',
+        priority: 'high',
+        createdAt: '2024-01-15T10:00:00Z',
+        updatedAt: '2024-01-15T10:00:00Z'
+    },
+    { 
+        id: 2, 
+        title: 'Review Express.js middleware', 
+        description: 'Go through middleware concepts and error handling',
+        status: 'completed',
+        priority: 'medium',
+        createdAt: '2024-01-14T09:00:00Z',
+        updatedAt: '2024-01-14T15:30:00Z'
+    }
+];
+
+let nextId = 3;
+
+console.log('📋 CRUD Operations Demo - Task Management API');
+console.log('');
+
+// ================================
+// CREATE - POST /tasks
+// ================================
+app.post('/tasks', (req, res) => {
+    console.log('✨ CREATE operation - POST /tasks');
+    console.log('Request body:', req.body);
+    
+    const { title, description, priority = 'medium' } = req.body;
+    
+    // Validation
+    if (!title || title.trim().length === 0) {
+        console.log('❌ Validation failed: Missing title');
+        return res.status(400).json({
+            success: false,
+            error: 'Validation Error',
+            message: 'Title is required and cannot be empty'
+        });
+    }
+    
+    // Create new task
+    const newTask = {
+        id: nextId++,
+        title: title.trim(),
+        description: description?.trim() || '',
+        status: 'pending',
+        priority: ['low', 'medium', 'high'].includes(priority) ? priority : 'medium',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    
+    tasks.push(newTask);
+    
+    console.log(\`✅ Task created with ID: \${newTask.id}\`);
+    
+    // HTTP 201 Created - Resource successfully created
+    res.status(201).json({
+        success: true,
+        message: 'Task created successfully',
+        data: newTask
+    });
+});
+
+// ================================
+// READ - GET /tasks (Collection)
+// ================================
+app.get('/tasks', (req, res) => {
+    console.log('📖 READ operation - GET /tasks (all tasks)');
+    
+    // Optional filtering with query parameters
+    const { status, priority, limit } = req.query;
+    let filteredTasks = [...tasks];
+    
+    if (status) {
+        filteredTasks = filteredTasks.filter(task => 
+            task.status.toLowerCase() === status.toLowerCase()
+        );
+        console.log(\`🔍 Filtered by status: \${status}\`);
+    }
+    
+    if (priority) {
+        filteredTasks = filteredTasks.filter(task => 
+            task.priority.toLowerCase() === priority.toLowerCase()
+        );
+        console.log(\`🔍 Filtered by priority: \${priority}\`);
+    }
+    
+    if (limit) {
+        const limitNum = parseInt(limit);
+        if (limitNum > 0) {
+            filteredTasks = filteredTasks.slice(0, limitNum);
+            console.log(\`📏 Limited to \${limitNum} results\`);
+        }
+    }
+    
+    console.log(\`📋 Returning \${filteredTasks.length} tasks\`);
+    
+    // HTTP 200 OK - Successful read operation
+    res.json({
+        success: true,
+        data: filteredTasks,
+        meta: {
+            total: filteredTasks.length,
+            filtered: tasks.length !== filteredTasks.length,
+            filters: { status, priority, limit }
+        }
+    });
+});
+
+// ================================
+// READ - GET /tasks/:id (Single Resource)
+// ================================
+app.get('/tasks/:id', (req, res) => {
+    const taskId = parseInt(req.params.id);
+    console.log(\`📖 READ operation - GET /tasks/\${taskId} (single task)\`);
+    
+    const task = tasks.find(t => t.id === taskId);
+    
+    if (!task) {
+        console.log(\`❌ Task not found: ID \${taskId}\`);
+        // HTTP 404 Not Found - Resource doesn't exist
+        return res.status(404).json({
+            success: false,
+            error: 'Resource Not Found',
+            message: \`Task with ID \${taskId} does not exist\`
+        });
+    }
+    
+    console.log(\`✅ Found task: "\${task.title}"\`);
+    
+    // HTTP 200 OK - Successful read operation
+    res.json({
+        success: true,
+        data: task
+    });
+});
+
+// ================================
+// UPDATE - PUT /tasks/:id (Replace entire resource)
+// ================================
+app.put('/tasks/:id', (req, res) => {
+    const taskId = parseInt(req.params.id);
+    console.log(\`🔄 UPDATE operation - PUT /tasks/\${taskId} (replace entire task)\`);
+    console.log('Request body:', req.body);
+    
+    const taskIndex = tasks.findIndex(t => t.id === taskId);
+    
+    if (taskIndex === -1) {
+        console.log(\`❌ Task not found: ID \${taskId}\`);
+        return res.status(404).json({
+            success: false,
+            error: 'Resource Not Found',
+            message: \`Task with ID \${taskId} does not exist\`
+        });
+    }
+    
+    const { title, description, status, priority } = req.body;
+    
+    // Validation for PUT - all fields should be provided
+    if (!title || !description || !status || !priority) {
+        console.log('❌ Validation failed: Missing required fields for PUT');
+        return res.status(400).json({
+            success: false,
+            error: 'Validation Error',
+            message: 'PUT requires all fields: title, description, status, priority'
+        });
+    }
+    
+    // Validate status and priority values
+    const validStatuses = ['pending', 'in-progress', 'completed', 'cancelled'];
+    const validPriorities = ['low', 'medium', 'high'];
+    
+    if (!validStatuses.includes(status)) {
+        return res.status(400).json({
+            success: false,
+            error: 'Validation Error',
+            message: \`Invalid status. Valid values: \${validStatuses.join(', ')}\`
+        });
+    }
+    
+    if (!validPriorities.includes(priority)) {
+        return res.status(400).json({
+            success: false,
+            error: 'Validation Error',
+            message: \`Invalid priority. Valid values: \${validPriorities.join(', ')}\`
+        });
+    }
+    
+    // Replace entire resource (keep original id, createdAt)
+    const originalTask = tasks[taskIndex];
+    tasks[taskIndex] = {
+        id: originalTask.id,
+        title: title.trim(),
+        description: description.trim(),
+        status,
+        priority,
+        createdAt: originalTask.createdAt,
+        updatedAt: new Date().toISOString()
+    };
+    
+    console.log(\`✅ Task replaced: "\${tasks[taskIndex].title}"\`);
+    
+    // HTTP 200 OK - Resource successfully updated
+    res.json({
+        success: true,
+        message: 'Task updated successfully',
+        data: tasks[taskIndex]
+    });
+});
+
+// ================================
+// UPDATE - PATCH /tasks/:id (Update part of resource)
+// ================================
+app.patch('/tasks/:id', (req, res) => {
+    const taskId = parseInt(req.params.id);
+    console.log(\`🔄 UPDATE operation - PATCH /tasks/\${taskId} (partial update)\`);
+    console.log('Request body:', req.body);
+    
+    const taskIndex = tasks.findIndex(t => t.id === taskId);
+    
+    if (taskIndex === -1) {
+        console.log(\`❌ Task not found: ID \${taskId}\`);
+        return res.status(404).json({
+            success: false,
+            error: 'Resource Not Found',
+            message: \`Task with ID \${taskId} does not exist\`
+        });
+    }
+    
+    const { title, description, status, priority } = req.body;
+    const updatedFields = [];
+    
+    // Update only provided fields
+    if (title !== undefined) {
+        if (title.trim().length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Validation Error',
+                message: 'Title cannot be empty'
+            });
+        }
+        tasks[taskIndex].title = title.trim();
+        updatedFields.push('title');
+    }
+    
+    if (description !== undefined) {
+        tasks[taskIndex].description = description.trim();
+        updatedFields.push('description');
+    }
+    
+    if (status !== undefined) {
+        const validStatuses = ['pending', 'in-progress', 'completed', 'cancelled'];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Validation Error',
+                message: \`Invalid status. Valid values: \${validStatuses.join(', ')}\`
+            });
+        }
+        tasks[taskIndex].status = status;
+        updatedFields.push('status');
+    }
+    
+    if (priority !== undefined) {
+        const validPriorities = ['low', 'medium', 'high'];
+        if (!validPriorities.includes(priority)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Validation Error',
+                message: \`Invalid priority. Valid values: \${validPriorities.join(', ')}\`
+            });
+        }
+        tasks[taskIndex].priority = priority;
+        updatedFields.push('priority');
+    }
+    
+    // Always update the updatedAt timestamp
+    tasks[taskIndex].updatedAt = new Date().toISOString();
+    
+    console.log(\`✅ Task partially updated: \${updatedFields.join(', ')}\`);
+    
+    // HTTP 200 OK - Resource successfully updated
+    res.json({
+        success: true,
+        message: \`Task updated successfully. Updated fields: \${updatedFields.join(', ')}\`,
+        data: tasks[taskIndex],
+        updatedFields
+    });
+});
+
+// ================================
+// DELETE - DELETE /tasks/:id
+// ================================
+app.delete('/tasks/:id', (req, res) => {
+    const taskId = parseInt(req.params.id);
+    console.log(\`🗑️ DELETE operation - DELETE /tasks/\${taskId}\`);
+    
+    const taskIndex = tasks.findIndex(t => t.id === taskId);
+    
+    if (taskIndex === -1) {
+        console.log(\`❌ Task not found: ID \${taskId}\`);
+        return res.status(404).json({
+            success: false,
+            error: 'Resource Not Found',
+            message: \`Task with ID \${taskId} does not exist\`
+        });
+    }
+    
+    const deletedTask = tasks.splice(taskIndex, 1)[0];
+    console.log(\`✅ Task deleted: "\${deletedTask.title}"\`);
+    
+    // HTTP 200 OK - Resource successfully deleted
+    // Alternative: HTTP 204 No Content (no response body)
+    res.json({
+        success: true,
+        message: 'Task deleted successfully',
+        deletedTask: {
+            id: deletedTask.id,
+            title: deletedTask.title
+        }
+    });
+});
+
+// Start server
+app.listen(3000, () => {
+    console.log('🚀 CRUD API server running on port 3000');
+    console.log('');
+    console.log('🧪 Test CRUD operations:');
+    console.log('   POST   /tasks                    - Create new task');
+    console.log('   GET    /tasks                    - Get all tasks');
+    console.log('   GET    /tasks/:id                - Get specific task');
+    console.log('   PUT    /tasks/:id                - Replace entire task');
+    console.log('   PATCH  /tasks/:id                - Update part of task');
+    console.log('   DELETE /tasks/:id                - Delete task');
+    console.log('');
+    console.log('🔍 Try query parameters:');
+    console.log('   GET /tasks?status=pending');
+    console.log('   GET /tasks?priority=high&limit=5');
+    console.log('');
+    console.log('💡 Key differences:');
+    console.log('   PUT   = Replace ENTIRE resource (all fields required)');
+    console.log('   PATCH = Update PARTIAL resource (only send changed fields)');
+    console.log('   POST  = Create new resource (returns 201 Created)');
+    console.log('   GET   = Read resource (safe, can be cached)');
+    console.log('   DELETE= Remove resource (idempotent)');
+});
+`}
+</InteractiveCodeBlock>
+
+**Student**: "The difference between PUT and PATCH is much clearer now! But I noticed you have validation in the code. How should I handle data validation properly in a real API?"
+
+**Teacher**: "Excellent observation! Data validation and sanitization are absolutely crucial for API security and reliability. Let me show you professional techniques to validate and sanitize user input effectively."
+
+## Request Validation and Data Sanitization
+
+Input validation is your first line of defense against bad data, security vulnerabilities, and application crashes. Never trust user input - always validate and sanitize it!
+
+### Key Principles:
+- **Validate early**: Check input as soon as possible
+- **Be specific**: Define exact rules for each field  
+- **Sanitize input**: Clean and normalize data
+- **Provide clear errors**: Help clients fix their requests
+- **Use validation libraries**: Don't reinvent the wheel
+
+<InteractiveCodeBlock
+  title="Professional Request Validation and Sanitization"
+  language="nodejs"
+  showOutput={true}
+  editable={true}
+>
+{`
+const express = require('express');
+const app = express();
+
+app.use(express.json());
+
+// ================================
+// VALIDATION UTILITIES
+// ================================
+
+// Email validation regex
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/;
+
+// Phone number validation (basic international format)
+const PHONE_REGEX = /^\\+?[1-9]\\d{1,14}$/;
+
+// Validation helper functions
+const validators = {
+    // Required field validator
+    required: (value, fieldName) => {
+        if (value === undefined || value === null || value === '') {
+            return \`\${fieldName} is required\`;
+        }
+        return null;
+    },
+    
+    // String length validator
+    stringLength: (value, min, max, fieldName) => {
+        if (typeof value !== 'string') {
+            return \`\${fieldName} must be a string\`;
+        }
+        if (value.length < min) {
+            return \`\${fieldName} must be at least \${min} characters long\`;
+        }
+        if (max && value.length > max) {
+            return \`\${fieldName} must be no more than \${max} characters long\`;
+        }
+        return null;
+    },
+    
+    // Email validator
+    email: (value, fieldName) => {
+        if (!EMAIL_REGEX.test(value)) {
+            return \`\${fieldName} must be a valid email address\`;
+        }
+        return null;
+    },
+    
+    // Phone validator
+    phone: (value, fieldName) => {
+        if (!PHONE_REGEX.test(value)) {
+            return \`\${fieldName} must be a valid phone number\`;
+        }
+        return null;
+    },
+    
+    // Enum validator (check against allowed values)
+    enum: (value, allowedValues, fieldName) => {
+        if (!allowedValues.includes(value)) {
+            return \`\${fieldName} must be one of: \${allowedValues.join(', ')}\`;
+        }
+        return null;
+    },
+    
+    // Number range validator
+    numberRange: (value, min, max, fieldName) => {
+        const num = Number(value);
+        if (isNaN(num)) {
+            return \`\${fieldName} must be a valid number\`;
+        }
+        if (num < min) {
+            return \`\${fieldName} must be at least \${min}\`;
+        }
+        if (max !== undefined && num > max) {
+            return \`\${fieldName} must be no more than \${max}\`;
+        }
+        return null;
+    },
+    
+    // Date validator
+    date: (value, fieldName) => {
+        const date = new Date(value);
+        if (isNaN(date.getTime())) {
+            return \`\${fieldName} must be a valid date\`;
+        }
+        return null;
+    }
+};
+
+// Data sanitization helpers
+const sanitizers = {
+    // Trim whitespace and normalize string
+    string: (value) => {
+        return typeof value === 'string' ? value.trim() : value;
+    },
+    
+    // Convert to lowercase
+    lowercase: (value) => {
+        return typeof value === 'string' ? value.toLowerCase().trim() : value;
+    },
+    
+    // Remove HTML tags (basic sanitization)
+    stripHtml: (value) => {
+        if (typeof value !== 'string') return value;
+        return value.replace(/<[^>]*>/g, '').trim();
+    },
+    
+    // Convert to integer
+    integer: (value) => {
+        const num = parseInt(value);
+        return isNaN(num) ? value : num;
+    },
+    
+    // Convert to float
+    float: (value) => {
+        const num = parseFloat(value);
+        return isNaN(num) ? value : num;
+    }
+};
+
+// ================================
+// VALIDATION MIDDLEWARE
+// ================================
+
+// Generic validation middleware factory
+const validateRequest = (schema) => {
+    return (req, res, next) => {
+        console.log(\`🔍 Validating request to \${req.method} \${req.path}\`);
+        console.log('Original body:', req.body);
+        
+        const errors = [];
+        const sanitizedData = {};
+        
+        // Process each field in the schema
+        for (const [fieldName, rules] of Object.entries(schema)) {
+            let value = req.body[fieldName];
+            
+            // Apply sanitization first
+            if (rules.sanitize) {
+                for (const sanitizeRule of rules.sanitize) {
+                    if (sanitizers[sanitizeRule]) {
+                        value = sanitizers[sanitizeRule](value);
+                    }
+                }
+            }
+            
+            // Apply validation rules
+            if (rules.validate) {
+                for (const validation of rules.validate) {
+                    const error = validation(value, fieldName);
+                    if (error) {
+                        errors.push(error);
+                        break; // Stop at first error for this field
+                    }
+                }
+            }
+            
+            // Store sanitized value
+            sanitizedData[fieldName] = value;
+        }
+        
+        if (errors.length > 0) {
+            console.log(\`❌ Validation failed: \${errors.length} errors\`);
+            errors.forEach(error => console.log(\`   - \${error}\`));
+            
+            return res.status(400).json({
+                success: false,
+                error: 'Validation Failed',
+                message: 'The request data did not pass validation',
+                validationErrors: errors,
+                receivedData: req.body
+            });
+        }
+        
+        console.log('✅ Validation passed');
+        console.log('Sanitized data:', sanitizedData);
+        
+        // Replace request body with sanitized data
+        req.body = sanitizedData;
+        next();
+    };
+};
+
+// Test endpoint for validation
+app.post('/test-validation', 
+    validateRequest({
+        name: {
+            sanitize: ['string', 'stripHtml'],
+            validate: [
+                (value, field) => validators.required(value, field),
+                (value, field) => validators.stringLength(value, 2, 50, field)
+            ]
+        },
+        email: {
+            sanitize: ['lowercase'],
+            validate: [
+                (value, field) => validators.required(value, field),
+                (value, field) => validators.email(value, field)
+            ]
+        },
+        age: {
+            sanitize: ['integer'],
+            validate: [
+                (value, field) => validators.numberRange(value, 13, 120, field)
+            ]
+        },
+        role: {
+            sanitize: ['lowercase'],
+            validate: [
+                (value, field) => validators.enum(value, ['user', 'admin'], field)
+            ]
+        }
+    }),
+    (req, res) => {
+        res.json({
+            success: true,
+            message: 'Validation passed!',
+            sanitizedData: req.body
+        });
+    }
+);
+
+app.listen(3000, () => {
+    console.log('🚀 Validation server running on port 3000');
+    console.log('');
+    console.log('🧪 Test validation:');
+    console.log('POST /test-validation');
+    console.log('✅ Valid: {"name": "John Doe", "email": "JOHN@EXAMPLE.COM", "age": "25", "role": "USER"}');
+    console.log('❌ Invalid: {"name": "", "email": "invalid", "age": "5", "role": "hacker"}');
+});
+`}
+</InteractiveCodeBlock>
+
+**Student**: "This validation system looks really professional! But how do I document my API so other developers know how to use it?"
+
+**Teacher**: "Fantastic question! API documentation is just as important as the code itself. Well-documented APIs are easier to use, debug, and maintain. Let me show you how to create professional API documentation and testing interfaces."
+
+## API Documentation Best Practices
+
+Good API documentation should be:
+- **Complete**: Cover all endpoints, parameters, and responses
+- **Clear**: Use simple language and examples
+- **Interactive**: Allow developers to test endpoints directly
+- **Up-to-date**: Stay synchronized with the actual API
+- **Standardized**: Follow common conventions (OpenAPI/Swagger)
+
+### Documentation Structure:
+1. **Overview**: What the API does and who it's for
+2. **Authentication**: How to authenticate requests
+3. **Endpoints**: Detailed endpoint documentation
+4. **Error Handling**: Common error codes and responses
+5. **Examples**: Real request/response examples
+6. **SDKs**: Code examples in different languages
+
+Now let's see it all come together in a complete, production-ready REST API!
+
+## Complete REST API: Task Management System
+
+Let's build a comprehensive task management API that demonstrates all the concepts we've learned: REST principles, CRUD operations, validation, error handling, and documentation.
+
+<DualPaneEditor
+  title="Complete Task Management REST API"
+  description="A production-ready REST API demonstrating all REST API best practices and patterns"
+  frontendCode={`<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Management API</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f5f7fa;
+        }
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2c3e50; margin-top: 0; text-align: center; }
+        h2 { color: #3498db; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        
+        .endpoint-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .method { 
+            display: inline-block; 
+            padding: 6px 12px; 
+            color: white; 
+            font-weight: bold; 
+            border-radius: 4px; 
+            margin-right: 10px;
+        }
+        .GET { background: #28a745; }
+        .POST { background: #007bff; }
+        .PATCH { background: #ffc107; color: #333; }
+        .DELETE { background: #dc3545; }
+        
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #495057;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        textarea { height: 100px; resize: vertical; }
+        
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 5px 5px 5px 0;
+            transition: all 0.3s;
+        }
+        button:hover { 
+            background: #2980b9; 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        button.secondary { background: #6c757d; }
+        button.secondary:hover { background: #5a6268; }
+        button.danger { background: #e74c3c; }
+        button.danger:hover { background: #c0392b; }
+        
+        .response-area {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            border-left: 4px solid #3498db;
+        }
+        
+        .task-card {
+            background: #fff;
+            border: 2px solid #e1e5e9;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            position: relative;
+        }
+        .task-card:hover {
+            border-color: #3498db;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+        }
+        .task-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        .task-meta {
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        .task-description {
+            color: #495057;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        .task-badges {
+            display: flex;
+            gap: 10px;
+        }
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-in-progress { background: #cce7ff; color: #004085; }
+        .status-completed { background: #d4edda; color: #155724; }
+        .priority-low { background: #e2e3e5; color: #383d41; }
+        .priority-medium { background: #fff3cd; color: #856404; }
+        .priority-high { background: #f8d7da; color: #721c24; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        .stat-label {
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Task Management API</h1>
+        <p style="text-align: center; color: #7f8c8d;">
+            Professional REST API for task and project management
+        </p>
+    </div>
+
+    <div class="container">
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalTasks">0</div>
+                <div class="stat-label">Total Tasks</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="stat-number" id="completedTasks">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="stat-number" id="inProgressTasks">0</div>
+                <div class="stat-label">In Progress</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                <div class="stat-number" id="pendingTasks">0</div>
+                <div class="stat-label">Pending</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📝 Create New Task</h2>
+        <form id="createTaskForm">
+            <div class="form-group">
+                <label for="taskTitle">Title *</label>
+                <input type="text" id="taskTitle" placeholder="Enter task title" required>
+            </div>
+            <div class="form-group">
+                <label for="taskDescription">Description</label>
+                <textarea id="taskDescription" placeholder="Describe the task (optional)"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="taskPriority">Priority</label>
+                <select id="taskPriority">
+                    <option value="low">🟢 Low</option>
+                    <option value="medium" selected>🟡 Medium</option>
+                    <option value="high">🔴 High</option>
+                </select>
+            </div>
+            <button type="submit">✨ Create Task</button>
+            <button type="reset" class="secondary">🔄 Clear Form</button>
+        </form>
+    </div>
+
+    <div class="container">
+        <h2>📋 Task List</h2>
+        <div style="margin-bottom: 20px;">
+            <label for="filterStatus">Filter by Status:</label>
+            <select id="filterStatus" onchange="loadTasks()">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+            </select>
+            
+            <label for="filterPriority" style="margin-left: 20px;">Filter by Priority:</label>
+            <select id="filterPriority" onchange="loadTasks()">
+                <option value="">All Priorities</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+            
+            <button onclick="loadTasks()" style="margin-left: 20px;">🔄 Refresh</button>
+        </div>
+        <div id="tasksList">
+            <p style="text-align: center; color: #7f8c8d;">Loading tasks...</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧪 API Testing</h2>
+        <div class="endpoint-section">
+            <h3><span class="method GET">GET</span> /api/tasks</h3>
+            <button onclick="testGetTasks()">Test Get All Tasks</button>
+            <button onclick="testGetTasksWithFilter()" class="secondary">Test With Filters</button>
+        </div>
+        
+        <div class="endpoint-section">
+            <h3><span class="method GET">GET</span> /api/tasks/:id</h3>
+            <input type="number" id="getTaskId" placeholder="Task ID" value="1" style="width: 100px; margin-right: 10px;">
+            <button onclick="testGetTask()">Test Get Specific Task</button>
+        </div>
+        
+        <div class="endpoint-section">
+            <h3><span class="method PATCH">PATCH</span> /api/tasks/:id</h3>
+            <input type="number" id="patchTaskId" placeholder="Task ID" value="1" style="width: 100px; margin-right: 10px;">
+            <select id="newStatus" style="width: 150px; margin-right: 10px;">
+                <option value="pending">Pending</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+            </select>
+            <button onclick="testUpdateTask()">Test Update Status</button>
+        </div>
+        
+        <div class="endpoint-section">
+            <h3><span class="method DELETE">DELETE</span> /api/tasks/:id</h3>
+            <input type="number" id="deleteTaskId" placeholder="Task ID" value="1" style="width: 100px; margin-right: 10px;">
+            <button onclick="testDeleteTask()" class="danger">Test Delete Task</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📡 API Response</h2>
+        <div id="responseDisplay" class="response-area">API responses will appear here...</div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001';
+        let tasks = [];
+
+        // Display API response
+        function displayResponse(response, request = null) {
+            const display = document.getElementById('responseDisplay');
+            
+            let output = '';
+            if (request) {
+                output += \`📤 REQUEST:\\n\${request.method} \${request.url}\\n\`;
+                if (request.headers) {
+                    output += 'Headers: ' + JSON.stringify(request.headers, null, 2) + '\\n';
+                }
+                if (request.body) {
+                    output += 'Body: ' + JSON.stringify(request.body, null, 2) + '\\n';
+                }
+                output += '\\n';
+            }
+            
+            output += \`📥 RESPONSE:\\n\`;
+            output += \`Status: \${response.status}\\n\`;
+            output += \`Body:\\n\${JSON.stringify(response.data, null, 2)}\`;
+            
+            display.textContent = output;
+        }
+
+        // Simulate API calls
+        async function makeRequest(method, endpoint, body = null) {
+            const request = {
+                method,
+                url: API_BASE + endpoint,
+                headers: { 'Content-Type': 'application/json' },
+                ...(body && { body })
+            };
+
+            // Simulate different responses
+            let response = { status: 200, data: {} };
+
+            if (method === 'GET' && endpoint === '/api/tasks') {
+                response.data = {
+                    success: true,
+                    data: tasks,
+                    meta: { total: tasks.length }
+                };
+            } else if (method === 'GET' && endpoint.startsWith('/api/tasks/')) {
+                const id = parseInt(endpoint.split('/')[3]);
+                const task = tasks.find(t => t.id === id);
+                if (task) {
+                    response.data = { success: true, data: task };
+                } else {
+                    response.status = 404;
+                    response.data = { success: false, error: 'Task not found' };
+                }
+            } else if (method === 'POST' && endpoint === '/api/tasks') {
+                const newTask = {
+                    id: Date.now(),
+                    ...body,
+                    status: 'pending',
+                    createdAt: new Date().toISOString()
+                };
+                tasks.push(newTask);
+                response.status = 201;
+                response.data = { success: true, data: newTask };
+            } else if (method === 'PATCH' && endpoint.startsWith('/api/tasks/')) {
+                const id = parseInt(endpoint.split('/')[3]);
+                const taskIndex = tasks.findIndex(t => t.id === id);
+                if (taskIndex !== -1) {
+                    tasks[taskIndex] = { ...tasks[taskIndex], ...body };
+                    response.data = { success: true, data: tasks[taskIndex] };
+                } else {
+                    response.status = 404;
+                    response.data = { success: false, error: 'Task not found' };
+                }
+            } else if (method === 'DELETE' && endpoint.startsWith('/api/tasks/')) {
+                const id = parseInt(endpoint.split('/')[3]);
+                const taskIndex = tasks.findIndex(t => t.id === id);
+                if (taskIndex !== -1) {
+                    const deleted = tasks.splice(taskIndex, 1)[0];
+                    response.data = { success: true, message: 'Task deleted', deletedTask: deleted };
+                } else {
+                    response.status = 404;
+                    response.data = { success: false, error: 'Task not found' };
+                }
+            }
+
+            displayResponse(response, request);
+            return response;
+        }
+
+        // Load and display tasks
+        async function loadTasks() {
+            const statusFilter = document.getElementById('filterStatus').value;
+            const priorityFilter = document.getElementById('filterPriority').value;
+            
+            let filteredTasks = [...tasks];
+            
+            if (statusFilter) {
+                filteredTasks = filteredTasks.filter(t => t.status === statusFilter);
+            }
+            if (priorityFilter) {
+                filteredTasks = filteredTasks.filter(t => t.priority === priorityFilter);
+            }
+
+            const tasksList = document.getElementById('tasksList');
+            
+            if (filteredTasks.length === 0) {
+                tasksList.innerHTML = '<p style="text-align: center; color: #7f8c8d;">No tasks found matching the filters.</p>';
+            } else {
+                tasksList.innerHTML = filteredTasks.map(task => \`
+                    <div class="task-card">
+                        <div class="task-title">\${task.title}</div>
+                        <div class="task-meta">ID: \${task.id} • Created: \${new Date(task.createdAt).toLocaleDateString()}</div>
+                        <div class="task-description">\${task.description || 'No description provided'}</div>
+                        <div class="task-badges">
+                            <span class="badge status-\${task.status}">\${task.status}</span>
+                            <span class="badge priority-\${task.priority}">\${task.priority} priority</span>
+                        </div>
+                    </div>
+                \`).join('');
+            }
+            
+            updateStats();
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalTasks').textContent = tasks.length;
+            document.getElementById('completedTasks').textContent = tasks.filter(t => t.status === 'completed').length;
+            document.getElementById('inProgressTasks').textContent = tasks.filter(t => t.status === 'in-progress').length;
+            document.getElementById('pendingTasks').textContent = tasks.filter(t => t.status === 'pending').length;
+        }
+
+        // Form submission
+        document.getElementById('createTaskForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const priority = document.getElementById('taskPriority').value;
+            
+            const response = await makeRequest('POST', '/api/tasks', {
+                title, description, priority
+            });
+            
+            if (response.data.success) {
+                document.getElementById('createTaskForm').reset();
+                loadTasks();
+            }
+        });
+
+        // Test functions
+        async function testGetTasks() {
+            await makeRequest('GET', '/api/tasks');
+        }
+
+        async function testGetTasksWithFilter() {
+            await makeRequest('GET', '/api/tasks?status=pending&priority=high');
+        }
+
+        async function testGetTask() {
+            const id = document.getElementById('getTaskId').value;
+            await makeRequest('GET', \`/api/tasks/\${id}\`);
+        }
+
+        async function testUpdateTask() {
+            const id = document.getElementById('patchTaskId').value;
+            const status = document.getElementById('newStatus').value;
+            const response = await makeRequest('PATCH', \`/api/tasks/\${id}\`, { status });
+            if (response.data.success) loadTasks();
+        }
+
+        async function testDeleteTask() {
+            const id = document.getElementById('deleteTaskId').value;
+            const response = await makeRequest('DELETE', \`/api/tasks/\${id}\`);
+            if (response.data.success) loadTasks();
+        }
+
+        // Initialize with sample data
+        tasks = [
+            {
+                id: 1,
+                title: 'Complete REST API Tutorial',
+                description: 'Finish learning about REST API development with Express.js',
+                status: 'in-progress',
+                priority: 'high',
+                createdAt: '2024-01-15T10:00:00Z'
+            },
+            {
+                id: 2,
+                title: 'Write API Documentation',
+                description: 'Create comprehensive documentation for the task management API',
+                status: 'pending',
+                priority: 'medium',
+                createdAt: '2024-01-15T11:00:00Z'
+            },
+            {
+                id: 3,
+                title: 'Set up Testing Environment',
+                description: 'Configure unit and integration tests for the API',
+                status: 'completed',
+                priority: 'high',
+                createdAt: '2024-01-14T09:00:00Z'
+            }
+        ];
+
+        // Load initial data
+        loadTasks();
+    </script>
+</body>
+</html>`}
+  backendCode={`const express = require('express');
+const app = express();
+
+// ================================
+// MIDDLEWARE SETUP
+// ================================
+
+// Enable JSON parsing with size limit
+app.use(express.json({ limit: '10mb' }));
+
+// CORS middleware for cross-origin requests
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key');
+    
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+    next();
+});
+
+// Request ID and timing middleware
+app.use((req, res, next) => {
+    req.requestId = 'req_' + Math.random().toString(36).substr(2, 9);
+    req.startTime = Date.now();
+    
+    console.log(\`📨 [\${req.requestId}] \${req.method} \${req.path}\`);
+    next();
+});
+
+// Security headers
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('X-Powered-By', 'Task Management API v1.0');
+    next();
+});
+
+// Response enhancement middleware
+app.use((req, res, next) => {
+    const originalJson = res.json;
+    
+    res.json = function(data) {
+        const responseTime = Date.now() - req.startTime;
+        
+        res.setHeader('X-Response-Time', \`\${responseTime}ms\`);
+        res.setHeader('X-Request-ID', req.requestId);
+        
+        console.log(\`✅ [\${req.requestId}] \${res.statusCode} - \${responseTime}ms\`);
+        
+        return originalJson.call(this, {
+            ...data,
+            meta: {
+                requestId: req.requestId,
+                responseTime: \`\${responseTime}ms\`,
+                timestamp: new Date().toISOString(),
+                ...data.meta
+            }
+        });
+    };
+    
+    next();
+});
+
+// ================================
+// DATA MODELS & VALIDATION
+// ================================
+
+// Task data store (in production, use a database)
+let tasks = [
+    {
+        id: 1,
+        title: 'Complete REST API Tutorial',
+        description: 'Finish learning about REST API development with Express.js',
+        status: 'in-progress',
+        priority: 'high',
+        createdAt: '2024-01-15T10:00:00Z',
+        updatedAt: '2024-01-15T10:00:00Z'
+    },
+    {
+        id: 2,
+        title: 'Write API Documentation',
+        description: 'Create comprehensive documentation for the task management API',
+        status: 'pending',
+        priority: 'medium',
+        createdAt: '2024-01-15T11:00:00Z',
+        updatedAt: '2024-01-15T11:00:00Z'
+    },
+    {
+        id: 3,
+        title: 'Set up Testing Environment',
+        description: 'Configure unit and integration tests for the API',
+        status: 'completed',
+        priority: 'high',
+        createdAt: '2024-01-14T09:00:00Z',
+        updatedAt: '2024-01-14T15:30:00Z'
+    }
+];
+
+let nextId = 4;
+
+// Validation constants
+const VALID_STATUSES = ['pending', 'in-progress', 'completed', 'cancelled'];
+const VALID_PRIORITIES = ['low', 'medium', 'high'];
+
+// Validation functions
+const validators = {
+    required: (value, field) => {
+        if (value === undefined || value === null || value === '') {
+            return \`\${field} is required\`;
+        }
+        return null;
+    },
+    
+    stringLength: (value, min, max, field) => {
+        if (typeof value !== 'string') {
+            return \`\${field} must be a string\`;
+        }
+        if (value.length < min) {
+            return \`\${field} must be at least \${min} characters long\`;
+        }
+        if (max && value.length > max) {
+            return \`\${field} must be no more than \${max} characters long\`;
+        }
+        return null;
+    },
+    
+    enum: (value, allowedValues, field) => {
+        if (!allowedValues.includes(value)) {
+            return \`\${field} must be one of: \${allowedValues.join(', ')}\`;
+        }
+        return null;
+    }
+};
+
+// Validation middleware
+const validateTaskCreation = (req, res, next) => {
+    console.log(\`🔍 [\${req.requestId}] Validating task creation\`);
+    
+    const { title, description, priority = 'medium' } = req.body;
+    const errors = [];
+    
+    // Validate title
+    const titleError = validators.required(title, 'title') || 
+                      validators.stringLength(title, 1, 100, 'title');
+    if (titleError) errors.push(titleError);
+    
+    // Validate description (optional)
+    if (description !== undefined) {
+        const descError = validators.stringLength(description, 0, 500, 'description');
+        if (descError) errors.push(descError);
+    }
+    
+    // Validate priority
+    const priorityError = validators.enum(priority, VALID_PRIORITIES, 'priority');
+    if (priorityError) errors.push(priorityError);
+    
+    if (errors.length > 0) {
+        console.log(\`❌ [\${req.requestId}] Validation failed: \${errors.join(', ')}\`);
+        return res.status(400).json({
+            success: false,
+            error: 'Validation Failed',
+            message: 'The request data did not pass validation',
+            errors,
+            received: req.body
+        });
+    }
+    
+    // Sanitize data
+    req.body = {
+        title: title.trim(),
+        description: description ? description.trim() : '',
+        priority: priority.toLowerCase()
+    };
+    
+    console.log(\`✅ [\${req.requestId}] Task creation validation passed\`);
+    next();
+};
+
+const validateTaskUpdate = (req, res, next) => {
+    console.log(\`🔍 [\${req.requestId}] Validating task update\`);
+    
+    const { title, description, status, priority } = req.body;
+    const errors = [];
+    const updatableFields = {};
+    
+    // Validate title (if provided)
+    if (title !== undefined) {
+        const titleError = validators.required(title, 'title') || 
+                          validators.stringLength(title, 1, 100, 'title');
+        if (titleError) {
+            errors.push(titleError);
+        } else {
+            updatableFields.title = title.trim();
+        }
+    }
+    
+    // Validate description (if provided)
+    if (description !== undefined) {
+        const descError = validators.stringLength(description, 0, 500, 'description');
+        if (descError) {
+            errors.push(descError);
+        } else {
+            updatableFields.description = description.trim();
+        }
+    }
+    
+    // Validate status (if provided)
+    if (status !== undefined) {
+        const statusError = validators.enum(status, VALID_STATUSES, 'status');
+        if (statusError) {
+            errors.push(statusError);
+        } else {
+            updatableFields.status = status.toLowerCase();
+        }
+    }
+    
+    // Validate priority (if provided)
+    if (priority !== undefined) {
+        const priorityError = validators.enum(priority, VALID_PRIORITIES, 'priority');
+        if (priorityError) {
+            errors.push(priorityError);
+        } else {
+            updatableFields.priority = priority.toLowerCase();
+        }
+    }
+    
+    if (errors.length > 0) {
+        console.log(\`❌ [\${req.requestId}] Update validation failed: \${errors.join(', ')}\`);
+        return res.status(400).json({
+            success: false,
+            error: 'Validation Failed',
+            message: 'The request data did not pass validation',
+            errors,
+            received: req.body
+        });
+    }
+    
+    if (Object.keys(updatableFields).length === 0) {
+        console.log(\`❌ [\${req.requestId}] No valid fields to update\`);
+        return res.status(400).json({
+            success: false,
+            error: 'Bad Request',
+            message: 'No valid fields provided for update',
+            validFields: ['title', 'description', 'status', 'priority']
+        });
+    }
+    
+    req.validatedFields = updatableFields;
+    console.log(\`✅ [\${req.requestId}] Task update validation passed\`);
+    next();
+};
+
+// Task existence middleware
+const checkTaskExists = (req, res, next) => {
+    const taskId = parseInt(req.params.id);
+    
+    if (isNaN(taskId)) {
+        console.log(\`❌ [\${req.requestId}] Invalid task ID: \${req.params.id}\`);
+        return res.status(400).json({
+            success: false,
+            error: 'Bad Request',
+            message: 'Task ID must be a valid number'
+        });
+    }
+    
+    const task = tasks.find(t => t.id === taskId);
+    
+    if (!task) {
+        console.log(\`❌ [\${req.requestId}] Task not found: ID \${taskId}\`);
+        return res.status(404).json({
+            success: false,
+            error: 'Resource Not Found',
+            message: \`Task with ID \${taskId} does not exist\`
+        });
+    }
+    
+    req.task = task;
+    req.taskId = taskId;
+    console.log(\`✅ [\${req.requestId}] Found task: \${task.title}\`);
+    next();
+};
+
+// ================================
+// API ROUTES
+// ================================
+
+// API Root - Documentation
+app.get('/api', (req, res) => {
+    res.json({
+        success: true,
+        message: 'Welcome to Task Management API',
+        version: '1.0.0',
+        documentation: {
+            endpoints: {
+                'GET /api': 'API information',
+                'GET /api/tasks': 'List all tasks (supports filtering)',
+                'POST /api/tasks': 'Create new task',
+                'GET /api/tasks/:id': 'Get specific task',
+                'PATCH /api/tasks/:id': 'Update task fields',
+                'DELETE /api/tasks/:id': 'Delete task',
+                'GET /api/stats': 'Get API statistics'
+            },
+            filtering: {
+                status: VALID_STATUSES,
+                priority: VALID_PRIORITIES
+            }
+        }
+    });
+});
+
+// GET /api/tasks - List tasks with optional filtering
+app.get('/api/tasks', (req, res) => {
+    console.log(\`📋 [\${req.requestId}] Fetching tasks\`);
+    
+    const { status, priority, limit, offset = 0 } = req.query;
+    let filteredTasks = [...tasks];
+    
+    // Apply filters
+    if (status) {
+        if (!VALID_STATUSES.includes(status.toLowerCase())) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid Filter',
+                message: \`Invalid status filter. Valid values: \${VALID_STATUSES.join(', ')}\`
+            });
+        }
+        filteredTasks = filteredTasks.filter(task => 
+            task.status === status.toLowerCase()
+        );
+        console.log(\`🔍 [\${req.requestId}] Filtered by status: \${status}\`);
+    }
+    
+    if (priority) {
+        if (!VALID_PRIORITIES.includes(priority.toLowerCase())) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid Filter',
+                message: \`Invalid priority filter. Valid values: \${VALID_PRIORITIES.join(', ')}\`
+            });
+        }
+        filteredTasks = filteredTasks.filter(task => 
+            task.priority === priority.toLowerCase()
+        );
+        console.log(\`🔍 [\${req.requestId}] Filtered by priority: \${priority}\`);
+    }
+    
+    // Apply pagination
+    const limitNum = limit ? parseInt(limit) : null;
+    const offsetNum = parseInt(offset);
+    
+    if (limitNum && limitNum > 0) {
+        const startIndex = offsetNum || 0;
+        const endIndex = startIndex + limitNum;
+        filteredTasks = filteredTasks.slice(startIndex, endIndex);
+        console.log(\`📄 [\${req.requestId}] Pagination: offset=\${offsetNum}, limit=\${limitNum}\`);
+    }
+    
+    console.log(\`📋 [\${req.requestId}] Returning \${filteredTasks.length} tasks\`);
+    
+    res.json({
+        success: true,
+        data: filteredTasks,
+        meta: {
+            total: filteredTasks.length,
+            hasFilters: !!(status || priority),
+            filters: { status, priority },
+            pagination: limitNum ? { limit: limitNum, offset: offsetNum } : null
+        }
+    });
+});
+
+// POST /api/tasks - Create new task
+app.post('/api/tasks', validateTaskCreation, (req, res) => {
+    console.log(\`✨ [\${req.requestId}] Creating new task\`);
+    
+    const newTask = {
+        id: nextId++,
+        ...req.body,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    
+    tasks.push(newTask);
+    console.log(\`✅ [\${req.requestId}] Task created: \${newTask.title} (ID: \${newTask.id})\`);
+    
+    res.status(201).json({
+        success: true,
+        message: 'Task created successfully',
+        data: newTask
+    });
+});
+
+// GET /api/tasks/:id - Get specific task
+app.get('/api/tasks/:id', checkTaskExists, (req, res) => {
+    console.log(\`📖 [\${req.requestId}] Fetching task ID: \${req.taskId}\`);
+    
+    res.json({
+        success: true,
+        data: req.task
+    });
+});
+
+// PATCH /api/tasks/:id - Update task fields
+app.patch('/api/tasks/:id', checkTaskExists, validateTaskUpdate, (req, res) => {
+    console.log(\`🔄 [\${req.requestId}] Updating task ID: \${req.taskId}\`);
+    
+    const taskIndex = tasks.findIndex(t => t.id === req.taskId);
+    const updatedFields = Object.keys(req.validatedFields);
+    
+    // Apply updates
+    Object.assign(tasks[taskIndex], req.validatedFields);
+    tasks[taskIndex].updatedAt = new Date().toISOString();
+    
+    console.log(\`✅ [\${req.requestId}] Task updated: \${updatedFields.join(', ')}\`);
+    
+    res.json({
+        success: true,
+        message: \`Task updated successfully. Updated fields: \${updatedFields.join(', ')}\`,
+        data: tasks[taskIndex],
+        updatedFields
+    });
+});
+
+// DELETE /api/tasks/:id - Delete task
+app.delete('/api/tasks/:id', checkTaskExists, (req, res) => {
+    console.log(\`🗑️ [\${req.requestId}] Deleting task ID: \${req.taskId}\`);
+    
+    const taskIndex = tasks.findIndex(t => t.id === req.taskId);
+    const deletedTask = tasks.splice(taskIndex, 1)[0];
+    
+    console.log(\`✅ [\${req.requestId}] Task deleted: \${deletedTask.title}\`);
+    
+    res.json({
+        success: true,
+        message: 'Task deleted successfully',
+        deletedTask: {
+            id: deletedTask.id,
+            title: deletedTask.title
+        }
+    });
+});
+
+// GET /api/stats - API statistics
+app.get('/api/stats', (req, res) => {
+    console.log(\`📊 [\${req.requestId}] Fetching API statistics\`);
+    
+    const stats = {
+        totalTasks: tasks.length,
+        tasksByStatus: {
+            pending: tasks.filter(t => t.status === 'pending').length,
+            'in-progress': tasks.filter(t => t.status === 'in-progress').length,
+            completed: tasks.filter(t => t.status === 'completed').length,
+            cancelled: tasks.filter(t => t.status === 'cancelled').length
+        },
+        tasksByPriority: {
+            low: tasks.filter(t => t.priority === 'low').length,
+            medium: tasks.filter(t => t.priority === 'medium').length,
+            high: tasks.filter(t => t.priority === 'high').length
+        },
+        oldestTask: tasks.length > 0 ? tasks.reduce((oldest, task) => 
+            new Date(task.createdAt) < new Date(oldest.createdAt) ? task : oldest
+        ).title : null,
+        newestTask: tasks.length > 0 ? tasks.reduce((newest, task) => 
+            new Date(task.createdAt) > new Date(newest.createdAt) ? task : newest
+        ).title : null
+    };
+    
+    res.json({
+        success: true,
+        data: stats
+    });
+});
+
+// ================================
+// ERROR HANDLING
+// ================================
+
+// 404 handler for undefined routes
+app.use('*', (req, res) => {
+    console.log(\`❓ [\${req.requestId}] 404: \${req.method} \${req.originalUrl}\`);
+    
+    res.status(404).json({
+        success: false,
+        error: 'Route Not Found',
+        message: \`The route \${req.method} \${req.originalUrl} does not exist\`,
+        availableRoutes: [
+            'GET /api',
+            'GET /api/tasks',
+            'POST /api/tasks',
+            'GET /api/tasks/:id',
+            'PATCH /api/tasks/:id',
+            'DELETE /api/tasks/:id',
+            'GET /api/stats'
+        ]
+    });
+});
+
+// Global error handler
+app.use((error, req, res, next) => {
+    console.error(\`💥 [\${req.requestId}] Error: \${error.message}\`);
+    console.error(error.stack);
+    
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    res.status(error.status || 500).json({
+        success: false,
+        error: error.status === 500 ? 'Internal Server Error' : error.message,
+        message: error.status === 500 ? 'An unexpected error occurred' : error.message,
+        ...(isDevelopment && {
+            stack: error.stack,
+            details: error.message
+        })
+    });
+});
+
+// ================================
+// SERVER STARTUP
+// ================================
+
+const PORT = process.env.PORT || 3001;
+
+const server = app.listen(PORT, () => {
+    console.log(\`🚀 Task Management API running on port \${PORT}\`);
+    console.log(\`🌍 Environment: \${process.env.NODE_ENV || 'development'}\`);
+    console.log('');
+    console.log('📋 Available Endpoints:');
+    console.log('   GET    /api                - API documentation');
+    console.log('   GET    /api/tasks          - List tasks (with filtering)');
+    console.log('   POST   /api/tasks          - Create new task');
+    console.log('   GET    /api/tasks/:id      - Get specific task');
+    console.log('   PATCH  /api/tasks/:id      - Update task fields');
+    console.log('   DELETE /api/tasks/:id      - Delete task');
+    console.log('   GET    /api/stats          - API statistics');
+    console.log('');
+    console.log('🔧 Features:');
+    console.log('   ✅ RESTful design principles');
+    console.log('   ✅ Comprehensive input validation');
+    console.log('   ✅ Professional error handling');
+    console.log('   ✅ Request/response logging');
+    console.log('   ✅ CORS support');
+    console.log('   ✅ Security headers');
+    console.log('   ✅ Filtering and pagination');
+    console.log('   ✅ API documentation');
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+    console.log('🛑 SIGTERM received, shutting down gracefully');
+    server.close(() => {
+        console.log('✅ Process terminated');
+    });
+});
+
+process.on('SIGINT', () => {
+    console.log('\\n🛑 SIGINT received, shutting down gracefully');
+    server.close(() => {
+        console.log('✅ Process terminated');
+    });
+});`}
+  previewType="html"
+  height="800px"
+/>
+
+## Summary and Best Practices
+
+**Student**: "This is incredible! I feel like I really understand how to build professional REST APIs now. What are the most important things to remember?"
+
+**Teacher**: "Perfect! You've mastered the fundamentals of REST API development. Here are the key takeaways that will make you a successful API developer:"
+
+### 🎯 Core REST Principles to Always Follow:
+
+1. **Resource-Based URLs**: Use nouns, not verbs (`/users`, not `/getUsers`)
+2. **HTTP Methods for Actions**: GET (read), POST (create), PUT/PATCH (update), DELETE (remove)
+3. **Consistent Response Format**: Always use the same JSON structure
+4. **Proper Status Codes**: 200 (OK), 201 (Created), 400 (Bad Request), 404 (Not Found), etc.
+5. **Stateless Design**: Each request contains all needed information
+
+### 🔒 Security & Validation Essentials:
+
+- **Never trust user input** - validate and sanitize everything
+- **Use proper HTTP status codes** to communicate results clearly
+- **Implement rate limiting** to prevent abuse
+- **Add security headers** to protect against common attacks
+- **Sanitize data** before storing or processing
+
+### 📚 Documentation & Testing:
+
+- **Document every endpoint** with examples and error codes
+- **Provide interactive testing interfaces** for developers
+- **Keep documentation up-to-date** with code changes
+- **Include authentication requirements** and API limits
+
+### 🚀 Production Readiness:
+
+- **Implement proper error handling** with meaningful messages
+- **Add request/response logging** for debugging
+- **Use middleware for cross-cutting concerns** (auth, logging, etc.)
+- **Plan for scalability** with pagination and filtering
+- **Monitor API performance** and usage patterns
+
+### What's Next?
+
+In upcoming tutorials, you'll learn about:
+- **Database Integration**: Connecting your APIs to PostgreSQL/MongoDB
+- **Authentication & Authorization**: JWT tokens, API keys, role-based access
+- **API Testing**: Unit tests, integration tests, and automated testing
+- **Deployment & Scaling**: Docker, cloud deployment, load balancing
+
+**Student**: "I'm excited to keep building! This foundation feels really solid."
+
+**Teacher**: "Excellent! You now have the skills to build production-ready REST APIs that follow industry best practices. Remember: start simple, validate everything, document thoroughly, and always think about the developer experience. Happy coding!"
+
+---
+
+*🎉 Congratulations! You've completed the REST API Development tutorial and learned how to build professional, scalable APIs with Express.js. You're now ready to create APIs that power real-world applications!*

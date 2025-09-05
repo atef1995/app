@@ -1,0 +1,1416 @@
+---
+title: "Node.js Modules & NPM: Building Your JavaScript Toolkit"
+description: "Master Node.js modules and npm to organize code and leverage the massive ecosystem"
+level: "beginner"
+estimatedTime: "50 minutes"
+topics: ["Modules", "CommonJS", "ES Modules", "NPM", "Package Management"]
+quizQuestions: 18
+order: 2
+---
+
+# Node.js Modules & NPM: Building Your JavaScript Toolkit
+
+Ready to level up your Node.js skills? 🚀 Let's dive into the world of modules and npm - the tools that will transform you from a solo coder into someone who can leverage the work of millions of developers worldwide!
+
+## What Are Modules, Really?
+
+Think of modules like LEGO blocks. Instead of building everything from scratch, you can create reusable pieces that snap together to build amazing things. In Node.js, modules let you organize your code into separate files and share functionality between them.
+
+**Student:** "So instead of writing everything in one giant file, I can split it up?"
+
+**Teacher:** "Exactly! And not just split it up - you can also use modules that other developers have created. It's like having access to a giant LEGO store where every piece is free and designed to work perfectly with Node.js!"
+
+## Your First Custom Module
+
+Let's start by creating our own module. We'll build a simple calculator that we can reuse anywhere:
+
+<InteractiveCodeBlock language="nodejs" title="Creating Your First Module" description="Let's build a reusable calculator module:">
+{`// First, let's create our calculator functions
+const calculator = {
+  add: (a, b) => {
+    console.log(\`Adding \${a} + \${b}\`);
+    return a + b;
+  },
+  
+  subtract: (a, b) => {
+    console.log(\`Subtracting \${a} - \${b}\`);
+    return a - b;
+  },
+  
+  multiply: (a, b) => {
+    console.log(\`Multiplying \${a} × \${b}\`);
+    return a * b;
+  },
+  
+  divide: (a, b) => {
+    if (b === 0) {
+      console.log("❌ Error: Cannot divide by zero!");
+      return null;
+    }
+    console.log(\`Dividing \${a} ÷ \${b}\`);
+    return a / b;
+  }
+};
+
+// This is how we "export" our module so other files can use it
+module.exports = calculator;
+
+console.log("✅ Calculator module created!");
+console.log("Functions available:", Object.keys(calculator));
+
+// Let's test our calculator
+console.log("\\n=== Testing Calculator ===");
+console.log("5 + 3 =", calculator.add(5, 3));
+console.log("10 - 4 =", calculator.subtract(10, 4));
+console.log("7 × 2 =", calculator.multiply(7, 2));
+console.log("15 ÷ 3 =", calculator.divide(15, 3));
+console.log("10 ÷ 0 =", calculator.divide(10, 0));`}
+</InteractiveCodeBlock>
+
+**Did you see that `module.exports`?** That's the magic line that makes our calculator available to other files. It's like putting a label on your LEGO creation that says "Hey, other people can use this!"
+
+## Understanding Different Module Systems
+
+Node.js actually supports two different ways to work with modules. Let's explore both:
+
+### CommonJS (The Traditional Way)
+
+<InteractiveCodeBlock language="nodejs" title="CommonJS Module System" description="The classic Node.js way of handling modules:">
+{`// CommonJS uses 'require' to import and 'module.exports' to export
+
+// Let's create a user management module using CommonJS
+const users = [];
+
+function addUser(name, age, email) {
+  const user = {
+    id: users.length + 1,
+    name: name,
+    age: age,
+    email: email,
+    createdAt: new Date().toISOString()
+  };
+  
+  users.push(user);
+  console.log(\`✅ Added user: \${name}\`);
+  return user;
+}
+
+function findUserById(id) {
+  const user = users.find(u => u.id === id);
+  if (user) {
+    console.log(\`👤 Found user: \${user.name}\`);
+  } else {
+    console.log(\`❌ User with ID \${id} not found\`);
+  }
+  return user;
+}
+
+function getAllUsers() {
+  console.log(\`📊 Total users: \${users.length}\`);
+  return users;
+}
+
+function removeUser(id) {
+  const index = users.findIndex(u => u.id === id);
+  if (index !== -1) {
+    const removed = users.splice(index, 1)[0];
+    console.log(\`🗑️ Removed user: \${removed.name}\`);
+    return removed;
+  } else {
+    console.log(\`❌ Cannot remove: User with ID \${id} not found\`);
+    return null;
+  }
+}
+
+// Export multiple functions
+module.exports = {
+  addUser: addUser,
+  findUserById: findUserById,
+  getAllUsers: getAllUsers,
+  removeUser: removeUser
+};
+
+// Let's test our user management system
+console.log("=== User Management System ===");
+
+// Add some users
+addUser("Alice Johnson", 28, "alice@example.com");
+addUser("Bob Smith", 32, "bob@example.com");
+addUser("Carol Williams", 25, "carol@example.com");
+
+// Display all users
+const allUsers = getAllUsers();
+allUsers.forEach(user => {
+  console.log(\`  - \${user.name} (ID: \${user.id}, Age: \${user.age})\`);
+});
+
+// Find a specific user
+findUserById(2);
+findUserById(99);
+
+// Remove a user
+removeUser(1);
+getAllUsers();`}
+</InteractiveCodeBlock>
+
+**Student:** "Why do I need to write `addUser: addUser`? That seems redundant."
+
+**Teacher:** "Great observation! In modern JavaScript, you can actually use shorthand: just `{ addUser, findUserById, getAllUsers }` when the key and value have the same name!"
+
+## Working with Built-in Modules Like a Pro
+
+Node.js comes with tons of built-in modules. Let's explore some of the most useful ones:
+
+<InteractiveCodeBlock language="nodejs" title="Built-in Modules Masterclass" description="Discover the power of Node.js built-in modules:">
+{`// File System Module - Your file manipulation superhero
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const crypto = require('crypto');
+
+console.log("=== Built-in Modules Showcase ===\\n");
+
+// 1. File System Operations
+console.log("📁 FILE SYSTEM OPERATIONS");
+const demoData = {
+  message: "Hello from Node.js modules!",
+  timestamp: new Date().toISOString(),
+  systemInfo: {
+    platform: os.platform(),
+    nodeVersion: process.version,
+    totalMemory: Math.round(os.totalmem() / 1024 / 1024) + "MB"
+  }
+};
+
+// Write data to file
+fs.writeFileSync('demo-data.json', JSON.stringify(demoData, null, 2));
+console.log("✅ Created demo-data.json");
+
+// Read it back
+const savedData = JSON.parse(fs.readFileSync('demo-data.json', 'utf8'));
+console.log("📖 Read back:", savedData.message);
+
+// 2. Path Operations  
+console.log("\\n🛣️  PATH OPERATIONS");
+const filePath = "/users/documents/projects/myapp/src/index.js";
+console.log("Original path:", filePath);
+console.log("Directory:", path.dirname(filePath));
+console.log("Filename:", path.basename(filePath));
+console.log("Extension:", path.extname(filePath));
+console.log("Without extension:", path.basename(filePath, path.extname(filePath)));
+
+// Join paths safely (works on all operating systems)
+const projectPath = path.join("projects", "myapp", "src", "components");
+console.log("Joined path:", projectPath);
+
+// 3. Operating System Info
+console.log("\\n💻 SYSTEM INFORMATION");
+console.log("Platform:", os.platform());
+console.log("Architecture:", os.arch());
+console.log("CPU cores:", os.cpus().length);
+console.log("Free memory:", Math.round(os.freemem() / 1024 / 1024) + "MB");
+console.log("Home directory:", os.homedir());
+
+// 4. Crypto Operations
+console.log("\\n🔐 CRYPTOGRAPHY");
+const secretMessage = "This is my secret message!";
+const hash = crypto.createHash('sha256').update(secretMessage).digest('hex');
+console.log("Original message:", secretMessage);
+console.log("SHA256 hash:", hash);
+
+// Generate a random ID
+const randomId = crypto.randomBytes(8).toString('hex');
+console.log("Random ID:", randomId);
+
+// 5. URL Parsing
+console.log("\\n🌐 URL OPERATIONS");
+const { URL } = require('url');
+const myURL = new URL('https://api.example.com/users/123?active=true&sort=name');
+console.log("Full URL:", myURL.href);
+console.log("Protocol:", myURL.protocol);
+console.log("Hostname:", myURL.hostname);
+console.log("Pathname:", myURL.pathname);
+console.log("Search params:", myURL.searchParams.toString());
+console.log("Active parameter:", myURL.searchParams.get('active'));`}
+</InteractiveCodeBlock>
+
+**Wow!** Look at all the functionality we get for free with Node.js. These built-in modules are like having a Swiss Army knife for programming!
+
+## Introduction to NPM - The Package Universe
+
+NPM (Node Package Manager) is like a massive library where millions of developers share their code. Want to work with dates? Someone's created a module for that. Need to make HTTP requests? There's a module for that too!
+
+<InteractiveCodeBlock language="nodejs" title="Understanding NPM Concepts" description="Let's explore what makes NPM so powerful:">
+{`// Let's simulate what NPM and package.json do for us
+const packageInfo = {
+  name: "my-awesome-project",
+  version: "1.0.0",
+  description: "Learning Node.js modules and NPM",
+  main: "index.js",
+  scripts: {
+    start: "node index.js",
+    test: "echo 'No tests yet' && exit 1",
+    dev: "node --watch index.js"
+  },
+  dependencies: {
+    // These would be packages we depend on
+    "lodash": "^4.17.21",  // Utility library
+    "axios": "^1.6.0",     // HTTP client
+    "moment": "^2.29.4"    // Date manipulation
+  },
+  devDependencies: {
+    // These are only used during development
+    "nodemon": "^3.0.2",   // Auto-restart server
+    "jest": "^29.7.0"      // Testing framework
+  },
+  keywords: ["nodejs", "javascript", "learning"],
+  author: "Your Name",
+  license: "MIT"
+};
+
+console.log("📦 PACKAGE.JSON BREAKDOWN");
+console.log("Project name:", packageInfo.name);
+console.log("Version:", packageInfo.version);
+console.log("Main entry point:", packageInfo.main);
+
+console.log("\\n🚀 Available scripts:");
+Object.entries(packageInfo.scripts).forEach(([name, command]) => {
+  console.log(\`  npm run \${name}: \${command}\`);
+});
+
+console.log("\\n📚 Dependencies (needed for production):");
+Object.entries(packageInfo.dependencies).forEach(([name, version]) => {
+  console.log(\`  \${name}: \${version}\`);
+});
+
+console.log("\\n🛠️ DevDependencies (only for development):");
+Object.entries(packageInfo.devDependencies).forEach(([name, version]) => {
+  console.log(\`  \${name}: \${version}\`);
+});
+
+// Simulate semantic versioning
+console.log("\\n🔢 SEMANTIC VERSIONING EXPLAINED");
+const versionExamples = [
+  { version: "^4.17.21", meaning: "Compatible with 4.17.21, allows updates to 4.x.x but not 5.0.0" },
+  { version: "~2.29.4", meaning: "Compatible with 2.29.4, allows updates to 2.29.x but not 2.30.0" },
+  { version: "1.6.0", meaning: "Exact version 1.6.0 only" },
+  { version: ">=3.0.0", meaning: "Version 3.0.0 or higher" }
+];
+
+versionExamples.forEach(({ version, meaning }) => {
+  console.log(\`\${version}: \${meaning}\`);
+});
+
+console.log("\\n✨ NPM COMMAND CHEAT SHEET");
+const npmCommands = [
+  "npm install - Install all dependencies",
+  "npm install lodash - Install specific package",
+  "npm install --save-dev jest - Install as dev dependency",
+  "npm update - Update all packages",
+  "npm list - Show installed packages",
+  "npm run start - Run the start script",
+  "npm init - Create new package.json",
+  "npm publish - Publish to NPM registry"
+];
+
+npmCommands.forEach(cmd => console.log("  " + cmd));`}
+</InteractiveCodeBlock>
+
+**Student:** "This is overwhelming! How do I know which packages to use?"
+
+**Teacher:** "Great question! Start with the most popular and well-maintained packages. Look for packages with lots of downloads, recent updates, and good documentation. The NPM website shows you statistics and user ratings!"
+
+## Frontend/Backend Integration with Modules
+
+Now let's see how modules help us organize a real application with both frontend and backend code:
+
+<DualPaneEditor
+  title="Real Frontend/Backend Communication"
+  description="See actual HTTP requests between frontend and backend with real API calls"
+  previewType="html"
+  frontendCode={`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real API Communication</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 700px; 
+            margin: 20px auto; 
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container { 
+            background: rgba(255,255,255,0.1); 
+            padding: 30px; 
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .api-section {
+            background: rgba(255,255,255,0.1);
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        button { 
+            padding: 10px 15px; 
+            margin: 5px; 
+            border: none; 
+            border-radius: 8px;
+            font-size: 14px;
+            background: #4CAF50; 
+            color: white; 
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover { background: #45a049; }
+        .response { 
+            background: rgba(0,0,0,0.3); 
+            padding: 15px; 
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .status { 
+            padding: 5px 10px; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            display: inline-block;
+            margin: 5px 0;
+        }
+        .success { background: rgba(76, 175, 80, 0.3); }
+        .error { background: rgba(244, 67, 54, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Real Frontend ↔️ Backend Communication</h1>
+        <p>This frontend will make ACTUAL HTTP requests to your backend server!</p>
+        
+        <div class="api-section">
+            <h3>📡 API Testing Dashboard</h3>
+            <div>
+                <button onclick="testConnection()">🔌 Test Connection</button>
+                <button onclick="getAllTodos()">📋 Get All Todos</button>
+                <button onclick="createTodo()">➕ Create Todo</button>
+                <button onclick="getStats()">📊 Get Stats</button>
+            </div>
+            
+            <div id="serverStatus" class="status">🔴 Server Status: Unknown</div>
+            <div id="apiResponse" class="response">No requests made yet...</div>
+        </div>
+        
+        <div class="api-section">
+            <h3>✏️ Interactive Todo Creation</h3>
+            <input type="text" id="todoText" placeholder="Enter new todo..." style="padding: 10px; margin: 5px; border-radius: 5px; border: none; color: #333;">
+            <button onclick="createCustomTodo()">Create Custom Todo</button>
+            <div id="todoResult" class="response"></div>
+        </div>
+    </div>
+
+    <script>
+        // Real API Communication Module
+        const APIClient = {
+            baseURL: null, // Will be detected automatically
+            
+            // Auto-detect WebContainer server URL
+            async detectServerURL() {
+                // Try common WebContainer patterns
+                const possibleURLs = [
+                    'https://webcontainer-api-server.stackblitz.io',
+                    'https://3000-webcontainer.stackblitz.io',
+                    'https://localhost-3000.webcontainer.io',
+                    // Fallback to relative URLs for testing
+                    window.location.origin
+                ];
+                
+                for (const testUrl of possibleURLs) {
+                    try {
+                        const response = await fetch(\`\${testUrl}/api/test-connection\`, {
+                            method: 'GET',
+                            mode: 'cors',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                        
+                        if (response.ok) {
+                            this.baseURL = testUrl;
+                            console.log(\`Found server at: \${testUrl}\`);
+                            return testUrl;
+                        }
+                    } catch (error) {
+                        console.log(\`Server not found at \${testUrl}:, error.message\`);
+                    }
+                }
+                
+                // If no server found, try to get it from parent window
+                try {
+                    if (window.parent && window.parent !== window) {
+                        const serverInfo = window.parent.webContainerInfo;
+                        if (serverInfo && serverInfo.url) {
+                            this.baseURL = serverInfo.url;
+                            return serverInfo.url;
+                        }
+                    }
+                } catch (error) {
+                    console.log('Cannot access parent window info');
+                }
+                
+                return null;
+            },
+            
+            async makeRequest(endpoint, options = {}) {
+                // Check for injected WebContainer proxy configuration
+                if (window.WEBCONTAINER_PROXY && window.WEBCONTAINER_PROXY.isRunning && window.WEBCONTAINER_PROXY.webContainerUrl) {
+                    console.log('Using WebContainer preview URL for request:', endpoint);
+                    
+                    try {
+                        // Make direct request to WebContainer preview URL
+                        const url = window.WEBCONTAINER_PROXY.webContainerUrl + endpoint;
+                        console.log('Direct WebContainer request to:', url);
+                        
+                        const response = await fetch(url, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                ...options.headers
+                            },
+                            mode: 'cors',
+                            ...options
+                        });
+                        
+                        const data = await response.json();
+                        
+                        return {
+                            success: response.ok,
+                            status: response.status,
+                            data: data,
+                            url: url,
+                            method: 'webcontainer-direct'
+                        };
+                    } catch (error) {
+                        console.error('WebContainer direct request failed:', error);
+                        
+                        // Fallback to proxy if direct fails
+                        try {
+                            const response = await window.WEBCONTAINER_PROXY.makeProxiedRequest(endpoint, options);
+                            const data = await response.json();
+                            
+                            return {
+                                success: response.ok,
+                                status: response.status,
+                                data: data,
+                                url: \`\${window.WEBCONTAINER_PROXY.proxyBaseUrl}\${endpoint}\`,
+                                method: 'proxy-fallback'
+                            };
+                        } catch (proxyError) {
+                            return {
+                                success: false,
+                                error: \`Direct: \${error.message}, Proxy: \${proxyError.message}\`,
+                                url: endpoint,
+                                method: 'both-failed'
+                            };
+                        }
+                    }
+                }
+                
+                // Fallback to auto-detection
+                if (!this.baseURL) {
+                    await this.detectServerURL();
+                }
+                
+                if (!this.baseURL) {
+                    return {
+                        success: false,
+                        error: 'Backend server not found. Please run the backend code first.',
+                        url: endpoint,
+                        debug: {
+                            proxyInfo: window.WEBCONTAINER_PROXY,
+                            baseURL: this.baseURL
+                        }
+                    };
+                }
+                
+                try {
+                    const url = \`\${this.baseURL}\${endpoint}\`;
+                    console.log(\`Making fallback request to: \${url}\`);
+                    
+                    const response = await fetch(url, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...options.headers
+                        },
+                        mode: 'cors',
+                        ...options
+                    });
+                    
+                    const data = await response.json();
+                    
+                    return {
+                        success: response.ok,
+                        status: response.status,
+                        data: data,
+                        url: url,
+                        method: 'fallback'
+                    };
+                } catch (error) {
+                    return {
+                        success: false,
+                        error: error.message,
+                        url: endpoint,
+                        method: 'fallback'
+                    };
+                }
+            },
+            
+            updateServerStatus(isOnline, port = null) {
+                const statusEl = document.getElementById('serverStatus');
+                if (isOnline && port) {
+                    this.baseURL = \`http://localhost:\${port}\`;
+                    statusEl.innerHTML = \`🟢 Server Online: localhost:\${port}\`;
+                    statusEl.className = 'status success';
+                } else {
+                    statusEl.innerHTML = '🔴 Server Offline';
+                    statusEl.className = 'status error';
+                }
+            }
+        };
+        
+        // API Functions that make REAL HTTP requests
+        async function testConnection() {
+            updateResponse('Testing connection...');
+            const result = await APIClient.makeRequest('/api/test-connection');
+            
+            if (result.success) {
+                APIClient.updateServerStatus(true, extractPort(result.url));
+                updateResponse(\`✅ Connection SUCCESS!\\n\${JSON.stringify(result.data, null, 2)}\`);
+            } else {
+                APIClient.updateServerStatus(false);
+                updateResponse(\`❌ Connection FAILED: \${result.error || 'Server not responding'}\`);
+            }
+        }
+        
+        async function getAllTodos() {
+            updateResponse('Fetching todos from server...');
+            const result = await APIClient.makeRequest('/api/todos');
+            
+            if (result.success) {
+                const todos = result.data.todos || [];
+                updateResponse(\`📋 Todos from server (count: \${todos.length}):\\n\${JSON.stringify(result.data, null, 2)}\`);
+            } else {
+                updateResponse(\`❌ Failed to fetch todos: \${result.error}\`);
+            }
+        }
+        
+        async function createTodo() {
+            updateResponse('Creating sample todo...');
+            const todoData = {
+                text: \`Sample todo created at \${new Date().toLocaleTimeString()}\`
+            };
+            
+            const result = await APIClient.makeRequest('/api/todos', {
+                method: 'POST',
+                body: JSON.stringify(todoData)
+            });
+            
+            if (result.success) {
+                updateResponse(\`✅ Todo CREATED!\\n\${JSON.stringify(result.data, null, 2)}\`);
+            } else {
+                updateResponse(\`❌ Failed to create todo: \${result.error}\`);
+            }
+        }
+        
+        async function createCustomTodo() {
+            const text = document.getElementById('todoText').value.trim();
+            if (!text) {
+                document.getElementById('todoResult').innerHTML = '⚠️ Please enter todo text';
+                return;
+            }
+            
+            document.getElementById('todoResult').innerHTML = 'Creating your todo...';
+            
+            const result = await APIClient.makeRequest('/api/todos', {
+                method: 'POST',
+                body: JSON.stringify({ text: text })
+            });
+            
+            if (result.success) {
+                document.getElementById('todoResult').innerHTML = 
+                    \`✅ YOUR TODO CREATED!\\n\${JSON.stringify(result.data, null, 2)}\`;
+                document.getElementById('todoText').value = '';
+            } else {
+                document.getElementById('todoResult').innerHTML = 
+                    \`❌ Creation failed: \${result.error}\`;
+            }
+        }
+        
+        async function getStats() {
+            updateResponse('Getting server statistics...');
+            const result = await APIClient.makeRequest('/api/stats');
+            
+            if (result.success) {
+                updateResponse(\`📊 Server Statistics:\\n\${JSON.stringify(result.data, null, 2)}\`);
+            } else {
+                updateResponse(\`❌ Failed to get stats: \${result.error}\`);
+            }
+        }
+        
+        // Helper functions
+        function updateResponse(text) {
+            document.getElementById('apiResponse').innerHTML = text;
+        }
+        
+        function extractPort(url) {
+            const match = url.match(/:(\d+)/);
+            return match ? parseInt(match[1]) : null;
+        }
+        
+        // Auto-detect server on page load
+        console.log('🌐 Frontend loaded - ready for REAL API calls!');
+        updateResponse('Frontend ready! Click "Test Connection" to connect to your backend server.');
+    </script>
+</body>
+</html>`}
+  
+  backendCode={`// Real Node.js API Server with Modules
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const { URL } = require('url');
+
+// Todo Storage Module (simulates a database)
+const TodoStorage = {
+  todos: [
+    { id: 1, text: 'Learn Node.js modules', completed: false, createdAt: '2024-01-01T10:00:00.000Z' },
+    { id: 2, text: 'Master NPM ecosystem', completed: false, createdAt: '2024-01-01T11:00:00.000Z' },
+    { id: 3, text: 'Build modular applications', completed: true, createdAt: '2024-01-01T12:00:00.000Z' }
+  ],
+  
+  getAll() {
+    console.log(\`📋 Fetching all todos (\${this.todos.length} items)\`);
+    return this.todos;
+  },
+  
+  create(text) {
+    const todo = {
+      id: Date.now(),
+      text: text,
+      completed: false,
+      createdAt: new Date().toISOString()
+    };
+    this.todos.push(todo);
+    console.log(\`✅ Created todo: \${text}\`);
+    return todo;
+  },
+  
+  update(id, updates) {
+    const index = this.todos.findIndex(todo => todo.id === parseInt(id));
+    if (index !== -1) {
+      this.todos[index] = { ...this.todos[index], ...updates };
+      console.log(\`📝 Updated todo ID \${id}\`);
+      return this.todos[index];
+    }
+    console.log(\`❌ Todo ID \${id} not found for update\`);
+    return null;
+  },
+  
+  delete(id) {
+    const index = this.todos.findIndex(todo => todo.id === parseInt(id));
+    if (index !== -1) {
+      const deleted = this.todos.splice(index, 1)[0];
+      console.log(\`🗑️ Deleted todo: \${deleted.text}\`);
+      return deleted;
+    }
+    console.log(\`❌ Todo ID \${id} not found for deletion\`);
+    return null;
+  }
+};
+
+// HTTP Response Helper Module
+const ResponseHelper = {
+  json(res, data, status = 200) {
+    res.writeHead(status, { 
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    });
+    res.end(JSON.stringify(data));
+  },
+  
+  error(res, message, status = 400) {
+    this.json(res, { error: message, status }, status);
+  }
+};
+
+// Router Module (handles different endpoints)
+const Router = {
+  async handle(req, res) {
+    const url = new URL(req.url, 'http://localhost:3000');
+    const method = req.method;
+    const pathname = url.pathname;
+    
+    console.log(\`\${method} \${pathname}\`);
+    
+    // Handle different routes
+    if (pathname === '/api/test-connection' && method === 'GET') {
+      // Test connection endpoint
+      ResponseHelper.json(res, {
+        message: 'Backend server is running!',
+        timestamp: new Date().toISOString(),
+        server: 'Node.js with modules',
+        endpoints: [
+          'GET /api/test-connection',
+          'GET /api/todos',
+          'POST /api/todos',
+          'PUT /api/todos/:id',
+          'DELETE /api/todos/:id',
+          'GET /api/stats'
+        ]
+      });
+      
+    } else if (pathname === '/api/todos' && method === 'GET') {
+      // Get all todos
+      const todos = TodoStorage.getAll();
+      ResponseHelper.json(res, { todos, count: todos.length });
+      
+    } else if (pathname === '/api/todos' && method === 'POST') {
+      // Create new todo
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const { text } = JSON.parse(body);
+          if (!text || text.trim() === '') {
+            ResponseHelper.error(res, 'Todo text is required');
+            return;
+          }
+          const todo = TodoStorage.create(text.trim());
+          ResponseHelper.json(res, todo, 201);
+        } catch (error) {
+          ResponseHelper.error(res, 'Invalid JSON data');
+        }
+      });
+      
+    } else if (pathname.startsWith('/api/todos/') && method === 'PUT') {
+      // Update todo
+      const id = pathname.split('/')[3];
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const updates = JSON.parse(body);
+          const todo = TodoStorage.update(id, updates);
+          if (todo) {
+            ResponseHelper.json(res, todo);
+          } else {
+            ResponseHelper.error(res, 'Todo not found', 404);
+          }
+        } catch (error) {
+          ResponseHelper.error(res, 'Invalid JSON data');
+        }
+      });
+      
+    } else if (pathname.startsWith('/api/todos/') && method === 'DELETE') {
+      // Delete todo
+      const id = pathname.split('/')[3];
+      const deleted = TodoStorage.delete(id);
+      if (deleted) {
+        ResponseHelper.json(res, { message: 'Todo deleted successfully', deleted });
+      } else {
+        ResponseHelper.error(res, 'Todo not found', 404);
+      }
+      
+    } else if (pathname === '/api/stats' && method === 'GET') {
+      // Get statistics
+      const todos = TodoStorage.getAll();
+      const stats = {
+        total: todos.length,
+        completed: todos.filter(t => t.completed).length,
+        pending: todos.filter(t => !t.completed).length,
+        oldestTodo: todos.length > 0 ? todos[0].createdAt : null,
+        newestTodo: todos.length > 0 ? todos[todos.length - 1].createdAt : null
+      };
+      ResponseHelper.json(res, stats);
+      
+    } else {
+      // 404 Not Found
+      ResponseHelper.error(res, \`Route \${method} \${pathname} not found\`, 404);
+    }
+  }
+};
+
+// Server Module
+const server = http.createServer((req, res) => {
+  Router.handle(req, res);
+});
+
+const PORT = 3000;
+server.listen(PORT, () => {
+  console.log(\`🚀 Todo API Server running at http://localhost:\${PORT}\`);
+  console.log('📡 Available endpoints:');
+  console.log('  GET    /api/todos     - Get all todos');
+  console.log('  POST   /api/todos     - Create new todo');  
+  console.log('  PUT    /api/todos/:id - Update todo');
+  console.log('  DELETE /api/todos/:id - Delete todo');
+  console.log('  GET    /api/stats     - Get statistics');
+  console.log('\\n🔄 Server will automatically stop after 30 seconds...');
+});
+
+// Demo the API with some test requests
+setTimeout(async () => {
+  console.log('\\n=== API DEMO ===');
+  
+  // Simulate getting all todos
+  console.log('📋 Current todos:');
+  TodoStorage.getAll().forEach((todo, index) => {
+    console.log(\`  \${index + 1}. \${todo.text} \${todo.completed ? '✅' : '⏳'}\`);
+  });
+  
+  // Simulate creating a new todo
+  const newTodo = TodoStorage.create('Complete this awesome tutorial');
+  console.log('\\n✨ Created new todo:', newTodo.text);
+  
+  // Simulate updating a todo
+  TodoStorage.update(newTodo.id, { completed: true });
+  console.log('✅ Marked new todo as completed');
+  
+  console.log('\\n📊 Final stats:');
+  const final = TodoStorage.getAll();
+  console.log(\`Total: \${final.length}, Completed: \${final.filter(t => t.completed).length}\`);
+  
+}, 2000);
+
+// Gracefully shut down server after demo
+setTimeout(() => {
+  console.log('\\n⏰ Demo completed - shutting down server...');
+  server.close(() => {
+    console.log('✅ Server stopped successfully');
+  });
+}, 30000);`}
+  
+  height="700px"
+  showPreview={true}
+/>
+
+**Mind = Blown!** 🤯 You just saw how modules help organize both frontend and backend code. Notice how we used:
+
+- **Frontend modules**: Organized our TodoManager as a reusable object
+- **Backend modules**: Separated concerns with TodoStorage, ResponseHelper, and Router modules
+- **Built-in modules**: Used `http`, `fs`, `path`, and `url` for server functionality
+
+## Creating Your Own NPM Package
+
+Want to see something really cool? Let's create a package that could be published to NPM:
+
+<InteractiveCodeBlock language="nodejs" title="Create Your First NPM Package" description="Build a utility package that others could use:">
+{`// This is how you'd structure a real NPM package
+// File: string-utilities.js
+
+/**
+ * String Utilities Package
+ * A collection of useful string manipulation functions
+ * @version 1.0.0
+ * @author Your Name
+ */
+
+const StringUtils = {
+  /**
+   * Capitalize the first letter of each word
+   * @param {string} text - The input text
+   * @returns {string} Text with capitalized words
+   */
+  titleCase(text) {
+    if (!text || typeof text !== 'string') return '';
+    
+    return text
+      .toLowerCase()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  },
+
+  /**
+   * Reverse a string
+   * @param {string} text - The input text  
+   * @returns {string} Reversed text
+   */
+  reverse(text) {
+    if (!text || typeof text !== 'string') return '';
+    return text.split('').reverse().join('');
+  },
+
+  /**
+   * Count words in a text
+   * @param {string} text - The input text
+   * @returns {number} Number of words
+   */
+  wordCount(text) {
+    if (!text || typeof text !== 'string') return 0;
+    return text.trim().split(/\\s+/).filter(word => word.length > 0).length;
+  },
+
+  /**
+   * Generate a random string
+   * @param {number} length - Desired length
+   * @param {string} chars - Characters to use (default: alphanumeric)
+   * @returns {string} Random string
+   */
+  random(length = 8, chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') {
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  },
+
+  /**
+   * Create a URL-friendly slug from text
+   * @param {string} text - The input text
+   * @returns {string} URL-friendly slug
+   */
+  slugify(text) {
+    if (!text || typeof text !== 'string') return '';
+    
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\\w\\s-]/g, '') // Remove special characters
+      .replace(/[\\s_-]+/g, '-')  // Replace spaces and underscores with hyphens
+      .replace(/^-+|-+$/g, '');   // Remove leading/trailing hyphens
+  },
+
+  /**
+   * Extract email addresses from text
+   * @param {string} text - The input text
+   * @returns {Array<string>} Array of email addresses
+   */
+  extractEmails(text) {
+    if (!text || typeof text !== 'string') return [];
+    
+    const emailRegex = /\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b/g;
+    return text.match(emailRegex) || [];
+  },
+
+  /**
+   * Get package information
+   * @returns {Object} Package metadata
+   */
+  getInfo() {
+    return {
+      name: 'string-utilities',
+      version: '1.0.0',
+      description: 'A collection of useful string manipulation functions',
+      functions: Object.keys(this).filter(key => typeof this[key] === 'function' && key !== 'getInfo'),
+      author: 'Your Name',
+      license: 'MIT'
+    };
+  }
+};
+
+// Export the module (this is what gets published to NPM)
+module.exports = StringUtils;
+
+// Demo our string utilities
+console.log("🔧 STRING UTILITIES PACKAGE DEMO");
+console.log("Package info:", StringUtils.getInfo());
+
+console.log("\\n=== Function Tests ===");
+
+// Test titleCase
+const testText = "hello world from javascript";
+console.log(\`Original: "\${testText}"\`);
+console.log(\`Title Case: "\${StringUtils.titleCase(testText)}"\`);
+
+// Test reverse
+console.log(\`Reversed: "\${StringUtils.reverse(testText)}"\`);
+
+// Test word count
+console.log(\`Word count: \${StringUtils.wordCount(testText)}\`);
+
+// Test random string generation
+console.log(\`Random string (8 chars): "\${StringUtils.random()}"\`);
+console.log(\`Random string (12 chars): "\${StringUtils.random(12)}"\`);
+console.log(\`Random numbers (6 digits): "\${StringUtils.random(6, '0123456789')}"\`);
+
+// Test slugify
+const blogTitle = "How to Master Node.js Modules & NPM in 2024!";
+console.log(\`Blog title: "\${blogTitle}"\`);
+console.log(\`Slug: "\${StringUtils.slugify(blogTitle)}"\`);
+
+// Test email extraction
+const textWithEmails = "Contact us at support@example.com or sales@company.co.uk for more info";
+console.log(\`Text: "\${textWithEmails}"\`);
+console.log("Extracted emails:", StringUtils.extractEmails(textWithEmails));
+
+console.log("\\n✨ Package ready for NPM publishing!");
+console.log("To publish: npm publish (after setting up npm account)");`}
+</InteractiveCodeBlock>
+
+**This is exactly how real NPM packages are structured!** You've just created a professional-quality utility library that could help thousands of developers.
+
+## Module Best Practices
+
+<InteractiveCodeBlock language="nodejs" title="Module Best Practices" description="Learn the patterns that professional developers use:">
+{`// Best Practices for Node.js Modules
+
+console.log("📋 MODULE BEST PRACTICES GUIDE\\n");
+
+// 1. SINGLE RESPONSIBILITY PRINCIPLE
+console.log("1️⃣ SINGLE RESPONSIBILITY");
+console.log("✅ DO: Each module should do ONE thing well");
+console.log("❌ DON'T: Create god modules that do everything");
+
+// Good example: A focused logger module
+const Logger = {
+  info(message) {
+    console.log(\`ℹ️  \${new Date().toISOString()} [INFO] \${message}\`);
+  },
+  
+  error(message) {
+    console.error(\`❌ \${new Date().toISOString()} [ERROR] \${message}\`);
+  },
+  
+  warn(message) {
+    console.warn(\`⚠️  \${new Date().toISOString()} [WARN] \${message}\`);
+  }
+};
+
+Logger.info("Logger module focuses only on logging");
+
+// 2. CLEAR EXPORTS
+console.log("\\n2️⃣ CLEAR EXPORTS");
+console.log("✅ DO: Export exactly what users need");
+console.log("❌ DON'T: Export internal implementation details");
+
+const UserValidator = {
+  // Public API
+  validateEmail(email) {
+    return this._isValidEmail(email);
+  },
+  
+  validateAge(age) {
+    return this._isValidAge(age);
+  },
+  
+  // Private helper (not exported)
+  _isValidEmail(email) {
+    const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+    return emailRegex.test(email);
+  },
+  
+  _isValidAge(age) {
+    return age >= 0 && age <= 150;
+  }
+};
+
+// Only export the public interface
+module.exports = {
+  validateEmail: UserValidator.validateEmail.bind(UserValidator),
+  validateAge: UserValidator.validateAge.bind(UserValidator)
+};
+
+console.log("Email validation:", UserValidator.validateEmail("user@example.com"));
+console.log("Age validation:", UserValidator.validateAge(25));
+
+// 3. ERROR HANDLING
+console.log("\\n3️⃣ PROPER ERROR HANDLING");
+
+const FileProcessor = {
+  processFile(filename) {
+    try {
+      // Simulate file processing
+      if (!filename) {
+        throw new Error("Filename is required");
+      }
+      
+      if (!filename.endsWith('.txt')) {
+        throw new Error("Only .txt files are supported");
+      }
+      
+      Logger.info(\`Processing file: \${filename}\`);
+      return { success: true, message: "File processed successfully" };
+      
+    } catch (error) {
+      Logger.error(\`File processing failed: \${error.message}\`);
+      return { success: false, error: error.message };
+    }
+  }
+};
+
+// Test error handling
+console.log("Processing valid file:", FileProcessor.processFile("data.txt"));
+console.log("Processing invalid file:", FileProcessor.processFile("data.pdf"));
+console.log("Processing no file:", FileProcessor.processFile(""));
+
+// 4. CONFIGURATION MANAGEMENT
+console.log("\\n4️⃣ CONFIGURATION MANAGEMENT");
+
+const Config = {
+  // Default configuration
+  defaults: {
+    apiUrl: 'https://api.example.com',
+    timeout: 5000,
+    retries: 3,
+    debug: false
+  },
+  
+  // Allow customization
+  create(customConfig = {}) {
+    const config = { ...this.defaults, ...customConfig };
+    
+    Logger.info("Configuration created:");
+    Object.entries(config).forEach(([key, value]) => {
+      console.log(\`  \${key}: \${value}\`);
+    });
+    
+    return config;
+  }
+};
+
+// Users can customize what they need
+const devConfig = Config.create({ debug: true, timeout: 10000 });
+const prodConfig = Config.create({ apiUrl: 'https://prod-api.example.com' });
+
+// 5. DOCUMENTATION AND EXAMPLES
+console.log("\\n5️⃣ SELF-DOCUMENTING CODE");
+
+/**
+ * A well-documented utility function
+ * @param {Array} items - Array of items to process
+ * @param {Function} processor - Function to process each item
+ * @param {Object} options - Processing options
+ * @param {boolean} options.parallel - Process items in parallel
+ * @param {number} options.batchSize - Number of items per batch
+ * @returns {Promise<Array>} Processed items
+ */
+async function processItems(items, processor, options = {}) {
+  const { parallel = false, batchSize = 10 } = options;
+  
+  Logger.info(\`Processing \${items.length} items (parallel: \${parallel})\`);
+  
+  if (parallel) {
+    return Promise.all(items.map(processor));
+  } else {
+    const results = [];
+    for (const item of items) {
+      results.push(await processor(item));
+    }
+    return results;
+  }
+}
+
+// Example usage
+const items = ['apple', 'banana', 'cherry'];
+const upperCaseProcessor = (item) => Promise.resolve(item.toUpperCase());
+
+processItems(items, upperCaseProcessor, { parallel: true })
+  .then(results => {
+    console.log("Processed items:", results);
+  })
+  .catch(error => {
+    Logger.error("Processing failed: " + error.message);
+  });
+
+console.log("\\n✅ FOLLOWING THESE PRACTICES MAKES YOUR MODULES:");
+console.log("  • Easy to understand and use");
+console.log("  • Maintainable and testable");  
+console.log("  • Professional and reliable");
+console.log("  • Ready for sharing with the community!");`}
+</InteractiveCodeBlock>
+
+## Quick Challenge: Build Your Own Module
+
+Time to put your knowledge to the test! Create a utility module that helps with common programming tasks:
+
+<InteractiveCodeBlock language="nodejs" title="Challenge: Create a Developer Utilities Module" description="Build a module that every developer would want to use:">
+{`// Your Mission: Complete this developer utilities module
+// Add the missing functions and test them!
+
+const DeveloperUtils = {
+  // 1. Format code execution time nicely
+  formatExecutionTime(startTime) {
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    
+    if (duration < 1000) {
+      return \`\${duration}ms\`;
+    } else if (duration < 60000) {
+      return \`\${(duration / 1000).toFixed(2)}s\`;
+    } else {
+      const minutes = Math.floor(duration / 60000);
+      const seconds = ((duration % 60000) / 1000).toFixed(0);
+      return \`\${minutes}m \${seconds}s\`;
+    }
+  },
+
+  // 2. Generate a project structure template
+  generateProjectStructure(projectName) {
+    return {
+      [projectName]: {
+        'package.json': 'Project configuration',
+        'README.md': 'Project documentation',
+        'src/': {
+          'index.js': 'Main entry point',
+          'utils/': {
+            'helpers.js': 'Utility functions'
+          },
+          'tests/': {
+            'index.test.js': 'Test files'
+          }
+        },
+        '.gitignore': 'Git ignore rules',
+        'LICENSE': 'Project license'
+      }
+    };
+  },
+
+  // 3. Color code console output
+  colorLog(message, color = 'white') {
+    const colors = {
+      red: '\\x1b[31m',
+      green: '\\x1b[32m',
+      yellow: '\\x1b[33m',
+      blue: '\\x1b[34m',
+      magenta: '\\x1b[35m',
+      cyan: '\\x1b[36m',
+      white: '\\x1b[37m',
+      reset: '\\x1b[0m'
+    };
+    
+    const colorCode = colors[color] || colors.white;
+    console.log(\`\${colorCode}\${message}\${colors.reset}\`);
+  },
+
+  // 4. TODO: Add a function to generate fake data for testing
+  // Hint: Create objects with random names, emails, ages, etc.
+  generateFakeUser() {
+    const firstNames = ['Alex', 'Sam', 'Jordan', 'Casey', 'Taylor', 'Morgan'];
+    const lastNames = ['Johnson', 'Smith', 'Brown', 'Davis', 'Wilson', 'Miller'];
+    const domains = ['example.com', 'test.org', 'demo.net'];
+    
+    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const domain = domains[Math.floor(Math.random() * domains.length)];
+    
+    return {
+      id: Math.floor(Math.random() * 10000),
+      name: \`\${firstName} \${lastName}\`,
+      email: \`\${firstName.toLowerCase()}.\${lastName.toLowerCase()}@\${domain}\`,
+      age: Math.floor(Math.random() * 50) + 18,
+      isActive: Math.random() > 0.3
+    };
+  },
+
+  // 5. TODO: Add a function to benchmark code execution
+  // Hint: Run a function multiple times and calculate average time
+  benchmark(func, iterations = 100, ...args) {
+    const times = [];
+    
+    for (let i = 0; i < iterations; i++) {
+      const startTime = Date.now();
+      func(...args);
+      const endTime = Date.now();
+      times.push(endTime - startTime);
+    }
+    
+    const average = times.reduce((a, b) => a + b, 0) / times.length;
+    const min = Math.min(...times);
+    const max = Math.max(...times);
+    
+    return {
+      average: \`\${average.toFixed(2)}ms\`,
+      min: \`\${min}ms\`,
+      max: \`\${max}ms\`,
+      iterations
+    };
+  },
+
+  // 6. Memory usage helper
+  getMemoryUsage() {
+    const usage = process.memoryUsage();
+    return {
+      rss: \`\${Math.round(usage.rss / 1024 / 1024)}MB\`,
+      heapTotal: \`\${Math.round(usage.heapTotal / 1024 / 1024)}MB\`,
+      heapUsed: \`\${Math.round(usage.heapUsed / 1024 / 1024)}MB\`,
+      external: \`\${Math.round(usage.external / 1024 / 1024)}MB\`
+    };
+  }
+};
+
+module.exports = DeveloperUtils;
+
+// Test your module!
+console.log("🧪 TESTING DEVELOPER UTILS MODULE\\n");
+
+// Test execution time formatting
+const startTime = Date.now() - 2500; // Simulate 2.5 seconds ago
+DeveloperUtils.colorLog(\`Execution time: \${DeveloperUtils.formatExecutionTime(startTime)}\`, 'green');
+
+// Test project structure generation
+DeveloperUtils.colorLog("\\nProject structure for 'my-app':", 'blue');
+const structure = DeveloperUtils.generateProjectStructure('my-app');
+console.log(JSON.stringify(structure, null, 2));
+
+// Test colored logging
+console.log("\\nColored log examples:");
+DeveloperUtils.colorLog("Success message", 'green');
+DeveloperUtils.colorLog("Warning message", 'yellow');  
+DeveloperUtils.colorLog("Error message", 'red');
+DeveloperUtils.colorLog("Info message", 'cyan');
+
+// Test fake user generation
+console.log("\\nGenerated fake users:");
+for (let i = 0; i < 3; i++) {
+  const user = DeveloperUtils.generateFakeUser();
+  console.log(\`  \${user.name} (\${user.email}) - Age: \${user.age}, Active: \${user.isActive}\`);
+}
+
+// Test benchmarking
+console.log("\\nBenchmarking string operations:");
+const testString = "Hello World ".repeat(1000);
+const benchResult = DeveloperUtils.benchmark(() => {
+  testString.toUpperCase();
+}, 50);
+console.log("String.toUpperCase() benchmark:", benchResult);
+
+// Test memory usage
+console.log("\\nCurrent memory usage:");
+const memUsage = DeveloperUtils.getMemoryUsage();
+console.log(memUsage);
+
+DeveloperUtils.colorLog("\\n✨ Module testing complete! Ready for NPM!", 'magenta');`}
+</InteractiveCodeBlock>
+
+**Congratulations!** 🎉 You've just built a professional utility module that could genuinely help other developers!
+
+## What You've Mastered
+
+Amazing work! You've learned:
+
+✅ **Module Fundamentals**: How to create and organize reusable code  
+✅ **CommonJS System**: Using `require()` and `module.exports`  
+✅ **Built-in Modules**: Leveraging Node.js's powerful built-in tools  
+✅ **NPM Concepts**: Understanding packages, dependencies, and versioning  
+✅ **Best Practices**: Writing professional, maintainable modules  
+✅ **Real-world Application**: Building frontend/backend integration  
+
+**Student:** "I feel like I've unlocked a superpower! Where can I find cool packages to use?"
+
+**Teacher:** "You absolutely have! Check out npmjs.com to explore packages. Some must-know ones: `lodash` (utilities), `axios` (HTTP requests), `moment` (dates), `express` (web framework), and `jest` (testing). The JavaScript ecosystem is your oyster!"
+
+## What's Next?
+
+In our next tutorial, we'll dive deep into **Package Management and NPM workflows**. You'll learn how to:
+
+- Create and publish your own NPM packages
+- Set up automated testing and CI/CD
+- Manage dependencies like a pro
+- Work with npm scripts for workflow automation
+- Explore the vast ecosystem of Node.js packages
+
+You're well on your way to becoming a Node.js expert! The modular thinking you've learned here is fundamental to all professional JavaScript development. 🌟

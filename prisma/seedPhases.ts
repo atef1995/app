@@ -197,6 +197,17 @@ export async function seedPhases() {
       estimatedWeeks: 4,
       prerequisites: ["advanced-concepts"],
       published: true,
+    },
+    {
+      slug: "nodejs-fundamentals",
+      title: "Node.js Fundamentals",
+      description: "Learn server-side JavaScript development with Node.js",
+      color: "from-green-400 to-emerald-600",
+      icon: "Server",
+      order: 9,
+      estimatedWeeks: 3,
+      prerequisites: ["javascript-fundamentals"],
+      published: true,
     }
   ];
 
@@ -322,7 +333,56 @@ export async function seedPhases() {
     }
   }
 
-  // This section has been refactored and moved above
+  // Handle Node.js phase
+  const nodejsPhase = await prisma.phase.findUnique({ where: { slug: "nodejs-fundamentals" } });
+  if (nodejsPhase) {
+    const nodejsTutorials = await prisma.tutorial.findMany({
+      where: { 
+        OR: [
+          { title: { contains: "Node", mode: "insensitive" } },
+          { title: { contains: "server", mode: "insensitive" } },
+          { slug: { contains: "nodejs" } },
+          { category: { slug: "nodejs" } }
+        ]
+      },
+      include: { category: true },
+      orderBy: { order: "asc" }
+    });
+    
+    console.log(`  Found ${nodejsTutorials.length} Node.js tutorials`);
+    
+    for (let i = 0; i < nodejsTutorials.length; i++) {
+      const tutorial = nodejsTutorials[i];
+      
+      await prisma.phaseStep.upsert({
+        where: { 
+          phaseId_contentType_contentId: {
+            phaseId: nodejsPhase.id,
+            contentType: "tutorial", 
+            contentId: tutorial.id
+          }
+        },
+        update: {
+          order: i + 1,
+          contentSlug: tutorial.slug,
+          estimatedHours: tutorial.estimatedTime / 60,
+          prerequisites: i === 0 ? [] : [`tutorial-${nodejsTutorials[i-1].slug}`]
+        },
+        create: {
+          phaseId: nodejsPhase.id,
+          contentType: "tutorial",
+          contentId: tutorial.id, 
+          contentSlug: tutorial.slug,
+          order: i + 1,
+          isOptional: false,
+          estimatedHours: tutorial.estimatedTime / 60,
+          prerequisites: i === 0 ? [] : [`tutorial-${nodejsTutorials[i-1].slug}`]
+        }
+      });
+      
+      console.log(`  ✅ Added Node.js tutorial: ${tutorial.title}`);
+    }
+  }
 
   console.log("✅ Phases seeded successfully!");
 }

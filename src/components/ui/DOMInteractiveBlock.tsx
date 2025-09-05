@@ -56,14 +56,14 @@ export function DOMInteractiveBlock({
     setExecuteCount(0);
     executeCountRef.current = 0;
     // Clear console via postMessage
-    window.postMessage({ type: "dom-console-clear" }, "*");
-  }, [javascript]);
+    window.postMessage({ type: "dom-console-clear", blockId }, "*");
+  }, [javascript, blockId]);
 
   const executeCode = useCallback(() => {
     if (!isMounted) return;
 
     // Clear console via postMessage
-    window.postMessage({ type: "dom-console-clear" }, "*");
+    window.postMessage({ type: "dom-console-clear", blockId }, "*");
 
     setExecuted(true);
     const newCount = executeCountRef.current + 1;
@@ -76,7 +76,7 @@ export function DOMInteractiveBlock({
         setActiveTab("preview");
       }, 500);
     }
-  }, [isMounted, activeTab]);
+  }, [isMounted, activeTab, blockId]);
 
   // Memoized preview component to prevent re-renders
   const PreviewComponent = useMemo(() => {

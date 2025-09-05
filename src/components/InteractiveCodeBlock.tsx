@@ -25,6 +25,14 @@ const InteractiveCodeBlock: React.FC<InteractiveCodeBlockProps> = ({
 }) => {
   language = language?.replace(/language-/, "") || "javascript";
 
+  // Keep nodejs/node as separate language for proper module system selection
+  // but normalize for Monaco editor display
+  let editorLanguage = language;
+  if (language === "nodejs" || language === "node") {
+    editorLanguage = "javascript"; // Monaco editor language
+    // but keep original language for execution
+  }
+
   if (language === "html") {
     editable = false;
   }
@@ -91,10 +99,15 @@ const InteractiveCodeBlock: React.FC<InteractiveCodeBlockProps> = ({
       )}
 
       <CodeEditor
-        language={language}
+        language={language} // Pass original language for execution logic
         initialCode={code}
         readOnly={!editable}
         height={height}
+        useWebContainer={
+          language === "javascript" ||
+          language === "nodejs" ||
+          language === "node"
+        }
         placeholder={
           editable
             ? "// Try modifying this code and click Run!"

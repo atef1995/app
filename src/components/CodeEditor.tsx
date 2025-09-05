@@ -5,11 +5,13 @@ import {
   executeJavaScriptAsync,
   executeTypeScriptWithCompiler,
   executeJavaScript,
+  executeJavaScriptStream,
   executeTypeScript,
 } from "@/lib/codeRunner";
 import Editor from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 import { useTheme } from "@/components/providers/ThemeProvider";
+import Console from "./Console";
 
 interface ExecutionResult {
   output: string[];
@@ -56,6 +58,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   const [isRunning, setIsRunning] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [forceUpdateCounter, setForceUpdateCounter] = useState(0);
+  const [streamingOutput, setStreamingOutput] = useState<string[]>([]);
   const { resolvedTheme } = useTheme();
   const editorRef = React.useRef<editor.IStandaloneCodeEditor | null>(null);
 
@@ -95,10 +98,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isExpanded, readOnly]);
 
+
   const handleRunCode = async () => {
     if (!code.trim() || isRunning) return;
 
     setIsRunning(true);
+    setStreamingOutput([]);
+    
     setResult({
       output: [],
       errors: [],
@@ -108,53 +114,74 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
     try {
       const startTime = Date.now();
-      let executionResult: CodeExecutionResult | undefined;
 
       if (useWebContainer) {
-        // WebContainer execution for reliable async logging
-        setResult({
-          output: ["Executing code..."],
-          errors: [],
-          executionTime: 0,
-          isComplete: false,
-        });
-
-        if (language === "javascript") {
-          executionResult = await executeJavaScript(code);
+        if (language === "javascript" || language === "nodejs") {
+          // Use streaming execution for real-time output
+          try {
+            await executeJavaScriptStream(
+              code,
+              language,
+              // onOutput callback - streams each line as it's available
+              (output: string) => {
+                setStreamingOutput(prev => [...prev, output]);
+              },
+              // onComplete callback - called when execution finishes
+              (finalResult) => {
+                const executionTime = Date.now() - startTime;
+                setResult({
+                  output: finalResult.logs,
+                  errors: finalResult.errors,
+                  executionTime,
+                  isComplete: true,
+                });
+                setIsRunning(false);
+                setForceUpdateCounter((prev) => prev + 1);
+              }
+            );
+          } catch (streamingError) {
+            console.error("Streaming execution failed, falling back to regular execution:", streamingError);
+            // Fallback to regular execution
+            const executionResult = await executeJavaScript(code, language);
+            if (executionResult) {
+              const executionTime = Date.now() - startTime;
+              setResult({
+                output: executionResult.output
+                  ? executionResult.output.split("\n").filter((line: string) => line.trim())
+                  : [],
+                errors: executionResult.error
+                  ? executionResult.error.split("\n").filter((line: string) => line.trim())
+                  : [],
+                executionTime,
+                isComplete: true,
+              });
+              setForceUpdateCounter((prev) => prev + 1);
+            }
+            setIsRunning(false);
+          }
         } else if (language === "typescript") {
-          executionResult = await executeTypeScript(code);
-        }
-
-        if (executionResult) {
-          const executionTime = Date.now() - startTime;
-          requestAnimationFrame(() => {
+          const executionResult = await executeTypeScript(code);
+          if (executionResult) {
+            const executionTime = Date.now() - startTime;
             setResult({
-              output: executionResult?.output
-                ? executionResult.output
-                    .split("\n")
-                    .filter((line: string) => line.trim())
+              output: executionResult.output
+                ? executionResult.output.split("\n").filter((line: string) => line.trim())
                 : [],
-              errors: executionResult?.error
-                ? executionResult.error
-                    .split("\n")
-                    .filter((line: string) => line.trim())
+              errors: executionResult.error
+                ? executionResult.error.split("\n").filter((line: string) => line.trim())
                 : [],
               executionTime,
               isComplete: true,
             });
             setForceUpdateCounter((prev) => prev + 1);
-          });
+          }
+          setIsRunning(false);
         }
       } else {
-        // Use async-aware execution for better Promise/setTimeout handling
+        // Fallback to non-WebContainer execution
+        let executionResult: CodeExecutionResult | undefined;
+        
         if (language === "javascript") {
-          setResult({
-            output: ["🚀 Executing JavaScript..."],
-            errors: [],
-            executionTime: 0,
-            isComplete: false,
-          });
-
           executionResult = await executeJavaScriptAsync(code);
         } else if (language === "typescript") {
           executionResult = await executeTypeScriptWithCompiler(code);
@@ -169,6 +196,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             isComplete: true,
           });
         }
+        setIsRunning(false);
       }
     } catch (error) {
       console.error("Execution error:", error);
@@ -180,7 +208,6 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         executionTime: 0,
         isComplete: true,
       });
-    } finally {
       setIsRunning(false);
     }
   };
@@ -189,7 +216,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   const lang = language.replace(firstLetter, firstLetter.toUpperCase());
 
   return (
-    <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
+      <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
       {/* Header */}
       <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
         <div className="flex items-center space-x-2">
@@ -263,7 +290,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
         <Editor
           height={isExpanded ? "calc(100vh - 140px)" : height}
-          defaultLanguage={language}
+          defaultLanguage={language === "nodejs" || language === "node" ? "javascript" : language}
           value={code}
           onChange={(value) => handleCodeChange(value || "")}
           theme={resolvedTheme === "dark" ? "vs-dark" : "light"}
@@ -347,57 +374,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         />
       </div>
 
-      {/* Output */}
-      {result && (
-        <div className="border-t border-gray-200 dark:border-gray-600 h-80">
-          <div className="flex flex-col p-3 bg-gray-50 dark:bg-gray-700 h-full">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Output
-              </h4>
-              <span className="text-xs text-gray-500">
-                {result.executionTime}ms
-              </span>
-            </div>
-
-            <div className="bg-black text-green-400 p-3 rounded font-mono text-sm overflow-y-auto text-balance h-full">
-              {result.output.length > 0 ? (
-                result.output.map((log, index) => (
-                  <div
-                    key={`output-${index}-${result.executionTime}-${forceUpdateCounter}`}
-                    className="mb-1 my-1"
-                  >
-                    {">"} {log}
-                  </div>
-                ))
-              ) : (
-                <div className="text-gray-500">
-                  {result.isComplete === false ? "Running..." : "No output"}
-                </div>
-              )}
-
-              {result.errors.length > 0 && (
-                <div className="mt-2">
-                  {result.errors.map((error, index) => (
-                    <div
-                      key={`error-${index}-${result.executionTime}-${forceUpdateCounter}`}
-                      className="text-red-400 mb-1"
-                    >
-                      ❌ {error}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {!result.isComplete && result.output.length > 0 && (
-                <div className="mt-2 text-yellow-400 text-xs">
-                  ⏳ Waiting for async operations to complete...
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Console Output */}
+      <Console 
+        result={result} 
+        isRunning={isRunning} 
+        forceUpdateCounter={forceUpdateCounter}
+        streamingOutput={streamingOutput}
+      />
     </div>
   );
 };

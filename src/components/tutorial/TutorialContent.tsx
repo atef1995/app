@@ -9,6 +9,7 @@ import { HTMLEditorPreview } from "@/components/ui/HTMLEditorPreview";
 import { SeparatedEditorPreview } from "@/components/ui/SeparatedEditorPreview";
 import TableOfContents from "@/components/TableOfContents";
 import { type TutorialData } from "@/hooks/useTutorial";
+import DualPaneEditor from "../DualPaneEditor";
 
 interface TutorialContentProps {
   tutorial: TutorialData;
@@ -114,6 +115,7 @@ const mdxComponents = {
   HTMLPreviewWindow,
   HTMLEditorPreview,
   SeparatedEditorPreview,
+  DualPaneEditor,
   // Use custom heading components with anchor IDs
   h1: createHeadingComponent(1),
   h2: createHeadingComponent(2),
@@ -167,13 +169,13 @@ const mdxComponents = {
   },
   ul: (props: React.HTMLAttributes<HTMLUListElement>) => (
     <ul
-      className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-300 mb-4 ml-4"
+      className="list-disc list-outside space-y-2 text-gray-600 dark:text-gray-300 mb-4 ml-6 pl-2"
       {...props}
     />
   ),
   ol: (props: React.HTMLAttributes<HTMLOListElement>) => (
     <ol
-      className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-300 mb-4 ml-4"
+      className="list-decimal list-outside space-y-2 text-gray-600 dark:text-gray-300 mb-4 ml-6 pl-2"
       {...props}
     />
   ),

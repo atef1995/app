@@ -1,0 +1,357 @@
+---
+title: "Node.js Fundamentals: Your First Server-Side Journey"
+description: "Discover what Node.js is and start building server-side applications with JavaScript"
+level: "beginner"
+estimatedTime: "45 minutes"
+topics: ["Node.js", "Server-side", "Runtime", "Modules", "File System"]
+quizQuestions: 15
+order: 1
+---
+
+# Node.js Fundamentals: Your First Server-Side Journey
+
+Welcome to the world of Node.js! 🚀 Ready to take your JavaScript skills beyond the browser?
+
+You know how you've been writing JavaScript that runs in web browsers? Well, imagine if you could use that same JavaScript knowledge to build servers, create command-line tools, and handle files on your computer. That's exactly what Node.js lets you do!
+
+## What is Node.js, Really?
+
+Think of Node.js like this: You know how your favorite video game can run on different gaming consoles? JavaScript used to only "run" in browsers, but Node.js is like a new gaming console that lets JavaScript run directly on your computer, outside of any browser!
+
+**Student:** "Wait, so Node.js isn't a programming language?"
+
+**Teacher:** "Exactly! Node.js is what we call a *runtime environment*. It's like the stage where JavaScript performs, but instead of performing in a browser, it performs directly on your computer. You're still writing JavaScript - just with some awesome new superpowers!"
+
+Let's start with the classic "Hello, World!" but this time, it's running on your computer, not in a browser:
+
+<InteractiveCodeBlock language="nodejs" title="Your First Node.js Program" description="This JavaScript is running in a real Node.js environment!">
+{`console.log("Hello from Node.js!");
+console.log("I'm running on the server side now!");
+
+// Let's see what version of Node.js we're using
+console.log("Node.js version info:", process.version);
+console.log("Platform:", process.platform);
+console.log("Current working directory:", process.cwd());`}
+</InteractiveCodeBlock>
+
+**Did you notice something cool?** We used `process.version` - that's a Node.js-specific feature that doesn't exist in browsers. The `process` object is like Node.js's way of saying "Hey, here's some info about the environment I'm running in!"
+
+## The Superpowers Node.js Gives You
+
+When JavaScript runs in Node.js instead of a browser, it gains some incredible abilities:
+
+### 1. File System Access - Reading and Writing Files
+
+In a browser, JavaScript can't directly access files on your computer (for security reasons). But with Node.js, you can read, write, and manipulate files! It's like giving JavaScript a key to your computer's filing cabinet.
+
+<InteractiveCodeBlock language="nodejs" title="Working with Files" description="Let's create and read a file:">
+{`const fs = require('fs');
+
+// Create a simple text file
+const message = "Hello from Node.js! This is my first file.";
+fs.writeFileSync('hello.txt', message);
+
+console.log("File created! Now let's read it back:");
+
+// Read the file we just created
+const fileContent = fs.readFileSync('hello.txt', 'utf8');
+console.log("File contains:", fileContent);
+
+// Let's also check if the file exists
+const fileExists = fs.existsSync('hello.txt');
+console.log("Does the file exist?", fileExists);`}
+</InteractiveCodeBlock>
+
+**Mind-blowing, right?** We just created a file, wrote some text to it, and then read it back! Try changing the message and running it again.
+
+**Student:** "This is cool, but what's that `require('fs')` thing?"
+
+**Teacher:** "Great question! That's Node.js's way of importing built-in modules. `fs` stands for 'file system' - it's like a toolbox full of file-related functions that Node.js gives us for free!"
+
+### 2. Built-in Modules - Your Swiss Army Knife
+
+Node.js comes with tons of built-in modules (think of them as pre-built tool kits). Let's explore a few:
+
+<InteractiveCodeBlock language="nodejs" title="Exploring Built-in Modules" description="Let's use some of Node.js's built-in superpowers:">
+{`// Operating System information
+const os = require('os');
+console.log("Your computer's platform:", os.platform());
+console.log("Available memory:", Math.round(os.freemem() / 1024 / 1024), "MB");
+
+// Path utilities (super helpful for file paths!)
+const path = require('path');
+const filePath = '/users/documents/myfile.txt';
+console.log("File name:", path.basename(filePath));
+console.log("Directory:", path.dirname(filePath));
+console.log("File extension:", path.extname(filePath));
+
+// URL utilities
+const url = require('url');
+const myURL = new URL('https://example.com/path?name=value');
+console.log("URL hostname:", myURL.hostname);
+console.log("URL pathname:", myURL.pathname);`}
+</InteractiveCodeBlock>
+
+**Pretty powerful stuff!** These modules are like having a toolshed full of specialized tools, each designed for specific tasks.
+
+### 3. Working with JSON - The Internet's Language
+
+JSON (JavaScript Object Notation) is like the universal language of the internet. Node.js makes it super easy to work with JSON data:
+
+<InteractiveCodeBlock title="JSON Magic" description="Let's work with some JSON data:">
+{`// Create a JavaScript object
+const student = {
+    name: "Alex",
+    age: 20,
+    courses: ["JavaScript", "Node.js", "React"],
+    isActive: true
+};
+
+console.log("Original object:", student);
+
+// Convert to JSON string (like packing it for shipping)
+const jsonString = JSON.stringify(student, null, 2);
+console.log("As JSON string:");
+console.log(jsonString);
+
+// Convert back to JavaScript object (unpacking)
+const parsedObject = JSON.parse(jsonString);
+console.log("Parsed back to object:", parsedObject);
+console.log("Student's first course:", parsedObject.courses[0]);`}
+</InteractiveCodeBlock>
+
+**Student:** "Why would I want to convert objects to strings and back?"
+
+**Teacher:** "Excellent question! When you want to save data to a file, send it over the internet, or store it in a database, you need to convert it to a format that can be easily transmitted or stored. JSON is perfect for this - it's like a universal packing format for data!"
+
+## Understanding the Event Loop (The Heart of Node.js)
+
+Here's something really cool about Node.js - it's designed to handle multiple things at once without getting stuck. Let's see this in action:
+
+<InteractiveCodeBlock language="nodejs" title="Asynchronous Magic" description="Watch how Node.js handles multiple tasks:">
+{`console.log("🚀 Starting our async adventure!");
+
+// This will happen immediately
+console.log("1. This happens first");
+
+// This will wait 2 seconds, but won't block other code
+setTimeout(() => {
+    console.log("3. This happens after 2 seconds");
+}, 2000);
+
+// This will wait 1 second
+setTimeout(() => {
+    console.log("2. This happens after 1 second");
+}, 1000);
+
+// This happens immediately, even though we wrote it after the timeouts
+console.log("4. This happens immediately, but I'm last in the code!");
+
+console.log("🎯 All timeouts are set up! Now we wait...");`}
+</InteractiveCodeBlock>
+
+**Did you see what happened?** The code didn't stop and wait for the timeouts - it kept running! This is called **asynchronous programming**, and it's one of Node.js's superpowers. It's like being able to start cooking pasta, then while the water is boiling, you can chop vegetables, make sauce, and set the table - all without standing around waiting!
+
+## Your First Practical Node.js Script
+
+Let's combine what we've learned to create something useful - a simple file organizer:
+
+<InteractiveCodeBlock language="nodejs" title="File Organizer Script" description="Let's build a practical tool:">
+{`const fs = require('fs');
+  const path = require('path');
+
+  // Function to create a log entry
+  function createLogEntry(message) {
+    const timestamp = new Date().toISOString();
+    return "[" + timestamp + "] " + message + "\\n";
+  }
+
+  // Simulate organizing files with async/await
+  const activities = [
+    "Scanning current directory...",
+    "Found 5 JavaScript files",
+    "Found 3 text files",
+    "Found 2 image files",
+    "Creating organized folder structure...",
+    "Moving JavaScript files to /js folder",
+    "Moving text files to /docs folder",
+    "Moving images to /images folder",
+    "Organization complete!"
+  ];
+
+  async function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async function organizeFiles() {
+    let logContent = createLogEntry("=== File Organization Started ===");
+
+    for (let i = 0; i < activities.length; i++) {
+      const activity = activities[i];
+      await delay(200); // Wait 200ms between activities
+
+      console.log(activity);
+      logContent += createLogEntry(activity);
+    }
+
+    // Save the log file
+    await delay(100);
+    fs.writeFileSync('organization-log.txt', logContent);
+    console.log("📋 Log saved to 'organization-log.txt'");
+
+    // Read and display the log
+    const savedLog = fs.readFileSync('organization-log.txt', 'utf8');
+    console.log("📖 Log contents:");
+    console.log(savedLog);
+  }
+
+  // Run the organization
+  organizeFiles().catch(console.error);`}
+</InteractiveCodeBlock>
+
+**Wow! Look at that!** We just built a script that simulates organizing files and creates a log of its activities. This is the kind of practical automation you can build with Node.js!
+
+## What Makes Node.js Different from Browser JavaScript?
+
+Let's clarify some key differences:
+
+**Browser JavaScript:**
+- Runs in a sandbox (limited access to your computer)
+- Has access to DOM (web page elements)
+- Can't directly access files or run system commands
+- Great for interactive websites
+
+**Node.js JavaScript:**
+- Runs directly on your computer
+- Can access files, networks, and system resources
+- No DOM (no web page elements)
+- Perfect for servers, tools, and desktop applications
+
+<InteractiveCodeBlock language="nodejs" title="Node.js vs Browser Features" description="Let's explore what's available in Node.js:">
+{`// Things that exist in Node.js but NOT in browsers:
+console.log("=== Node.js Exclusive Features ===");
+console.log("Current working directory:", process.cwd());
+console.log("Command line arguments:", process.argv.slice(2));
+console.log("Environment variables available:", Object.keys(process.env).length);
+
+// The global object in Node.js
+console.log("\\n=== Global Object ===");
+console.log("In Node.js, the global object is called 'global'");
+console.log("Type of global:", typeof global);
+
+// Module system
+console.log("\\n=== Module System ===");
+console.log("Current module filename:", __filename || "Not available in this environment");
+console.log("Current module directory:", __dirname || "Not available in this environment");
+
+// Note: In browsers, you'd have 'window' object and DOM methods
+// But in Node.js, there's no 'window' or 'document'
+console.log("\\n=== What's NOT Available ===");
+console.log("'window' object exists?", typeof window !== 'undefined');
+console.log("'document' object exists?", typeof document !== 'undefined');`}
+</InteractiveCodeBlock>
+
+## Quick Practice Challenge
+
+Before we wrap up, let's put your new Node.js knowledge to the test:
+
+<InteractiveCodeBlock language="nodejs" title="Practice Challenge: Personal Info Tool" description="Complete this Node.js script:">
+{`// Your mission: Create a simple personal information manager
+const fs = require('fs');
+
+// 1. Create an object with your information
+const myInfo = {
+    name: "Your Name Here",
+    age: 25,
+    hobbies: ["coding", "reading", "gaming"],
+    favoriteLanguage: "JavaScript",
+    learningGoals: ["Master Node.js", "Build awesome apps"]
+};
+
+// 2. Convert to JSON and save to file
+const jsonData = JSON.stringify(myInfo, null, 2);
+fs.writeFileSync('my-profile.json', jsonData);
+console.log("✅ Profile saved!");
+
+// 3. Read it back and display specific info
+const profile = JSON.parse(fs.readFileSync('my-profile.json', 'utf8'));
+console.log(\`👋 Hi, I'm \${profile.name}!\`);
+console.log(\`🎯 My goal: \${profile.learningGoals[0]}\`);
+console.log(\`🎮 My hobbies: \${profile.hobbies.join(", ")}\`);
+
+// 4. Bonus: Add a timestamp
+profile.lastUpdated = new Date().toISOString();
+fs.writeFileSync('my-profile.json', JSON.stringify(profile, null, 2));
+console.log("🕒 Profile updated with timestamp!");`}
+</InteractiveCodeBlock>
+
+**Try customizing the information with your own details!** This is a simple example of how Node.js can handle data persistence - saving information that survives between program runs.
+
+## What's Next?
+
+Congratulations! 🎉 You've just taken your first steps into the world of Node.js. You've learned:
+
+✅ What Node.js is and how it differs from browser JavaScript  
+✅ How to work with files using the `fs` module  
+✅ How to use built-in modules like `os`, `path`, and `url`  
+✅ How to handle JSON data  
+✅ The basics of asynchronous programming  
+✅ How to build practical scripts  
+
+**Student:** "This is amazing! What can I build with Node.js?"
+
+**Teacher:** "The possibilities are endless! You can build web servers, REST APIs, command-line tools, desktop applications, real-time chat systems, file processors, web scrapers, and so much more. Node.js is used by companies like Netflix, Uber, and LinkedIn to power their applications!"
+
+In our next tutorial, we'll dive deeper into Node.js modules and learn how to organize your code like a professional developer. We'll also explore npm (Node Package Manager) and discover the vast ecosystem of packages available to supercharge your Node.js applications!
+
+## Bonus: Your First HTTP Server! 🌐
+
+Want to see something really exciting? Let's create a simple web server with just a few lines of Node.js code:
+
+<InteractiveCodeBlock language="nodejs" title="Create Your First Web Server" description="Build a real HTTP server that responds to requests:">
+{`const http = require('http');
+
+// Create a simple HTTP server
+const server = http.createServer((req, res) => {
+    // Set response headers
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    
+    // Send HTML response
+    res.end(\`
+        <html>
+            <head><title>My First Node.js Server</title></head>
+            <body>
+                <h1>🎉 Hello from Node.js Server!</h1>
+                <p>You just built your first web server!</p>
+                <p><strong>Request URL:</strong> \${req.url}</p>
+                <p><strong>Method:</strong> \${req.method}</p>
+                <p><strong>Time:</strong> \${new Date().toLocaleString()}</p>
+            </body>
+        </html>
+    \`);
+});
+
+// Start the server on port 3000
+const PORT = 3000;
+server.listen(PORT, () => {
+    console.log(\`🚀 Server is running at http://localhost:\${PORT}\`);
+    console.log(\`📡 Try visiting the server in your browser!\`);
+    console.log(\`🛑 Press Ctrl+C to stop the server\`);
+});
+
+// Keep the server running for 10 seconds for demo
+setTimeout(() => {
+    console.log("\\n⏰ Demo timeout - server stopping...");
+    server.close(() => {
+        console.log("✅ Server stopped gracefully");
+    });
+}, 10000);`}
+</InteractiveCodeBlock>
+
+**Mind-blown?** 🤯 You just created a real web server! In a production environment, this server would keep running and handle thousands of requests. This is the foundation of web applications, REST APIs, and microservices.
+
+**Student:** "Wait, that's it? That's all it takes to create a web server?"
+
+**Teacher:** "Exactly! That's the beauty of Node.js - complex tasks become simple. Companies use this same `http` module (often with frameworks like Express) to build entire web applications that serve millions of users!"
+
+**Ready to continue your Node.js journey?** The server-side world is waiting for you! 🌟

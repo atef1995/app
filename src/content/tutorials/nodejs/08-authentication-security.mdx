@@ -1,0 +1,1226 @@
+---
+title: "Authentication & Security: Protecting Your Node.js Applications"
+description: "Master user authentication, JWT tokens, password security, OAuth integration, and API protection. Build secure, production-ready authentication systems that actually work in the real world."
+difficulty: 4
+tags: ["authentication", "security", "jwt", "oauth", "bcrypt", "rate-limiting"]
+relatedTutorials: ["07-database-integration", "09-real-time-applications", "10-testing-debugging"]
+estimatedTime: "120 minutes"
+prerequisites: ["Database integration with Prisma/MongoDB", "Express.js middleware concepts", "Understanding of HTTP headers and cookies", "Basic knowledge of cryptography concepts"]
+objectives:
+  - "Understand authentication vs authorization and common security vulnerabilities"
+  - "Implement secure password hashing and verification with bcrypt"
+  - "Build JWT-based authentication systems with proper token management"
+  - "Integrate OAuth providers like Google and GitHub for social login"
+  - "Implement API security measures including rate limiting and input validation"
+order: 8
+isPremium: true
+requiredPlan: "VIBED"
+---
+
+# Authentication & Security: Protecting Your Node.js Applications
+
+Security isn't just about keeping bad actors out—it's about building user trust, protecting sensitive data, and creating applications that people actually want to use. In this tutorial, we'll explore how to build authentication systems that are both secure and user-friendly.
+
+**Student**: "I've built some APIs, but I'm nervous about adding user accounts. What if I mess up the security and someone gets hacked?"
+
+**Teacher**: "That's exactly the right mindset! Security anxiety is healthy—it means you understand the stakes. But here's the thing: security isn't magic, it's just good engineering practices applied systematically. By the end of this tutorial, you'll know how to build authentication systems that protect both your users and your peace of mind."
+
+## Understanding Authentication in the Modern Web
+
+Before we start coding, let's establish a clear mental model of what we're building and why.
+
+### Authentication vs Authorization: The Foundation
+
+Many developers confuse these concepts, but they're fundamentally different:
+
+**Authentication** answers: "Who are you?"
+- Verifying identity (username/password, social login, biometrics)
+- Like showing your ID at a security checkpoint
+
+**Authorization** answers: "What can you do?"
+- Determining permissions based on identity
+- Like your ID determining which floors you can access in a building
+
+### The Security Landscape: What We're Protecting Against
+
+Understanding threats helps us build better defenses:
+
+**Credential Attacks**:
+- Password brute forcing
+- Credential stuffing (using leaked passwords from other sites)
+- Social engineering
+
+**Session Attacks**:
+- Session hijacking
+- Cross-site request forgery (CSRF)
+- Token theft and replay attacks
+
+**Data Attacks**:
+- SQL/NoSQL injection
+- Cross-site scripting (XSS)
+- Man-in-the-middle attacks
+
+**Student**: "This sounds overwhelming. How do I know if my security is actually working?"
+
+**Teacher**: "Think of security like building a house. You don't need to become an expert locksmith—you just need to know which locks to buy and how to install them properly. We'll use proven, battle-tested tools and patterns that thousands of applications rely on."
+
+## Password Security: Getting the Basics Right
+
+The foundation of most authentication systems is still the humble password. Let's explore how to handle passwords securely.
+
+<InteractiveCodeBlock
+  title="Understanding Password Security Fundamentals"
+  language="nodejs"
+  showOutput={true}
+  editable={true}
+>
+{`
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+
+// NEVER store passwords like this!
+const terriblePasswordStorage = {
+  user1: "mypassword123",     // Plain text - anyone with DB access sees it
+  user2: btoa("secret456"),   // Base64 encoded - easily decoded
+  user3: crypto.createHash('md5').update("hello123").digest('hex') // MD5 - fast but broken
+};
+
+console.log('❌ Bad Password Storage Examples:');
+console.log('Plain text:', terriblePasswordStorage.user1);
+console.log('Base64:', atob(terriblePasswordStorage.user2));
+console.log('MD5 hash:', terriblePasswordStorage.user3);
+console.log('');
+
+// The right way: bcrypt with proper salt rounds
+async function demonstrateSecureHashing() {
+  const password = "userPassword123!";
+  const saltRounds = 12; // Higher = more secure but slower
+  
+  console.log('✅ Secure Password Hashing with bcrypt:');
+  console.log('');
+  
+  // Hash the password
+  console.log('Original password:', password);
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+  console.log('Hashed password:', hashedPassword);
+  console.log('');
+  
+  // Each hash is unique, even with same password
+  const secondHash = await bcrypt.hash(password, saltRounds);
+  console.log('Second hash of same password:', secondHash);
+  console.log('Hashes are different?', hashedPassword !== secondHash);
+  console.log('');
+  
+  // Verification works for both
+  const isValidFirst = await bcrypt.compare(password, hashedPassword);
+  const isValidSecond = await bcrypt.compare(password, secondHash);
+  console.log('First hash validates:', isValidFirst);
+  console.log('Second hash validates:', isValidSecond);
+  console.log('');
+  
+  // Wrong password fails
+  const wrongPassword = await bcrypt.compare("wrongPassword", hashedPassword);
+  console.log('Wrong password validates:', wrongPassword);
+  console.log('');
+  
+  // Understanding salt rounds impact
+  console.log('⚡ Salt Rounds Performance:');
+  const rounds = [10, 12, 14];
+  
+  for (const round of rounds) {
+    const start = Date.now();
+    await bcrypt.hash(password, round);
+    const time = Date.now() - start;
+    console.log(\`Rounds: \${round}, Time: \${time}ms\`);
+  }
+  
+  console.log('');
+  console.log('🎯 Key Takeaways:');
+  console.log('• bcrypt automatically handles salt generation');
+  console.log('• Each hash is unique, preventing rainbow table attacks');
+  console.log('• Salt rounds balance security vs performance (12 is good for 2024)');
+  console.log('• bcrypt.compare() handles timing attack prevention');
+}
+
+// Run the demonstration
+await demonstrateSecureHashing();
+`}
+</InteractiveCodeBlock>
+
+### Understanding bcrypt: Why It's the Gold Standard
+
+bcrypt isn't just another hashing algorithm—it's specifically designed for password storage:
+
+**Adaptive Hashing**: The salt rounds parameter lets you increase difficulty as computers get faster. What takes 100ms today might take 10ms in a few years, so you can bump up the rounds.
+
+**Built-in Salt**: Each hash includes a unique salt, preventing rainbow table attacks where attackers pre-compute hashes for common passwords.
+
+**Timing Attack Resistance**: The comparison function runs in constant time, preventing attackers from learning information based on how long verification takes.
+
+## Building a Complete Authentication System
+
+Now let's build a production-ready authentication system that handles registration, login, and session management.
+
+<InteractiveCodeBlock
+  title="Complete Authentication System with Express and Prisma"
+  language="nodejs"
+  showOutput={true}
+  editable={true}
+>
+{`
+const express = require('express');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { PrismaClient } = require('@prisma/client');
+const rateLimit = require('express-rate-limit');
+
+const app = express();
+const prisma = new PrismaClient();
+
+// Configuration - in production, use environment variables
+const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this';
+const JWT_EXPIRY = '24h';
+const SALT_ROUNDS = 12;
+
+app.use(express.json({ limit: '10mb' }));
+
+// Rate limiting for auth endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 attempts per window
+  message: { error: 'Too many auth attempts, try again later' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Input validation middleware
+function validateRegistration(req, res, next) {
+  const { email, password, name } = req.body;
+  const errors = [];
+  
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRegex.test(email)) {
+    errors.push('Valid email is required');
+  }
+  
+  // Password strength validation
+  if (!password || password.length < 8) {
+    errors.push('Password must be at least 8 characters');
+  }
+  
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumbers = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  
+  if (!hasUppercase || !hasLowercase || !hasNumbers || !hasSpecialChar) {
+    errors.push('Password must contain uppercase, lowercase, number, and special character');
+  }
+  
+  // Name validation
+  if (!name || name.trim().length < 2) {
+    errors.push('Name must be at least 2 characters');
+  }
+  
+  if (errors.length > 0) {
+    return res.status(400).json({ success: false, errors });
+  }
+  
+  next();
+}
+
+// JWT authentication middleware
+async function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  
+  if (!token) {
+    return res.status(401).json({ 
+      success: false, 
+      error: 'Access token required' 
+    });
+  }
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    
+    // Check if user still exists (handles deleted users)
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { id: true, email: true, name: true, isActive: true }
+    });
+    
+    if (!user || !user.isActive) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Invalid or expired token' 
+      });
+    }
+    
+    req.user = user;
+    next();
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Token expired' 
+      });
+    }
+    
+    return res.status(403).json({ 
+      success: false, 
+      error: 'Invalid token' 
+    });
+  }
+}
+
+// User registration endpoint
+app.post('/auth/register', authLimiter, validateRegistration, async (req, res) => {
+  try {
+    const { email, password, name } = req.body;
+    
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() }
+    });
+    
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        error: 'User with this email already exists'
+      });
+    }
+    
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+    
+    // Create user
+    const user = await prisma.user.create({
+      data: {
+        email: email.toLowerCase(),
+        name: name.trim(),
+        password: hashedPassword,
+        isActive: true
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true
+      }
+    });
+    
+    // Generate JWT token
+    const token = jwt.sign(
+      { 
+        userId: user.id, 
+        email: user.email 
+      },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRY }
+    );
+    
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully',
+      data: {
+        user,
+        token,
+        expiresIn: JWT_EXPIRY
+      }
+    });
+    
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// User login endpoint
+app.post('/auth/login', authLimiter, async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email and password are required'
+      });
+    }
+    
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() }
+    });
+    
+    // Generic error message for security (don't reveal if email exists)
+    if (!user) {
+      // Still hash a password to prevent timing attacks
+      await bcrypt.hash('dummy-password', SALT_ROUNDS);
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid email or password'
+      });
+    }
+    
+    // Check if account is active
+    if (!user.isActive) {
+      return res.status(401).json({
+        success: false,
+        error: 'Account is disabled'
+      });
+    }
+    
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    
+    if (!isValidPassword) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid email or password'
+      });
+    }
+    
+    // Update last login
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() }
+    });
+    
+    // Generate JWT token
+    const token = jwt.sign(
+      { 
+        userId: user.id, 
+        email: user.email 
+      },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRY }
+    );
+    
+    res.json({
+      success: true,
+      message: 'Login successful',
+      data: {
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name
+        },
+        token,
+        expiresIn: JWT_EXPIRY
+      }
+    });
+    
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Protected route example
+app.get('/auth/profile', authenticateToken, async (req, res) => {
+  try {
+    // Get full user profile
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        lastLoginAt: true,
+        _count: {
+          select: { tasks: true }
+        }
+      }
+    });
+    
+    res.json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    console.error('Profile error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Token refresh endpoint
+app.post('/auth/refresh', authenticateToken, async (req, res) => {
+  try {
+    // Generate new token
+    const token = jwt.sign(
+      { 
+        userId: req.user.id, 
+        email: req.user.email 
+      },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRY }
+    );
+    
+    res.json({
+      success: true,
+      data: {
+        token,
+        expiresIn: JWT_EXPIRY
+      }
+    });
+  } catch (error) {
+    console.error('Refresh error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Logout endpoint (for client-side token cleanup)
+app.post('/auth/logout', authenticateToken, async (req, res) => {
+  // In a more sophisticated system, you might:
+  // - Add token to a blacklist
+  // - Store logout timestamp
+  // - Clear server-side sessions
+  
+  res.json({
+    success: true,
+    message: 'Logged out successfully'
+  });
+});
+
+console.log('🔐 Authentication System Features:');
+console.log('✓ Secure password hashing with bcrypt');
+console.log('✓ JWT token-based authentication');
+console.log('✓ Rate limiting on auth endpoints');
+console.log('✓ Input validation and sanitization');
+console.log('✓ Proper error handling without information leakage');
+console.log('✓ Protected routes with middleware');
+console.log('✓ Token refresh capability');
+console.log('');
+console.log('🔒 Security Measures Implemented:');
+console.log('• Password strength validation');
+console.log('• Timing attack prevention');
+console.log('• Generic error messages');
+console.log('• Active user verification');
+console.log('• JWT expiration handling');
+`}
+</InteractiveCodeBlock>
+
+### Deep Dive: JWT Tokens and Session Management
+
+JSON Web Tokens (JWTs) have become the de facto standard for API authentication, but they're often misunderstood. Let's explore how they work and when to use them.
+
+**JWT Structure**: A JWT consists of three parts separated by dots:
+- **Header**: Specifies the algorithm and token type
+- **Payload**: Contains claims (user data, expiration, etc.)
+- **Signature**: Verifies the token hasn't been tampered with
+
+**Student**: "I've heard JWTs are either amazing or terrible depending on who you ask. What's the real story?"
+
+**Teacher**: "JWTs are a tool, and like any tool, they solve some problems really well while creating others. They're excellent for stateless APIs and microservices, but they're not suitable for every use case. The key is understanding their tradeoffs."
+
+**JWT Advantages**:
+- **Stateless**: No server-side session storage required
+- **Scalable**: Works across multiple servers without shared state
+- **Standard**: Widely supported across languages and platforms
+- **Self-contained**: Includes all necessary information
+
+**JWT Limitations**:
+- **Size**: Larger than session IDs, sent with every request
+- **Revocation**: Hard to invalidate before expiration
+- **Security**: If compromised, valid until expiration
+- **Storage**: Client must store securely (vulnerable to XSS)
+
+## OAuth Integration: Social Login Done Right
+
+OAuth allows users to authenticate using existing accounts (Google, GitHub, etc.) without sharing passwords with your application. Let's implement Google OAuth integration.
+
+<InteractiveCodeBlock
+  title="Google OAuth Integration with Passport.js"
+  language="nodejs"
+  showOutput={true}
+  editable={true}
+>
+{`
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const express = require('express');
+const session = require('express-session');
+const { PrismaClient } = require('@prisma/client');
+
+const app = express();
+const prisma = new PrismaClient();
+
+// Session configuration
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    httpOnly: true, // Prevent XSS
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Passport Google Strategy configuration
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: "/auth/google/callback"
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    console.log('🔍 Processing Google OAuth callback');
+    console.log('Profile ID:', profile.id);
+    console.log('Profile Name:', profile.displayName);
+    console.log('Profile Email:', profile.emails?.[0]?.value);
+    
+    // Check if user already exists with this Google ID
+    let user = await prisma.user.findUnique({
+      where: { googleId: profile.id }
+    });
+    
+    if (user) {
+      console.log('✓ Existing user found, updating last login');
+      // Update last login and access token
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { 
+          lastLoginAt: new Date(),
+          googleAccessToken: accessToken,
+          // Update profile info in case it changed
+          name: profile.displayName,
+          avatar: profile.photos?.[0]?.value
+        }
+      });
+    } else {
+      console.log('➕ Creating new user from Google profile');
+      
+      const email = profile.emails?.[0]?.value;
+      if (!email) {
+        return done(new Error('No email provided by Google'), null);
+      }
+      
+      // Check if user exists with same email but no Google ID
+      const existingEmailUser = await prisma.user.findUnique({
+        where: { email: email.toLowerCase() }
+      });
+      
+      if (existingEmailUser) {
+        // Link Google account to existing user
+        console.log('🔗 Linking Google account to existing user');
+        user = await prisma.user.update({
+          where: { id: existingEmailUser.id },
+          data: {
+            googleId: profile.id,
+            googleAccessToken: accessToken,
+            avatar: profile.photos?.[0]?.value || existingEmailUser.avatar,
+            lastLoginAt: new Date()
+          }
+        });
+      } else {
+        // Create new user
+        user = await prisma.user.create({
+          data: {
+            email: email.toLowerCase(),
+            name: profile.displayName,
+            googleId: profile.id,
+            googleAccessToken: accessToken,
+            avatar: profile.photos?.[0]?.value,
+            isActive: true,
+            emailVerified: true, // Trust Google's email verification
+            provider: 'google'
+          }
+        });
+      }
+    }
+    
+    console.log('✅ OAuth authentication successful for user:', user.id);
+    return done(null, user);
+    
+  } catch (error) {
+    console.error('❌ OAuth authentication error:', error);
+    return done(error, null);
+  }
+}));
+
+// Serialize user for session
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+// Deserialize user from session
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        avatar: true,
+        isActive: true
+      }
+    });
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
+});
+
+// OAuth routes
+app.get('/auth/google', 
+  passport.authenticate('google', { 
+    scope: ['profile', 'email'] 
+  })
+);
+
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { 
+    failureRedirect: '/login?error=oauth_failed' 
+  }),
+  (req, res) => {
+    // Successful authentication
+    console.log('🎉 Google OAuth callback successful');
+    res.redirect('/dashboard?login=success');
+  }
+);
+
+// Middleware to check if user is authenticated
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated() && req.user.isActive) {
+    return next();
+  }
+  res.status(401).json({
+    success: false,
+    error: 'Authentication required'
+  });
+}
+
+// Protected route using OAuth session
+app.get('/auth/profile', ensureAuthenticated, (req, res) => {
+  res.json({
+    success: true,
+    data: req.user
+  });
+});
+
+// Logout route
+app.post('/auth/logout', (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      console.error('Logout error:', err);
+      return res.status(500).json({
+        success: false,
+        error: 'Logout failed'
+      });
+    }
+    
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Session destroy error:', err);
+      }
+      res.json({
+        success: true,
+        message: 'Logged out successfully'
+      });
+    });
+  });
+});
+
+// Hybrid auth: Support both JWT and OAuth sessions
+app.get('/auth/me', async (req, res) => {
+  try {
+    let user = null;
+    
+    // Check for session-based auth (OAuth)
+    if (req.isAuthenticated()) {
+      user = req.user;
+    } else {
+      // Check for JWT token
+      const authHeader = req.headers['authorization'];
+      const token = authHeader && authHeader.split(' ')[1];
+      
+      if (token) {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        user = await prisma.user.findUnique({
+          where: { id: decoded.userId },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            avatar: true,
+            isActive: true
+          }
+        });
+      }
+    }
+    
+    if (!user || !user.isActive) {
+      return res.status(401).json({
+        success: false,
+        error: 'Not authenticated'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: user
+    });
+    
+  } catch (error) {
+    console.error('Auth check error:', error);
+    res.status(401).json({
+      success: false,
+      error: 'Invalid authentication'
+    });
+  }
+});
+
+console.log('🚀 OAuth Integration Features:');
+console.log('✓ Google OAuth 2.0 integration');
+console.log('✓ Account linking for existing users');
+console.log('✓ Session-based authentication');
+console.log('✓ Hybrid auth (both JWT and sessions)');
+console.log('✓ Secure session configuration');
+console.log('✓ Proper error handling');
+console.log('');
+console.log('⚙️ Environment Variables Required:');
+console.log('• GOOGLE_CLIENT_ID: From Google Cloud Console');
+console.log('• GOOGLE_CLIENT_SECRET: From Google Cloud Console');
+console.log('• SESSION_SECRET: Random string for session encryption');
+console.log('');
+console.log('📝 Google Cloud Console Setup:');
+console.log('1. Create project and enable Google+ API');
+console.log('2. Create OAuth 2.0 credentials');
+console.log('3. Add authorized redirect URI');
+console.log('4. Copy client ID and secret to env vars');
+`}
+</InteractiveCodeBlock>
+
+### OAuth Best Practices and Security Considerations
+
+OAuth can significantly improve user experience, but it introduces new security considerations:
+
+**State Parameter**: Always use the state parameter to prevent CSRF attacks during the OAuth flow. This prevents attackers from hijacking the authentication process.
+
+**Scope Minimization**: Only request the permissions you actually need. Users are more likely to grant minimal permissions, and it reduces your liability if compromised.
+
+**Token Storage**: Store OAuth tokens securely server-side. Don't expose them to client-side JavaScript where they could be stolen via XSS.
+
+**Account Linking**: Handle the case where users have both password-based and OAuth accounts with the same email address.
+
+## API Security: Rate Limiting, Validation, and Protection
+
+Authentication is just the first layer of defense. Let's implement comprehensive API security measures.
+
+<InteractiveCodeBlock
+  title="Comprehensive API Security Implementation"
+  language="nodejs"
+  showOutput={true}
+  editable={true}
+>
+{`
+const express = require('express');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const slowDown = require('express-slow-down');
+const validator = require('validator');
+const mongoSanitize = require('express-mongo-sanitize');
+const hpp = require('hpp');
+
+const app = express();
+
+// Security middleware stack
+console.log('🛡️ Implementing Security Middleware Stack');
+console.log('');
+
+// 1. Helmet - Sets various HTTP headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false
+}));
+
+// 2. Rate limiting with different strategies
+const createRateLimiter = (windowMs, max, message, skipSuccessfulRequests = false) => {
+  return rateLimit({
+    windowMs,
+    max,
+    message: { success: false, error: message },
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests,
+    // Custom key generator for more granular control
+    keyGenerator: (req) => {
+      // Combine IP and user ID if authenticated for more precise limiting
+      const baseKey = req.ip;
+      const userKey = req.user ? \`user-\${req.user.id}\` : 'anonymous';
+      return \`\${baseKey}-\${userKey}\`;
+    }
+  });
+};
+
+// Different rate limits for different endpoints
+const globalLimiter = createRateLimiter(
+  15 * 60 * 1000, // 15 minutes
+  100, // 100 requests per window
+  'Too many requests, please try again later'
+);
+
+const authLimiter = createRateLimiter(
+  15 * 60 * 1000, // 15 minutes  
+  5, // 5 attempts per window
+  'Too many authentication attempts, please try again later',
+  true // Don't count successful logins against the limit
+);
+
+const apiLimiter = createRateLimiter(
+  1 * 60 * 1000, // 1 minute
+  30, // 30 requests per minute
+  'API rate limit exceeded'
+);
+
+// 3. Progressive delay for suspicious activity
+const speedLimiter = slowDown({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  delayAfter: 50, // Allow 50 requests per 15 minutes at full speed
+  delayMs: 500, // Add 500ms delay after limit is reached
+  maxDelayMs: 20000, // Maximum delay of 20 seconds
+  keyGenerator: (req) => req.ip
+});
+
+// Apply global middleware
+app.use(globalLimiter);
+app.use(speedLimiter);
+
+// 4. Body parsing with size limits
+app.use(express.json({ 
+  limit: '10mb',
+  verify: (req, res, buf) => {
+    // Store raw body for webhook signature verification if needed
+    req.rawBody = buf;
+  }
+}));
+app.use(express.urlencoded({ 
+  limit: '10mb', 
+  extended: true 
+}));
+
+// 5. Prevent NoSQL injection attacks
+app.use(mongoSanitize({
+  replaceWith: '_' // Replace prohibited characters
+}));
+
+// 6. Prevent HTTP parameter pollution
+app.use(hpp({
+  whitelist: ['tags', 'categories'] // Allow arrays for these parameters
+}));
+
+// Input validation helpers
+const validateInput = {
+  email: (email) => {
+    if (!email || typeof email !== 'string') return false;
+    return validator.isEmail(email) && email.length <= 255;
+  },
+  
+  password: (password) => {
+    if (!password || typeof password !== 'string') return false;
+    return password.length >= 8 && password.length <= 128;
+  },
+  
+  name: (name) => {
+    if (!name || typeof name !== 'string') return false;
+    const cleaned = validator.escape(name.trim());
+    return cleaned.length >= 2 && cleaned.length <= 100;
+  },
+  
+  id: (id) => {
+    return validator.isInt(String(id), { min: 1 });
+  },
+  
+  url: (url) => {
+    if (!url) return true; // Optional field
+    return validator.isURL(url, {
+      protocols: ['http', 'https'],
+      require_protocol: true
+    });
+  }
+};
+
+// Security-focused validation middleware
+function validateUserInput(req, res, next) {
+  const errors = [];
+  
+  // Validate based on endpoint
+  if (req.route.path.includes('/register') || req.route.path.includes('/profile')) {
+    if (!validateInput.email(req.body.email)) {
+      errors.push('Valid email address is required');
+    }
+    
+    if (!validateInput.name(req.body.name)) {
+      errors.push('Name must be 2-100 characters');
+    }
+    
+    if (req.body.website && !validateInput.url(req.body.website)) {
+      errors.push('Website must be a valid URL');
+    }
+  }
+  
+  if (req.route.path.includes('/register') || req.route.path.includes('/login')) {
+    if (!validateInput.password(req.body.password)) {
+      errors.push('Password must be 8-128 characters');
+    }
+  }
+  
+  // Check for suspicious patterns
+  const suspiciousPatterns = [
+    /<script/i,
+    /javascript:/i,
+    /on\w+\s*=/i,
+    /union\s+select/i,
+    /drop\s+table/i
+  ];
+  
+  const checkSuspicious = (value) => {
+    if (typeof value === 'string') {
+      return suspiciousPatterns.some(pattern => pattern.test(value));
+    }
+    return false;
+  };
+  
+  // Recursively check all input values
+  const checkObject = (obj) => {
+    for (const [key, value] of Object.entries(obj)) {
+      if (typeof value === 'object' && value !== null) {
+        if (checkObject(value)) return true;
+      } else if (checkSuspicious(value)) {
+        errors.push(\`Suspicious content detected in \${key}\`);
+        return true;
+      }
+    }
+    return false;
+  };
+  
+  checkObject(req.body);
+  checkObject(req.query);
+  
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      errors,
+      timestamp: new Date().toISOString()
+    });
+  }
+  
+  next();
+}
+
+// Security logging middleware
+function securityLogger(req, res, next) {
+  const securityEvents = [];
+  
+  // Check for common attack patterns
+  const userAgent = req.get('User-Agent') || '';
+  const xForwardedFor = req.get('X-Forwarded-For');
+  
+  // Log suspicious user agents
+  const suspiciousAgents = [
+    'sqlmap',
+    'nmap',
+    'nikto',
+    'burpsuite',
+    'curl', // Might be legitimate, but worth logging
+  ];
+  
+  if (suspiciousAgents.some(agent => userAgent.toLowerCase().includes(agent))) {
+    securityEvents.push({
+      type: 'suspicious_user_agent',
+      userAgent,
+      ip: req.ip
+    });
+  }
+  
+  // Log requests with unusual headers
+  const unusualHeaders = [
+    'x-original-url',
+    'x-rewrite-url',
+    'x-forwarded-host'
+  ];
+  
+  unusualHeaders.forEach(header => {
+    if (req.get(header)) {
+      securityEvents.push({
+        type: 'unusual_header',
+        header,
+        value: req.get(header),
+        ip: req.ip
+      });
+    }
+  });
+  
+  // Log if there are security events
+  if (securityEvents.length > 0) {
+    console.log('🚨 Security Events Detected:', {
+      timestamp: new Date().toISOString(),
+      url: req.originalUrl,
+      method: req.method,
+      ip: req.ip,
+      events: securityEvents
+    });
+  }
+  
+  next();
+}
+
+app.use(securityLogger);
+
+// Apply specific rate limits to routes
+app.use('/auth', authLimiter);
+app.use('/api', apiLimiter);
+
+// Example secure endpoints
+app.post('/auth/register', validateUserInput, async (req, res) => {
+  // Registration logic here
+  console.log('✓ Registration request passed all security checks');
+  res.json({ 
+    success: true, 
+    message: 'Registration would proceed' 
+  });
+});
+
+app.post('/auth/login', validateUserInput, async (req, res) => {
+  // Login logic here
+  console.log('✓ Login request passed all security checks');
+  res.json({ 
+    success: true, 
+    message: 'Login would proceed' 
+  });
+});
+
+// Error handling middleware with security considerations
+app.use((error, req, res, next) => {
+  // Log error without exposing sensitive information
+  console.error('Application Error:', {
+    timestamp: new Date().toISOString(),
+    url: req.originalUrl,
+    method: req.method,
+    ip: req.ip,
+    error: error.message,
+    // Don't log full stack trace in production
+    stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+  });
+  
+  // Generic error response to prevent information leakage
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  res.status(error.status || 500).json({
+    success: false,
+    error: isDevelopment ? error.message : 'Internal server error',
+    ...(isDevelopment && { stack: error.stack })
+  });
+});
+
+console.log('🔐 Security Measures Implemented:');
+console.log('✓ HTTP security headers (Helmet)');
+console.log('✓ Multiple rate limiting strategies');
+console.log('✓ Progressive delay for suspicious activity');
+console.log('✓ NoSQL injection prevention');
+console.log('✓ HTTP parameter pollution prevention');
+console.log('✓ Comprehensive input validation');
+console.log('✓ Suspicious pattern detection');
+console.log('✓ Security event logging');
+console.log('✓ Information leakage prevention');
+console.log('');
+console.log('⚡ Performance Considerations:');
+console.log('• Rate limiting prevents abuse and ensures fair usage');
+console.log('• Input validation catches attacks early');
+console.log('• Security logging helps identify attack patterns');
+console.log('• Progressive delays discourage brute force attacks');
+`}
+</InteractiveCodeBlock>
+
+### Advanced Security Patterns
+
+**Defense in Depth**: Security isn't a single barrier—it's multiple layers that each provide protection. Even if one layer fails, others continue to protect your application.
+
+**Fail Secure**: When something goes wrong, default to denying access rather than granting it. It's better to have a temporarily inaccessible application than a compromised one.
+
+**Least Privilege**: Give users and processes only the minimum permissions they need to function. This limits the damage if an account is compromised.
+
+## Practical Security Checklist for Production
+
+Here's a comprehensive checklist to ensure your authentication system is production-ready:
+
+### Environment and Configuration
+- [ ] Use strong, unique secrets for JWT signing and session encryption
+- [ ] Enable HTTPS in production with proper SSL certificates
+- [ ] Configure secure cookie settings (httpOnly, secure, sameSite)
+- [ ] Set appropriate CORS policies
+- [ ] Use environment variables for all sensitive configuration
+
+### Password Security
+- [ ] Implement proper password strength requirements
+- [ ] Use bcrypt with appropriate salt rounds (12+ for 2024)
+- [ ] Hash passwords server-side only
+- [ ] Never log or store passwords in plain text
+- [ ] Implement password reset functionality securely
+
+### Token Management
+- [ ] Use appropriate JWT expiration times (15 minutes to 24 hours)
+- [ ] Implement token refresh mechanism
+- [ ] Consider token blacklisting for immediate revocation
+- [ ] Store tokens securely on the client side
+- [ ] Validate tokens on every protected request
+
+### Rate Limiting and Abuse Prevention
+- [ ] Implement progressive rate limiting
+- [ ] Use different limits for different endpoints
+- [ ] Monitor and alert on unusual traffic patterns
+- [ ] Implement account lockout after failed attempts
+- [ ] Use CAPTCHA for high-risk operations
+
+### Input Validation and Sanitization
+- [ ] Validate all user input server-side
+- [ ] Sanitize data before database storage
+- [ ] Use parameterized queries to prevent injection
+- [ ] Implement file upload security if applicable
+- [ ] Validate and sanitize all HTTP headers
+
+### Monitoring and Logging
+- [ ] Log all authentication events
+- [ ] Monitor for suspicious patterns
+- [ ] Set up alerts for security incidents
+- [ ] Regularly review security logs
+- [ ] Implement intrusion detection
+
+**Student**: "This seems like a lot to remember. How do I know if I'm actually secure, or just security theater?"
+
+**Teacher**: "Great question! The key is understanding that security is a process, not a checkbox. Start with the fundamentals—proper password hashing, input validation, and HTTPS. Then gradually add layers like rate limiting and monitoring. Most importantly, keep learning and stay updated on new threats. Security is about reducing risk, not eliminating it entirely."
+
+Security is ultimately about building user trust and protecting data. By implementing these patterns systematically and understanding the reasoning behind each layer, you'll create applications that users can confidently rely on. Remember: good security often goes unnoticed, but poor security can destroy a business overnight.
+
+The techniques we've covered form the foundation of secure web applications. In our next tutorial, we'll explore real-time applications with WebSockets, where we'll need to apply these security principles to persistent connections and live data streams.
