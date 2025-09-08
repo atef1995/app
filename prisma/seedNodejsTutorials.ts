@@ -129,6 +129,34 @@ const NODEJS_TUTORIALS = [
     isPremium: true,
     requiredPlan: "CRACKED",
   },
+  {
+    slug: "nodejs-testing-debugging",
+    title: "Testing & Debugging: Building Bulletproof Node.js Applications",
+    description:
+      "Master unit testing with Jest, integration testing strategies, API testing with Supertest, and advanced debugging techniques. Learn to write tests that actually catch bugs and debug applications like a pro.",
+    mdxFile: "nodejs/10-testing-debugging",
+    category: "nodejs",
+    estimatedTime: 140.0,
+    difficulty: 3,
+    order: 10,
+    published: true,
+    isPremium: true,
+    requiredPlan: "CRACKED",
+  },
+  {
+    slug: "nodejs-performance-optimization",
+    title: "Performance Optimization: Building Lightning-Fast Node.js Applications",
+    description:
+      "Master profiling techniques, memory management, caching strategies with Redis, load balancing, and clustering. Learn to identify bottlenecks and optimize Node.js applications for production-scale performance.",
+    mdxFile: "nodejs/11-performance-optimization",
+    category: "nodejs",
+    estimatedTime: 180.0,
+    difficulty: 4,
+    order: 11,
+    published: true,
+    isPremium: true,
+    requiredPlan: "CRACKED",
+  },
 ];
 
 export async function seedNodejsTutorials() {
@@ -1363,8 +1391,362 @@ export async function seedNodejsTutorials() {
             },
           ],
         },
+        {
+          slug: "nodejs-testing-debugging-quiz",
+          title: "Testing & Debugging Quiz",
+          tutorialSlug: "nodejs-testing-debugging",
+          isPremium: true,
+          requiredPlan: "CRACKED",
+          questions: [
+            {
+              id: "testing-1",
+              question: "What is the primary purpose of unit testing in Node.js applications?",
+              type: "multiple-choice",
+              options: [
+                "To test the entire application workflow",
+                "To test individual functions and methods in isolation",
+                "To test database connections",
+                "To test user interface components",
+              ],
+              correct: 1,
+              explanation:
+                "Unit testing focuses on testing individual functions and methods in isolation to ensure they work correctly with various inputs and edge cases.",
+            },
+            {
+              id: "testing-2",
+              question: "Which testing framework is most commonly used with Node.js?",
+              type: "multiple-choice",
+              options: ["Mocha", "Jest", "Jasmine", "Vitest"],
+              correct: 1,
+              explanation:
+                "Jest is the most popular testing framework for Node.js applications, providing built-in test runners, assertions, mocking, and coverage reporting.",
+            },
+            {
+              id: "testing-3",
+              question: "What does the 'describe' block do in Jest tests?",
+              type: "multiple-choice",
+              options: [
+                "Runs a single test case",
+                "Groups related test cases together",
+                "Mocks external dependencies",
+                "Measures test coverage",
+              ],
+              correct: 1,
+              explanation:
+                "The 'describe' block groups related test cases together, providing organization and context for your tests, often representing a class or feature being tested.",
+            },
+            {
+              id: "testing-4",
+              question: "What is the difference between 'it' and 'test' in Jest?",
+              type: "multiple-choice",
+              options: [
+                "They have different functionality",
+                "They are aliases for the same function",
+                "'it' is for unit tests, 'test' is for integration tests",
+                "'test' runs faster than 'it'",
+              ],
+              correct: 1,
+              explanation:
+                "'it' and 'test' are aliases for the same function in Jest. Both define individual test cases, with 'it' being more descriptive ('it should do something').",
+            },
+            {
+              id: "testing-5",
+              question: "How do you test asynchronous functions in Jest?",
+              type: "multiple-choice",
+              options: [
+                "Use setTimeout() to wait",
+                "Return promises or use async/await in test functions",
+                "Async functions cannot be tested",
+                "Use synchronous code only",
+              ],
+              correct: 1,
+              explanation:
+                "Jest handles async tests by returning promises from test functions or using async/await syntax, automatically waiting for promises to resolve.",
+            },
+            {
+              id: "testing-6",
+              question: "What is the purpose of mocking in testing?",
+              type: "multiple-choice",
+              options: [
+                "To make tests run faster",
+                "To isolate code under test by replacing dependencies with controlled fake implementations",
+                "To increase test coverage",
+                "To test error conditions only",
+              ],
+              correct: 1,
+              explanation:
+                "Mocking replaces real dependencies with controlled fake implementations, allowing you to isolate the code under test and control external behavior.",
+            },
+            {
+              id: "testing-7",
+              question: "How do you mock an entire module in Jest?",
+              type: "multiple-choice",
+              options: [
+                "jest.mockModule('module')",
+                "jest.mock('module')",
+                "jest.replace('module')",
+                "jest.stub('module')",
+              ],
+              correct: 1,
+              explanation:
+                "jest.mock('module') mocks an entire module, replacing all its exports with Jest mock functions or custom implementations.",
+            },
+            {
+              id: "testing-8",
+              question: "What is integration testing in the context of Node.js APIs?",
+              type: "multiple-choice",
+              options: [
+                "Testing individual functions",
+                "Testing how multiple components work together, including HTTP endpoints",
+                "Testing only database connections",
+                "Testing user interface interactions",
+              ],
+              correct: 1,
+              explanation:
+                "Integration testing verifies how multiple components work together, including testing actual HTTP endpoints, database interactions, and component integration.",
+            },
+            {
+              id: "testing-9",
+              question: "Which library is commonly used for HTTP endpoint testing in Node.js?",
+              type: "multiple-choice",
+              options: ["axios", "supertest", "fetch", "request"],
+              correct: 1,
+              explanation:
+                "Supertest is specifically designed for testing HTTP endpoints in Node.js applications, providing a fluent API for making requests and asserting responses.",
+            },
+            {
+              id: "testing-10",
+              question: "What should you do before each test to ensure test isolation?",
+              type: "multiple-choice",
+              options: [
+                "Clear all variables",
+                "Restart the server",
+                "Reset database state and clear mocks",
+                "Delete all files",
+              ],
+              correct: 2,
+              explanation:
+                "Test isolation requires resetting database state, clearing mocks, and ensuring each test starts with a clean slate to prevent tests from affecting each other.",
+            },
+            {
+              id: "testing-11",
+              question: "What is test coverage and why is it important?",
+              type: "multiple-choice",
+              options: [
+                "The number of tests written",
+                "The percentage of code executed during tests",
+                "The time taken to run all tests",
+                "The number of bugs found",
+              ],
+              correct: 1,
+              explanation:
+                "Test coverage measures the percentage of code executed during tests, helping identify untested code paths and ensuring comprehensive testing.",
+            },
+            {
+              id: "testing-12",
+              question: "How do you debug Node.js applications effectively?",
+              type: "multiple-choice",
+              options: [
+                "Use console.log() everywhere",
+                "Use Node.js debugger, IDE debugging tools, and structured logging",
+                "Read code without running it",
+                "Use only error handling",
+              ],
+              correct: 1,
+              explanation:
+                "Effective debugging uses proper debugging tools like Node.js debugger, IDE integration, structured logging, and step-by-step code execution rather than just console.log().",
+            },
+            {
+              id: "testing-13",
+              question: "What is the Node.js debugger command to set a breakpoint in code?",
+              type: "multiple-choice",
+              options: ["break", "debugger", "pause", "stop"],
+              correct: 1,
+              explanation:
+                "The 'debugger' statement creates a breakpoint in your code when running with Node.js debugger, pausing execution for inspection.",
+            },
+            {
+              id: "testing-14",
+              question: "How should you structure test files in a Node.js project?",
+              type: "multiple-choice",
+              options: [
+                "All tests in one file",
+                "Mirror source code structure with .test.js or .spec.js files",
+                "Random organization",
+                "Tests in separate repository",
+              ],
+              correct: 1,
+              explanation:
+                "Test files should mirror your source code structure, using naming conventions like .test.js or .spec.js, making tests easy to find and maintain.",
+            },
+            {
+              id: "testing-15",
+              question: "What are the key principles of writing good tests?",
+              type: "multiple-choice",
+              options: [
+                "Make tests as complex as possible",
+                "Fast, independent, repeatable, self-validating, and timely (F.I.R.S.T)",
+                "Write tests after deployment",
+                "Test only happy paths",
+              ],
+              correct: 1,
+              explanation:
+                "Good tests follow F.I.R.S.T principles: Fast execution, Independent of each other, Repeatable in any environment, Self-validating with clear pass/fail, and Timely (written with or before code).",
+            },
+          ],
+        },
       ],
       ...realTimeQuizzes,
+      {
+        slug: "nodejs-performance-optimization-quiz",
+        title: "Performance Optimization Quiz",
+        tutorialSlug: "nodejs-performance-optimization",
+        isPremium: true,
+        requiredPlan: "CRACKED",
+        questions: [
+          {
+            id: "perf-1",
+            question:
+              "What is the first step in performance optimization?",
+            type: "multiple-choice",
+            options: [
+              "Start optimizing code immediately",
+              "Profile and measure to identify actual bottlenecks",
+              "Add more servers",
+              "Optimize the database first",
+            ],
+            correct: 1,
+            explanation:
+              "Performance optimization should always start with profiling and measuring to identify the actual bottlenecks, rather than guessing where problems might be.",
+          },
+          {
+            id: "perf-2",
+            question: "What is the main cause of memory leaks in Node.js?",
+            type: "multiple-choice",
+            options: [
+              "Using too much CPU",
+              "Unclosed event listeners, timers, and circular references",
+              "Having too many files open",
+              "Using async/await",
+            ],
+            correct: 1,
+            explanation:
+              "Memory leaks in Node.js are typically caused by unclosed event listeners, unterminated timers, circular references, and not properly cleaning up resources.",
+          },
+          {
+            id: "perf-3",
+            question: "What is the cache-aside pattern?",
+            type: "multiple-choice",
+            options: [
+              "Application manages cache manually, checking cache first then database",
+              "Database automatically manages cache",
+              "Cache writes data to database automatically",
+              "Cache replaces the database entirely",
+            ],
+            correct: 0,
+            explanation:
+              "Cache-aside pattern means the application manually manages the cache, checking cache first for data, and if not found, fetching from database and storing in cache.",
+          },
+          {
+            id: "perf-4",
+            question: "When should you use Node.js clustering?",
+            type: "multiple-choice",
+            options: [
+              "Always, for every application",
+              "When you have CPU-intensive tasks and multiple CPU cores",
+              "Only for database-heavy applications",
+              "When using Express.js",
+            ],
+            correct: 1,
+            explanation:
+              "Node.js clustering is beneficial when you have CPU-intensive tasks and multiple CPU cores available. For I/O-heavy apps, optimize the I/O operations first.",
+          },
+          {
+            id: "perf-5",
+            question: "What does the N+1 query problem refer to?",
+            type: "multiple-choice",
+            options: [
+              "Having N+1 database connections",
+              "Making one query to get N items, then N additional queries for related data",
+              "Having N+1 servers in a cluster",
+              "Making N+1 API calls to external services",
+            ],
+            correct: 1,
+            explanation:
+              "The N+1 problem occurs when you make one query to fetch N items, then make N additional queries to fetch related data for each item, instead of using efficient JOINs or batch loading.",
+          },
+          {
+            id: "perf-6",
+            question: "What is the purpose of a load balancer?",
+            type: "multiple-choice",
+            options: [
+              "To cache database queries",
+              "To distribute incoming requests across multiple servers",
+              "To compress response data",
+              "To encrypt network traffic",
+            ],
+            correct: 1,
+            explanation:
+              "A load balancer distributes incoming requests across multiple servers to prevent any single server from being overwhelmed and to improve overall system reliability.",
+          },
+          {
+            id: "perf-7",
+            question: "Which Node.js built-in module helps with performance profiling?",
+            type: "multiple-choice",
+            options: [
+              "fs",
+              "http",
+              "perf_hooks",
+              "cluster",
+            ],
+            correct: 2,
+            explanation:
+              "The perf_hooks module provides access to performance measurement APIs, including performance.now(), performance.mark(), and PerformanceObserver.",
+          },
+          {
+            id: "perf-8",
+            question: "What is the difference between horizontal and vertical scaling?",
+            type: "multiple-choice",
+            options: [
+              "Horizontal adds more servers, vertical increases server resources",
+              "Vertical adds more servers, horizontal increases server resources",
+              "They are the same thing",
+              "Horizontal is for databases, vertical is for web servers",
+            ],
+            correct: 0,
+            explanation:
+              "Horizontal scaling (scale out) adds more servers/instances, while vertical scaling (scale up) increases the resources (CPU, memory) of existing servers.",
+          },
+          {
+            id: "perf-9",
+            question: "What should you monitor in production for performance?",
+            type: "multiple-choice",
+            options: [
+              "Only response times",
+              "Response times, error rates, throughput, and resource usage",
+              "Only error logs",
+              "Only CPU usage",
+            ],
+            correct: 1,
+            explanation:
+              "Production monitoring should include response times (P95, P99), error rates, throughput (requests/second), memory usage, CPU usage, and availability metrics.",
+          },
+          {
+            id: "perf-10",
+            question: "When optimizing API performance, what should you prioritize?",
+            type: "multiple-choice",
+            options: [
+              "Code readability over performance",
+              "The biggest bottlenecks first (80/20 rule)",
+              "Optimize everything equally",
+              "Focus only on database queries",
+            ],
+            correct: 1,
+            explanation:
+              "Follow the 80/20 rule: identify and fix the biggest bottlenecks first, as they typically provide the most significant performance improvements with the least effort.",
+          },
+        ],
+      },
     ];
 
     // Create quizzes
@@ -1423,6 +1805,12 @@ export async function seedNodejsTutorials() {
     );
     console.log(
       "   9. Real-Time Applications: Building Live, Interactive Experiences"
+    );
+    console.log(
+      "   10. Testing & Debugging: Building Bulletproof Node.js Applications"
+    );
+    console.log(
+      "   11. Performance Optimization: Building Lightning-Fast Node.js Applications"
     );
 
     return nodejsCategory;

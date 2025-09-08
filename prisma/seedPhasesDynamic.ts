@@ -127,6 +127,12 @@ async function populatePhasesDynamically() {
     contentTypes: ["tutorial", "quiz", "challenge", "project"],
   });
 
+  phaseContentMapping.set("backend-development", {
+    categories: ["nodejs"], // Node.js category
+    keywords: [], // No keyword matching for Node.js - category is enough
+    contentTypes: ["tutorial", "quiz", "challenge", "project"],
+  });
+
   // Get all phases
   const phases = await prisma.phase.findMany({
     orderBy: { order: "asc" },
@@ -248,21 +254,24 @@ async function populatePhasesDynamically() {
 
         // Only match if tutorial is NOT in a category we've already processed
         const tutorialCategorySlug = tutorial.category?.slug;
-        if (tutorialCategorySlug && mapping.categories.includes(tutorialCategorySlug)) {
+        if (
+          tutorialCategorySlug &&
+          mapping.categories.includes(tutorialCategorySlug)
+        ) {
           return false; // Already handled by category
         }
 
         const text = `${tutorial.title} ${tutorial.description || ""} ${
           tutorial.slug
         }`.toLowerCase();
-        
+
         // Use more strict matching - require multi-word keywords to match completely
         return mapping.keywords.some((keyword) => {
           const keywordLower = keyword.toLowerCase();
           // For multi-word keywords, require all words to be present
-          if (keywordLower.includes(' ')) {
-            const words = keywordLower.split(' ');
-            return words.every(word => text.includes(word));
+          if (keywordLower.includes(" ")) {
+            const words = keywordLower.split(" ");
+            return words.every((word) => text.includes(word));
           }
           // For single words, use exact matching with word boundaries when possible
           return text.includes(keywordLower);
@@ -576,6 +585,17 @@ export async function seedPhasesDynamic() {
       prerequisites: ["advanced-concepts"],
       published: true,
     },
+    {
+      slug: "backend-development",
+      title: "Backend Development with Node.js",
+      description: "Master server-side JavaScript development and API creation",
+      color: "from-green-400 to-teal-600",
+      icon: "Server",
+      order: 9,
+      estimatedWeeks: 6,
+      prerequisites: ["async-programming"],
+      published: true,
+    },
   ];
 
   // Create phases
@@ -606,22 +626,21 @@ export async function cleanupPhases() {
 // Main function that clears and re-seeds everything
 export async function reseedPhasesDynamic() {
   console.log("🔄 Clearing existing phases and re-seeding...");
-  
+
   // Clear existing phase steps and phases
-  await cleanupPhases();
-  
+  // await cleanupPhases();
+
   // Re-seed everything
   await seedPhasesDynamic();
 }
 
 // Run if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  reseedPhasesDynamic()
-    .catch((e) => {
-      console.error(e);
-      process.exit(1);
-    })
-    .finally(async () => {
-      await prisma.$disconnect();
-    });
-}
+
+reseedPhasesDynamic()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

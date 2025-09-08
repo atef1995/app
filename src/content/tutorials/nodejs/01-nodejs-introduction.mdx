@@ -14,6 +14,124 @@ Welcome to the world of Node.js! 🚀 Ready to take your JavaScript skills beyon
 
 You know how you've been writing JavaScript that runs in web browsers? Well, imagine if you could use that same JavaScript knowledge to build servers, create command-line tools, and handle files on your computer. That's exactly what Node.js lets you do!
 
+## Quick Note: Installing Node.js (Optional)
+
+*If you don't have Node.js installed on your computer yet, don't worry! You can quickly get it from [nodejs.org](https://nodejs.org) - just download the LTS (Long Term Support) version. Once installed, you'll have both `node` and `npm` commands available in your terminal. You can verify your installation by running `node --version` and `npm --version` in your command line.*
+
+**Student:** "Do I need to install anything special?"
+
+**Teacher:** "If you're following along locally, you'll need Node.js installed. But if you're just learning the concepts first, you can continue reading and try the code examples later. The interactive code blocks in this tutorial will work regardless!"
+
+## Setting Up Your First Node.js Project
+
+Before we dive into Node.js magic, let's set up a proper Node.js project on your local machine. Think of this as creating a workspace where all your Node.js experiments will live!
+
+### Step 1: Initialize Your Project
+
+<InteractiveCodeBlock editable={false} language="bash" title="Initialize Your Node.js Project" description="Create a new Node.js project with npm:">
+{`# Create a new directory for your project
+mkdir my-first-nodejs-project
+cd my-first-nodejs-project
+
+# Initialize a new Node.js project (creates package.json)
+npm init -y
+
+# Let's see what was created
+ls -la`}
+</InteractiveCodeBlock>
+
+**Student:** "What just happened? What's this `package.json` file?"
+
+**Teacher:** "Great question! The `npm init -y` command creates a `package.json` file, which is like your project's ID card. It contains information about your project, its dependencies, and scripts you can run. The `-y` flag automatically answers 'yes' to all the setup questions."
+
+### Step 2: Understanding Your Project Structure
+
+<InteractiveCodeBlock language="bash" editable={false} title="Explore Your Project" description="Let's examine what npm init created:">
+{`# Look at the package.json file that was created
+cat package.json
+
+# Create a simple folder structure for organizing our code
+mkdir src
+mkdir scripts
+
+# Create your first Node.js file
+touch src/index.js
+
+# See your project structure
+tree . || ls -la`}
+</InteractiveCodeBlock>
+
+Let's also create a proper `package.json` with some useful information:
+
+<InteractiveCodeBlock language="json" editable={false} title="Enhanced package.json" description="A well-structured package.json file:">
+{`{
+  "name": "my-first-nodejs-project",
+  "version": "1.0.0",
+  "description": "My first Node.js learning project",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "echo \\"Error: no test specified\\" && exit 1"
+  },
+  "keywords": ["nodejs", "learning", "javascript"],
+  "author": "Your Name",
+  "license": "MIT"
+}`}
+</InteractiveCodeBlock>
+
+### Step 3: Create Your First Node.js File
+
+Now let's create your first Node.js application file:
+
+<InteractiveCodeBlock language="nodejs" title="src/index.js - Your First Node.js App" description="Create your main application file:">
+{`// src/index.js
+console.log("🎉 Welcome to your first Node.js project!");
+console.log("📁 Project initialized successfully!");
+console.log("🚀 Node.js version:", process.version);
+console.log("💻 Platform:", process.platform);
+
+// Create a simple greeting function
+function greetUser(name = "Developer") {
+    const greeting = \`Hello, \${name}! Welcome to Node.js development! 👨‍💻\`;
+    console.log(greeting);
+    return greeting;
+}
+
+// Call our function
+greetUser("Future Node.js Expert");
+
+// Show current working directory
+console.log("📂 Current directory:", process.cwd());
+
+// Show when this script was run
+console.log("⏰ Script executed at:", new Date().toISOString());`}
+</InteractiveCodeBlock>
+
+### Step 4: Run Your Node.js Application
+
+<InteractiveCodeBlock language="bash" title="Run Your First Node.js App" description="Execute your Node.js application:">
+{`# Method 1: Run directly with node
+node src/index.js
+
+# Method 2: Use the npm script we defined in package.json
+npm start
+
+# Method 3: Run in development mode with auto-reload (Node.js 18+)
+# npm run dev`}
+</InteractiveCodeBlock>
+
+**Congratulations!** 🎉 You've just created and run your first Node.js project! You now have:
+
+✅ A proper Node.js project structure  
+✅ A `package.json` file that manages your project  
+✅ Your first Node.js application file  
+✅ NPM scripts to run your application  
+
+**Student:** "This is awesome! But why do we need all these files? Can't I just create a `.js` file and run it?"
+
+**Teacher:** "You absolutely could! But as your projects grow, you'll want proper organization, dependency management, and scripts. Think of `package.json` as your project's blueprint - it tells anyone (including yourself in 6 months!) exactly how your project works and what it needs to run."
+
 ## What is Node.js, Really?
 
 Think of Node.js like this: You know how your favorite video game can run on different gaming consoles? JavaScript used to only "run" in browsers, but Node.js is like a new gaming console that lets JavaScript run directly on your computer, outside of any browser!
