@@ -953,7 +953,14 @@ class EmailService {
     `;
   }
 
-  private assessRequestRisk(requestData: any): "low" | "medium" | "high" {
+  private assessRequestRisk(requestData: {
+    name: string;
+    email: string;
+    reason: string;
+    goals: string;
+    age?: number | null;
+    occupation: string;
+  }): "low" | "medium" | "high" {
     let riskScore = 0;
 
     // Check email domain (free email providers slightly increase risk)
@@ -986,7 +993,14 @@ class EmailService {
     return "low";
   }
 
-  private getRiskAssessmentNotes(requestData: any): string[] {
+  private getRiskAssessmentNotes(requestData: {
+    name: string;
+    email: string;
+    reason: string;
+    goals: string;
+    age?: number | null;
+    occupation: string;
+  }): string[] {
     const notes = [];
     const emailDomain = requestData.email.split('@')[1]?.toLowerCase();
 
