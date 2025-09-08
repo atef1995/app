@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { emailService } from "@/lib/services/emailService";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import mailchecker from "mailchecker";
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,6 +26,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (mailchecker.isValid(email)) {
+      return NextResponse.json({ error: "error" }, { status: 400 });
+    }
+
     // Get user agent for debugging purposes
     const userAgent = request.headers.get("user-agent") || undefined;
 
@@ -50,9 +53,9 @@ export async function POST(request: NextRequest) {
     console.log(`📧 Contact form submitted by ${name} (${email}): ${subject}`);
 
     return NextResponse.json(
-      { 
-        success: true, 
-        message: "Your message has been sent successfully!" 
+      {
+        success: true,
+        message: "Your message has been sent successfully!",
       },
       { status: 200 }
     );

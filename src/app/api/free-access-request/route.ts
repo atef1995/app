@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { emailService } from "@/lib/services/emailService";
 import { headers } from "next/headers";
+import mailchecker from "mailchecker";
 
 // Rate limiting store (in production, use Redis or database)
 const rateLimit = new Map<string, { count: number; resetTime: number }>();
@@ -90,6 +91,10 @@ export async function POST(request: NextRequest) {
         { error: "Please provide a valid email address" },
         { status: 400 }
       );
+    }
+
+    if (mailchecker.isValid(body.email)) {
+      return NextResponse.json({ error: "error email" }, { status: 400 });
     }
 
     // Get additional security information

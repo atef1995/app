@@ -6,9 +6,17 @@ import { useSession } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
 import { useToast } from "@/hooks/useToast";
 import getMoodColors from "@/lib/getMoodColors";
+import mailchecker from "mailchecker";
+import { useRouter } from "next/navigation";
 
 export default function FreeAccessPage() {
   const { data: session } = useSession();
+  const router = useRouter();
+
+  if (!session) {
+    router.push("/auth/signin");
+  }
+
   const { currentMood } = useMood();
   const { success, error, warning } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -65,6 +73,11 @@ export default function FreeAccessPage() {
         "Missing Required Fields",
         "Please fill in all required fields before submitting."
       );
+      return;
+    }
+
+    if (mailchecker.isValid(formData.email)) {
+      warning("Email not supported");
       return;
     }
 

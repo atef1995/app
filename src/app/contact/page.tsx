@@ -5,6 +5,7 @@ import { Send, Mail, MessageSquare } from "lucide-react";
 import { useMood } from "@/components/providers/MoodProvider";
 import { useToast } from "@/hooks/useToast";
 import getMoodColors from "@/lib/getMoodColors";
+import mailchecker from "mailchecker";
 
 export default function ContactPage() {
   const { currentMood } = useMood();
@@ -42,6 +43,10 @@ export default function ContactPage() {
         title: "Missing Fields",
         message: "Please fill in all fields before submitting.",
       });
+      return;
+    }
+
+    if (!mailchecker.isValid(formData.email)) {
       return;
     }
 

@@ -828,10 +828,18 @@ class EmailService {
             .request-details { background: #f3e5f5; padding: 20px; border-left: 4px solid #9c27b0; margin: 20px 0; }
             .security-info { background: #fff3e0; padding: 20px; border-left: 4px solid #ff9800; margin: 20px 0; }
             .risk-assessment { background: ${
-              riskLevel === "high" ? "#ffebee" : riskLevel === "medium" ? "#fff8e1" : "#e8f5e8"
+              riskLevel === "high"
+                ? "#ffebee"
+                : riskLevel === "medium"
+                ? "#fff8e1"
+                : "#e8f5e8"
             }; padding: 20px; border-left: 4px solid ${
-              riskLevel === "high" ? "#f44336" : riskLevel === "medium" ? "#ffc107" : "#4caf50"
-            }; margin: 20px 0; }
+      riskLevel === "high"
+        ? "#f44336"
+        : riskLevel === "medium"
+        ? "#ffc107"
+        : "#4caf50"
+    }; margin: 20px 0; }
             .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 10px 10px; }
             .label { font-weight: bold; color: #555; display: block; margin-bottom: 5px; }
             .value { white-space: pre-wrap; }
@@ -858,10 +866,18 @@ class EmailService {
               <p><span class="label">Name:</span> ${requestData.name}</p>
               <p><span class="label">Email:</span> ${requestData.email}</p>
               <p><span class="label">Country:</span> ${requestData.country}</p>
-              <p><span class="label">Age:</span> ${requestData.age || "Not specified"}</p>
-              <p><span class="label">Occupation:</span> ${requestData.occupation}</p>
-              <p><span class="label">Programming Experience:</span> ${requestData.experience}</p>
-              <p><span class="label">How Found Us:</span> ${requestData.howFoundUs}</p>
+              <p><span class="label">Age:</span> ${
+                requestData.age || "Not specified"
+              }</p>
+              <p><span class="label">Occupation:</span> ${
+                requestData.occupation
+              }</p>
+              <p><span class="label">Programming Experience:</span> ${
+                requestData.experience
+              }</p>
+              <p><span class="label">How Found Us:</span> ${
+                requestData.howFoundUs
+              }</p>
             </div>
 
             <div class="request-details">
@@ -898,21 +914,37 @@ class EmailService {
               <p><span class="label">Risk Level:</span> <span class="risk-badge risk-${riskLevel}">${riskLevel.toUpperCase()}</span></p>
               <p><span class="label">Assessment Notes:</span></p>
               <ul>
-                ${this.getRiskAssessmentNotes(requestData).map(note => `<li>${note}</li>`).join('')}
+                ${this.getRiskAssessmentNotes(requestData)
+                  .map((note) => `<li>${note}</li>`)
+                  .join("")}
               </ul>
             </div>
 
             <div class="security-info">
               <h2>🔒 Security Information</h2>
-              <p><span class="label">IP Address:</span> ${requestData.securityInfo.ip}</p>
-              <p><span class="label">Timestamp:</span> ${new Date(requestData.securityInfo.timestamp).toLocaleString()}</p>
-              <p><span class="label">User Agent:</span> ${requestData.securityInfo.userAgent}</p>
-              <p><span class="label">Accept Language:</span> ${requestData.securityInfo.acceptLanguage}</p>
-              <p><span class="label">Referer:</span> ${requestData.securityInfo.referer}</p>
+              <p><span class="label">IP Address:</span> ${
+                requestData.securityInfo.ip
+              }</p>
+              <p><span class="label">Timestamp:</span> ${new Date(
+                requestData.securityInfo.timestamp
+              ).toLocaleString()}</p>
+              <p><span class="label">User Agent:</span> ${
+                requestData.securityInfo.userAgent
+              }</p>
+              <p><span class="label">Accept Language:</span> ${
+                requestData.securityInfo.acceptLanguage
+              }</p>
+              <p><span class="label">Referer:</span> ${
+                requestData.securityInfo.referer
+              }</p>
               
               <details>
                 <summary style="cursor: pointer; font-weight: bold; margin: 10px 0;">Request Headers (Click to expand)</summary>
-                <pre>${JSON.stringify(requestData.securityInfo.requestHeaders, null, 2)}</pre>
+                <pre>${JSON.stringify(
+                  requestData.securityInfo.requestHeaders,
+                  null,
+                  2
+                )}</pre>
               </details>
             </div>
 
@@ -936,10 +968,16 @@ class EmailService {
               <h3>📊 Quick Stats</h3>
               <ul>
                 <li><strong>Request Date:</strong> ${new Date().toLocaleString()}</li>
-                <li><strong>Email Domain:</strong> ${requestData.email.split('@')[1]}</li>
+                <li><strong>Email Domain:</strong> ${
+                  requestData.email.split("@")[1]
+                }</li>
                 <li><strong>Country:</strong> ${requestData.country}</li>
-                <li><strong>Experience Level:</strong> ${requestData.experience}</li>
-                <li><strong>Time Commitment:</strong> ${requestData.timeCommitment}</li>
+                <li><strong>Experience Level:</strong> ${
+                  requestData.experience
+                }</li>
+                <li><strong>Time Commitment:</strong> ${
+                  requestData.timeCommitment
+                }</li>
               </ul>
             </div>
           </div>
@@ -964,9 +1002,18 @@ class EmailService {
     let riskScore = 0;
 
     // Check email domain (free email providers slightly increase risk)
-    const emailDomain = requestData.email.split('@')[1]?.toLowerCase();
-    const freeEmailProviders = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', '10minutemail.com', 'tempmail.org'];
-    if (freeEmailProviders.some(provider => emailDomain?.includes(provider))) {
+    const emailDomain = requestData.email.split("@")[1]?.toLowerCase();
+    const freeEmailProviders = [
+      "gmail.com",
+      "yahoo.com",
+      "hotmail.com",
+      "outlook.com",
+      "10minutemail.com",
+      "tempmail.org",
+    ];
+    if (
+      freeEmailProviders.some((provider) => emailDomain?.includes(provider))
+    ) {
       riskScore += 1;
     }
 
@@ -981,9 +1028,10 @@ class EmailService {
     }
 
     // Check for suspicious patterns
-    const suspiciousKeywords = ['test', 'fake', 'lorem', 'asdf', '123'];
-    const allText = `${requestData.name} ${requestData.reason} ${requestData.goals}`.toLowerCase();
-    if (suspiciousKeywords.some(keyword => allText.includes(keyword))) {
+    const suspiciousKeywords = ["test", "fake", "lorem", "asdf", "123"];
+    const allText =
+      `${requestData.name} ${requestData.reason} ${requestData.goals}`.toLowerCase();
+    if (suspiciousKeywords.some((keyword) => allText.includes(keyword))) {
       riskScore += 3;
     }
 
@@ -1002,9 +1050,14 @@ class EmailService {
     occupation: string;
   }): string[] {
     const notes = [];
-    const emailDomain = requestData.email.split('@')[1]?.toLowerCase();
+    const emailDomain = requestData.email.split("@")[1]?.toLowerCase();
 
-    if (emailDomain && ['10minutemail.com', 'tempmail.org', 'guerrillamail.com'].some(temp => emailDomain.includes(temp))) {
+    if (
+      emailDomain &&
+      ["10minutemail.com", "tempmail.org", "guerrillamail.com"].some((temp) =>
+        emailDomain.includes(temp)
+      )
+    ) {
       notes.push("⚠️ Temporary email domain detected");
     }
 
