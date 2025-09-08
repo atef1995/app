@@ -153,6 +153,36 @@ class EmailService {
     return await this.sendEmail(devEmail!, subject, html);
   }
 
+  async sendFreeAccessRequestEmail(requestData: {
+    name: string;
+    email: string;
+    country: string;
+    age?: number | null;
+    occupation: string;
+    experience: string;
+    reason: string;
+    goals: string;
+    timeCommitment: string;
+    hasTriedOtherPlatforms: string;
+    financialSituation: string;
+    howFoundUs: string;
+    securityInfo: {
+      ip: string;
+      userAgent: string;
+      acceptLanguage: string;
+      referer: string;
+      timestamp: string;
+      requestHeaders: Record<string, string | null>;
+    };
+  }) {
+    const subject = `[FREE ACCESS REQUEST] ${requestData.name} from ${requestData.country}`;
+    const html = this.generateFreeAccessRequestTemplate(requestData);
+
+    // Send to admin email
+    const adminEmail = process.env.ADMIN_EMAIL;
+    return await this.sendEmail(adminEmail!, subject, html);
+  }
+
   async sendPaymentConfirmationEmail(
     user: User,
     paymentData: {
@@ -757,6 +787,235 @@ class EmailService {
         </body>
       </html>
     `;
+  }
+
+  private generateFreeAccessRequestTemplate(requestData: {
+    name: string;
+    email: string;
+    country: string;
+    age?: number | null;
+    occupation: string;
+    experience: string;
+    reason: string;
+    goals: string;
+    timeCommitment: string;
+    hasTriedOtherPlatforms: string;
+    financialSituation: string;
+    howFoundUs: string;
+    securityInfo: {
+      ip: string;
+      userAgent: string;
+      acceptLanguage: string;
+      referer: string;
+      timestamp: string;
+      requestHeaders: Record<string, string | null>;
+    };
+  }): string {
+    const riskLevel = this.assessRequestRisk(requestData);
+
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Free Access Request - ${requestData.name}</title>
+          <style>
+            body { font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: white; padding: 30px; border: 1px solid #ddd; }
+            .info-section { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 15px 0; }
+            .personal-info { background: #e3f2fd; padding: 20px; border-left: 4px solid #2196f3; margin: 20px 0; }
+            .request-details { background: #f3e5f5; padding: 20px; border-left: 4px solid #9c27b0; margin: 20px 0; }
+            .security-info { background: #fff3e0; padding: 20px; border-left: 4px solid #ff9800; margin: 20px 0; }
+            .risk-assessment { background: ${
+              riskLevel === "high" ? "#ffebee" : riskLevel === "medium" ? "#fff8e1" : "#e8f5e8"
+            }; padding: 20px; border-left: 4px solid ${
+              riskLevel === "high" ? "#f44336" : riskLevel === "medium" ? "#ffc107" : "#4caf50"
+            }; margin: 20px 0; }
+            .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 10px 10px; }
+            .label { font-weight: bold; color: #555; display: block; margin-bottom: 5px; }
+            .value { white-space: pre-wrap; }
+            .action-buttons { text-align: center; margin: 30px 0; }
+            .approve-btn { display: inline-block; background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; margin: 0 10px; font-weight: bold; }
+            .reject-btn { display: inline-block; background: #ef4444; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; margin: 0 10px; font-weight: bold; }
+            .risk-badge { display: inline-block; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+            .risk-low { background: #dcfce7; color: #166534; }
+            .risk-medium { background: #fef3c7; color: #92400e; }
+            .risk-high { background: #fecaca; color: #991b1b; }
+            pre { background: #f4f4f4; padding: 10px; border-radius: 5px; font-size: 11px; overflow-x: auto; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>💝 Free Access Request</h1>
+            <p>New request submitted to Vibed to Cracked</p>
+            <span class="risk-badge risk-${riskLevel}">Risk Level: ${riskLevel}</span>
+          </div>
+          
+          <div class="content">
+            <div class="personal-info">
+              <h2>👤 Personal Information</h2>
+              <p><span class="label">Name:</span> ${requestData.name}</p>
+              <p><span class="label">Email:</span> ${requestData.email}</p>
+              <p><span class="label">Country:</span> ${requestData.country}</p>
+              <p><span class="label">Age:</span> ${requestData.age || "Not specified"}</p>
+              <p><span class="label">Occupation:</span> ${requestData.occupation}</p>
+              <p><span class="label">Programming Experience:</span> ${requestData.experience}</p>
+              <p><span class="label">How Found Us:</span> ${requestData.howFoundUs}</p>
+            </div>
+
+            <div class="request-details">
+              <h2>📝 Request Details</h2>
+              
+              <div style="margin-bottom: 20px;">
+                <span class="label">Why requesting free access:</span>
+                <div class="value">${requestData.reason}</div>
+              </div>
+
+              <div style="margin-bottom: 20px;">
+                <span class="label">Learning Goals:</span>
+                <div class="value">${requestData.goals}</div>
+              </div>
+
+              <div style="margin-bottom: 20px;">
+                <span class="label">Time Commitment:</span>
+                <div class="value">${requestData.timeCommitment}</div>
+              </div>
+
+              <div style="margin-bottom: 20px;">
+                <span class="label">Previous Platform Experience:</span>
+                <div class="value">${requestData.hasTriedOtherPlatforms}</div>
+              </div>
+
+              <div style="margin-bottom: 20px;">
+                <span class="label">Financial Situation:</span>
+                <div class="value">${requestData.financialSituation}</div>
+              </div>
+            </div>
+
+            <div class="risk-assessment">
+              <h2>⚠️ Risk Assessment</h2>
+              <p><span class="label">Risk Level:</span> <span class="risk-badge risk-${riskLevel}">${riskLevel.toUpperCase()}</span></p>
+              <p><span class="label">Assessment Notes:</span></p>
+              <ul>
+                ${this.getRiskAssessmentNotes(requestData).map(note => `<li>${note}</li>`).join('')}
+              </ul>
+            </div>
+
+            <div class="security-info">
+              <h2>🔒 Security Information</h2>
+              <p><span class="label">IP Address:</span> ${requestData.securityInfo.ip}</p>
+              <p><span class="label">Timestamp:</span> ${new Date(requestData.securityInfo.timestamp).toLocaleString()}</p>
+              <p><span class="label">User Agent:</span> ${requestData.securityInfo.userAgent}</p>
+              <p><span class="label">Accept Language:</span> ${requestData.securityInfo.acceptLanguage}</p>
+              <p><span class="label">Referer:</span> ${requestData.securityInfo.referer}</p>
+              
+              <details>
+                <summary style="cursor: pointer; font-weight: bold; margin: 10px 0;">Request Headers (Click to expand)</summary>
+                <pre>${JSON.stringify(requestData.securityInfo.requestHeaders, null, 2)}</pre>
+              </details>
+            </div>
+
+            <div class="action-buttons">
+              <h2>🎯 Review Actions</h2>
+              <p>Please review this request and take appropriate action:</p>
+              
+              <!-- You can create a simple admin panel or handle this manually -->
+              <div style="margin: 20px 0; padding: 15px; background: #f0f9ff; border-radius: 8px;">
+                <p><strong>Manual Review Required:</strong></p>
+                <ol>
+                  <li>Verify the information provided seems genuine</li>
+                  <li>Check IP address for previous requests</li>
+                  <li>Consider the risk assessment level</li>
+                  <li>Make a decision and respond via email</li>
+                </ol>
+              </div>
+            </div>
+
+            <div class="info-section">
+              <h3>📊 Quick Stats</h3>
+              <ul>
+                <li><strong>Request Date:</strong> ${new Date().toLocaleString()}</li>
+                <li><strong>Email Domain:</strong> ${requestData.email.split('@')[1]}</li>
+                <li><strong>Country:</strong> ${requestData.country}</li>
+                <li><strong>Experience Level:</strong> ${requestData.experience}</li>
+                <li><strong>Time Commitment:</strong> ${requestData.timeCommitment}</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="footer">
+            <p><strong>Free Access Request System</strong><br>Vibed to Cracked Platform</p>
+            <p>This email contains sensitive user information. Please handle with care and follow privacy guidelines.</p>
+          </div>
+        </body>
+      </html>
+    `;
+  }
+
+  private assessRequestRisk(requestData: any): "low" | "medium" | "high" {
+    let riskScore = 0;
+
+    // Check email domain (free email providers slightly increase risk)
+    const emailDomain = requestData.email.split('@')[1]?.toLowerCase();
+    const freeEmailProviders = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', '10minutemail.com', 'tempmail.org'];
+    if (freeEmailProviders.some(provider => emailDomain?.includes(provider))) {
+      riskScore += 1;
+    }
+
+    // Check if reason is too short or generic
+    if (requestData.reason.length < 50) {
+      riskScore += 2;
+    }
+
+    // Check if goals are too generic
+    if (requestData.goals.length < 30) {
+      riskScore += 1;
+    }
+
+    // Check for suspicious patterns
+    const suspiciousKeywords = ['test', 'fake', 'lorem', 'asdf', '123'];
+    const allText = `${requestData.name} ${requestData.reason} ${requestData.goals}`.toLowerCase();
+    if (suspiciousKeywords.some(keyword => allText.includes(keyword))) {
+      riskScore += 3;
+    }
+
+    // Determine risk level
+    if (riskScore >= 4) return "high";
+    if (riskScore >= 2) return "medium";
+    return "low";
+  }
+
+  private getRiskAssessmentNotes(requestData: any): string[] {
+    const notes = [];
+    const emailDomain = requestData.email.split('@')[1]?.toLowerCase();
+
+    if (emailDomain && ['10minutemail.com', 'tempmail.org', 'guerrillamail.com'].some(temp => emailDomain.includes(temp))) {
+      notes.push("⚠️ Temporary email domain detected");
+    }
+
+    if (requestData.reason.length < 50) {
+      notes.push("⚠️ Reason for request is quite short");
+    }
+
+    if (requestData.goals.length < 30) {
+      notes.push("⚠️ Learning goals are briefly described");
+    }
+
+    if (!requestData.age) {
+      notes.push("ℹ️ Age not provided");
+    }
+
+    if (requestData.occupation === "Not specified") {
+      notes.push("ℹ️ Occupation not specified");
+    }
+
+    if (notes.length === 0) {
+      notes.push("✅ No immediate red flags detected");
+      notes.push("✅ Information appears complete and genuine");
+    }
+
+    return notes;
   }
 }
 

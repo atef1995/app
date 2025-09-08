@@ -459,6 +459,32 @@ export default function PricingPage() {
           ))}
         </div>
 
+        {/* Financial Assistance Section */}
+        <div className="mt-16 max-w-3xl mx-auto">
+          <div className="bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-8 text-center border border-purple-200 dark:border-purple-800">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+              💝 Can&apos;t Afford Premium?
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
+              We believe everyone deserves access to quality programming
+              education, regardless of financial situation. If you&apos;re
+              facing financial hardship, you can request free access to our
+              premium features.
+            </p>
+            <Link
+              href="/free-access"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-colors"
+            >
+              <span>💝</span>
+              Request Free Access
+            </Link>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
+              We review each request personally and aim to help those who
+              genuinely need it.
+            </p>
+          </div>
+        </div>
+
         {/* FAQ Section */}
         <div className="mt-20 max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-12">

@@ -538,6 +538,22 @@ export default function HomePage() {
           >
             Free tier includes 3 quizzes per month • No credit card required
           </motion.p>
+          <motion.p
+            className="text-xs text-gray-400 dark:text-gray-500 mt-2"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 1.0 }}
+          >
+            Can&apos;t afford premium?{" "}
+            <Link
+              href="/free-access"
+              className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 underline"
+            >
+              Request free access
+            </Link>{" "}
+            - we believe everyone deserves to learn! 💝
+          </motion.p>
         </motion.div>
       </div>
     </div>

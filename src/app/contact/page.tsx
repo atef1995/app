@@ -150,6 +150,12 @@ export default function ContactPage() {
                   🐛 Report a Bug
                 </a>
                 <a
+                  href="/free-access"
+                  className="block w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-4 rounded-lg text-center hover:from-purple-600 hover:to-pink-600 transition-colors"
+                >
+                  💝 Request Free Access
+                </a>
+                <a
                   href="/tutorials"
                   className="block w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-center hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                 >
