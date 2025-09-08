@@ -152,6 +152,11 @@ async function seedPhasesClean() {
       includeProjects: true,
       includeChallenges: true,
     },
+    "backend-development": {
+      categories: ["nodejs"],
+      includeProjects: true,
+      includeChallenges: true,
+    },
   };
 
   // Get all content
