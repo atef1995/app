@@ -34,23 +34,23 @@ Before you can work magic on a webpage, you need to tell JavaScript exactly what
   description="Let's explore different ways to find and grab elements:"
   javascript={`// Method 1: Find by ID (like looking up someone's social security number)
 const title = document.getElementById("main-title");
-console.log("Found the title:", title);
+console.log("Found the title:", title.innerText);
 
 // Method 2: Find the first match using CSS-style selectors
 const firstButton = document.querySelector("button");
-console.log("Found first button:", firstButton);
+console.log("Found first button:", firstButton.innerText);
 
 // Method 3: Find ALL elements with a specific class
 const allItems = document.getElementsByClassName("item");
-console.log("Found", allItems.length, "items:", allItems);
+console.log("Found", allItems.length, "items:", ...allItems);
 
 // Method 4: More flexible - find ALL matches with querySelector
 const allButtons = document.querySelectorAll("button");
-console.log("Found", allButtons.length, "buttons:", allButtons);
+console.log("Found", allButtons.length, "buttons:", ...allButtons);
 
 // Pro tip: You can use ANY CSS selector with querySelector!
 const itemsAnotherWay = document.querySelectorAll(".item");
-console.log("Items found with querySelector:", itemsAnotherWay);`}
+console.log("Items found with querySelector:", ...itemsAnotherWay);`}
   html={`<h1 id="main-title">Welcome to DOM Manipulation</h1>
 <button>First Button</button>
 <button>Second Button</button>
@@ -105,7 +105,9 @@ paragraph.innerHTML = "Updated content with <strong>bold text</strong>, <em>ital
 // We can even add completely new HTML elements
 setTimeout(() => {
   paragraph.innerHTML += "<br><br>🎉 <strong>Bonus content added 2 seconds later!</strong>";
-}, 2000);`}
+  
+}, 2000);
+console.log("New text:", heading.textContent);`}
   html={`<p id="intro">Original plain paragraph content.</p>
 <p>Watch the paragraph above get a complete makeover with fancy formatting!</p>`}
 />
