@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { readdirSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -16,12 +17,12 @@ async function safeFetch(url, options = {}) {
       },
       ...options,
     });
-    
+
     if (!response.ok) {
       console.warn(`Failed to fetch ${url}: ${response.status}`);
       return null;
     }
-    
+
     return await response.json();
   } catch (error) {
     console.warn(`Error fetching ${url}:`, error.message);
@@ -30,8 +31,11 @@ async function safeFetch(url, options = {}) {
 }
 
 // next-sitemap.config.js
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
-  siteUrl: process.env.NEXTAUTH_URL || "https://www.vibed-to-cracked.com",
+  siteUrl: process.env.NODE_ENV === 'production'
+    ? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.NEXTAUTH_URL || "https://vibed-to-cracked.com")
+    : "https://vibed-to-cracked.com",
   generateRobotsTxt: true,
   sitemapSize: 7000,
   changefreq: "weekly",
@@ -47,14 +51,16 @@ export default {
   },
   exclude: [
     "/admin/*",
-    "/api/*", 
+    "/api/*",
     "/auth/*",
     "/test-error",
     "/glitch-demo",
     "/achievements/shared/*"
   ],
   async additionalPaths(config) {
-    const baseUrl = process.env.NEXTAUTH_URL || "https://www.vibed-to-cracked.com";
+    const baseUrl = process.env.NODE_ENV === 'production'
+      ? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.NEXTAUTH_URL || "https://vibed-to-cracked.com")
+      : "https://vibed-to-cracked.com";
     const paths = [];
 
     // Static tutorial files from content directory
@@ -84,7 +90,7 @@ export default {
         }
         return items;
       };
-      
+
       paths.push(...walkDir(tutorialDir));
     } catch (error) {
       console.warn("Error processing tutorial files:", error.message);
@@ -92,12 +98,12 @@ export default {
 
     // Dynamic tutorials from database
     const tutorialsData = await safeFetch(`${baseUrl}/api/tutorials`);
-    if (tutorialsData?.tutorials) {
-      const dbTutorialPaths = tutorialsData.tutorials
+    if (tutorialsData?.success && tutorialsData?.data) {
+      const dbTutorialPaths = tutorialsData.data
         .filter(tutorial => tutorial.published)
         .map(tutorial => ({
           loc: `/tutorials/${tutorial.slug}`,
-          changefreq: "weekly", 
+          changefreq: "weekly",
           priority: tutorial.isPremium ? 0.9 : 0.8,
           lastmod: new Date(tutorial.updatedAt || tutorial.createdAt).toISOString(),
         }));
@@ -140,8 +146,8 @@ export default {
 
     // Projects
     const projectsData = await safeFetch(`${baseUrl}/api/projects`);
-    if (projectsData?.projects) {
-      const projectPaths = projectsData.projects.map(project => ({
+    if (projectsData?.success && projectsData?.data) {
+      const projectPaths = projectsData.data.map(project => ({
         loc: `/projects/${project.slug}`,
         changefreq: "monthly",
         priority: 0.6,
