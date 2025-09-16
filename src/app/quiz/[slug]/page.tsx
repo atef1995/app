@@ -12,7 +12,10 @@ import { QuizResults } from "@/components/quiz/QuizResults";
 import { QuizProgress } from "@/components/quiz/QuizProgress";
 import { useQuiz } from "@/hooks/useQuiz";
 import { useAntiCheat } from "@/hooks/useAntiCheat";
-import { MoodImpactIndicator, MoodDifficultyBadge } from "@/components/ui/MoodImpactIndicator";
+import {
+  MoodImpactIndicator,
+  MoodDifficultyBadge,
+} from "@/components/ui/MoodImpactIndicator";
 
 export default function QuizPage({
   params,
@@ -61,13 +64,20 @@ export default function QuizPage({
       shuffledQuestions.length > 0
     ) {
       // Calculate total time: timeLimit per question × number of questions
-      const totalTime = moodConfig.quizSettings.timeLimit * shuffledQuestions.length;
+      const totalTime =
+        moodConfig.quizSettings.timeLimit * shuffledQuestions.length;
       setQuizState((prev) => ({
         ...prev,
         timeLeft: totalTime,
       }));
     }
-  }, [currentMood, quizState.showResults, quizState.timeLeft, shuffledQuestions.length, setQuizState]);
+  }, [
+    currentMood,
+    quizState.showResults,
+    quizState.timeLeft,
+    shuffledQuestions.length,
+    setQuizState,
+  ]);
 
   if (loadingQuiz) {
     return (
@@ -188,7 +198,9 @@ export default function QuizPage({
           isActive={!!quizState.timeLeft && quizState.timeLeft > 0}
           totalQuestions={shuffledQuestions.length}
           currentQuestion={quizState.currentQuestion}
-          timePerQuestion={MOODS[currentMood.id.toLowerCase()].quizSettings.timeLimit}
+          timePerQuestion={
+            MOODS[currentMood.id.toLowerCase()].quizSettings.timeLimit
+          }
         />
 
         <div className="max-w-2xl mx-auto space-y-6">
@@ -205,7 +217,6 @@ export default function QuizPage({
               quizTitle={quiz.title}
               currentQuestion={quizState.currentQuestion}
               totalQuestions={shuffledQuestions.length}
-              currentMoodConfig={currentMoodConfig}
             />
 
             <QuizQuestion

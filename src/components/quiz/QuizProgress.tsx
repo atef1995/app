@@ -6,14 +6,12 @@ interface QuizProgressProps {
   quizTitle: string;
   currentQuestion: number;
   totalQuestions: number;
-  currentMoodConfig: MoodConfig;
 }
 
 export function QuizProgress({
   quizTitle,
   currentQuestion,
   totalQuestions,
-  currentMoodConfig,
 }: QuizProgressProps) {
   const progressPercentage = ((currentQuestion + 1) / totalQuestions) * 100;
 
@@ -27,9 +25,6 @@ export function QuizProgress({
           <span className="text-sm text-gray-500 dark:text-gray-400">
             {currentQuestion + 1} / {totalQuestions}
           </span>
-          <div className="text-xs px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-            {currentMoodConfig.name} {currentMoodConfig.emoji}
-          </div>
         </div>
       </div>
 
