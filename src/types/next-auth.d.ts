@@ -1,5 +1,6 @@
 import "next-auth";
 import { Mood, Plan } from "@prisma/client";
+import type { SubscriptionInfo } from "@/lib/subscriptionService";
 
 declare module "next-auth" {
   interface Session {
@@ -12,6 +13,8 @@ declare module "next-auth" {
       subscription?: Plan;
       username: string;
       role: string;
+      /** Full subscription info cached in session to prevent repeated DB queries */
+      subscriptionInfo?: SubscriptionInfo;
     };
   }
 

@@ -22,10 +22,12 @@ Great question! Let's see the difference in action:
 **Without types (JavaScript):**
 ```javascript
 function greetUser(user) {
-  return `Hello, ${user.name}!`;
+  const result = `Hello, ${user.name}!`;
+  console.log(result); // Shows: "Hello, undefined!"
+  return result;
 }
 
-greetUser("John"); // 💥 BOOM! Runtime error - strings don't have .name
+greetUser("John"); // No error, but outputs: "Hello, undefined!"
 ```
 
 **With types (TypeScript):**
@@ -131,25 +133,26 @@ Objects are everywhere in JavaScript, and TypeScript makes them so much safer an
 
 <InteractiveCodeBlock editable={true} language="typescript">
 {`// Let's build a user profile step by step
+{
+  // 🎯 Simple object typing - define the shape of your data
+  let user: {
+    name: string;
+    age: number;
+    isActive: boolean;
+  } = {
+    name: "Alex Chen",
+    age: 29,
+    isActive: true
+  };
 
-// 🎯 Simple object typing - define the shape of your data
-let user: {
-  name: string;
-  age: number;
-  isActive: boolean;
-} = {
-  name: "Alex Chen",
-  age: 29,
-  isActive: true
-};
-
-console.log("User profile:", user);
-console.log(\`\${user.name} is \${user.age} years old\`);
+  console.log("User profile:", user);
+  console.log(\`\${user.name} is \${user.age} years old\`);
+}
 
 // 🏗️ But typing every object like this gets tedious...
 // That's why we use type aliases! Much cleaner:
-
-type Product = {
+{
+  type Product = {
   id: number;
   name: string;
   price: number;
@@ -196,7 +199,8 @@ console.log("App:", appConfig.appName, "v" + appConfig.version);
 console.log("Debug mode:", appConfig.debugMode ? "ON" : "OFF");
 
 // Try uncommenting this line - TypeScript will stop you!
-// appConfig.version = "2.0.0"; // ❌ Error: Cannot assign to 'version'`}
+// appConfig.version = "2.0.0"; // ❌ Error: Cannot assign to 'version'
+}`}
 </InteractiveCodeBlock>
 
 **What's the magic here?** Notice how we defined the exact "shape" that our objects must have. The `?` makes properties optional, and `readonly` prevents changes. This is like having a blueprint for your data!
@@ -410,6 +414,7 @@ Ready for the most powerful feature in TypeScript? Generics let you write code t
 
 <InteractiveCodeBlock editable={true} language="typescript">
 {`// Generics - write once, use with any type!
+{
 
 // 🎭 Basic generic function - works with any type
 function getFirstItem<T>(items: T[]): T | undefined {
@@ -508,7 +513,8 @@ let updatedUser = updateRecord(user, { name: "Alice Smith" });
 let updatedProduct = updateRecord(product, { price: 899.99 });
 
 console.log("Updated user:", updatedUser);
-console.log("Updated product:", updatedProduct);`}
+console.log("Updated product:", updatedProduct);
+}`}
 </InteractiveCodeBlock>
 
 **This is where TypeScript becomes magical!** Generics let you write flexible, reusable code that's still completely type-safe. The `<T>` is like saying "I don't know what type this will be yet, but when you use it, TypeScript will figure it out."
@@ -523,7 +529,9 @@ console.log("Updated product:", updatedProduct);`}
 TypeScript comes with amazing utility types that solve common problems. Think of them as power tools in your TypeScript toolkit!
 
 <InteractiveCodeBlock editable={true} language="typescript">
-{`// Utility types - TypeScript's built-in superpowers!
+{`
+{
+// Utility types - TypeScript's built-in superpowers!
 
 // 🏗️ Let's start with a base type
 type User = {
@@ -639,7 +647,9 @@ type UserData = ReturnType<typeof getUserData>;
 let userData: UserData = getUserData();
 console.log("\\n=== Inferred Return Type ===");
 console.log("User data:", userData);
-console.log("Theme preference:", userData.preferences.theme);`}
+console.log("Theme preference:", userData.preferences.theme);
+}
+`}
 </InteractiveCodeBlock>
 
 **These utility types are game-changers!** They save you from writing repetitive type definitions and help you transform types in powerful ways. `Partial` for updates, `Pick` for selecting fields, `Omit` for excluding them - it's like having a Swiss Army knife for types!
@@ -655,7 +665,7 @@ Let's put everything together with a practical example that you might actually b
 
 <InteractiveCodeBlock editable={true} language="typescript">
 {`// 🛒 Real-world example: Type-safe shopping cart system
-
+{
 // First, let's define our core types
 type Product = {
   id: string;
@@ -813,7 +823,8 @@ console.log("\\n--- Removing an item ---");
 cart.removeItem("2"); // Remove T-Shirt
 
 console.log("\\n--- Final Cart Summary ---");
-console.log(cart.getSummary());`}
+console.log(cart.getSummary());
+}`}
 </InteractiveCodeBlock>
 
 **Wow! Look what we built!** This shopping cart uses almost every TypeScript feature we've learned:

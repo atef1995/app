@@ -9,7 +9,80 @@ interface AchievementCheck {
   metadata?: AchievementMetadata;
 }
 
+/**
+ * Simple in-memory cache for achievement checks to prevent duplicate queries
+ * Cache expires after 30 seconds
+ */
+interface CacheEntry {
+  data: (UserAchievement & { achievement: Achievement })[];
+  timestamp: number;
+}
+
 export class AchievementService {
+  private static cache: Map<string, CacheEntry> = new Map();
+  private static CACHE_TTL = 30000; // 30 seconds
+
+  /**
+   * Generate cache key for achievement checks
+   */
+  private static getCacheKey(userId: string, action: AchievementAction): string {
+    return `${userId}:${action}`;
+  }
+
+  /**
+   * Check if cache entry is still valid
+   */
+  private static isCacheValid(entry: CacheEntry | undefined): boolean {
+    if (!entry) return false;
+    return Date.now() - entry.timestamp < this.CACHE_TTL;
+  }
+
+  /**
+   * Get from cache if valid
+   */
+  private static getFromCache(
+    userId: string,
+    action: AchievementAction
+  ): (UserAchievement & { achievement: Achievement })[] | null {
+    const key = this.getCacheKey(userId, action);
+    const entry = this.cache.get(key);
+
+    if (this.isCacheValid(entry)) {
+      return entry!.data;
+    }
+
+    // Clean up expired entry
+    if (entry) {
+      this.cache.delete(key);
+    }
+
+    return null;
+  }
+
+  /**
+   * Store in cache
+   */
+  private static setCache(
+    userId: string,
+    action: AchievementAction,
+    data: (UserAchievement & { achievement: Achievement })[]
+  ): void {
+    const key = this.getCacheKey(userId, action);
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now(),
+    });
+
+    // Periodically clean up old cache entries (keep cache size reasonable)
+    if (this.cache.size > 100) {
+      const now = Date.now();
+      for (const [cacheKey, entry] of this.cache.entries()) {
+        if (now - entry.timestamp >= this.CACHE_TTL) {
+          this.cache.delete(cacheKey);
+        }
+      }
+    }
+  }
   /**
    * Check and unlock achievements based on user actions
    */
@@ -19,6 +92,12 @@ export class AchievementService {
     metadata = {},
   }: AchievementCheck) {
     try {
+      // Check cache first to prevent duplicate queries
+      const cached = this.getFromCache(userId, action);
+      if (cached !== null) {
+        return cached;
+      }
+
       const unlockedAchievements: (UserAchievement & {
         achievement: Achievement;
       })[] = [];
@@ -170,6 +249,9 @@ export class AchievementService {
           }
         }
       }
+
+      // Store result in cache before returning
+      this.setCache(userId, action, unlockedAchievements);
 
       return unlockedAchievements;
     } catch (error) {

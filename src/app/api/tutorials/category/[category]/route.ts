@@ -25,12 +25,12 @@ export async function GET(
     const offset = (page - 1) * limit;
 
     const decodedCategory = decodeURIComponent(category);
-    const tutorials = await TutorialService.getTutorialsByCategory(
-      decodedCategory,
-      limit,
-      offset
-    );
-    const totalCount = await TutorialService.getTutorialsCount({ category: decodedCategory });
+
+    // Use Promise.all to fetch tutorials and count in parallel (more efficient than sequential)
+    const [tutorials, totalCount] = await Promise.all([
+      TutorialService.getTutorialsByCategory(decodedCategory, limit, offset),
+      TutorialService.getTutorialsCount({ category: decodedCategory })
+    ]);
     
     return NextResponse.json({
       success: true,

@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
+import { useSession } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
 import { useTutorial } from "@/hooks/useTutorial";
 import { useTutorialNavigation } from "@/hooks/useTutorialNavigation";
-import { useSubscription, checkContentAccess } from "@/hooks/useSubscription";
+import { checkContentAccess } from "@/hooks/useSubscription";
 import { useTutorialStart } from "@/hooks/useTutorialStart";
 import { useTutorialCompletion } from "@/hooks/useTutorialCompletion";
 import { useProgressiveLoading } from "@/hooks/useProgressiveLoading";
@@ -31,7 +32,11 @@ export default function TutorialClient({
 }: TutorialClientProps) {
   const { currentMood } = useMood();
   const [contentLoaded, setContentLoaded] = useState(false);
-  const { data } = useSubscription();
+
+  // Get session directly instead of making API call
+  // subscriptionInfo is pre-loaded in the session to prevent repeated DB queries
+  const { data: session } = useSession();
+  const subscriptionInfo = session?.user?.subscriptionInfo;
 
   // Use TanStack Query hook for tutorial data
   const { data: tutorial, isLoading, error, isError } = useTutorial(slug);
@@ -40,10 +45,10 @@ export default function TutorialClient({
   const { data: navigationData, isLoading: isNavigationLoading } =
     useTutorialNavigation(slug, category);
 
-  // Check if user can access this tutorial
+  // Check if user can access this tutorial using cached session subscription
   const accessCheck = tutorial
     ? checkContentAccess(
-        data,
+        subscriptionInfo,
         tutorial.requiredPlan || tutorial.meta?.requiredPlan,
         tutorial.isPremium || tutorial.meta?.isPremium
       )

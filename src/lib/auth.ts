@@ -6,6 +6,8 @@ import { generateUniqueUsername } from "@/lib/username";
 import { emailService } from "@/lib/services/emailService";
 import type { NextAuthOptions } from "next-auth";
 import { devMode } from "./services/envService";
+import { SubscriptionService, type SubscriptionInfo } from "@/lib/subscriptionService";
+
 const debugMode = devMode();
 
 export const authOptions: NextAuthOptions = {
@@ -28,6 +30,11 @@ export const authOptions: NextAuthOptions = {
       try {
         if (session?.user && user) {
           session.user.id = user.id;
+
+          // Fetch full subscription info once and cache in session
+          // This eliminates the need for repeated subscription API calls
+          const subscriptionInfo = await SubscriptionService.getUserSubscription(user.id);
+
           // Add mood, subscription, and role to session
           const dbUser = await prisma.user.findUnique({
             where: { id: user.id },
@@ -38,9 +45,13 @@ export const authOptions: NextAuthOptions = {
               role: true,
             },
           });
+
           session.user.mood = dbUser?.mood || "CHILL";
           session.user.subscription = dbUser?.subscription || "FREE";
           session.user.role = dbUser?.role || "USER";
+
+          // Store full subscription info in session to prevent repeated DB queries
+          session.user.subscriptionInfo = subscriptionInfo;
 
           // Ensure user has a username, generate if missing
           if (!dbUser?.username) {

@@ -46,7 +46,7 @@ interface CodeEditorProps {
 const CodeEditor: React.FC<CodeEditorProps> = ({
   initialCode = "",
   readOnly = false,
-  height = "500px",
+  height = "100%",
   placeholder,
   onCodeChange,
   canRun = true,
@@ -279,7 +279,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       {/* Code Editor */}
       <div
         className={`relative ${
-          isExpanded ? "fixed inset-0 z-50 bg-white dark:bg-gray-800" : ""
+          isExpanded ? "fixed inset-0 bg-white dark:bg-gray-800" : ""
         }`}
       >
         {isExpanded && (

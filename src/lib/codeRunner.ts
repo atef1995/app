@@ -381,20 +381,43 @@ finalTimeout = setTimeout(() => {
   process.exit(0);
 }, 8000);
 
-// Execute user code
+// Execute user code with comprehensive error handling
 async function runUserCode() {
   try {
+    // Use strict mode to catch more errors
+    'use strict';
+
     await (async () => {
       ${code}
     })();
-    
+
     executionComplete = true;
     setTimeout(() => {
       checkCompletion();
     }, 100);
-    
+
   } catch (error) {
-    console.error('Execution error:', error.message);
+    // Capture detailed error information
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : '';
+
+    // Extract the actual error line from stack if available
+    let lineInfo = '';
+    if (errorStack) {
+      const match = errorStack.match(/at .*:(\d+):(\d+)/);
+      if (match) {
+        lineInfo = \` (line \${match[1]})\`;
+      }
+    }
+
+    // Log the full error with helpful context
+    console.error(\`❌ Runtime Error\${lineInfo}: \${errorMessage}\`);
+
+    // If it's a TypeError (common for property access errors), provide extra context
+    if (error instanceof TypeError) {
+      console.error('💡 Tip: This often happens when accessing properties on undefined, null, or wrong types');
+    }
+
     executionComplete = true;
     setTimeout(() => {
       checkCompletion();
@@ -1081,8 +1104,31 @@ export async function executeJavaScriptAsync(code: string): Promise<{
     };
 
     try {
+      // Wrap user code in strict mode and comprehensive error handling
+      const wrappedCode = `
+        'use strict';
+        try {
+          ${code}
+        } catch (error) {
+          // Capture runtime errors with helpful details
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          const errorName = error instanceof Error ? error.name : 'Error';
+
+          console.error(\`❌ \${errorName}: \${errorMessage}\`);
+
+          // Provide helpful tips for common errors
+          if (error instanceof TypeError) {
+            console.error('💡 Tip: Check that you are accessing properties on the correct type of value');
+          } else if (error instanceof ReferenceError) {
+            console.error('💡 Tip: Make sure all variables and functions are defined before use');
+          }
+
+          throw error; // Re-throw to maintain error state
+        }
+      `;
+
       // Create function with mocked globals
-      const func = new Function("console", "setTimeout", "Promise", code);
+      const func = new Function("console", "setTimeout", "Promise", wrappedCode);
 
       // Execute the code with native Promise support
       func(mockConsole, mockSetTimeout, Promise);
@@ -1111,7 +1157,11 @@ export async function executeJavaScriptAsync(code: string): Promise<{
         }, 15000); // 15 second maximum
       }
     } catch (error) {
-      errors.push(String(error));
+      // Capture error with details
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorName = error instanceof Error ? error.name : 'Error';
+      errors.push(`❌ ${errorName}: ${errorMessage}`);
+
       resolve({
         success: false,
         output: logs.join("\n"),
@@ -1161,26 +1211,51 @@ export function executeJavaScriptSimple(code: string) {
       },
     };
 
+    // Wrap code in strict mode and error handling
+    const wrappedCode = `
+      'use strict';
+      try {
+        ${code}
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorName = error instanceof Error ? error.name : 'Error';
+
+        console.error(\`❌ \${errorName}: \${errorMessage}\`);
+
+        if (error instanceof TypeError) {
+          console.error('💡 Tip: Check that you are accessing properties on the correct type of value');
+        } else if (error instanceof ReferenceError) {
+          console.error('💡 Tip: Make sure all variables and functions are defined before use');
+        }
+
+        throw error;
+      }
+    `;
+
     // Create a function with the code and mock console
-    const func = new Function("console", code);
+    const func = new Function("console", wrappedCode);
 
     // Execute the code
     func(mockConsole);
 
     return {
-      success: true,
+      success: errors.length === 0,
       output: logs.join("\n"),
       error: errors.join("\n"),
       logs,
       errors,
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorName = error instanceof Error ? error.name : "Error";
+    const formattedError = `❌ ${errorName}: ${errorMessage}`;
+
     return {
       success: false,
       output: "",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: formattedError,
       logs: [],
-      errors: [error instanceof Error ? error.message : "Unknown error"],
+      errors: [formattedError],
     };
   }
 }

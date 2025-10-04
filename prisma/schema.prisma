@@ -132,6 +132,10 @@ model Tutorial {
   tutorialProgress TutorialProgress[]
   category         Category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
+  // Performance indexes for frequently queried fields
+  @@index([categoryId, published, order]) // Composite index for category page queries
+  @@index([published, order])             // Index for all tutorials queries
+  @@index([categoryId])                   // Index for category relation queries
   @@map("tutorials")
 }
 
@@ -148,6 +152,7 @@ model Quiz {
   attempts     QuizAttempt[]
   tutorial     Tutorial      @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
 
+  @@index([tutorialId]) // Index for tutorial-quiz relation queries
   @@map("quizzes")
 }
 
@@ -165,6 +170,8 @@ model QuizAttempt {
   quiz       Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId]) // Index for user quiz attempts queries (used in achievement stats)
+  @@index([quizId]) // Index for quiz attempts lookup
   @@map("quiz_attempts")
 }
 
@@ -184,6 +191,7 @@ model TutorialProgress {
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, tutorialId])
+  @@index([userId, quizPassed]) // Index for achievement stats queries (getUserStats)
   @@map("tutorial_progress")
 }
 
@@ -204,6 +212,7 @@ model ChallengeProgress {
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, challengeId])
+  @@index([userId, passed]) // Index for achievement stats queries (getUserStats)
   @@map("challenge_progress")
 }
 
