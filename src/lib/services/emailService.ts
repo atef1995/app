@@ -129,9 +129,12 @@ class EmailService {
     // Send to admin/support email
     const adminEmail = process.env.ADMIN_EMAIL;
     if (!adminEmail) {
-      return Error("No recepient email defined");
+      return {
+        success: false,
+        error: "No recipient email defined in environment variables",
+      };
     }
-    return await this.sendEmail(adminEmail!, subject, html);
+    return await this.sendEmail(adminEmail, subject, html);
   }
 
   async sendBugReportEmail(bugData: {
@@ -153,7 +156,13 @@ class EmailService {
 
     // Send to development team email
     const devEmail = process.env.ADMIN_EMAIL;
-    return await this.sendEmail(devEmail!, subject, html);
+    if (!devEmail) {
+      return {
+        success: false,
+        error: "No recipient email defined in environment variables",
+      };
+    }
+    return await this.sendEmail(devEmail, subject, html);
   }
 
   async sendFreeAccessRequestEmail(requestData: {
