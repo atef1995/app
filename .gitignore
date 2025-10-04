@@ -45,3 +45,4 @@ CLAUDE.md
 public/sitemap-0.xml
 src/content/tutorials/nodejs/TUTORIAL-PLAN.md
 src/content/tutorials/github/GITHUB_TUTORIALS_PLAN.md
+.claude/agents/nextjs-expert-engineer.md

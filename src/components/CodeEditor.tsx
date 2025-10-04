@@ -69,7 +69,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     if (initialCode.trim() && editorRef.current) {
       setTimeout(() => {
         editorRef.current?.getAction("editor.action.formatDocument")?.run();
-      }, 100);
+      }, 1000);
     }
   }, [initialCode]);
 
@@ -98,13 +98,12 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isExpanded, readOnly]);
 
-
   const handleRunCode = async () => {
     if (!code.trim() || isRunning) return;
 
     setIsRunning(true);
     setStreamingOutput([]);
-    
+
     setResult({
       output: [],
       errors: [],
@@ -124,7 +123,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
               language,
               // onOutput callback - streams each line as it's available
               (output: string) => {
-                setStreamingOutput(prev => [...prev, output]);
+                setStreamingOutput((prev) => [...prev, output]);
               },
               // onComplete callback - called when execution finishes
               (finalResult) => {
@@ -140,17 +139,24 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
               }
             );
           } catch (streamingError) {
-            console.error("Streaming execution failed, falling back to regular execution:", streamingError);
+            console.error(
+              "Streaming execution failed, falling back to regular execution:",
+              streamingError
+            );
             // Fallback to regular execution
             const executionResult = await executeJavaScript(code, language);
             if (executionResult) {
               const executionTime = Date.now() - startTime;
               setResult({
                 output: executionResult.output
-                  ? executionResult.output.split("\n").filter((line: string) => line.trim())
+                  ? executionResult.output
+                      .split("\n")
+                      .filter((line: string) => line.trim())
                   : [],
                 errors: executionResult.error
-                  ? executionResult.error.split("\n").filter((line: string) => line.trim())
+                  ? executionResult.error
+                      .split("\n")
+                      .filter((line: string) => line.trim())
                   : [],
                 executionTime,
                 isComplete: true,
@@ -165,10 +171,14 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             const executionTime = Date.now() - startTime;
             setResult({
               output: executionResult.output
-                ? executionResult.output.split("\n").filter((line: string) => line.trim())
+                ? executionResult.output
+                    .split("\n")
+                    .filter((line: string) => line.trim())
                 : [],
               errors: executionResult.error
-                ? executionResult.error.split("\n").filter((line: string) => line.trim())
+                ? executionResult.error
+                    .split("\n")
+                    .filter((line: string) => line.trim())
                 : [],
               executionTime,
               isComplete: true,
@@ -180,7 +190,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       } else {
         // Fallback to non-WebContainer execution
         let executionResult: CodeExecutionResult | undefined;
-        
+
         if (language === "javascript") {
           executionResult = await executeJavaScriptAsync(code);
         } else if (language === "typescript") {
@@ -216,7 +226,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   const lang = language.replace(firstLetter, firstLetter.toUpperCase());
 
   return (
-      <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
+    <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
       {/* Header */}
       <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
         <div className="flex items-center space-x-2">
@@ -290,7 +300,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
         <Editor
           height={isExpanded ? "calc(100vh - 140px)" : height}
-          defaultLanguage={language === "nodejs" || language === "node" ? "javascript" : language}
+          defaultLanguage={
+            language === "nodejs" || language === "node"
+              ? "javascript"
+              : language
+          }
           value={code}
           onChange={(value) => handleCodeChange(value || "")}
           theme={resolvedTheme === "dark" ? "vs-dark" : "light"}
@@ -332,7 +346,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             if (code.trim()) {
               setTimeout(() => {
                 editor.getAction("editor.action.formatDocument")?.run();
-              }, 100);
+              }, 1000);
             }
 
             // Add placeholder support
@@ -375,9 +389,9 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       </div>
 
       {/* Console Output */}
-      <Console 
-        result={result} 
-        isRunning={isRunning} 
+      <Console
+        result={result}
+        isRunning={isRunning}
         forceUpdateCounter={forceUpdateCounter}
         streamingOutput={streamingOutput}
       />
