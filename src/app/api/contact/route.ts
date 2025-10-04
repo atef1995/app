@@ -26,8 +26,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (mailchecker.isValid(email)) {
-      return NextResponse.json({ error: "error" }, { status: 400 });
+    if (!mailchecker.isValid(email)) {
+      return NextResponse.json(
+        { error: "Invalid or disposable email address" },
+        { status: 400 }
+      );
     }
 
     // Get user agent for debugging purposes

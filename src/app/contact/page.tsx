@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { Send, Mail, MessageSquare } from "lucide-react";
 import { useMood } from "@/components/providers/MoodProvider";
-import { useToast } from "@/hooks/useToast";
+import { useToastContext } from "@/components/providers/ToastProvider";
 import getMoodColors from "@/lib/getMoodColors";
 import mailchecker from "mailchecker";
 
 export default function ContactPage() {
   const { currentMood } = useMood();
-  const { addToast } = useToast();
+  const { addToast } = useToastContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
