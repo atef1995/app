@@ -128,6 +128,9 @@ class EmailService {
 
     // Send to admin/support email
     const adminEmail = process.env.ADMIN_EMAIL;
+    if (!adminEmail) {
+      return Error("No recepient email defined");
+    }
     return await this.sendEmail(adminEmail!, subject, html);
   }
 
