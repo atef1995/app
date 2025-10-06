@@ -21,6 +21,7 @@ import {
   Code2,
   Video,
   Smartphone,
+  Check,
 } from "lucide-react";
 import { MOODS } from "@/lib/moods";
 import { MoodCard } from "@/components/MoodCard";
@@ -149,9 +150,9 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            The only programming learning platform that adapts to your mood.
-            Whether you&apos;re chilling, rushing, or grinding - we&apos;ve got
-            the perfect learning experience for you.
+            Master JavaScript and build 10 real portfolio projects in 12 weeks.
+            Mood-adaptive learning that fits YOUR energy level - no burnout, just
+            results.
           </motion.p>
           <motion.div
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
@@ -167,19 +168,14 @@ export default function HomePage() {
                 Start Learning
               </Link>
             </motion.div>
-            {/* <motion.button
-              onClick={() => {
-                // Scroll to mood selection section
-                document.querySelector("#mood-selection")?.scrollIntoView({
-                  behavior: "smooth",
-                });
-              }}
-              className="border-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors cursor-pointer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Watch Demo
-            </motion.button> */}
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link
+                href="/free-course"
+                className="inline-block border-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors cursor-pointer"
+              >
+                Get Free Course
+              </Link>
+            </motion.div>
           </motion.div>
         </motion.div>
 
@@ -388,6 +384,170 @@ export default function HomePage() {
           </AnimatePresence>
         </motion.div>
 
+        {/* Curriculum Roadmap Section */}
+        <motion.div
+          className="mb-16"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <motion.h2
+            className="text-3xl font-bold text-center mb-4 text-gray-900 dark:text-gray-100"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            Your Learning Path to Mastery
+          </motion.h2>
+          <motion.p
+            className="text-center text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            A structured curriculum that takes you from complete beginner to job-ready developer
+          </motion.p>
+
+          <div className="max-w-5xl mx-auto">
+            {/* Beginner Level */}
+            <motion.div
+              className="mb-8"
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-semibold">
+                  Level 1: Beginner
+                </div>
+                <div className="h-px flex-1 bg-gradient-to-r from-green-300 to-transparent dark:from-green-700"></div>
+              </div>
+              <div className="grid md:grid-cols-3 gap-4">
+                {[
+                  { title: "JavaScript Fundamentals", duration: "4-6 hrs", topics: "Variables, Functions, Arrays" },
+                  { title: "HTML Essentials", duration: "2-3 hrs", topics: "Structure, Forms, Semantic HTML" },
+                  { title: "CSS Styling", duration: "3-4 hrs", topics: "Flexbox, Grid, Animations" },
+                ].map((module, idx) => (
+                  <motion.div
+                    key={module.title}
+                    className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: 0.3 + idx * 0.1 }}
+                    whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">{module.title}</h3>
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{module.topics}</p>
+                    <div className="text-xs text-gray-500 dark:text-gray-500">{module.duration}</div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Intermediate Level */}
+            <motion.div
+              className="mb-8"
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm font-semibold">
+                  Level 2: Intermediate
+                </div>
+                <div className="h-px flex-1 bg-gradient-to-r from-blue-300 to-transparent dark:from-blue-700"></div>
+              </div>
+              <div className="grid md:grid-cols-4 gap-4">
+                {[
+                  { title: "DOM Manipulation", duration: "2-3 hrs", topics: "Events, Dynamic Pages" },
+                  { title: "OOP JavaScript", duration: "3-4 hrs", topics: "Classes, Inheritance" },
+                  { title: "Async Programming", duration: "2-3 hrs", topics: "Promises, Async/Await" },
+                  { title: "Data Structures", duration: "4-6 hrs", topics: "Arrays, Objects, Maps" },
+                ].map((module, idx) => (
+                  <motion.div
+                    key={module.title}
+                    className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: 0.5 + idx * 0.1 }}
+                    whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">{module.title}</h3>
+                      <Check className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{module.topics}</p>
+                    <div className="text-xs text-gray-500 dark:text-gray-500">{module.duration}</div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Advanced Level */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 px-3 py-1 rounded-full text-sm font-semibold">
+                  Level 3: Advanced
+                </div>
+                <div className="h-px flex-1 bg-gradient-to-r from-purple-300 to-transparent dark:from-purple-700"></div>
+              </div>
+              <div className="grid md:grid-cols-3 gap-4">
+                {[
+                  { title: "Advanced JavaScript", duration: "5-8 hrs", topics: "Closures, Patterns, Performance" },
+                  { title: "Node.js & APIs", duration: "6-8 hrs", topics: "Express, REST APIs, Databases" },
+                  { title: "Git & GitHub", duration: "2-3 hrs", topics: "Version Control, Collaboration" },
+                ].map((module, idx) => (
+                  <motion.div
+                    key={module.title}
+                    className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: 0.7 + idx * 0.1 }}
+                    whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">{module.title}</h3>
+                      <Check className="w-5 h-5 text-purple-500 flex-shrink-0" />
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{module.topics}</p>
+                    <div className="text-xs text-gray-500 dark:text-gray-500">{module.duration}</div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Total Duration */}
+            <motion.div
+              className="mt-8 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold">
+                <Trophy className="w-5 h-5" />
+                Complete Curriculum: 40-60 hours to job-ready skills
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+
         {/* Features Section */}
         <motion.div
           className="mb-16"
@@ -414,28 +574,28 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
-                icon: TargetIcon,
-                title: "Mood-Driven Learning",
+                icon: Trophy,
+                title: "Build 10+ Portfolio Projects",
                 description:
-                  "First platform to adapt content to your current mood and energy level",
+                  "Create real-world projects that impress employers and land you interviews",
+              },
+              {
+                icon: Target,
+                title: "Job-Ready in 12 Weeks",
+                description:
+                  "Structured learning path from beginner to employable developer",
+              },
+              {
+                icon: Zap,
+                title: "Learn at Your Own Pace",
+                description:
+                  "Mood-adaptive content adjusts to your energy level - no burnout",
               },
               {
                 icon: Code2,
-                title: "Live Code Editor",
+                title: "Master Modern JavaScript",
                 description:
-                  "Practice JavaScript right in your browser with instant feedback",
-              },
-              {
-                icon: Video,
-                title: "Interactive Challenges",
-                description:
-                  "Hands-on coding challenges that test your skills in real-time",
-              },
-              {
-                icon: Smartphone,
-                title: "Mobile First",
-                description:
-                  "Learn anywhere, anytime with our mobile-optimized experience",
+                  "From basics to advanced - ES6+, async/await, APIs, and Node.js",
               },
             ].map((feature, index) => (
               <motion.div
@@ -474,6 +634,167 @@ export default function HomePage() {
           </div>
         </motion.div>
 
+        {/* Free Course Promotion */}
+        <motion.div
+          className="mb-16"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <div className="bg-gradient-to-r from-orange-500 to-pink-500 rounded-2xl p-8 md:p-12 text-white shadow-xl">
+            <div className="max-w-3xl mx-auto text-center">
+              <motion.div
+                className="inline-block bg-white/20 px-4 py-1 rounded-full text-sm font-semibold mb-4"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                🎁 Limited Time Offer
+              </motion.div>
+              <motion.h2
+                className="text-3xl md:text-4xl font-bold mb-4"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
+                Not Ready to Commit? Start with Our Free Course!
+              </motion.h2>
+              <motion.p
+                className="text-xl mb-6 text-orange-100"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                Get our 5-day JavaScript crash course delivered to your inbox — absolutely free.
+                No credit card required.
+              </motion.p>
+              <motion.div
+                className="flex flex-col sm:flex-row gap-4 justify-center"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
+                <Link
+                  href="/free-course"
+                  className="inline-block bg-white text-orange-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
+                >
+                  Get Free Course →
+                </Link>
+              </motion.div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Comparison Table */}
+        <motion.div
+          className="mb-16"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <motion.h2
+            className="text-3xl font-bold text-center mb-4 text-gray-900 dark:text-gray-100"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            Why Choose Us Over Alternatives?
+          </motion.h2>
+          <motion.p
+            className="text-center text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            See how we stack up against other learning options
+          </motion.p>
+
+          <div className="max-w-5xl mx-auto overflow-x-auto">
+            <motion.table
+              className="w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <thead className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                <tr>
+                  <th className="px-6 py-4 text-left font-semibold">Feature</th>
+                  <th className="px-6 py-4 text-center font-semibold">YouTube/Free</th>
+                  <th className="px-6 py-4 text-center font-semibold">Bootcamps</th>
+                  <th className="px-6 py-4 text-center font-semibold bg-white/20">Vibed to Cracked</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {[
+                  { feature: "Structured Curriculum", youtube: false, bootcamp: true, us: true },
+                  { feature: "Mood-Adaptive Learning", youtube: false, bootcamp: false, us: true },
+                  { feature: "Learn at Your Pace", youtube: true, bootcamp: false, us: true },
+                  { feature: "Portfolio Projects", youtube: false, bootcamp: true, us: true },
+                  { feature: "Interactive Code Editor", youtube: false, bootcamp: true, us: true },
+                  { feature: "Progress Tracking", youtube: false, bootcamp: true, us: true },
+                  { feature: "Cost", youtube: "Free", bootcamp: "$15k-20k", us: "$9.98/mo" },
+                  { feature: "Time Commitment", youtube: "Self-paced", bootcamp: "3-6 months full-time", us: "12 weeks part-time" },
+                ].map((row, idx) => (
+                  <motion.tr
+                    key={row.feature}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: 0.3 + idx * 0.05 }}
+                  >
+                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">
+                      {row.feature}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      {typeof row.youtube === 'boolean' ? (
+                        row.youtube ? (
+                          <Check className="w-5 h-5 text-green-500 mx-auto" />
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )
+                      ) : (
+                        <span className="text-gray-600 dark:text-gray-400 text-sm">{row.youtube}</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      {typeof row.bootcamp === 'boolean' ? (
+                        row.bootcamp ? (
+                          <Check className="w-5 h-5 text-green-500 mx-auto" />
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )
+                      ) : (
+                        <span className="text-gray-600 dark:text-gray-400 text-sm">{row.bootcamp}</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-center bg-blue-50 dark:bg-blue-900/20">
+                      {typeof row.us === 'boolean' ? (
+                        row.us ? (
+                          <Check className="w-5 h-5 text-blue-600 dark:text-blue-400 mx-auto" />
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )
+                      ) : (
+                        <span className="text-blue-600 dark:text-blue-400 font-semibold text-sm">{row.us}</span>
+                      )}
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </motion.table>
+          </div>
+        </motion.div>
+
         {/* CTA Section */}
         <motion.div
           className="text-center bg-white dark:bg-gray-900 rounded-2xl p-12 shadow-lg"
@@ -486,6 +807,17 @@ export default function HomePage() {
             transition: { duration: 0.2 },
           }}
         >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-4"
+          >
+            <div className="inline-block bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 px-4 py-2 rounded-full text-sm font-semibold mb-4">
+              🔥 Early Adopter Pricing Active
+            </div>
+          </motion.div>
           <motion.h2
             className="text-3xl font-bold mb-4 text-gray-900 dark:text-gray-100"
             initial={{ opacity: 0, y: 20 }}
@@ -502,8 +834,8 @@ export default function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            Join thousands of developers who are learning JavaScript in a way
-            that actually fits their lifestyle.
+            Join developers who are mastering JavaScript with mood-adaptive
+            learning that actually works for real life.
           </motion.p>
           <motion.div
             className="flex flex-col sm:flex-row gap-4 justify-center"
@@ -536,10 +868,28 @@ export default function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.8 }}
           >
-            Free tier includes 3 quizzes per month • No credit card required
+            Free tier includes 15 tutorials + unlimited practice challenges • No credit card required
           </motion.p>
+          <motion.div
+            className="flex flex-wrap justify-center items-center gap-6 mt-8 text-sm text-gray-500 dark:text-gray-400"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.9 }}
+          >
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-green-500" />
+              <span>30-day money-back guarantee</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span>Secure payment via Stripe</span>
+            </div>
+          </motion.div>
           <motion.p
-            className="text-xs text-gray-400 dark:text-gray-500 mt-2"
+            className="text-xs text-gray-400 dark:text-gray-500 mt-4"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}

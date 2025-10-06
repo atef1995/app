@@ -99,18 +99,18 @@ export default function PricingPage() {
       price: 0,
       period: "forever",
       description:
-        "Perfect for testing the waters and getting your first taste 🌊",
+        "Start your journey and build your first 3 projects 🌊",
       emoji: "🎯",
       features: [
-        { text: "3 Free Tutorials", included: true },
-        { text: "5 Practice Challenges", included: true },
+        { text: "15 Beginner Tutorials", included: true, highlight: true },
+        { text: "Unlimited Practice Challenges", included: true, highlight: true },
+        { text: "Build Your First 3 Projects", included: true },
         { text: "Mood-Adaptive Learning", included: true },
-        { text: "Progress Tracking", included: true },
-        { text: "Interactive Code Editor", included: true },
-        { text: "3 Quizzes", included: true },
-        { text: "Advanced Tutorials", included: false },
-        { text: "Unlimited Challenges", included: false },
-        { text: "Priority Support", included: false },
+        { text: "Progress Tracking Dashboard", included: true },
+        { text: "5 Quizzes per month", included: true },
+        { text: "Advanced Projects & Tutorials", included: false },
+        { text: "Job-Ready Portfolio", included: false },
+        { text: "Code Review & Mentorship", included: false },
       ],
       cta: "Start Free",
     },
@@ -119,20 +119,20 @@ export default function PricingPage() {
       name: "Vibed",
       price: getRealPrice("VIBED", false),
       period: "month",
-      description: "For the motivated learner ready to level up their game 🚀",
+      description: "Build a job-ready portfolio and master full-stack development 🚀",
       popular: true,
       emoji: "🔥",
       features: [
-        { text: "Unlimited Tutorials", included: true, highlight: true },
-        { text: "Unlimited Challenges", included: true, highlight: true },
-        { text: "Quizzes & Assessments", included: true, highlight: true },
-        { text: "Advanced Progress Analytics", included: true },
-        { text: "Mood-Adaptive Learning", included: true },
-        { text: "Interactive Code Editor", included: true },
-        { text: "Priority Support", included: true },
-        { text: "Certificate of Completion", included: true },
-        { text: "Manual Code Reviews", included: false },
-        { text: "Highly Advanced Tutorials", included: false },
+        { text: "Build 10+ Portfolio Projects", included: true, highlight: true },
+        { text: "Master JavaScript, HTML & CSS", included: true, highlight: true },
+        { text: "Learn Node.js & REST APIs", included: true, highlight: true },
+        { text: "Unlimited Quizzes & Assessments", included: true },
+        { text: "Completion Certificates", included: true },
+        { text: "Advanced Analytics Dashboard", included: true },
+        { text: "Priority Email Support", included: true },
+        { text: "All Future Content Updates", included: true },
+        { text: "1-on-1 Code Reviews", included: false },
+        { text: "Personalized Mentorship", included: false },
       ],
       cta: "Get Vibed",
     },
@@ -142,22 +142,24 @@ export default function PricingPage() {
       price: getRealPrice("CRACKED", false),
       period: "month",
       description:
-        "When you're ready to become absolutely cracked at coding 💪",
+        "Land your dream job with personalized mentorship and career support 💪",
       emoji: "⚡",
       features: [
-        { text: "Everything in Vibed", included: true },
+        { text: "Everything in Vibed, plus:", included: true },
         {
-          text: "Manual Code Reviews",
+          text: "Weekly 1-on-1 Code Reviews",
           included: true,
           highlight: true,
         },
         {
-          text: "Advanced Analytics Dashboard",
+          text: "Personalized Career Mentorship",
           included: true,
           highlight: true,
         },
-        { text: "1-on-1 Mentorship Sessions", included: true },
-        { text: "Access to Advanced Tutorials", included: true },
+        { text: "Interview Prep & Resume Review", included: true, highlight: true },
+        { text: "Direct Access to Instructor", included: true },
+        { text: "Job Application Support", included: true },
+        { text: "Advanced System Design Topics", included: true },
       ],
       cta: "Get Cracked",
     },
@@ -228,6 +230,16 @@ export default function PricingPage() {
   return (
     <div className={`min-h-screen bg-gradient-to-br ${moodColors.gradient}`}>
       <div className="container mx-auto px-4 py-12">
+        {/* Early Bird Pricing Banner */}
+        {!isExistingSubscriber && (
+          <div className="mb-8 mx-auto max-w-2xl">
+            <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-lg shadow-lg text-center">
+              <div className="font-bold text-lg">🔥 Early Adopter Pricing - Limited Time</div>
+              <div className="text-sm mt-1">Lock in this price forever. Prices increase as we add more features.</div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="text-center mb-12">
           {/* Current Plan Status */}
@@ -343,6 +355,11 @@ export default function PricingPage() {
                   <Star className="w-4 h-4" /> Most Popular
                 </div>
               )}
+              {plan.id === "CRACKED" && plan.id !== currentPlan && !plan.popular && (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-purple-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                  ⚡ Limited Mentorship Slots
+                </div>
+              )}
 
               <div className="p-8">
                 {/* Plan header */}
@@ -451,12 +468,65 @@ export default function PricingPage() {
                 {/* Free trial note for premium plans */}
                 {plan.id === "VIBED" && (
                   <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    7-day free trial • Cancel anytime
+                    7-day free trial • 30-day money-back guarantee • Cancel anytime
+                  </p>
+                )}
+                {plan.id === "CRACKED" && (
+                  <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    30-day money-back guarantee • Cancel anytime
                   </p>
                 )}
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Trust Signals Section */}
+        <div className="mt-12 max-w-4xl mx-auto">
+          <div className="flex flex-wrap justify-center items-center gap-8 py-8 px-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+              <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                <Check className="w-5 h-5 text-green-600 dark:text-green-400" />
+              </div>
+              <div className="text-sm">
+                <div className="font-semibold">30-Day Guarantee</div>
+                <div className="text-xs text-gray-500">100% money-back</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <div className="text-sm">
+                <div className="font-semibold">Secure Payments</div>
+                <div className="text-xs text-gray-500">Powered by Stripe</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+              <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div className="text-sm">
+                <div className="font-semibold">Instant Access</div>
+                <div className="text-xs text-gray-500">Start learning now</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+              <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                <svg className="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </div>
+              <div className="text-sm">
+                <div className="font-semibold">Cancel Anytime</div>
+                <div className="text-xs text-gray-500">No questions asked</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Financial Assistance Section */}
@@ -509,6 +579,14 @@ export default function PricingPage() {
                 The 7-day free trial gives you full access to all Vibed
                 features. No credit card required to start - just pure learning
                 vibes!
+              </p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg border-2 border-orange-200 dark:border-orange-800">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                Will prices increase? 💰
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Yes! We&apos;re currently offering early adopter pricing. As we add more features and content, prices will increase. Lock in your price now and keep it forever - even as we raise prices for new members.
               </p>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">

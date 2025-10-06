@@ -48,6 +48,7 @@ export interface PlanLimits {
   maxTutorials: number;
   maxChallenges: number;
   hasQuizzes: boolean;
+  maxQuizzes?: number;
   hasMoodAdaptation: boolean;
   hasProgressTracking: boolean;
   hasAdvancedFeatures: boolean;
@@ -59,9 +60,10 @@ export interface PlanLimits {
 // Plan configurations
 export const PLAN_CONFIGS: Record<Plan, PlanLimits> = {
   FREE: {
-    maxTutorials: 3,
-    maxChallenges: 5,
-    hasQuizzes: false,
+    maxTutorials: 15,
+    maxChallenges: Infinity,
+    hasQuizzes: true,
+    maxQuizzes: 5,
     hasMoodAdaptation: true,
     hasProgressTracking: true,
     hasAdvancedFeatures: false,
@@ -70,6 +72,7 @@ export const PLAN_CONFIGS: Record<Plan, PlanLimits> = {
     maxTutorials: Infinity,
     maxChallenges: Infinity,
     hasQuizzes: true,
+    maxQuizzes: Infinity,
     hasMoodAdaptation: true,
     hasProgressTracking: true,
     hasAdvancedFeatures: true,
@@ -81,6 +84,7 @@ export const PLAN_CONFIGS: Record<Plan, PlanLimits> = {
     maxTutorials: Infinity,
     maxChallenges: Infinity,
     hasQuizzes: true,
+    maxQuizzes: Infinity,
     hasMoodAdaptation: true,
     hasProgressTracking: true,
     hasAdvancedFeatures: true,

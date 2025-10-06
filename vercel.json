@@ -4,5 +4,11 @@
       "source": "/api/payments/webhook",
       "destination": "/api/payments/webhook/"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/send-course-emails",
+      "schedule": "0 9 * * *"
+    }
   ]
 }

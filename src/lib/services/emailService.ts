@@ -213,6 +213,13 @@ class EmailService {
     return await this.sendEmail(user.email, subject, html);
   }
 
+  async sendFreeCourseEmail(email: string, day: number, name?: string) {
+    const subject = `Day ${day}: ${this.getCourseDayTitle(day)} 🚀`;
+    const html = this.generateFreeCourseTemplate(email, day, name);
+
+    return await this.sendEmail(email, subject, html);
+  }
+
   private generateWelcomeTemplate(user: User): string {
     const moodEmojis: Record<string, string> = {
       CHILL: "😎",
@@ -1051,6 +1058,252 @@ class EmailService {
     if (riskScore >= 4) return "high";
     if (riskScore >= 2) return "medium";
     return "low";
+  }
+
+  private getCourseDayTitle(day: number): string {
+    const titles: Record<number, string> = {
+      1: "Variables & Data Types - The Building Blocks",
+      2: "Functions & Scope - Writing Reusable Code",
+      3: "Arrays & Objects - Organizing Your Data",
+      4: "DOM Manipulation - Making Pages Interactive",
+      5: "Build Your First Project - Putting It All Together",
+    };
+    return titles[day] || `Day ${day}`;
+  }
+
+  private generateFreeCourseTemplate(email: string, day: number, name?: string): string {
+    const userName = name || "there";
+    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+
+    const courseDays: Record<number, { title: string; content: string; exercise: string; tutorialSlug: string }> = {
+      1: {
+        title: "Variables & Data Types",
+        content: `
+          <p>Welcome to Day 1! Today we're starting with the foundation of all programming: <strong>variables</strong>.</p>
+
+          <h3>What You'll Learn:</h3>
+          <ul>
+            <li>📝 How to declare variables with let, const, and var</li>
+            <li>🔢 Different data types (strings, numbers, booleans)</li>
+            <li>✨ Best practices for naming variables</li>
+          </ul>
+
+          <h3>Quick Example:</h3>
+          <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto;">
+// Declaring variables
+let userName = "JavaScript Learner";
+const age = 25;
+let isLearning = true;
+
+console.log(\`Hello, \${userName}!\`);
+          </pre>
+        `,
+        exercise: "Create 3 variables: your name (string), your age (number), and whether you're excited to learn (boolean). Then console.log them!",
+        tutorialSlug: "fundamentals/variables-and-data-types"
+      },
+      2: {
+        title: "Functions & Scope",
+        content: `
+          <p>Great job on Day 1! Today we're learning about <strong>functions</strong> - the power tools of JavaScript.</p>
+
+          <h3>What You'll Learn:</h3>
+          <ul>
+            <li>🎯 How to write and call functions</li>
+            <li>📦 Function parameters and return values</li>
+            <li>🔒 Understanding scope (global vs local)</li>
+          </ul>
+
+          <h3>Quick Example:</h3>
+          <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto;">
+// Function that greets a user
+function greetUser(name) {
+  return \`Hello, \${name}! Welcome to JavaScript!\`;
+}
+
+const greeting = greetUser("Alex");
+console.log(greeting); // "Hello, Alex! Welcome to JavaScript!"
+          </pre>
+        `,
+        exercise: "Write a function called 'calculateAge' that takes a birth year and returns the person's age.",
+        tutorialSlug: "fundamentals/functions-and-scope"
+      },
+      3: {
+        title: "Arrays & Objects",
+        content: `
+          <p>You're halfway there! Today we're exploring <strong>arrays and objects</strong> - essential for organizing data.</p>
+
+          <h3>What You'll Learn:</h3>
+          <ul>
+            <li>📚 Creating and manipulating arrays</li>
+            <li>🗂️ Working with objects and properties</li>
+            <li>🔄 Array methods like map, filter, forEach</li>
+          </ul>
+
+          <h3>Quick Example:</h3>
+          <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto;">
+// Arrays
+const skills = ["HTML", "CSS", "JavaScript"];
+skills.push("React"); // Add to end
+
+// Objects
+const developer = {
+  name: "Jamie",
+  level: "beginner",
+  skills: skills
+};
+
+console.log(developer.name); // "Jamie"
+          </pre>
+        `,
+        exercise: "Create an array of your favorite programming languages and an object representing yourself as a developer.",
+        tutorialSlug: "fundamentals/arrays-and-objects"
+      },
+      4: {
+        title: "DOM Manipulation",
+        content: `
+          <p>Almost there! Today we're making websites <strong>interactive</strong> with the DOM.</p>
+
+          <h3>What You'll Learn:</h3>
+          <ul>
+            <li>🎨 Selecting HTML elements</li>
+            <li>✏️ Changing content and styles</li>
+            <li>👆 Handling click events</li>
+          </ul>
+
+          <h3>Quick Example:</h3>
+          <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto;">
+// Select an element
+const button = document.querySelector('#myButton');
+
+// Add click event
+button.addEventListener('click', () => {
+  document.querySelector('h1').textContent = 'You clicked me!';
+  document.body.style.backgroundColor = 'lightblue';
+});
+          </pre>
+        `,
+        exercise: "Create a button that changes the text of a heading when clicked.",
+        tutorialSlug: "dom/dom-manipulation"
+      },
+      5: {
+        title: "Build Your First Project",
+        content: `
+          <p>🎉 Final Day! Let's put everything together and build something real.</p>
+
+          <h3>Your First Project: Interactive Counter</h3>
+          <p>Combine variables, functions, and DOM manipulation to create a working counter app!</p>
+
+          <h3>Project Features:</h3>
+          <ul>
+            <li>➕ Increment button</li>
+            <li>➖ Decrement button</li>
+            <li>🔄 Reset button</li>
+            <li>💾 Save count to localStorage</li>
+          </ul>
+
+          <h3>Starter Code:</h3>
+          <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto;">
+let count = 0;
+
+function updateDisplay() {
+  document.querySelector('#counter').textContent = count;
+}
+
+document.querySelector('#increment').addEventListener('click', () => {
+  count++;
+  updateDisplay();
+});
+
+// Add decrement and reset yourself!
+          </pre>
+
+          <p><strong>Ready for more?</strong> Sign up for our full platform to access advanced projects, quizzes, and personalized learning!</p>
+        `,
+        exercise: "Complete the counter app with decrement and reset functionality. Share it with a friend!",
+        tutorialSlug: "tutorials"
+      }
+    };
+
+    const dayContent = courseDays[day];
+    if (!dayContent) return this.generateDefaultCourseTemplate(email, day, userName);
+
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Day ${day}: ${dayContent.title}</title>
+          <style>
+            body { font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .day-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; margin-bottom: 10px; font-size: 14px; }
+            .content { background: white; padding: 30px; border: 1px solid #ddd; }
+            .exercise-box { background: #fff3cd; padding: 20px; border-left: 4px solid #ffc107; margin: 20px 0; border-radius: 5px; }
+            .cta-button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; margin: 20px 0; }
+            .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 10px 10px; }
+            pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; font-size: 13px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="day-badge">Day ${day} of 5</div>
+            <h1>${dayContent.title}</h1>
+            <p>5-Day JavaScript Crash Course</p>
+          </div>
+
+          <div class="content">
+            <h2>Hey ${userName}! 👋</h2>
+
+            ${dayContent.content}
+
+            <div class="exercise-box">
+              <h3>💪 Today's Exercise:</h3>
+              <p>${dayContent.exercise}</p>
+            </div>
+
+            <p style="text-align: center; margin: 30px 0;">
+              <a href="${baseUrl}/tutorials/category/${dayContent.tutorialSlug}" class="cta-button">
+                Read Full Tutorial →
+              </a>
+            </p>
+
+            ${day === 5 ? `
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0;">
+                <h3>🎉 Congratulations on Completing the Course!</h3>
+                <p>Ready to take your skills to the next level?</p>
+                <a href="${baseUrl}/pricing" style="display: inline-block; background: white; color: #667eea; padding: 12px 30px; text-decoration: none; border-radius: 25px; margin: 10px 0; font-weight: bold;">
+                  View Premium Plans
+                </a>
+              </div>
+            ` : `
+              <p><small>Tomorrow: Day ${day + 1} - ${this.getCourseDayTitle(day + 1)}</small></p>
+            `}
+          </div>
+
+          <div class="footer">
+            <p>Happy coding!<br>The Vibed to Cracked Team</p>
+            <p><a href="${baseUrl}">Visit Our Platform</a> | <a href="${baseUrl}/pricing">View Pricing</a></p>
+          </div>
+        </body>
+      </html>
+    `;
+  }
+
+  private generateDefaultCourseTemplate(email: string, day: number, userName: string): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>JavaScript Course - Day ${day}</title>
+        </head>
+        <body>
+          <h1>Day ${day} Content</h1>
+          <p>Hello ${userName},</p>
+          <p>Your Day ${day} content will be available soon!</p>
+        </body>
+      </html>
+    `;
   }
 
   private getRiskAssessmentNotes(requestData: {
