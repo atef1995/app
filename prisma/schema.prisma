@@ -51,6 +51,14 @@ model User {
   createdAt                DateTime                  @default(now())
   updatedAt                DateTime                  @updatedAt
   role                     String                    @default("USER")
+
+  // Conversion tracking fields
+  conversionSource         String?   // UTM source or referrer source
+  conversionMedium         String?   // UTM medium (organic, cpc, email, etc.)
+  conversionCampaign       String?   // UTM campaign name
+  firstLandingPage         String?   // First page they visited before signup
+  anonymousSessionId       String?   // Link to original anonymous session
+
   accounts                 Account[]
   challengeAttempts        ChallengeAttempt[]
   challengeCodeProgress    ChallengeCodeProgress[]
@@ -703,7 +711,50 @@ model PhaseStep {
   updatedAt       DateTime @updatedAt
   
   phase           Phase    @relation(fields: [phaseId], references: [id], onDelete: Cascade)
-  
+
   @@unique([phaseId, contentType, contentId]) // Prevent duplicate content in same phase
   @@map("phase_steps")
+}
+
+model AnonymousSession {
+  id                String   @id @default(cuid())
+  anonymousId       String   @unique  // Browser fingerprint + random ID
+
+  // Tracking data
+  tutorialsViewed   Json     @default("[]")  // Array of {tutorialId, slug, timeSpent, startedAt}
+  totalTimeSpent    Int      @default(0)     // Total seconds spent on site
+  pagesViewed       Int      @default(0)     // Total page views
+
+  // Attribution tracking
+  source            String?  // UTM source (google, facebook, direct, etc.)
+  medium            String?  // UTM medium (organic, cpc, social, email, etc.)
+  campaign          String?  // UTM campaign name
+  referrer          String?  // HTTP referrer URL
+  landingPage       String?  // First page they visited
+
+  // Device/Browser information
+  userAgent         String?  // Full user agent string
+  device            String?  // mobile, tablet, desktop
+  browser           String?  // chrome, firefox, safari, etc.
+  os                String?  // windows, macos, linux, android, ios
+
+  // Geographic info (from IP, optional)
+  country           String?
+  region            String?
+  city              String?
+
+  // Lifecycle tracking
+  createdAt         DateTime @default(now())
+  lastActiveAt      DateTime @updatedAt
+  convertedToUserId String?  // User ID if they signed up
+  convertedAt       DateTime?
+
+  // Privacy
+  ipHash            String?  // Hashed IP address for privacy compliance
+
+  @@index([anonymousId])
+  @@index([convertedToUserId])
+  @@index([createdAt])
+  @@index([lastActiveAt])
+  @@map("anonymous_sessions")
 }
