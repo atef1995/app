@@ -5,60 +5,62 @@ const prisma = new PrismaClient();
 /**
  * Helper function to populate a phase with tutorials and quizzes from a category
  */
-async function populatePhaseWithContent(
+export async function populatePhaseWithContent(
   phaseSlug: string,
   categorySlug: string,
   phaseName: string
 ) {
   console.log(`🔗 Creating phase steps for ${phaseName}...`);
-  
+
   const tutorials = await prisma.tutorial.findMany({
     include: { category: true },
     where: { category: { slug: categorySlug } },
-    orderBy: { order: "asc" }
+    orderBy: { order: "asc" },
   });
 
-  const phase = await prisma.phase.findUnique({ 
-    where: { slug: phaseSlug } 
+  const phase = await prisma.phase.findUnique({
+    where: { slug: phaseSlug },
   });
 
   if (phase && tutorials.length > 0) {
     for (let i = 0; i < tutorials.length; i++) {
       const tutorial = tutorials[i];
-      
+
       await prisma.phaseStep.upsert({
-        where: { 
+        where: {
           phaseId_contentType_contentId: {
             phaseId: phase.id,
-            contentType: "tutorial", 
-            contentId: tutorial.id
-          }
+            contentType: "tutorial",
+            contentId: tutorial.id,
+          },
         },
         update: {
           order: i + 1,
           contentSlug: tutorial.slug,
           estimatedHours: tutorial.estimatedTime / 60,
-          prerequisites: i === 0 ? [] : [`tutorial-${tutorials[i-1].slug}`]
+          prerequisites: i === 0 ? [] : [`tutorial-${tutorials[i - 1].slug}`],
         },
         create: {
           phaseId: phase.id,
           contentType: "tutorial",
-          contentId: tutorial.id, 
+          contentId: tutorial.id,
           contentSlug: tutorial.slug,
           order: i + 1,
           isOptional: false,
           estimatedHours: tutorial.estimatedTime / 60,
-          prerequisites: i === 0 ? [] : [`tutorial-${tutorials[i-1].slug}`]
-        }
+          prerequisites: i === 0 ? [] : [`tutorial-${tutorials[i - 1].slug}`],
+        },
       });
-      
-      console.log(`  ✅ Added ${categorySlug.toUpperCase()} tutorial: ${tutorial.title}`);
+
+      console.log(
+        `  ✅ Added ${categorySlug.toUpperCase()} tutorial: ${tutorial.title}`
+      );
     }
 
     // Add quizzes for this category
     const quizzes = await prisma.quiz.findMany({
       include: { tutorial: { include: { category: true } } },
-      where: { tutorial: { category: { slug: categorySlug } } }
+      where: { tutorial: { category: { slug: categorySlug } } },
     });
 
     for (const quiz of quizzes) {
@@ -66,8 +68,8 @@ async function populatePhaseWithContent(
         where: {
           phaseId: phase.id,
           contentId: quiz.tutorialId,
-          contentType: "tutorial"
-        }
+          contentType: "tutorial",
+        },
       });
 
       if (tutorialStep && quiz.tutorial) {
@@ -76,14 +78,14 @@ async function populatePhaseWithContent(
             phaseId_contentType_contentId: {
               phaseId: phase.id,
               contentType: "quiz",
-              contentId: quiz.id
-            }
+              contentId: quiz.id,
+            },
           },
           update: {
             order: tutorialStep.order + 0.5,
             contentSlug: quiz.slug,
             estimatedHours: 0.5,
-            prerequisites: [`tutorial-${quiz.tutorial.slug}`]
+            prerequisites: [`tutorial-${quiz.tutorial.slug}`],
           },
           create: {
             phaseId: phase.id,
@@ -93,15 +95,19 @@ async function populatePhaseWithContent(
             order: tutorialStep.order + 0.5,
             isOptional: false,
             estimatedHours: 0.5,
-            prerequisites: [`tutorial-${quiz.tutorial.slug}`]
-          }
+            prerequisites: [`tutorial-${quiz.tutorial.slug}`],
+          },
         });
-        
-        console.log(`  ✅ Added ${categorySlug.toUpperCase()} quiz: ${quiz.title}`);
+
+        console.log(
+          `  ✅ Added ${categorySlug.toUpperCase()} quiz: ${quiz.title}`
+        );
       }
     }
   } else {
-    console.log(`  ⚠️  No ${categorySlug} content found or phase doesn't exist`);
+    console.log(
+      `  ⚠️  No ${categorySlug} content found or phase doesn't exist`
+    );
   }
 }
 
@@ -122,10 +128,10 @@ export async function seedPhases() {
       published: true,
     },
     {
-      slug: "css-foundations", 
+      slug: "css-foundations",
       title: "CSS Foundations",
       description: "Style and layout your web pages with CSS",
-      color: "from-blue-400 to-purple-500", 
+      color: "from-blue-400 to-purple-500",
       icon: "Palette",
       order: 2,
       estimatedWeeks: 3,
@@ -134,11 +140,11 @@ export async function seedPhases() {
     },
     {
       slug: "javascript-fundamentals",
-      title: "JavaScript Fundamentals", 
+      title: "JavaScript Fundamentals",
       description: "Master the core concepts and syntax of JavaScript",
       color: "from-green-400 to-blue-500",
       icon: "Sprout",
-      order: 3, 
+      order: 3,
       estimatedWeeks: 4,
       prerequisites: ["html-foundations", "css-foundations"],
       published: true,
@@ -146,7 +152,7 @@ export async function seedPhases() {
     {
       slug: "dom-interactivity",
       title: "DOM Manipulation & Interactivity",
-      description: "Learn to make web pages interactive and dynamic", 
+      description: "Learn to make web pages interactive and dynamic",
       color: "from-purple-400 to-pink-500",
       icon: "MousePointer",
       order: 4,
@@ -159,14 +165,14 @@ export async function seedPhases() {
       title: "Object-Oriented Programming",
       description: "Master classes, inheritance, and OOP principles",
       color: "from-orange-400 to-red-500",
-      icon: "Building", 
+      icon: "Building",
       order: 5,
       estimatedWeeks: 3,
       prerequisites: ["javascript-fundamentals"],
       published: true,
     },
     {
-      slug: "async-programming", 
+      slug: "async-programming",
       title: "Asynchronous JavaScript",
       description: "Master promises, async/await, and API integration",
       color: "from-yellow-400 to-orange-500",
@@ -178,9 +184,9 @@ export async function seedPhases() {
     },
     {
       slug: "advanced-concepts",
-      title: "Advanced JavaScript", 
+      title: "Advanced JavaScript",
       description: "Deep dive into advanced concepts and patterns",
-      color: "from-red-400 to-purple-600", 
+      color: "from-red-400 to-purple-600",
       icon: "Flame",
       order: 7,
       estimatedWeeks: 5,
@@ -192,7 +198,7 @@ export async function seedPhases() {
       title: "Data Structures & Algorithms",
       description: "Master computer science fundamentals",
       color: "from-blue-400 to-indigo-600",
-      icon: "Database", 
+      icon: "Database",
       order: 8,
       estimatedWeeks: 4,
       prerequisites: ["advanced-concepts"],
@@ -208,7 +214,7 @@ export async function seedPhases() {
       estimatedWeeks: 3,
       prerequisites: ["javascript-fundamentals"],
       published: true,
-    }
+    },
   ];
 
   // Create phases
@@ -222,164 +228,184 @@ export async function seedPhases() {
   }
 
   // Populate phases with content
-  await populatePhaseWithContent("html-foundations", "html", "HTML Foundations");
+  await populatePhaseWithContent(
+    "html-foundations",
+    "html",
+    "HTML Foundations"
+  );
   await populatePhaseWithContent("css-foundations", "css", "CSS Foundations");
-  await populatePhaseWithContent("javascript-fundamentals", "javascript", "JavaScript Fundamentals");
-  await populatePhaseWithContent("dom-interactivity", "dom", "DOM Manipulation & Interactivity");
-  
+
+  await populatePhaseWithContent(
+    "dom-interactivity",
+    "dom",
+    "DOM Manipulation & Interactivity"
+  );
+
   // For advanced phases, you might want to handle them differently
   // since they might not have direct category mappings
   console.log("📚 Checking for advanced JavaScript content...");
-  
+
   // Handle OOP phase with specific content
-  const oopPhase = await prisma.phase.findUnique({ where: { slug: "oop-concepts" } });
+  const oopPhase = await prisma.phase.findUnique({
+    where: { slug: "oop" },
+  });
   if (oopPhase) {
     const oopTutorials = await prisma.tutorial.findMany({
-      where: { 
+      where: {
         OR: [
           { title: { contains: "Object", mode: "insensitive" } },
           { title: { contains: "Class", mode: "insensitive" } },
           { title: { contains: "OOP", mode: "insensitive" } },
           { title: { contains: "Inheritance", mode: "insensitive" } },
-          { slug: { contains: "oop" } }
-        ]
+          { slug: { contains: "oop" } },
+        ],
       },
-      orderBy: { order: "asc" }
+      orderBy: { order: "asc" },
     });
-    
+
     console.log(`  Found ${oopTutorials.length} OOP tutorials`);
-    
+
     for (let i = 0; i < oopTutorials.length; i++) {
       const tutorial = oopTutorials[i];
-      
+
       await prisma.phaseStep.upsert({
-        where: { 
+        where: {
           phaseId_contentType_contentId: {
             phaseId: oopPhase.id,
-            contentType: "tutorial", 
-            contentId: tutorial.id
-          }
+            contentType: "tutorial",
+            contentId: tutorial.id,
+          },
         },
         update: {
           order: i + 1,
           contentSlug: tutorial.slug,
           estimatedHours: tutorial.estimatedTime / 60,
-          prerequisites: i === 0 ? [] : [`tutorial-${oopTutorials[i-1].slug}`]
+          prerequisites:
+            i === 0 ? [] : [`tutorial-${oopTutorials[i - 1].slug}`],
         },
         create: {
           phaseId: oopPhase.id,
           contentType: "tutorial",
-          contentId: tutorial.id, 
+          contentId: tutorial.id,
           contentSlug: tutorial.slug,
           order: i + 1,
           isOptional: false,
           estimatedHours: tutorial.estimatedTime / 60,
-          prerequisites: i === 0 ? [] : [`tutorial-${oopTutorials[i-1].slug}`]
-        }
+          prerequisites:
+            i === 0 ? [] : [`tutorial-${oopTutorials[i - 1].slug}`],
+        },
       });
-      
+
       console.log(`  ✅ Added OOP tutorial: ${tutorial.title}`);
     }
   }
-  
+
   // Handle Async phase
-  const asyncPhase = await prisma.phase.findUnique({ where: { slug: "async-programming" } });
+  const asyncPhase = await prisma.phase.findUnique({
+    where: { slug: "async-programming" },
+  });
   if (asyncPhase) {
     const asyncTutorials = await prisma.tutorial.findMany({
-      where: { 
+      where: {
         OR: [
           { title: { contains: "async", mode: "insensitive" } },
           { title: { contains: "await", mode: "insensitive" } },
           { title: { contains: "Promise", mode: "insensitive" } },
           { title: { contains: "fetch", mode: "insensitive" } },
-          { slug: { contains: "async" } }
-        ]
+          { slug: { contains: "async" } },
+        ],
       },
-      orderBy: { order: "asc" }
+      orderBy: { order: "asc" },
     });
-    
+
     console.log(`  Found ${asyncTutorials.length} Async tutorials`);
-    
+
     for (let i = 0; i < asyncTutorials.length; i++) {
       const tutorial = asyncTutorials[i];
-      
+
       await prisma.phaseStep.upsert({
-        where: { 
+        where: {
           phaseId_contentType_contentId: {
             phaseId: asyncPhase.id,
-            contentType: "tutorial", 
-            contentId: tutorial.id
-          }
+            contentType: "tutorial",
+            contentId: tutorial.id,
+          },
         },
         update: {
           order: i + 1,
           contentSlug: tutorial.slug,
           estimatedHours: tutorial.estimatedTime / 60,
-          prerequisites: i === 0 ? [] : [`tutorial-${asyncTutorials[i-1].slug}`]
+          prerequisites:
+            i === 0 ? [] : [`tutorial-${asyncTutorials[i - 1].slug}`],
         },
         create: {
           phaseId: asyncPhase.id,
           contentType: "tutorial",
-          contentId: tutorial.id, 
+          contentId: tutorial.id,
           contentSlug: tutorial.slug,
           order: i + 1,
           isOptional: false,
           estimatedHours: tutorial.estimatedTime / 60,
-          prerequisites: i === 0 ? [] : [`tutorial-${asyncTutorials[i-1].slug}`]
-        }
+          prerequisites:
+            i === 0 ? [] : [`tutorial-${asyncTutorials[i - 1].slug}`],
+        },
       });
-      
+
       console.log(`  ✅ Added Async tutorial: ${tutorial.title}`);
     }
   }
 
   // Handle Node.js phase
-  const nodejsPhase = await prisma.phase.findUnique({ where: { slug: "nodejs-fundamentals" } });
+  const nodejsPhase = await prisma.phase.findUnique({
+    where: { slug: "nodejs-fundamentals" },
+  });
   if (nodejsPhase) {
     const nodejsTutorials = await prisma.tutorial.findMany({
-      where: { 
+      where: {
         OR: [
           { title: { contains: "Node", mode: "insensitive" } },
           { title: { contains: "server", mode: "insensitive" } },
           { slug: { contains: "nodejs" } },
-          { category: { slug: "nodejs" } }
-        ]
+          { category: { slug: "nodejs" } },
+        ],
       },
       include: { category: true },
-      orderBy: { order: "asc" }
+      orderBy: { order: "asc" },
     });
-    
+
     console.log(`  Found ${nodejsTutorials.length} Node.js tutorials`);
-    
+
     for (let i = 0; i < nodejsTutorials.length; i++) {
       const tutorial = nodejsTutorials[i];
-      
+
       await prisma.phaseStep.upsert({
-        where: { 
+        where: {
           phaseId_contentType_contentId: {
             phaseId: nodejsPhase.id,
-            contentType: "tutorial", 
-            contentId: tutorial.id
-          }
+            contentType: "tutorial",
+            contentId: tutorial.id,
+          },
         },
         update: {
           order: i + 1,
           contentSlug: tutorial.slug,
           estimatedHours: tutorial.estimatedTime / 60,
-          prerequisites: i === 0 ? [] : [`tutorial-${nodejsTutorials[i-1].slug}`]
+          prerequisites:
+            i === 0 ? [] : [`tutorial-${nodejsTutorials[i - 1].slug}`],
         },
         create: {
           phaseId: nodejsPhase.id,
           contentType: "tutorial",
-          contentId: tutorial.id, 
+          contentId: tutorial.id,
           contentSlug: tutorial.slug,
           order: i + 1,
           isOptional: false,
           estimatedHours: tutorial.estimatedTime / 60,
-          prerequisites: i === 0 ? [] : [`tutorial-${nodejsTutorials[i-1].slug}`]
-        }
+          prerequisites:
+            i === 0 ? [] : [`tutorial-${nodejsTutorials[i - 1].slug}`],
+        },
       });
-      
+
       console.log(`  ✅ Added Node.js tutorial: ${tutorial.title}`);
     }
   }
@@ -389,9 +415,9 @@ export async function seedPhases() {
 
 export async function cleanupPhases() {
   console.log("🧹 Cleaning up phases...");
-  
+
   await prisma.phaseStep.deleteMany();
   await prisma.phase.deleteMany();
-  
+
   console.log("✅ Phase cleanup completed!");
 }
