@@ -51,6 +51,14 @@ model User {
   createdAt                DateTime                  @default(now())
   updatedAt                DateTime                  @updatedAt
   role                     String                    @default("USER")
+
+  // Attribution tracking for anonymous conversion
+  conversionSource         String?
+  conversionMedium         String?
+  conversionCampaign       String?
+  firstLandingPage         String?
+  anonymousSessionId       String?
+
   accounts                 Account[]
   challengeAttempts        ChallengeAttempt[]
   challengeCodeProgress    ChallengeCodeProgress[]
@@ -706,4 +714,46 @@ model PhaseStep {
   
   @@unique([phaseId, contentType, contentId]) // Prevent duplicate content in same phase
   @@map("phase_steps")
+}
+
+model AnonymousSession {
+  id                String   @id @default(cuid())
+  anonymousId       String   @unique
+
+  // Tracking data
+  tutorialsViewed   Json     @default("[]")
+  totalTimeSpent    Int      @default(0)
+  pagesViewed       Int      @default(0)
+
+  // Attribution
+  source            String?
+  medium            String?
+  campaign          String?
+  referrer          String?
+  landingPage       String?
+
+  // Device/Browser info
+  userAgent         String?
+  device            String?
+  browser           String?
+  os                String?
+
+  // Geographic (from IP)
+  country           String?
+  region            String?
+  city              String?
+
+  // Lifecycle
+  createdAt         DateTime @default(now())
+  lastActiveAt      DateTime @updatedAt
+  convertedToUserId String?
+  convertedAt       DateTime?
+
+  // Privacy
+  ipAddress         String?
+
+  @@index([anonymousId])
+  @@index([convertedToUserId])
+  @@index([createdAt])
+  @@map("anonymous_sessions")
 }

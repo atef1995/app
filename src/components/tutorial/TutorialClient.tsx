@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
 import { useTutorial } from "@/hooks/useTutorial";
@@ -20,18 +20,34 @@ import TutorialNavigation from "@/components/tutorial/TutorialNavigation";
 import AccessControlWrapper from "@/components/tutorial/AccessControlWrapper";
 import AccessWarningBanner from "@/components/tutorial/AccessWarningBanner";
 import TutorialErrorState from "@/components/tutorial/TutorialErrorState";
+import AnonymousProgressBanner from "@/components/tutorial/AnonymousProgressBanner";
+import AnonymousLimitReached from "@/components/tutorial/AnonymousLimitReached";
+
+// Import anonymous tracking utilities
+import {
+  getAnonymousId,
+  trackAnonymousTutorialView,
+  hasReachedAnonymousLimit,
+  updateAnonymousTutorialTime,
+  getDeviceType,
+  getBrowserName,
+  getOSName,
+} from '@/lib/anonymousId';
 
 interface TutorialClientProps {
   category: string;
   slug: string;
+  isAnonymous?: boolean;
 }
 
 export default function TutorialClient({
   category,
   slug,
+  isAnonymous = false,
 }: TutorialClientProps) {
   const { currentMood } = useMood();
   const [contentLoaded, setContentLoaded] = useState(false);
+  const [anonymousLimitReached, setAnonymousLimitReached] = useState(false);
 
   // Get session directly instead of making API call
   // subscriptionInfo is pre-loaded in the session to prevent repeated DB queries
@@ -72,6 +88,54 @@ export default function TutorialClient({
     onLoaded: () => setContentLoaded(true),
   });
 
+  // Handle anonymous tracking
+  useEffect(() => {
+    if (isAnonymous && tutorial?.id) {
+      // Check if limit reached
+      if (hasReachedAnonymousLimit(5)) {
+        setAnonymousLimitReached(true);
+        return;
+      }
+
+      // Track tutorial view
+      trackAnonymousTutorialView(tutorial.id, slug, category);
+
+      // Send tracking data to server
+      const anonymousId = getAnonymousId();
+      fetch('/api/anonymous/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          anonymousId,
+          tutorialId: tutorial.id,
+          tutorialSlug: slug,
+          action: 'VIEW',
+          device: getDeviceType(),
+          browser: getBrowserName(),
+          os: getOSName(),
+        }),
+      }).catch(err => console.error('Failed to track anonymous view:', err));
+
+      // Track time spent every 30 seconds
+      const interval = setInterval(() => {
+        updateAnonymousTutorialTime(tutorial.id, 30);
+
+        fetch('/api/anonymous/track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            anonymousId,
+            tutorialId: tutorial.id,
+            action: 'TIME_UPDATE',
+            timeSpent: 30,
+          }),
+        }).catch(err => console.error('Failed to track time:', err));
+      }, 30000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isAnonymous, tutorial?.id, slug, category]);
+
   const moodColors = getMoodColors(currentMood.id);
 
   // Handle loading state
@@ -84,8 +148,13 @@ export default function TutorialClient({
     return <TutorialErrorState error={error?.message} category={category} />;
   }
 
-  // Handle access control
-  if (!accessCheck.canAccess) {
+  // Handle anonymous limit reached
+  if (isAnonymous && anonymousLimitReached) {
+    return <AnonymousLimitReached category={category} />;
+  }
+
+  // Handle access control (for authenticated users)
+  if (!isAnonymous && !accessCheck.canAccess) {
     return (
       <AccessControlWrapper accessCheck={accessCheck} category={category}>
         {null}
@@ -96,6 +165,9 @@ export default function TutorialClient({
   // Main render
   return (
     <div className={`min-h-screen bg-gradient-to-br ${moodColors.gradient}`}>
+      {/* Show anonymous progress banner */}
+      {isAnonymous && <AnonymousProgressBanner />}
+
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Tutorial Header */}

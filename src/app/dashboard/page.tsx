@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { MoodSelector } from "@/components/MoodSelector";
 import { useProgressStats } from "@/hooks/useProgress";
 import { ProgressStats } from "@/components/ProgressComponents";
+import { AnonymousDashboard } from "@/components/AnonymousDashboard";
 import { BookOpen, Code, Brain, Hand, Building } from "lucide-react";
 import Link from "next/link";
 
@@ -47,17 +48,19 @@ export default function DashboardPage() {
     );
   }
 
-  if (!session) {
-    return null; // Middleware will handle redirect
+  // Show anonymous dashboard for unauthenticated users
+  if (status === "unauthenticated" || !session) {
+    return <AnonymousDashboard />;
   }
 
+  // Authenticated dashboard
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-3">
-            Welcome back, {session.user.name?.split(" ")[0]}!{" "}
+            Welcome back, {session?.user.name?.split(" ")[0]}!{" "}
             <Hand className="h-8 w-8 text-yellow-500" />
           </h1>
           <p className="text-gray-600 dark:text-gray-400">

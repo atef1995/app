@@ -26,6 +26,7 @@ import {
   StatsCardSkeleton,
 } from "@/components/tutorial/TutorialSkeleton";
 import CategoryLoading from "./category/loading";
+import { SignupCTA } from "@/components/SignupCTA";
 
 export default function TutorialsPage() {
   const { data: session } = useSession();
@@ -34,6 +35,9 @@ export default function TutorialsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [loadingCategory, setLoadingCategory] = useState<string | null>(null);
+
+  // Detect anonymous user state
+  const isAnonymous = !session;
 
   // Fetch optimized categories with stats (includes tutorial counts and user progress)
   const { data, error, isLoading } = useCategoriesWithStats(
@@ -88,29 +92,6 @@ export default function TutorialsPage() {
     };
   };
 
-  if (!session) {
-    return (
-      <PageLayout
-        title="Programming Tutorials"
-        subtitle="Interactive lessons tailored to your learning style"
-      >
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <p className="text-gray-600 dark:text-gray-300">
-              Please sign in to access tutorials.
-            </p>
-            <Link
-              href="/auth/signin"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              Sign in here
-            </Link>
-          </div>
-        </div>
-      </PageLayout>
-    );
-  }
-
   if (isLoading) {
     return <CategoryLoading />;
   }
@@ -160,6 +141,17 @@ export default function TutorialsPage() {
           </Suspense>
         </ErrorBoundary>
       </div>
+
+      {/* Anonymous User Signup Banner */}
+      {isAnonymous && (
+        <div className="mb-8">
+          <SignupCTA
+            variant="banner"
+            message="Create your free account to save progress and unlock all features"
+            showBenefits={true}
+          />
+        </div>
+      )}
 
       {/* Categories Grid */}
       <div className="mb-8" id="categories-section">
@@ -223,44 +215,62 @@ export default function TutorialsPage() {
       <div className="mb-8">
         <ErrorBoundary fallback={ComponentErrorFallback}>
           <Suspense fallback={<StatsCardSkeleton />}>
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                Your Learning Progress
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {overallStats?.totalTutorials || 0}
+            {isAnonymous ? (
+              // Anonymous user - show signup CTA
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg text-center">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  Track Your Learning Progress
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  Sign up to save your progress, earn achievements, and unlock
+                  your full learning potential
+                </p>
+                <SignupCTA
+                  variant="primary"
+                  message="Start Tracking Progress Free"
+                />
+              </div>
+            ) : (
+              // Authenticated user - show actual stats
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                  Your Learning Progress
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      {overallStats?.totalTutorials || 0}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      Total Tutorials
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Total Tutorials
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                      {overallStats?.completedTutorials || 0}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      Completed
+                    </div>
                   </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {overallStats?.completedTutorials || 0}
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Completed
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                    {overallStats && overallStats.totalTutorials > 0
-                      ? Math.round(
-                          (overallStats.completedTutorials /
-                            overallStats.totalTutorials) *
-                            100
-                        )
-                      : 0}
-                    %
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Completion
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                      {overallStats && overallStats.totalTutorials > 0
+                        ? Math.round(
+                            (overallStats.completedTutorials /
+                              overallStats.totalTutorials) *
+                              100
+                          )
+                        : 0}
+                      %
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      Completion
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </Suspense>
         </ErrorBoundary>
       </div>

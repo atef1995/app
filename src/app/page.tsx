@@ -58,7 +58,7 @@ export default function HomePage() {
 
     // Show animation for 2 seconds before redirecting
     setTimeout(() => {
-      window.location.href = "/auth/signin";
+      window.location.href = "/dashboard";
     }, 2000);
   };
 
@@ -162,7 +162,7 @@ export default function HomePage() {
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
-                href="/auth/signin"
+                href="/dashboard"
                 className="inline-block border-2 border-transparent/5 bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors cursor-pointer text-center whitespace-nowrap"
               >
                 Start Learning
@@ -834,8 +834,8 @@ export default function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            Join developers who are mastering JavaScript with mood-adaptive
-            learning that actually works for real life.
+            Master JavaScript with mood-adaptive learning that actually works
+            for real life.
           </motion.p>
           <motion.div
             className="flex flex-col sm:flex-row gap-4 justify-center"
@@ -846,7 +846,7 @@ export default function HomePage() {
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
-                href="/auth/signin"
+                href="/dashboard"
                 className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:opacity-90 transition-opacity"
               >
                 Get Started Free
@@ -868,7 +868,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.8 }}
           >
-            Free tier includes 15 tutorials + unlimited practice challenges • No credit card required
+            Try 5 tutorials free without signup • No credit card required
           </motion.p>
           <motion.div
             className="flex flex-wrap justify-center items-center gap-6 mt-8 text-sm text-gray-500 dark:text-gray-400"

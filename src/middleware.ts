@@ -29,7 +29,52 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL(callbackUrl, req.url));
   }
 
-  // Check if the route requires authentication
+  // Handle tutorial access - both anonymous and authenticated
+  if (pathname.startsWith("/tutorials/category/")) {
+    if (!sessionToken) {
+      // Anonymous user trying to view tutorial - check anonymous limit
+      const anonymousCheckResult = await handleAnonymousTutorialAccess(
+        req,
+        pathname
+      );
+      if (anonymousCheckResult) {
+        return anonymousCheckResult; // Redirect to signup if limit reached
+      }
+      // Allow access if under limit
+      return NextResponse.next();
+    } else {
+      // Authenticated user - check subscription limits
+      const limitCheckResult = await checkTutorialAccessLimits(
+        sessionToken,
+        pathname,
+        req
+      );
+      if (debugMode) {
+        console.log("🔍 Check result:", { limitCheckResult });
+      }
+      if (!limitCheckResult.hasAccess) {
+        if (debugMode) {
+          console.log(`🚫 Tutorial access denied: ${limitCheckResult.reason}`);
+        }
+        // Redirect to subscription upgrade page with context
+        const upgradeUrl = new URL("/subscription/upgrade", req.url);
+        upgradeUrl.searchParams.set(
+          "reason",
+          limitCheckResult.reason || "Access denied"
+        );
+        upgradeUrl.searchParams.set("feature", "tutorials");
+        upgradeUrl.searchParams.set("returnUrl", pathname);
+
+        return NextResponse.redirect(upgradeUrl);
+      } else {
+        if (debugMode) {
+          console.log("✅ Tutorial access granted");
+        }
+      }
+    }
+  }
+
+  // Check if the route requires authentication (non-tutorial routes)
   if (isProtectedRoute(pathname) && !sessionToken) {
     if (debugMode) {
       console.log("Redirecting unauthenticated user to signin for:", pathname);
@@ -39,48 +84,81 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(signInUrl);
   }
 
-  // Check tutorial access limits for authenticated users
-  if (pathname.startsWith("/tutorials/category/") && sessionToken) {
-    const limitCheckResult = await checkTutorialAccessLimits(
-      sessionToken,
-      pathname,
-      req
-    );
-    if (debugMode) {
-      console.log("🔍 Check result:", { limitCheckResult });
-    }
-    if (!limitCheckResult.hasAccess) {
-      if (debugMode) {
-        console.log(`🚫 Tutorial access denied: ${limitCheckResult.reason}`);
-      } // Redirect to subscription upgrade page with context
-      const upgradeUrl = new URL("/subscription/upgrade", req.url);
-      upgradeUrl.searchParams.set(
-        "reason",
-        limitCheckResult.reason || "Access denied"
-      );
-      upgradeUrl.searchParams.set("feature", "tutorials");
-      upgradeUrl.searchParams.set("returnUrl", pathname);
-
-      return NextResponse.redirect(upgradeUrl);
-    } else {
-      if (debugMode) {
-        console.log("✅ Tutorial access granted");
-      }
-    }
-  }
-
   // Allow the request to continue
   return NextResponse.next();
 }
 
+/**
+ * Handle anonymous tutorial access with limits
+ * Returns NextResponse redirect if limit reached, null if allowed
+ */
+async function handleAnonymousTutorialAccess(
+  req: NextRequest,
+  pathname: string
+): Promise<NextResponse | null> {
+  const ANONYMOUS_TUTORIAL_LIMIT = 5;
+
+  // Check anonymous session in cookies
+  const anonymousId = req.cookies.get("vibed_anonymous_id")?.value;
+
+  if (!anonymousId) {
+    // First-time anonymous visitor - allow access
+    if (debugMode) {
+      console.log("✅ First-time anonymous visitor, allowing tutorial access");
+    }
+    return null;
+  }
+
+  // Check how many tutorials they've viewed
+  try {
+    const baseUrl = new URL(req.url).origin;
+    const trackingUrl = `${baseUrl}/api/anonymous/check-limit?anonymousId=${anonymousId}`;
+
+    const response = await fetch(trackingUrl);
+
+    if (!response.ok) {
+      // If check fails, allow access (fail open)
+      return null;
+    }
+
+    const data = await response.json();
+
+    if (data.limitReached) {
+      // Redirect to signup page with message
+      if (debugMode) {
+        console.log("🚫 Anonymous limit reached, redirecting to signup");
+      }
+
+      const signupUrl = new URL("/auth/signin", req.url);
+      signupUrl.searchParams.set("callbackUrl", pathname);
+      signupUrl.searchParams.set(
+        "message",
+        `You've viewed ${ANONYMOUS_TUTORIAL_LIMIT} tutorials! Sign up free to continue learning.`
+      );
+      signupUrl.searchParams.set("reason", "anonymous_limit");
+
+      return NextResponse.redirect(signupUrl);
+    }
+
+    // Within limit - allow access
+    if (debugMode) {
+      console.log(
+        `✅ Anonymous access granted (${data.viewedCount}/${ANONYMOUS_TUTORIAL_LIMIT})`
+      );
+    }
+    return null;
+  } catch (error) {
+    console.error("Error checking anonymous limit:", error);
+    // Fail open - allow access
+    return null;
+  }
+}
+
 function isProtectedRoute(pathname: string): boolean {
   const protectedRoutes = [
-    "/dashboard",
-    "/tutorials",
     "/practice",
-    "/quizzes",
-    "/quiz",
     "/settings",
+    "/quiz/",  // Individual quiz attempts (note the trailing slash to avoid matching /quizzes)
   ];
   return protectedRoutes.some((route) => pathname.startsWith(route));
 }
@@ -205,12 +283,11 @@ async function checkTutorialAccessLimits(
 
 export const config = {
   matcher: [
-    "/dashboard/:path*",
-    "/tutorials/:path*",
+    // Note: /dashboard and /tutorials removed to allow anonymous access
     "/practice/:path*",
-    "/quizzes/:path*",
     "/quiz/:path*",
     "/settings/:path*",
+    "/tutorials/category/:path*",  // Keep for anonymous limit checking
     "/auth/signin",
     "/auth/signin/:path*",
     // Catch all auth routes

@@ -31,12 +31,39 @@ function SignInContent() {
     setAuthProviders();
   }, []);
 
-  // Redirect authenticated users to the callback URL
+  // Redirect authenticated users to the callback URL and convert anonymous session
   useEffect(() => {
-    if (status === "authenticated") {
-      window.location.href = callbackUrl;
+    if (status === "authenticated" && session?.user?.id) {
+      // Check for anonymous session and convert it
+      const convertAnonymousSession = async () => {
+        try {
+          const anonymousId = localStorage.getItem('vibed_anonymous_id');
+          if (anonymousId) {
+            const response = await fetch('/api/auth/convert-anonymous', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ anonymousId }),
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              console.log('Anonymous session converted:', data);
+              // Clear anonymous data from localStorage
+              localStorage.removeItem('vibed_anonymous_id');
+              localStorage.removeItem('vibed_anonymous_session');
+            }
+          }
+        } catch (error) {
+          console.error('Failed to convert anonymous session:', error);
+          // Don't block signin on conversion failure
+        }
+      };
+
+      convertAnonymousSession().finally(() => {
+        window.location.href = callbackUrl;
+      });
     }
-  }, [status, callbackUrl]);
+  }, [status, session?.user?.id, callbackUrl]);
 
   const handleSignIn = (provider: ClientSafeProvider) => {
     setLoading(true);

@@ -143,6 +143,7 @@ export function DOMInteractiveBlock({
                 onCodeChange={(code) => setCurrentCode(code)}
                 placeholder="Write your JavaScript code here..."
                 canRun={false}
+                height={`${height}px`}
               />
             </div>
 

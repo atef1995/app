@@ -30,6 +30,7 @@
     "prisma/seed*.ts",
     "prisma/migrations/**/*",
     "prisma/checkTutorial.ts",
-    "prisma/phases/*"
+    "prisma/phases/*",
+    "src/app/api/email/test/*"
   ]
 }
