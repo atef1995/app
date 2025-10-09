@@ -11,8 +11,6 @@ import { useTutorialCompletion } from "@/hooks/useTutorialCompletion";
 import { useProgressiveLoading } from "@/hooks/useProgressiveLoading";
 import getMoodColors from "@/lib/getMoodColors";
 import TutorialLoading from "../../app/tutorials/category/[category]/[slug]/loading";
-
-// Import new components
 import TutorialHeader from "@/components/tutorial/TutorialHeader";
 import TutorialContent from "@/components/tutorial/TutorialContent";
 import TutorialQuizSection from "@/components/tutorial/TutorialQuizSection";
@@ -32,7 +30,7 @@ import {
   getDeviceType,
   getBrowserName,
   getOSName,
-} from '@/lib/anonymousId';
+} from "@/lib/anonymousId";
 
 interface TutorialClientProps {
   category: string;
@@ -102,34 +100,34 @@ export default function TutorialClient({
 
       // Send tracking data to server
       const anonymousId = getAnonymousId();
-      fetch('/api/anonymous/track', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      fetch("/api/anonymous/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           anonymousId,
           tutorialId: tutorial.id,
           tutorialSlug: slug,
-          action: 'VIEW',
+          action: "VIEW",
           device: getDeviceType(),
           browser: getBrowserName(),
           os: getOSName(),
         }),
-      }).catch(err => console.error('Failed to track anonymous view:', err));
+      }).catch((err) => console.error("Failed to track anonymous view:", err));
 
       // Track time spent every 30 seconds
       const interval = setInterval(() => {
         updateAnonymousTutorialTime(tutorial.id, 30);
 
-        fetch('/api/anonymous/track', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        fetch("/api/anonymous/track", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             anonymousId,
             tutorialId: tutorial.id,
-            action: 'TIME_UPDATE',
+            action: "TIME_UPDATE",
             timeSpent: 30,
           }),
-        }).catch(err => console.error('Failed to track time:', err));
+        }).catch((err) => console.error("Failed to track time:", err));
       }, 30000);
 
       return () => clearInterval(interval);

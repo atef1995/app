@@ -7,9 +7,11 @@ import { DOMInteractiveBlock } from "@/components/ui/DOMInteractiveBlock";
 import { HTMLPreviewWindow } from "@/components/ui/HTMLPreviewWindow";
 import { HTMLEditorPreview } from "@/components/ui/HTMLEditorPreview";
 import { SeparatedEditorPreview } from "@/components/ui/SeparatedEditorPreview";
+import { TwoPointerVisualizer } from "../visualizer/examples/TwoPointerVisualizer";
 import TableOfContents from "@/components/TableOfContents";
 import { type TutorialData } from "@/hooks/useTutorial";
 import DualPaneEditor from "../DualPaneEditor";
+import { ComparisonTable } from "./ComparisonTable";
 
 interface TutorialContentProps {
   tutorial: TutorialData;
@@ -115,7 +117,9 @@ const mdxComponents = {
   HTMLPreviewWindow,
   HTMLEditorPreview,
   SeparatedEditorPreview,
+  TwoPointerVisualizer,
   DualPaneEditor,
+  ComparisonTable,
   // Use custom heading components with anchor IDs
   h1: createHeadingComponent(1),
   h2: createHeadingComponent(2),
