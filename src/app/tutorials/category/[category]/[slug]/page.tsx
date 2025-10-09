@@ -12,19 +12,19 @@ interface TutorialPageProps {
 }
 
 export default async function TutorialPage({ params }: TutorialPageProps) {
-  // Server-side session check - no re-renders!
+  // Check for session (but don't require it - allow anonymous browsing)
   const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/auth/signin");
-  }
 
   // Resolve params on server side
   const { category, slug } = await params;
 
   return (
     <ErrorBoundary fallback={TutorialErrorFallback}>
-      <TutorialClient category={category} slug={slug} />
+      <TutorialClient
+        category={category}
+        slug={slug}
+        isAnonymous={!session}
+      />
     </ErrorBoundary>
   );
 }

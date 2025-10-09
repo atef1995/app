@@ -52,12 +52,12 @@ model User {
   updatedAt                DateTime                  @updatedAt
   role                     String                    @default("USER")
 
-  // Conversion tracking fields
-  conversionSource         String?   // UTM source or referrer source
-  conversionMedium         String?   // UTM medium (organic, cpc, email, etc.)
-  conversionCampaign       String?   // UTM campaign name
-  firstLandingPage         String?   // First page they visited before signup
-  anonymousSessionId       String?   // Link to original anonymous session
+  // Attribution tracking for anonymous conversion
+  conversionSource         String?
+  conversionMedium         String?
+  conversionCampaign       String?
+  firstLandingPage         String?
+  anonymousSessionId       String?
 
   accounts                 Account[]
   challengeAttempts        ChallengeAttempt[]
@@ -711,50 +711,49 @@ model PhaseStep {
   updatedAt       DateTime @updatedAt
   
   phase           Phase    @relation(fields: [phaseId], references: [id], onDelete: Cascade)
-
+  
   @@unique([phaseId, contentType, contentId]) // Prevent duplicate content in same phase
   @@map("phase_steps")
 }
 
 model AnonymousSession {
   id                String   @id @default(cuid())
-  anonymousId       String   @unique  // Browser fingerprint + random ID
+  anonymousId       String   @unique
 
   // Tracking data
-  tutorialsViewed   Json     @default("[]")  // Array of {tutorialId, slug, timeSpent, startedAt}
-  totalTimeSpent    Int      @default(0)     // Total seconds spent on site
-  pagesViewed       Int      @default(0)     // Total page views
+  tutorialsViewed   Json     @default("[]")
+  totalTimeSpent    Int      @default(0)
+  pagesViewed       Int      @default(0)
 
-  // Attribution tracking
-  source            String?  // UTM source (google, facebook, direct, etc.)
-  medium            String?  // UTM medium (organic, cpc, social, email, etc.)
-  campaign          String?  // UTM campaign name
-  referrer          String?  // HTTP referrer URL
-  landingPage       String?  // First page they visited
+  // Attribution
+  source            String?
+  medium            String?
+  campaign          String?
+  referrer          String?
+  landingPage       String?
 
-  // Device/Browser information
-  userAgent         String?  // Full user agent string
-  device            String?  // mobile, tablet, desktop
-  browser           String?  // chrome, firefox, safari, etc.
-  os                String?  // windows, macos, linux, android, ios
+  // Device/Browser info
+  userAgent         String?
+  device            String?
+  browser           String?
+  os                String?
 
-  // Geographic info (from IP, optional)
+  // Geographic (from IP)
   country           String?
   region            String?
   city              String?
 
-  // Lifecycle tracking
+  // Lifecycle
   createdAt         DateTime @default(now())
   lastActiveAt      DateTime @updatedAt
-  convertedToUserId String?  // User ID if they signed up
+  convertedToUserId String?
   convertedAt       DateTime?
 
   // Privacy
-  ipHash            String?  // Hashed IP address for privacy compliance
+  ipAddress         String?
 
   @@index([anonymousId])
   @@index([convertedToUserId])
   @@index([createdAt])
-  @@index([lastActiveAt])
   @@map("anonymous_sessions")
 }

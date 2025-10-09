@@ -6,6 +6,14 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
+
+interface TutorialView {
+  tutorialId: string;
+  slug?: string;
+  startedAt: string;
+  timeSpent: number;
+}
 
 export interface AnonymousTrackingData {
   anonymousId: string;
@@ -52,7 +60,7 @@ export class AnonymousTrackingService {
             device: data.device,
             browser: data.browser,
             os: data.os,
-            ipHash: data.ipAddress ? await this.hashIp(data.ipAddress) : null,
+            ipAddress: data.ipAddress ? await this.hashIp(data.ipAddress) : null,
             tutorialsViewed: [],
             pagesViewed: 1,
           },
@@ -89,8 +97,8 @@ export class AnonymousTrackingService {
 
     if (!session) return;
 
-    const viewed = (session.tutorialsViewed as any[]) || [];
-    const existing = viewed.find((t: any) => t.tutorialId === tutorialId);
+    const viewed = (session.tutorialsViewed as unknown as TutorialView[]) || [];
+    const existing = viewed.find((t) => t.tutorialId === tutorialId);
 
     if (!existing) {
       viewed.push({
@@ -103,7 +111,7 @@ export class AnonymousTrackingService {
       await prisma.anonymousSession.update({
         where: { id: sessionId },
         data: {
-          tutorialsViewed: viewed,
+          tutorialsViewed: viewed as unknown as Prisma.InputJsonValue,
           pagesViewed: { increment: 1 },
           lastActiveAt: new Date(),
         },
@@ -125,8 +133,8 @@ export class AnonymousTrackingService {
 
     if (!session) return;
 
-    const viewed = (session.tutorialsViewed as any[]) || [];
-    const tutorial = viewed.find((t: any) => t.tutorialId === tutorialId);
+    const viewed = (session.tutorialsViewed as unknown as TutorialView[]) || [];
+    const tutorial = viewed.find((t) => t.tutorialId === tutorialId);
 
     if (tutorial) {
       tutorial.timeSpent = (tutorial.timeSpent || 0) + timeSpent;
@@ -134,7 +142,7 @@ export class AnonymousTrackingService {
       await prisma.anonymousSession.update({
         where: { id: sessionId },
         data: {
-          tutorialsViewed: viewed,
+          tutorialsViewed: viewed as unknown as Prisma.InputJsonValue,
           totalTimeSpent: { increment: timeSpent },
           lastActiveAt: new Date(),
         },
@@ -177,7 +185,7 @@ export class AnonymousTrackingService {
       const session = await this.getAnonymousSession(anonymousId);
       if (!session) return false;
 
-      const tutorialsViewed = (session.tutorialsViewed as any[]) || [];
+      const tutorialsViewed = (session.tutorialsViewed as unknown as TutorialView[]) || [];
       return tutorialsViewed.length >= limit;
     } catch (error) {
       console.error('Error checking anonymous limit:', error);
@@ -193,7 +201,7 @@ export class AnonymousTrackingService {
       const session = await this.getAnonymousSession(anonymousId);
       if (!session) return 0;
 
-      const tutorialsViewed = (session.tutorialsViewed as any[]) || [];
+      const tutorialsViewed = (session.tutorialsViewed as unknown as TutorialView[]) || [];
       return tutorialsViewed.length;
     } catch (error) {
       console.error('Error getting tutorial count:', error);
@@ -235,7 +243,7 @@ export class AnonymousTrackingService {
         });
 
         // Create TutorialProgress entries for viewed tutorials
-        const viewed = (session.tutorialsViewed as any[]) || [];
+        const viewed = (session.tutorialsViewed as unknown as TutorialView[]) || [];
         let migrated = 0;
 
         for (const tutorial of viewed) {
@@ -245,12 +253,11 @@ export class AnonymousTrackingService {
                 userId,
                 tutorialId: tutorial.tutorialId,
                 status: 'IN_PROGRESS',
-                startedAt: new Date(tutorial.startedAt),
                 timeSpent: tutorial.timeSpent || 0,
               },
             });
             migrated++;
-          } catch (error) {
+          } catch {
             // Ignore duplicates - user may have already started this tutorial
             console.warn('Tutorial progress already exists:', tutorial.tutorialId);
           }
@@ -292,9 +299,9 @@ export class AnonymousTrackingService {
   private static async hashIp(ip: string): Promise<string> {
     try {
       // For Node.js environment
-      const crypto = require('crypto');
-      return crypto.createHash('sha256').update(ip).digest('hex');
-    } catch (error) {
+      const cryptoModule = await import('crypto');
+      return cryptoModule.createHash('sha256').update(ip).digest('hex');
+    } catch {
       // Fallback for edge/serverless environments
       const encoder = new TextEncoder();
       const data = encoder.encode(ip);
@@ -340,7 +347,12 @@ export class AnonymousTrackingService {
    */
   static async getSessionStats(startDate?: Date, endDate?: Date) {
     try {
-      const where: any = {};
+      const where: {
+        createdAt?: {
+          gte?: Date;
+          lte?: Date;
+        };
+      } = {};
 
       if (startDate || endDate) {
         where.createdAt = {};
@@ -366,7 +378,7 @@ export class AnonymousTrackingService {
 
       // Calculate average tutorials viewed
       const totalTutorials = avgTutorialsViewed.reduce((sum, session) => {
-        const viewed = (session.tutorialsViewed as any[]) || [];
+        const viewed = (session.tutorialsViewed as unknown as TutorialView[]) || [];
         return sum + viewed.length;
       }, 0);
 
@@ -407,11 +419,11 @@ export class AnonymousTrackingService {
       const tutorialCounts: { [key: string]: { count: number; slug: string } } = {};
 
       sessions.forEach(session => {
-        const viewed = (session.tutorialsViewed as any[]) || [];
-        viewed.forEach((tutorial: any) => {
+        const viewed = (session.tutorialsViewed as unknown as TutorialView[]) || [];
+        viewed.forEach((tutorial) => {
           const id = tutorial.tutorialId;
           if (!tutorialCounts[id]) {
-            tutorialCounts[id] = { count: 0, slug: tutorial.slug };
+            tutorialCounts[id] = { count: 0, slug: tutorial.slug || '' };
           }
           tutorialCounts[id].count++;
         });
@@ -456,7 +468,7 @@ export class AnonymousTrackingService {
       };
 
       sessions.forEach(session => {
-        const viewed = (session.tutorialsViewed as any[]) || [];
+        const viewed = (session.tutorialsViewed as unknown as TutorialView[]) || [];
         const count = viewed.length;
         const converted = !!session.convertedToUserId;
 

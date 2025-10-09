@@ -36,6 +36,13 @@ describe('EmailService', () => {
     image: null,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
+    role: 'USER',
+    // Anonymous conversion attribution fields
+    conversionSource: null,
+    conversionMedium: null,
+    conversionCampaign: null,
+    firstLandingPage: null,
+    anonymousSessionId: null,
   };
 
   describe('sendEmail', () => {

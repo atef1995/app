@@ -32,6 +32,12 @@ export async function POST(req: NextRequest) {
       subscriptionEndsAt: null,
       stripeCustomerId: null,
       role: "",
+      // Anonymous conversion attribution fields
+      conversionSource: null,
+      conversionMedium: null,
+      conversionCampaign: null,
+      firstLandingPage: null,
+      anonymousSessionId: null,
     };
 
     let result;

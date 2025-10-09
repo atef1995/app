@@ -112,29 +112,6 @@ export default function CategoryPage() {
     );
   };
 
-  if (!session) {
-    return (
-      <PageLayout
-        title="JavaScript Tutorials"
-        subtitle="Interactive lessons tailored to your learning style"
-      >
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <p className="text-gray-600 dark:text-gray-300">
-              Please sign in to access tutorials.
-            </p>
-            <Link
-              href="/auth/signin"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              Sign in here
-            </Link>
-          </div>
-        </div>
-      </PageLayout>
-    );
-  }
-
   if (categoryTutorialsQuery.isLoading || categoryQuery.isLoading) {
     return <CategoryTutorialsLoading />;
   }

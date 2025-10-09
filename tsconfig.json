@@ -29,6 +29,7 @@
     "scripts/**/*",
     "prisma/seed*.ts",
     "prisma/migrations/**/*",
-    "prisma/checkTutorial.ts"
+    "prisma/checkTutorial.ts",
+    "src/app/api/email/test/*"
   ]
 }
