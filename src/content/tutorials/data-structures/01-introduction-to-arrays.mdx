@@ -12,35 +12,49 @@ learningObjectives:
   - "Practice solving real-world problems with arrays"
 ---
 
-# Introduction to Arrays and Array Methods
+import { ComparisonTable } from '@/components/tutorial/ComparisonTable';
+import { TutorialRecommendations } from '@/components/tutorial/TutorialRecommendations';
 
-Arrays are one of the most fundamental and powerful data structures in JavaScript. They allow you to store multiple values in a single variable and provide numerous methods to manipulate and work with that data.
+# Arrays: The List That Runs the Internet
+
+Ever wondered how Instagram loads thousands of photos without breaking? Or how Netflix knows what to recommend? Arrays.
+
+Not fancy AI. Not blockchain wizardry. Just good old arrays doing their thing.
+
+Here's the deal: You're about to learn the data structure that powers literally everything you touch online. And once you get comfortable with array methods, you'll write code that makes other developers jealous.
+
+**What you'll actually be able to do after this:**
+- Transform messy data into exactly what you need (no more nested for-loops)
+- Build shopping carts, filter search results, process user data
+- Write code that senior devs nod at approvingly
+
+Let's get into it.
 
 ## What are Arrays?
 
-An array is an ordered collection of elements that can hold any data type - numbers, strings, objects, or even other arrays. Think of an array like a list where each item has a specific position (index).
+An array is a list. That's it. A list where each item has a position (we call it an index).
 
 ```javascript
-// Creating arrays
+// Creating arrays - super straightforward
 const fruits = ['apple', 'banana', 'orange'];
 const numbers = [1, 2, 3, 4, 5];
-const mixed = ['hello', 42, true, null];
-const empty = [];
+const mixed = ['hello', 42, true, null]; // Can mix types
+const empty = []; // Valid array, just empty
 
-// Arrays are zero-indexed
+// Accessing items (starts at 0, not 1)
 console.log(fruits[0]); // 'apple'
 console.log(fruits[1]); // 'banana'
 console.log(fruits[2]); // 'orange'
 ```
 
-### Why Arrays Matter
+### Why This Matters
 
-Arrays are essential because they:
-- **Organize related data** in a single structure
-- **Maintain order** of elements
-- **Provide powerful methods** for data manipulation
-- **Enable efficient data processing** with iteration
-- **Form the foundation** for more complex data structures
+Arrays let you:
+- Store related data together instead of having a million variables
+- Keep things in order (first to last matters)
+- Use powerful built-in methods to manipulate data
+- Process collections of data efficiently
+- Build basically every feature users actually care about
 
 ## Basic Array Operations
 
@@ -49,15 +63,13 @@ Arrays are essential because they:
 ```javascript
 const fruits = ['apple', 'banana'];
 
-// Add to the end
 fruits.push('orange');
 console.log(fruits); // ['apple', 'banana', 'orange']
 
-// Add to the beginning
 fruits.unshift('grape');
 console.log(fruits); // ['grape', 'apple', 'banana', 'orange']
 
-// Add at specific position
+// Insert at specific spot
 fruits.splice(2, 0, 'kiwi'); // At index 2, delete 0, insert 'kiwi'
 console.log(fruits); // ['grape', 'apple', 'kiwi', 'banana', 'orange']
 ```
@@ -67,18 +79,15 @@ console.log(fruits); // ['grape', 'apple', 'kiwi', 'banana', 'orange']
 ```javascript
 const fruits = ['grape', 'apple', 'kiwi', 'banana', 'orange'];
 
-// Remove from the end
 const lastFruit = fruits.pop();
 console.log(lastFruit); // 'orange'
 console.log(fruits); // ['grape', 'apple', 'kiwi', 'banana']
 
-// Remove from the beginning
 const firstFruit = fruits.shift();
 console.log(firstFruit); // 'grape'
 console.log(fruits); // ['apple', 'kiwi', 'banana']
 
-// Remove from specific position
-const removed = fruits.splice(1, 1); // At index 1, delete 1 element
+const removed = fruits.splice(1, 1);
 console.log(removed); // ['kiwi']
 console.log(fruits); // ['apple', 'banana']
 ```
@@ -88,19 +97,16 @@ console.log(fruits); // ['apple', 'banana']
 ```javascript
 const numbers = [10, 20, 30, 40, 50];
 
-// Check if element exists
 console.log(numbers.includes(30)); // true
 console.log(numbers.includes(60)); // false
 
-// Find index of element
 console.log(numbers.indexOf(40)); // 3
-console.log(numbers.indexOf(60)); // -1 (not found)
+console.log(numbers.indexOf(60)); // -1 means not found
 
-// Find element that meets condition
+// Find first match that passes a test
 const found = numbers.find(num => num > 25);
 console.log(found); // 30
 
-// Find index of element that meets condition
 const foundIndex = numbers.findIndex(num => num > 25);
 console.log(foundIndex); // 2
 ```
@@ -186,142 +192,137 @@ console.log(numbers); // [9, 6, 5, 4, 3, 2, 1, 1]
 
 ## Array Iteration Methods
 
-These methods are powerful tools for processing array data:
+Here's where arrays become truly powerful:
 
-### forEach() - Execute function for each element
+### forEach() - Run some code for every item
 
 ```javascript
 const fruits = ['apple', 'banana', 'orange'];
 
-// Basic iteration
 fruits.forEach(fruit => {
   console.log(`I like ${fruit}`);
 });
 
-// With index and array parameters
+// You can also access the index if you need it
 fruits.forEach((fruit, index, array) => {
   console.log(`${index}: ${fruit} (total: ${array.length})`);
 });
 ```
 
-### map() - Transform each element
+### map() - Turn each item into something else
+
+This is where things get interesting. Need to transform every item in a list? map() is your friend.
 
 ```javascript
-const numbers = [1, 2, 3, 4, 5];
-
-// Square each number
-const squared = numbers.map(num => num ** 2);
-console.log(squared); // [1, 4, 9, 16, 25]
-
-// Transform strings
-const fruits = ['apple', 'banana', 'orange'];
-const uppercased = fruits.map(fruit => fruit.toUpperCase());
-console.log(uppercased); // ['APPLE', 'BANANA', 'ORANGE']
-
-// Transform objects
-const people = [
-  { name: 'Alice', age: 25 },
-  { name: 'Bob', age: 30 },
-  { name: 'Charlie', age: 35 }
+// Real scenario: You have user data from an API, need to display names
+const users = [
+  { id: 1, firstName: 'Sarah', lastName: 'Connor', age: 29 },
+  { id: 2, firstName: 'John', lastName: 'Wick', age: 35 },
+  { id: 3, firstName: 'Alice', lastName: 'Johnson', age: 42 }
 ];
 
-const names = people.map(person => person.name);
-console.log(names); // ['Alice', 'Bob', 'Charlie']
+// Instead of writing a loop like a caveman
+const fullNames = users.map(user => `${user.firstName} ${user.lastName}`);
+console.log(fullNames); // ['Sarah Connor', 'John Wick', 'Alice Johnson']
+
+// Or extract just the data you need for display
+const userCards = users.map(user => ({
+  name: `${user.firstName} ${user.lastName}`,
+  id: user.id
+}));
+// Perfect for rendering in your UI
 ```
 
-### filter() - Select elements that meet criteria
+### filter() - Grab only the items you want
+
+User clicked "Under $50" filter? This is what you use.
 
 ```javascript
-const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
-// Get even numbers
-const evenNumbers = numbers.filter(num => num % 2 === 0);
-console.log(evenNumbers); // [2, 4, 6, 8, 10]
-
-// Get numbers greater than 5
-const bigNumbers = numbers.filter(num => num > 5);
-console.log(bigNumbers); // [6, 7, 8, 9, 10]
-
-// Filter objects
-const people = [
-  { name: 'Alice', age: 25, city: 'New York' },
-  { name: 'Bob', age: 30, city: 'San Francisco' },
-  { name: 'Charlie', age: 35, city: 'New York' },
-  { name: 'Diana', age: 28, city: 'Seattle' }
+// Real scenario: User searches for products under $50
+const products = [
+  { name: 'Wireless Headphones', price: 79, category: 'electronics' },
+  { name: 'Phone Case', price: 15, category: 'accessories' },
+  { name: 'Laptop', price: 899, category: 'electronics' },
+  { name: 'USB Cable', price: 8, category: 'accessories' },
+  { name: 'Keyboard', price: 45, category: 'electronics' }
 ];
 
-const newYorkers = people.filter(person => person.city === 'New York');
-console.log(newYorkers);
-// [{ name: 'Alice', age: 25, city: 'New York' }, 
-//  { name: 'Charlie', age: 35, city: 'New York' }]
+const affordable = products.filter(p => p.price < 50);
+console.log(affordable);
+// [{ name: 'Phone Case', price: 15 }, { name: 'USB Cable', price: 8 }, { name: 'Keyboard', price: 45 }]
+
+// Combine conditions - electronics under $50
+const cheapElectronics = products.filter(p =>
+  p.category === 'electronics' && p.price < 50
+);
+console.log(cheapElectronics); // [{ name: 'Keyboard', price: 45 }]
 ```
 
-### reduce() - Reduce array to single value
+### reduce() - Combine everything into one value
+
+reduce() is the power move. It takes an array and boils it down to a single value.
 
 ```javascript
 const numbers = [1, 2, 3, 4, 5];
 
 // Sum all numbers
-const sum = numbers.reduce((accumulator, current) => {
-  return accumulator + current;
-}, 0);
+const sum = numbers.reduce((total, current) => total + current, 0);
 console.log(sum); // 15
 
-// Find maximum value
-const max = numbers.reduce((max, current) => {
-  return current > max ? current : max;
-});
-console.log(max); // 5
-
-// Count occurrences
-const fruits = ['apple', 'banana', 'apple', 'orange', 'banana', 'apple'];
-const fruitCount = fruits.reduce((count, fruit) => {
-  count[fruit] = (count[fruit] || 0) + 1;
-  return count;
-}, {});
-console.log(fruitCount); // { apple: 3, banana: 2, orange: 1 }
-
-// Group objects by property
-const people = [
-  { name: 'Alice', department: 'Engineering' },
-  { name: 'Bob', department: 'Marketing' },
-  { name: 'Charlie', department: 'Engineering' },
-  { name: 'Diana', department: 'Marketing' }
+// Real scenario: Calculate shopping cart total
+const cart = [
+  { item: 'Laptop', price: 1000, quantity: 1 },
+  { item: 'Mouse', price: 25, quantity: 2 },
+  { item: 'Keyboard', price: 75, quantity: 1 }
 ];
 
-const groupedByDept = people.reduce((groups, person) => {
-  const dept = person.department;
-  if (!groups[dept]) {
-    groups[dept] = [];
-  }
-  groups[dept].push(person);
-  return groups;
+const cartTotal = cart.reduce((total, item) => {
+  return total + (item.price * item.quantity);
+}, 0);
+console.log(cartTotal); // 1125
+
+// Count how many times each value appears
+const votes = ['pizza', 'burger', 'pizza', 'tacos', 'burger', 'pizza'];
+const voteCount = votes.reduce((tally, vote) => {
+  tally[vote] = (tally[vote] || 0) + 1;
+  return tally;
 }, {});
-console.log(groupedByDept);
+console.log(voteCount); // { pizza: 3, burger: 2, tacos: 1 }
 ```
 
 ## Advanced Array Techniques
 
-### Chaining Methods
+### The Moment It Clicks: Chaining Methods
+
+Here's where it all comes together. You can chain these methods to build data processing pipelines that read like plain English.
 
 ```javascript
-const sales = [
-  { product: 'Laptop', amount: 1200, category: 'Electronics' },
-  { product: 'Coffee', amount: 5, category: 'Food' },
-  { product: 'Phone', amount: 800, category: 'Electronics' },
-  { product: 'Book', amount: 15, category: 'Education' },
-  { product: 'Tablet', amount: 400, category: 'Electronics' }
+// Real scenario from a production app
+const rawSales = [
+  { item: 'Laptop', amount: 1200, returns: 0, category: 'electronics' },
+  { item: 'Coffee', amount: 5, returns: 2, category: 'food' },
+  { item: 'Phone', amount: 800, returns: 1, category: 'electronics' },
+  { item: 'USB Cable', amount: 15, returns: 0, category: 'electronics' },
+  { item: 'Monitor', amount: 300, returns: 0, category: 'electronics' },
+  { item: 'Snacks', amount: 12, returns: 5, category: 'food' }
 ];
 
-// Get total electronics sales over $500
-const highElectronicsSales = sales
-  .filter(sale => sale.category === 'Electronics')
-  .filter(sale => sale.amount > 500)
-  .map(sale => sale.amount)
-  .reduce((total, amount) => total + amount, 0);
+// Boss wants: "Total electronics sales minus returns, over $500"
+// Old way: nested loops, temp variables, 15 lines of code
+// New way:
 
-console.log(highElectronicsSales); // 2000
+const total = rawSales
+  .filter(sale => sale.category === 'electronics')
+  .filter(sale => sale.amount - sale.returns > 500)
+  .reduce((sum, sale) => sum + sale.amount, 0);
+
+console.log(total); // 2000
+
+// Read it out loud - it literally says what it does:
+// "Take sales, filter electronics, filter ones over $500, add them up"
 ```
+
+This is the power of array methods. Once you see it, you can't unsee it.
 
 ### Working with Nested Arrays
 
@@ -439,28 +440,27 @@ console.log(topPerformers);
 
 ## Performance Considerations
 
-### When to Use Different Methods
+### Choosing the Right Tool
 
-```javascript
-const largeArray = Array.from({ length: 100000 }, (_, i) => i);
+Use this guide when you're not sure which method to reach for:
 
-// For simple iteration: forEach is clear and readable
-largeArray.forEach(num => {
-  // Process each number
-});
-
-// For transformation: map is perfect
-const doubled = largeArray.map(num => num * 2);
-
-// For filtering: filter is most appropriate
-const evens = largeArray.filter(num => num % 2 === 0);
-
-// For finding single items: find is more efficient than filter
-const found = largeArray.find(num => num === 50000);
-
-// For checking existence: includes or some
-const hasLargeNumber = largeArray.some(num => num > 90000);
-```
+<ComparisonTable
+  headers={['What You Need', 'Use This', 'Not This']}
+  rows={[
+    {
+      label: 'New array with transformed values',
+      values: ['map()', 'forEach() + push'],
+      highlighted: true
+    },
+    { label: 'Side effects only (logging, API calls)', values: ['forEach()', 'map()'] },
+    { label: 'Find ONE item', values: ['find()', 'filter()[0]'] },
+    { label: 'Check if item exists', values: ['includes() or some()', 'indexOf() !== -1'] },
+    { label: 'Combine to single value', values: ['reduce()', 'forEach() + variable'] },
+    { label: 'Check if ALL pass test', values: ['every()', 'filter().length === arr.length'] }
+  ]}
+  variant="bordered"
+  caption="Choose the right tool for the job"
+/>
 
 ### Memory and Performance Tips
 
@@ -482,39 +482,37 @@ for (let i = 0; i < numbers.length && result2.length < 5; i++) {
 }
 ```
 
-## Common Patterns and Best Practices
+## Common Mistakes (And How to Avoid Them)
 
-### 1. Always Return Values in map()
+### 1. Forgetting to Return in map()
 
 ```javascript
-// ❌ Bad: map() without return
-const doubled = numbers.map(num => {
-  num * 2; // Missing return!
-});
+const numbers = [1, 2, 3];
 
-// ✅ Good: Explicit return
+// This doesn't work - you forgot the return
 const doubled = numbers.map(num => {
-  return num * 2;
+  num * 2; // ← JavaScript sees no return, gives you undefined
 });
+console.log(doubled); // [undefined, undefined, undefined] - oops
 
-// ✅ Good: Implicit return with arrow function
-const doubled = numbers.map(num => num * 2);
+// Do this instead
+const doubled = numbers.map(num => num * 2); // Implicit return = clean code
 ```
 
-### 2. Use Appropriate Method for the Job
+### 2. Using the Wrong Method
 
 ```javascript
-// ❌ Bad: Using map() for side effects
-numbers.map(num => console.log(num));
+// Don't do this - map() is for transforming, not side effects
+numbers.map(num => console.log(num)); // Creates array of undefined values you don't use
 
-// ✅ Good: Use forEach for side effects
-numbers.forEach(num => console.log(num));
+// Do this instead - forEach() is built for side effects
+numbers.forEach(num => console.log(num)); // No wasted array creation
 
-// ❌ Bad: Using forEach when you need a new array
+// Don't do this - why manually build an array?
 let doubled = [];
 numbers.forEach(num => doubled.push(num * 2));
 
-// ✅ Good: Use map for transformations
+// Do this instead - map() does it in one clean line
 const doubled = numbers.map(num => num * 2);
 ```
 
@@ -539,67 +537,256 @@ function safeArrayOperation(arr, operation) {
 
 ## Practice Exercises
 
-Try implementing these functions to test your understanding:
+Time to build something. Here are real scenarios you might face:
+
+### Challenge 1: Clean Up Duplicate Cart Items
 
 ```javascript
-// 1. Remove duplicates from an array
-function removeDuplicates(arr) {
-  // Your implementation here
+// Scenario: User added same item to cart multiple times by accident
+function cleanupCart(items) {
+  // Your code here - remove duplicate product IDs
 }
 
-// 2. Find the intersection of two arrays
-function findIntersection(arr1, arr2) {
-  // Your implementation here
-}
+// Test it:
+const messyCart = [
+  { id: 1, name: 'Laptop' },
+  { id: 2, name: 'Mouse' },
+  { id: 1, name: 'Laptop' }, // duplicate!
+  { id: 3, name: 'Keyboard' }
+];
 
-// 3. Group array elements by a property
-function groupBy(arr, property) {
-  // Your implementation here
-}
+console.log(cleanupCart(messyCart));
+// Should return: [{ id: 1, name: 'Laptop' }, { id: 2, name: 'Mouse' }, { id: 3, name: 'Keyboard' }]
+```
 
-// 4. Chunk array into smaller arrays of specified size
-function chunkArray(arr, size) {
-  // Your implementation here
-}
+<details>
+<summary><strong>Solution & Explanation</strong></summary>
 
-// 5. Rotate array elements by n positions
-function rotateArray(arr, positions) {
-  // Your implementation here
+```javascript
+function cleanupCart(items) {
+  return items.filter((item, index, arr) =>
+    arr.findIndex(i => i.id === item.id) === index
+  );
 }
 ```
 
-## Summary
+**What's happening**: We keep an item only if its current index matches the first time we see that ID. Duplicates will have a different `findIndex` result, so they get filtered out.
 
-Arrays are fundamental to JavaScript programming and provide powerful tools for:
+**Alternative** (more readable):
+```javascript
+function cleanupCart(items) {
+  const seen = new Set();
+  return items.filter(item => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
+}
+```
 
-- **Storing collections** of related data
-- **Transforming data** with map, filter, and reduce
-- **Searching and finding** specific elements
-- **Organizing and sorting** information
-- **Building complex data processing pipelines**
+This way uses a Set to track IDs we've seen. Faster and clearer intent.
 
-Master these array methods and patterns, and you'll be well-equipped to handle most data manipulation tasks in JavaScript.
+</details>
+
+### Challenge 2: Find Common Tags
+
+```javascript
+// Scenario: Find tags that appear in both blog posts
+function findCommonTags(post1Tags, post2Tags) {
+  // Your code here
+}
+
+const postA = ['javascript', 'webdev', 'react', 'tutorial'];
+const postB = ['react', 'tutorial', 'beginners', 'node'];
+
+console.log(findCommonTags(postA, postB));
+// Should return: ['react', 'tutorial']
+```
+
+<details>
+<summary><strong>Solution & Explanation</strong></summary>
+
+```javascript
+function findCommonTags(post1Tags, post2Tags) {
+  return post1Tags.filter(tag => post2Tags.includes(tag));
+}
+```
+
+**Simple version**: Filter first array, keep only tags that exist in second array.
+
+**Optimized for large arrays**:
+```javascript
+function findCommonTags(post1Tags, post2Tags) {
+  const set2 = new Set(post2Tags);
+  return post1Tags.filter(tag => set2.has(tag));
+}
+```
+
+Using a Set makes lookups faster for large tag lists.
+
+</details>
+
+### Challenge 3: Group Users by Role
+
+```javascript
+// Scenario: Group users for admin dashboard
+function groupByRole(users) {
+  // Your code here
+}
+
+const users = [
+  { name: 'Alice', role: 'admin' },
+  { name: 'Bob', role: 'user' },
+  { name: 'Charlie', role: 'admin' },
+  { name: 'Diana', role: 'moderator' }
+];
+
+console.log(groupByRole(users));
+// Should return:
+// {
+//   admin: [{ name: 'Alice', role: 'admin' }, { name: 'Charlie', role: 'admin' }],
+//   user: [{ name: 'Bob', role: 'user' }],
+//   moderator: [{ name: 'Diana', role: 'moderator' }]
+// }
+```
+
+<details>
+<summary><strong>Solution & Explanation</strong></summary>
+
+```javascript
+function groupByRole(users) {
+  return users.reduce((groups, user) => {
+    const role = user.role;
+    if (!groups[role]) {
+      groups[role] = [];
+    }
+    groups[role].push(user);
+    return groups;
+  }, {});
+}
+```
+
+**What's happening**: reduce() builds up an object. For each user, we check if that role exists as a key yet. If not, create an empty array. Then add the user to that role's array.
+
+**Modern alternative**:
+```javascript
+function groupByRole(users) {
+  return users.reduce((groups, user) => ({
+    ...groups,
+    [user.role]: [...(groups[user.role] || []), user]
+  }), {});
+}
+```
+
+Same logic, more functional style. Pick whichever reads better to you.
+
+</details>
+
+### Challenge 4: Paginate Results
+
+```javascript
+// Scenario: Split search results into pages
+function paginate(items, pageSize) {
+  // Your code here
+}
+
+const searchResults = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
+console.log(paginate(searchResults, 3));
+// Should return: [['a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i']]
+```
+
+<details>
+<summary><strong>Solution & Explanation</strong></summary>
+
+```javascript
+function paginate(items, pageSize) {
+  const pages = [];
+  for (let i = 0; i < items.length; i += pageSize) {
+    pages.push(items.slice(i, i + pageSize));
+  }
+  return pages;
+}
+```
+
+**What's happening**: Loop through array in steps of `pageSize`, slice out each chunk, and collect them.
+
+**Functional approach**:
+```javascript
+function paginate(items, pageSize) {
+  return Array.from(
+    { length: Math.ceil(items.length / pageSize) },
+    (_, i) => items.slice(i * pageSize, (i + 1) * pageSize)
+  );
+}
+```
+
+Creates array of correct length, maps each index to a slice. Same result, different style.
+
+</details>
+
+### Challenge 5: Cycle Through Array
+
+```javascript
+// Scenario: Rotate featured products on homepage
+function rotateArray(arr, positions) {
+  // Your code here
+}
+
+const featured = ['Product A', 'Product B', 'Product C', 'Product D'];
+console.log(rotateArray(featured, 2));
+// Should return: ['Product C', 'Product D', 'Product A', 'Product B']
+```
+
+<details>
+<summary><strong>Solution & Explanation</strong></summary>
+
+```javascript
+function rotateArray(arr, positions) {
+  const normalized = positions % arr.length;
+  return [...arr.slice(normalized), ...arr.slice(0, normalized)];
+}
+```
+
+**What's happening**: Normalize positions in case it's larger than array length. Split array at rotation point, swap the halves using spread operator.
+
+**Example walkthrough**:
+- Array: ['A', 'B', 'C', 'D'], rotate by 2
+- Split: ['C', 'D'] and ['A', 'B']
+- Combine: ['C', 'D', 'A', 'B']
+
+</details>
+
+## You're Ready
+
+At this point, you know arrays. Not just "I read about them" know—you can actually use them.
+
+You can transform data with map, filter out the noise, and reduce everything down to what matters. You can chain methods like a pro and write code that does in one line what used to take a whole for-loop.
+
+**Next time you're coding:**
+- See a for-loop? Ask yourself if map/filter/reduce would be cleaner
+- Need to process user data? You've got the tools
+- Want to impress in a code review? Drop a well-placed reduce()
+
+Now go build something. The shopping cart example is a good starting point—try adding features, break it, fix it. That's how you really learn.
 
 ---
 
 ## What's Next?
 
-Now that you've mastered arrays, you're ready to learn powerful techniques for solving array problems efficiently.
+Arrays are just the beginning. Now you're ready to learn why some operations on arrays are way faster than others.
 
-**Next Tutorial**: [Why Sorting Matters](/tutorials/category/data-structures/02-why-sorting-matters) (Coming Soon)
+<TutorialRecommendations
+  currentTutorialSlug="01-introduction-to-arrays"
+  title="Continue Your Learning Journey"
+  description="Based on what you just learned, here are the perfect next steps"
+  limit={3}
+/>
 
-**Related Topics**:
-- [What Are Algorithms?](/tutorials/category/data-structures/00-what-are-algorithms)
-- [Time Complexity & Big O](/tutorials/category/data-structures/04-time-complexity-big-o)
-- [Two-Pointer Technique](/tutorials/category/data-structures/05-two-pointer-technique)
-
-**Practice**:
-- Complete the exercises above
-- Try building a small data processing application
-- Explore the [Array documentation on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)
+**Keep Practicing**:
+- Build a todo list with filtering and sorting
+- Create a product search with auto-complete
+- Process CSV data and generate reports
 
 ---
 
-*Was this tutorial helpful? Share it with someone learning to code!*
-
-**Questions or feedback?** Drop a comment below or [join our Discord community](/community).
+*Share this with someone learning to code. Arrays are fundamental—everyone needs to master them.*

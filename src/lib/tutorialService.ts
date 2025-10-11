@@ -391,4 +391,57 @@ export class TutorialService {
       throw new Error("Failed to count tutorials");
     }
   }
+
+  /**
+   * Get recommended tutorials based on current tutorial
+   * Uses topics, category, prerequisites, and difficulty for smart matching
+   */
+  static async getRecommendedTutorials(
+    currentTutorialSlug: string,
+    limit: number = 3
+  ): Promise<TutorialWithAll[]> {
+    try {
+      const currentTutorial = await this.getTutorialBySlug(currentTutorialSlug);
+      if (!currentTutorial) return [];
+
+      const allTutorials = await this.getAllTutorials();
+
+      const scoredTutorials = allTutorials
+        .filter(tutorial => tutorial.slug !== currentTutorialSlug)
+        .map(tutorial => {
+          let score = 0;
+
+          const currentTopics = currentTutorial.topics as string[] || [];
+          const tutorialTopics = tutorial.topics as string[] || [];
+
+          const sharedTopics = currentTopics.filter(topic =>
+            tutorialTopics.includes(topic)
+          );
+
+          if (sharedTopics.length >= 2) score += 3;
+          else if (sharedTopics.length === 1) score += 2;
+
+          if (tutorial.categoryId === currentTutorial.categoryId) score += 1;
+
+          const diffDifference = Math.abs(tutorial.difficulty - currentTutorial.difficulty);
+          if (diffDifference === 1) score += 1;
+          else if (diffDifference === 0) score += 0.5;
+
+          const currentPrereqs = currentTutorial.prerequisites as string[] || [];
+          const tutorialPrereqs = tutorial.prerequisites as string[] || [];
+          if (tutorialPrereqs.includes(currentTutorial.title)) score += 2;
+          if (currentPrereqs.includes(tutorial.title)) score += 1.5;
+
+          return { tutorial, score };
+        })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, limit)
+        .map(item => item.tutorial);
+
+      return scoredTutorials;
+    } catch (error) {
+      console.error("Error in getRecommendedTutorials:", error);
+      return [];
+    }
+  }
 }
