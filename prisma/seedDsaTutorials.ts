@@ -108,6 +108,365 @@ const dsaTutorials: TutorialSeedData[] = [
  */
 const dsaQuizzes: QuizSeedData[] = [
   {
+    slug: "00-what-are-algorithms-quiz",
+    title: "What Are Algorithms? Quiz",
+    tutorialSlug: "00-what-are-algorithms",
+    isPremium: false,
+    requiredPlan: "FREE",
+    questions: [
+      {
+        id: "algo-1",
+        question: "What is an algorithm?",
+        type: "multiple-choice",
+        options: [
+          "A programming language",
+          "A step-by-step procedure to solve a problem",
+          "A type of computer",
+          "A software application",
+        ],
+        correct: 1,
+        explanation:
+          "An algorithm is a step-by-step procedure or set of instructions to solve a problem or complete a task. It's like a recipe that can be followed to achieve a specific result.",
+      },
+      {
+        id: "algo-2",
+        question:
+          "Which of these everyday activities is an example of an algorithm?",
+        type: "multiple-choice",
+        options: [
+          "Making a sandwich",
+          "Sleeping",
+          "Thinking randomly",
+          "Feeling emotions",
+        ],
+        correct: 0,
+        explanation:
+          "Making a sandwich follows a clear sequence of steps (algorithm): get bread, add ingredients, close sandwich. Sleeping and feeling emotions aren't step-by-step procedures.",
+      },
+      {
+        id: "algo-3",
+        question: "What are the key characteristics of a good algorithm?",
+        type: "multiple-choice",
+        options: [
+          "Long and complex",
+          "Uses fancy words",
+          "Clear, finite, and produces correct output",
+          "Only works on expensive computers",
+        ],
+        correct: 2,
+        explanation:
+          "Good algorithms are: Clear (easy to understand), Finite (eventually ends), Correct (produces right output), Efficient (doesn't waste resources), and Robust (handles edge cases).",
+      },
+      {
+        id: "algo-4",
+        question: "What does 'finite' mean when describing an algorithm?",
+        type: "multiple-choice",
+        options: [
+          "It uses finite memory",
+          "It must eventually terminate/end",
+          "It works with finite numbers only",
+          "It has a finite number of lines of code",
+        ],
+        correct: 1,
+        explanation:
+          "Finite means the algorithm must eventually stop - it can't run forever. An infinite loop is not a valid algorithm because it never completes the task.",
+      },
+      {
+        id: "algo-5",
+        question:
+          "In the FizzBuzz algorithm, what should you output for the number 15?",
+        type: "multiple-choice",
+        options: ["Fizz", "Buzz", "FizzBuzz", "15"],
+        correct: 2,
+        explanation:
+          "15 is divisible by both 3 and 5, so it outputs 'FizzBuzz'. The algorithm checks: if divisible by 3 and 5 → FizzBuzz, if divisible by 3 → Fizz, if divisible by 5 → Buzz, else → the number.",
+      },
+      {
+        id: "algo-6",
+        question: "Why do we write algorithms before coding?",
+        type: "multiple-choice",
+        options: [
+          "To make work take longer",
+          "To plan our solution and catch problems early",
+          "Because it's required by law",
+          "To confuse ourselves",
+        ],
+        correct: 1,
+        explanation:
+          "Writing algorithms first helps us think through the problem logically, spot potential issues before coding, and communicate our solution clearly. It saves time in the long run.",
+      },
+      {
+        id: "algo-7",
+        question: "What is pseudocode?",
+        type: "multiple-choice",
+        options: [
+          "Fake code that doesn't work",
+          "Code written in Python only",
+          "Plain language description of algorithm logic",
+          "A type of encryption",
+        ],
+        correct: 2,
+        explanation:
+          "Pseudocode is a plain-language way to describe an algorithm's logic without worrying about specific programming syntax. It helps you focus on the steps before implementation.",
+      },
+      {
+        id: "algo-8",
+        question:
+          "Which characteristic is NOT essential for a good algorithm?",
+        type: "multiple-choice",
+        options: [
+          "Being written in a specific programming language",
+          "Producing correct output",
+          "Having clear, unambiguous steps",
+          "Eventually terminating",
+        ],
+        correct: 0,
+        explanation:
+          "Algorithms are language-independent - the same algorithm can be implemented in any programming language. What matters is the logic and steps, not the language used.",
+      },
+      {
+        id: "algo-9",
+        question: "What makes an algorithm 'efficient'?",
+        type: "multiple-choice",
+        options: [
+          "It has the most lines of code",
+          "It uses the least time and resources to solve the problem",
+          "It was written quickly",
+          "It looks impressive",
+        ],
+        correct: 1,
+        explanation:
+          "An efficient algorithm solves the problem using minimal time and resources (memory, CPU). Two algorithms might both be correct, but one could be much faster or use less memory.",
+      },
+      {
+        id: "algo-10",
+        question:
+          "Why is it important for algorithms to handle 'edge cases'?",
+        type: "multiple-choice",
+        options: [
+          "To make code longer",
+          "Edge cases don't matter",
+          "To ensure the algorithm works correctly in unusual situations",
+          "To confuse other programmers",
+        ],
+        correct: 2,
+        explanation:
+          "Edge cases are unusual or extreme inputs (like empty arrays, negative numbers, or very large values). Good algorithms handle these gracefully instead of crashing or giving wrong answers.",
+      },
+    ],
+  },
+  {
+    slug: "01-introduction-to-arrays-quiz",
+    title: "Introduction to Arrays Quiz",
+    tutorialSlug: "01-introduction-to-arrays",
+    isPremium: false,
+    requiredPlan: "FREE",
+    questions: [
+      {
+        id: "array-1",
+        question: "What is an array in JavaScript?",
+        type: "multiple-choice",
+        options: [
+          "A single value",
+          "An ordered collection that can hold multiple values",
+          "A function",
+          "A loop",
+        ],
+        correct: 1,
+        explanation:
+          "An array is an ordered collection (list) that can store multiple values of any type. Each value has a position (index) starting from 0.",
+      },
+      {
+        id: "array-2",
+        question: "What index does the first element in an array have?",
+        type: "multiple-choice",
+        options: ["1", "0", "-1", "It depends"],
+        correct: 1,
+        explanation:
+          "Arrays in JavaScript (and most programming languages) are zero-indexed, meaning the first element is at index 0, second at index 1, and so on.",
+      },
+      {
+        id: "array-3",
+        question:
+          "Which method adds an element to the END of an array?",
+        type: "multiple-choice",
+        options: ["shift()", "unshift()", "push()", "pop()"],
+        correct: 2,
+        explanation:
+          "push() adds elements to the end of an array. pop() removes from end, unshift() adds to beginning, shift() removes from beginning.",
+      },
+      {
+        id: "array-4",
+        question: "What does the map() method return?",
+        type: "multiple-choice",
+        options: [
+          "Nothing (undefined)",
+          "The original array modified",
+          "A new array with transformed elements",
+          "A single value",
+        ],
+        correct: 2,
+        explanation:
+          "map() returns a NEW array with each element transformed by the callback function. The original array remains unchanged.",
+      },
+      {
+        id: "array-5",
+        question: "When should you use filter() instead of map()?",
+        type: "multiple-choice",
+        options: [
+          "When you want to transform each element",
+          "When you want to select specific elements based on a condition",
+          "When you want to combine elements",
+          "When you want to sort elements",
+        ],
+        correct: 1,
+        explanation:
+          "Use filter() when you want to select only elements that meet certain criteria. It returns a new array containing only elements that pass the test function.",
+      },
+      {
+        id: "array-6",
+        question: "What does reduce() do?",
+        type: "multiple-choice",
+        options: [
+          "Makes the array smaller",
+          "Combines all array elements into a single value",
+          "Removes duplicate elements",
+          "Sorts the array",
+        ],
+        correct: 1,
+        explanation:
+          "reduce() combines/reduces all array elements into a single value by applying a function cumulatively. Common uses: sum numbers, count occurrences, group objects.",
+      },
+      {
+        id: "array-7",
+        question:
+          "What's wrong with this code?\nconst doubled = numbers.map(num => { num * 2 });",
+        type: "multiple-choice",
+        options: [
+          "Nothing, it works fine",
+          "Missing return statement",
+          "Should use forEach instead",
+          "Syntax error in arrow function",
+        ],
+        correct: 1,
+        explanation:
+          "Without 'return', the arrow function with curly braces returns undefined. Either add 'return num * 2' or use implicit return: 'num => num * 2' without braces.",
+      },
+      {
+        id: "array-8",
+        question:
+          "Which method should you use for side effects (like console.log)?",
+        type: "multiple-choice",
+        options: ["map()", "filter()", "forEach()", "reduce()"],
+        correct: 2,
+        explanation:
+          "forEach() is designed for side effects (operations that don't return a value like logging, making API calls). Don't use map() for side effects as it creates an unnecessary array.",
+      },
+      {
+        id: "array-9",
+        question:
+          "What happens when you chain array methods?\narray.filter().map().reduce()",
+        type: "multiple-choice",
+        options: [
+          "Error - can't chain methods",
+          "Only the last method runs",
+          "Each method processes the result of the previous one",
+          "They run in random order",
+        ],
+        correct: 2,
+        explanation:
+          "Method chaining means each method's output becomes the input for the next. The array is filtered, then the filtered result is mapped, then the mapped result is reduced.",
+      },
+      {
+        id: "array-10",
+        question:
+          "Which is more efficient for finding a single item: find() or filter()?",
+        type: "multiple-choice",
+        options: [
+          "filter() because it returns an array",
+          "find() because it stops at the first match",
+          "They're equally efficient",
+          "Neither - use forEach()",
+        ],
+        correct: 1,
+        explanation:
+          "find() is more efficient because it stops searching as soon as it finds the first match. filter() continues through the entire array even after finding matches.",
+      },
+      {
+        id: "array-11",
+        question: "What does slice(1, 3) return for array [0, 1, 2, 3, 4]?",
+        type: "multiple-choice",
+        options: [
+          "[1, 2, 3]",
+          "[1, 2]",
+          "[0, 1, 2]",
+          "[2, 3]",
+        ],
+        correct: 1,
+        explanation:
+          "slice(start, end) returns elements from index start up to (but NOT including) index end. So slice(1, 3) returns [1, 2] - elements at indices 1 and 2.",
+      },
+      {
+        id: "array-12",
+        question: "What's the difference between slice() and splice()?",
+        type: "multiple-choice",
+        options: [
+          "No difference, same method",
+          "slice() copies, splice() modifies original array",
+          "splice() copies, slice() modifies original array",
+          "Both modify the original array",
+        ],
+        correct: 1,
+        explanation:
+          "slice() creates a copy without modifying original (non-mutating). splice() actually modifies the original array by adding/removing elements (mutating).",
+      },
+      {
+        id: "array-13",
+        question:
+          "How do you remove duplicates from an array [1, 2, 2, 3]?",
+        type: "multiple-choice",
+        options: [
+          "[...new Set(array)]",
+          "array.unique()",
+          "array.removeDuplicates()",
+          "array.distinct()",
+        ],
+        correct: 0,
+        explanation:
+          "Use [...new Set(array)] - Set automatically removes duplicates, then spread operator converts it back to an array. JavaScript has no built-in unique() method.",
+      },
+      {
+        id: "array-14",
+        question: "What does includes() return?",
+        type: "multiple-choice",
+        options: [
+          "The index of the element",
+          "The element itself",
+          "A boolean (true/false)",
+          "A new array",
+        ],
+        correct: 2,
+        explanation:
+          "includes() returns a boolean - true if the element exists in the array, false if it doesn't. Use indexOf() if you need the position.",
+      },
+      {
+        id: "array-15",
+        question:
+          "Why is this approach inefficient?\nfor (let i = 0; i < arr.length; i++) {\n  if (arr.includes(target)) {...}\n}",
+        type: "multiple-choice",
+        options: [
+          "includes() is slow",
+          "includes() inside a loop makes it O(n²)",
+          "for loops are outdated",
+          "Nothing wrong with it",
+        ],
+        correct: 1,
+        explanation:
+          "includes() is O(n) by itself. Inside an O(n) loop, you get O(n²) - quadratic time. For large arrays, this gets slow fast. Move includes() outside the loop when possible.",
+      },
+    ],
+  },
+  {
     slug: "04-time-complexity-big-o-quiz",
     title: "Time Complexity & Big O Notation Quiz",
     tutorialSlug: "04-time-complexity-big-o",
