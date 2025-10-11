@@ -9,6 +9,7 @@ import { checkContentAccess } from "@/hooks/useSubscription";
 import { useTutorialStart } from "@/hooks/useTutorialStart";
 import { useTutorialCompletion } from "@/hooks/useTutorialCompletion";
 import { useProgressiveLoading } from "@/hooks/useProgressiveLoading";
+import { useFeedbackTrigger } from "@/hooks/useFeedbackTrigger";
 import getMoodColors from "@/lib/getMoodColors";
 import TutorialLoading from "../../app/tutorials/category/[category]/[slug]/loading";
 import TutorialHeader from "@/components/tutorial/TutorialHeader";
@@ -20,6 +21,9 @@ import AccessWarningBanner from "@/components/tutorial/AccessWarningBanner";
 import TutorialErrorState from "@/components/tutorial/TutorialErrorState";
 import AnonymousProgressBanner from "@/components/tutorial/AnonymousProgressBanner";
 import AnonymousLimitReached from "@/components/tutorial/AnonymousLimitReached";
+import { FeedbackModal } from "@/components/feedback/FeedbackModal";
+import { submitFeedback } from "@/lib/services/feedbackService";
+import { FeedbackFormData } from "@/types/feedback";
 
 // Import anonymous tracking utilities
 import {
@@ -68,6 +72,24 @@ export default function TutorialClient({
       )
     : { canAccess: true };
 
+  // Initialize feedback trigger system (only for authenticated users)
+  const {
+    shouldShowModal: shouldShowFeedback,
+    currentTutorial: feedbackTutorial,
+    onTutorialComplete: handleFeedbackTrigger,
+    onFeedbackSubmit: handleFeedbackSubmitted,
+    onFeedbackDismiss: handleFeedbackDismissed,
+  } = useFeedbackTrigger({
+    config: {
+      showAfterFirst: true,
+      minInterval: 3,
+      maxInterval: 5,
+      useVariableIntervals: true,
+      respectSessionDismissals: true,
+    },
+    minHoursBetweenPrompts: 24,
+  });
+
   // Track tutorial start when tutorial loads
   useTutorialStart({
     tutorialId: tutorial?.id,
@@ -78,6 +100,17 @@ export default function TutorialClient({
   const { hasCompletedReading, isCompleting } = useTutorialCompletion({
     tutorialId: tutorial?.id,
     canAccess: accessCheck.canAccess,
+    onComplete: (tutorialId) => {
+      // Trigger feedback modal check when tutorial is completed
+      if (!isAnonymous && tutorial) {
+        handleFeedbackTrigger({
+          tutorialId,
+          tutorialSlug: tutorial.slug,
+          tutorialTitle: tutorial.title,
+          completedAt: new Date(),
+        });
+      }
+    },
   });
 
   // Progressive content loading
@@ -136,6 +169,35 @@ export default function TutorialClient({
 
   const moodColors = getMoodColors(currentMood.id);
 
+  /**
+   * Handle feedback submission
+   * Submits feedback to API and updates trigger state
+   */
+  const handleFeedbackSubmit = async (formData: FeedbackFormData) => {
+    if (!feedbackTutorial) return;
+
+    try {
+      await submitFeedback({
+        tutorialId: feedbackTutorial.tutorialId,
+        rating: formData.rating!,
+        helpful: formData.difficulty === "just-right",
+        difficulty: formData.difficulty,
+        feedback: formData.feedback,
+        tags: formData.tags,
+        quizHelpful: formData.quizHelpful,
+        improvementAreas: formData.improvementAreas,
+        positiveAspects: formData.positiveAspects,
+        isAnonymous: formData.isAnonymous,
+      });
+
+      // Notify feedback system of successful submission
+      handleFeedbackSubmitted(feedbackTutorial.tutorialId);
+    } catch (error) {
+      console.error("Failed to submit feedback:", error);
+      throw error;
+    }
+  };
+
   // Handle loading state
   if (isLoading) {
     return <TutorialLoading />;
@@ -191,6 +253,17 @@ export default function TutorialClient({
           />
         </div>
       </div>
+
+      {/* Feedback Modal - only shown for authenticated users */}
+      {!isAnonymous && shouldShowFeedback && feedbackTutorial && (
+        <FeedbackModal
+          isOpen={shouldShowFeedback}
+          onClose={handleFeedbackDismissed}
+          tutorialId={feedbackTutorial.tutorialId}
+          tutorialTitle={feedbackTutorial.tutorialTitle}
+          onSubmit={handleFeedbackSubmit}
+        />
+      )}
     </div>
   );
 }

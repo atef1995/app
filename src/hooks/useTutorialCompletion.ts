@@ -8,6 +8,8 @@ import { Achievement, Progress } from "@prisma/client";
 interface UseTutorialCompletionParams {
   tutorialId?: string;
   canAccess: boolean;
+  /** Callback fired when tutorial is completed (for feedback triggers) */
+  onComplete?: (tutorialId: string) => void;
 }
 
 interface TutorialCompletionResponse {
@@ -37,6 +39,7 @@ const completeTutorial = async (
 export function useTutorialCompletion({
   tutorialId,
   canAccess,
+  onComplete,
 }: UseTutorialCompletionParams) {
   const [hasCompletedReading, setHasCompletedReading] = useState(false);
   const { syncProgress } = useProgressSync();
@@ -51,6 +54,11 @@ export function useTutorialCompletion({
       if (data.achievements && data.achievements.length > 0) {
         // You could show a toast or modal here
         console.log("🎉 Achievements unlocked:", data.achievements);
+      }
+
+      // Notify completion callback (for feedback triggers)
+      if (onComplete && tutorialId) {
+        onComplete(tutorialId);
       }
     },
     onError: (error) => {

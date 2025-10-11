@@ -51,15 +51,13 @@ model User {
   createdAt                DateTime                  @default(now())
   updatedAt                DateTime                  @updatedAt
   role                     String                    @default("USER")
-
-  // Attribution tracking for anonymous conversion
-  conversionSource         String?
-  conversionMedium         String?
-  conversionCampaign       String?
-  firstLandingPage         String?
   anonymousSessionId       String?
-
+  conversionCampaign       String?
+  conversionMedium         String?
+  conversionSource         String?
+  firstLandingPage         String?
   accounts                 Account[]
+  certificates             Certificate[]
   challengeAttempts        ChallengeAttempt[]
   challengeCodeProgress    ChallengeCodeProgress[]
   challengeProgress        ChallengeProgress[]
@@ -79,12 +77,11 @@ model User {
   reactions                Reaction[]
   sessions                 Session[]
   subscriptions            Subscription[]
+  tutorialFeedback         TutorialFeedback[]
   tutorialProgress         TutorialProgress[]
   achievements             UserAchievement[]
   userSettings             UserSettings?
   studyProgress            UserStudyProgress[]
-  certificates             Certificate[]
-  tutorialFeedback         TutorialFeedback[]
 
   @@map("users")
 }
@@ -138,32 +135,31 @@ model Tutorial {
   categoryId       String
   progress         Progress[]
   quizzes          Quiz[]
-  tutorialProgress TutorialProgress[]
   feedback         TutorialFeedback[]
+  tutorialProgress TutorialProgress[]
   category         Category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-  // Performance indexes for frequently queried fields
-  @@index([categoryId, published, order]) // Composite index for category page queries
-  @@index([published, order])             // Index for all tutorials queries
-  @@index([categoryId])                   // Index for category relation queries
+  @@index([categoryId, published, order])
+  @@index([published, order])
+  @@index([categoryId])
   @@map("tutorials")
 }
 
 model Quiz {
-  id           String        @id @default(cuid())
-  slug         String        @unique
+  id           String             @id @default(cuid())
+  slug         String             @unique
   tutorialId   String
   title        String
   questions    Json
-  isPremium    Boolean       @default(false)
-  requiredPlan String        @default("FREE")
+  isPremium    Boolean            @default(false)
+  requiredPlan String             @default("FREE")
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
   attempts     QuizAttempt[]
-  feedback     TutorialFeedback[]
   tutorial     Tutorial           @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  feedback     TutorialFeedback[]
 
-  @@index([tutorialId]) // Index for tutorial-quiz relation queries
+  @@index([tutorialId])
   @@map("quizzes")
 }
 
@@ -181,8 +177,8 @@ model QuizAttempt {
   quiz       Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId]) // Index for user quiz attempts queries (used in achievement stats)
-  @@index([quizId]) // Index for quiz attempts lookup
+  @@index([userId])
+  @@index([quizId])
   @@map("quiz_attempts")
 }
 
@@ -202,7 +198,7 @@ model TutorialProgress {
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, tutorialId])
-  @@index([userId, quizPassed]) // Index for achievement stats queries (getUserStats)
+  @@index([userId, quizPassed])
   @@map("tutorial_progress")
 }
 
@@ -223,7 +219,7 @@ model ChallengeProgress {
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, challengeId])
-  @@index([userId, passed]) // Index for achievement stats queries (getUserStats)
+  @@index([userId, passed])
   @@map("challenge_progress")
 }
 
@@ -261,29 +257,29 @@ model CodeExecution {
 }
 
 model TutorialFeedback {
-  id               String    @id @default(cuid())
+  id               String   @id @default(cuid())
   userId           String
   tutorialId       String
   quizId           String?
-  rating           Int // 1-5 scale
+  rating           Int
   helpful          Boolean?
-  difficulty       String? // "too-easy" | "just-right" | "too-hard"
-  completion       String? // "finished" | "partial" | "abandoned"
+  difficulty       String?
+  completion       String?
   feedback         String?
-  tags             Json? // Array of tags like ["too-easy", "loved-it"]
+  tags             Json?
   quizHelpful      Boolean?
-  improvementAreas Json? // Array of improvement areas
-  positiveAspects  Json? // Array of what user loved
-  isAnonymous      Boolean   @default(false)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tutorial         Tutorial  @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
-  quiz             Quiz?     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  improvementAreas Json?
+  positiveAspects  Json?
+  isAnonymous      Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  quiz             Quiz?    @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  tutorial         Tutorial @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, tutorialId]) // One feedback per tutorial per user
-  @@index([tutorialId]) // Index for tutorial feedback queries
-  @@index([rating]) // Index for rating aggregation
+  @@unique([userId, tutorialId])
+  @@index([tutorialId])
+  @@index([rating])
   @@index([userId])
   @@map("tutorial_feedback")
 }
@@ -608,17 +604,17 @@ model ProjectReviewAssignment {
   assignedBy      String            @default("SYSTEM")
   priority        Int               @default(1)
   status          String            @default("UNASSIGNED")
-  expiredAt       DateTime
-  rejectedAt      DateTime
-  rejectionReason String
   dueDate         DateTime
-  type            String
   acceptedAt      DateTime?
   completedAt     DateTime?
   declinedReason  String?
   remindersSent   Int               @default(0)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+  expiredAt       DateTime
+  rejectedAt      DateTime
+  rejectionReason String
+  type            String
   reviewer        User              @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
   submission      ProjectSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
   reviews         ProjectReview[]
@@ -674,7 +670,7 @@ model Skill {
   category    String
   keywords    String[]
   iconName    String
-  level       String   @default("BEGINNER") // BEGINNER, INTERMEDIATE, ADVANCED
+  level       String   @default("BEGINNER")
   order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -686,15 +682,15 @@ model Certificate {
   id           String          @id @default(cuid())
   userId       String
   type         CertificateType
-  entityId     String // Tutorial ID or Category ID
-  entityTitle  String // Tutorial title or Category title
-  entitySlug   String // Tutorial slug or Category slug
+  entityId     String
+  entityTitle  String
+  entitySlug   String
   completedAt  DateTime
   issuedAt     DateTime        @default(now())
-  shareableId  String          @unique // Public ID for sharing
-  shareableUrl String? // Generated shareable URL
+  shareableId  String          @unique
+  shareableUrl String?
   isPublic     Boolean         @default(false)
-  metadata     Json? // Additional data like score, time taken, etc.
+  metadata     Json?
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
   user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -703,88 +699,73 @@ model Certificate {
   @@map("certificates")
 }
 
-enum CertificateType {
-  TUTORIAL
-  CATEGORY
-}
-
 model Phase {
-  id              String   @id @default(cuid())
-  slug            String   @unique
-  title           String
-  description     String
-  color           String   // Tailwind gradient class like "from-blue-400 to-purple-500"
-  icon            String   // Icon name for the phase
-  order           Int      @default(0)
-  estimatedWeeks  Int      @default(1)
-  prerequisites   String[] // Array of phase slugs that must be completed first
-  published       Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  // Relations to content
-  phaseSteps      PhaseStep[]
-  
+  id             String      @id @default(cuid())
+  slug           String      @unique
+  title          String
+  description    String
+  color          String
+  icon           String
+  order          Int         @default(0)
+  estimatedWeeks Int         @default(1)
+  prerequisites  String[]
+  published      Boolean     @default(false)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  phaseSteps     PhaseStep[]
+
   @@map("phases")
 }
 
 model PhaseStep {
-  id              String   @id @default(cuid())
-  phaseId         String
-  contentType     String   // "tutorial", "challenge", "quiz", "project"
-  contentId       String   // References the actual content (tutorial.id, challenge.id, etc.)
-  contentSlug     String   // References the actual content slug for easier lookup
-  order           Int      @default(0)
-  isOptional      Boolean  @default(false)
-  estimatedHours  Float    @default(1.0)
-  prerequisites   String[] // Array of step IDs that must be completed first
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  phase           Phase    @relation(fields: [phaseId], references: [id], onDelete: Cascade)
-  
-  @@unique([phaseId, contentType, contentId]) // Prevent duplicate content in same phase
+  id             String   @id @default(cuid())
+  phaseId        String
+  contentType    String
+  contentId      String
+  contentSlug    String
+  order          Int      @default(0)
+  isOptional     Boolean  @default(false)
+  estimatedHours Float    @default(1.0)
+  prerequisites  String[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  phase          Phase    @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+
+  @@unique([phaseId, contentType, contentId])
   @@map("phase_steps")
 }
 
 model AnonymousSession {
-  id                String   @id @default(cuid())
-  anonymousId       String   @unique
-
-  // Tracking data
-  tutorialsViewed   Json     @default("[]")
-  totalTimeSpent    Int      @default(0)
-  pagesViewed       Int      @default(0)
-
-  // Attribution
+  id                String    @id @default(cuid())
+  anonymousId       String    @unique
+  tutorialsViewed   Json      @default("[]")
+  totalTimeSpent    Int       @default(0)
+  pagesViewed       Int       @default(0)
   source            String?
   medium            String?
   campaign          String?
   referrer          String?
   landingPage       String?
-
-  // Device/Browser info
   userAgent         String?
   device            String?
   browser           String?
   os                String?
-
-  // Geographic (from IP)
   country           String?
   region            String?
   city              String?
-
-  // Lifecycle
-  createdAt         DateTime @default(now())
-  lastActiveAt      DateTime @updatedAt
+  createdAt         DateTime  @default(now())
+  lastActiveAt      DateTime  @updatedAt
   convertedToUserId String?
   convertedAt       DateTime?
-
-  // Privacy
   ipAddress         String?
 
   @@index([anonymousId])
   @@index([convertedToUserId])
   @@index([createdAt])
   @@map("anonymous_sessions")
+}
+
+enum CertificateType {
+  TUTORIAL
+  CATEGORY
 }
