@@ -5,7 +5,7 @@ import { MoodSelector } from "@/components/MoodSelector";
 import { useProgressStats } from "@/hooks/useProgress";
 import { ProgressStats } from "@/components/ProgressComponents";
 import { AnonymousDashboard } from "@/components/AnonymousDashboard";
-import { BookOpen, Code, Brain, Hand, Building } from "lucide-react";
+import { BookOpen, Code, Brain, Hand, Building, ToolCase } from "lucide-react";
 import Link from "next/link";
 
 interface ProgressStats {
@@ -151,7 +151,25 @@ export default function DashboardPage() {
             </div>
           </Link>
         </div>
-
+        <div className="flex flex-col mt-5">
+          <Link
+            href="/tools/complexity-visualizer"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-red-200 dark:hover:border-red-400 dark:shadow-xl"
+          >
+            <div className="mb-4 flex justify-center">
+              <ToolCase className="h-8 w-8 text-red-600 dark:text-red-400" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              Algorithms Visualisation Tool
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Take a look at our new algorithms time complexity visualiser
+            </p>
+            <div className="text-sm text-red-600 dark:text-red-400 font-semibold">
+              Explore →
+            </div>
+          </Link>
+        </div>
         {/* Progress Section */}
         <div className="mt-12">
           {loadingProgress ? (

@@ -250,7 +250,7 @@ export default function StudyPlanPage() {
               <StudyPlanOverview
                 studyPlan={studyPlan}
                 completedSteps={userProgress.completedSteps}
-                hoursSpent={userProgress.hoursSpent}
+                hoursSpent={Math.round(userProgress.hoursSpent)}
                 currentStepId={userProgress.currentStepId}
                 onStartStep={handleStartStep}
                 navigatingStepId={navigatingStepId}

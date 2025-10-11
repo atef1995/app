@@ -28,7 +28,7 @@ export interface Step {
   /** Operation being performed */
   operation?: Operation;
   /** Variables and their values at this step */
-  variables?: Record<string, any>;
+  variables?: Record<string, number>;
   /** Performance metrics */
   metrics?: StepMetrics;
 }
@@ -191,7 +191,7 @@ export interface VisualizerConfig {
   /** Algorithm being visualized */
   algorithm: string;
   /** Initial data */
-  initialData: any;
+  initialData: Array<number>;
   /** Whether to show code alongside */
   showCode?: boolean;
   /** Whether to show complexity analysis */

@@ -31,6 +31,7 @@
     "prisma/migrations/**/*",
     "prisma/checkTutorial.ts",
     "prisma/phases/*",
-    "src/app/api/email/test/*"
+    "src/app/api/email/test/*",
+    "prisma/utils/*"
   ]
 }

@@ -32,8 +32,10 @@ export function calculateTreeLayout(
   const horizontalSpacing = 20; // Spacing between nodes
 
   // First pass: assign initial positions
-  const positions = new Map<string, { x: number; mod: number; level: number }>();
-  let nodeIndex = 0;
+  const positions = new Map<
+    string,
+    { x: number; mod: number; level: number }
+  >();
 
   function firstPass(
     node: TreeNode | null,
@@ -78,9 +80,7 @@ export function calculateTreeLayout(
  */
 export function getTreeHeight(node: TreeNode | null): number {
   if (!node) return -1;
-  return (
-    1 + Math.max(getTreeHeight(node.left), getTreeHeight(node.right))
-  );
+  return 1 + Math.max(getTreeHeight(node.left), getTreeHeight(node.right));
 }
 
 /**
@@ -195,7 +195,7 @@ export function calculateForceDirectedLayout(
       const dy = pos2.y - pos1.y;
       const distance = Math.sqrt(dx * dx + dy * dy) || 1;
 
-      const force = c2 * (distance * distance) / k;
+      const force = (c2 * (distance * distance)) / k;
       const fx = (force * dx) / distance;
       const fy = (force * dy) / distance;
 

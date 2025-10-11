@@ -17,7 +17,7 @@ export function generateBubbleSortSteps(arr: number[]): Step[] {
   const steps: Step[] = [];
   const values = [...arr];
   const sorted = new Array(values.length).fill(false);
-  let metrics: StepMetrics = {
+  const metrics: StepMetrics = {
     comparisons: 0,
     swaps: 0,
     accesses: 0,
@@ -114,7 +114,7 @@ export function generateSelectionSortSteps(arr: number[]): Step[] {
   const steps: Step[] = [];
   const values = [...arr];
   const sorted = new Array(values.length).fill(false);
-  let metrics: StepMetrics = {
+  const metrics: StepMetrics = {
     comparisons: 0,
     swaps: 0,
     accesses: 0,
@@ -236,7 +236,7 @@ export function generateInsertionSortSteps(arr: number[]): Step[] {
   const sorted = new Array(values.length).fill(false);
   sorted[0] = true; // First element is always sorted
 
-  let metrics: StepMetrics = {
+  const metrics: StepMetrics = {
     comparisons: 0,
     swaps: 0,
     accesses: 0,
@@ -349,13 +349,10 @@ export function generateInsertionSortSteps(arr: number[]): Step[] {
 /**
  * Generate steps for Two Pointer technique
  */
-export function generateTwoPointerSteps(
-  arr: number[],
-  target: number
-): Step[] {
+export function generateTwoPointerSteps(arr: number[], target: number): Step[] {
   const steps: Step[] = [];
   const values = [...arr].sort((a, b) => a - b); // Two pointer usually works on sorted array
-  let metrics: StepMetrics = {
+  const metrics: StepMetrics = {
     comparisons: 0,
     swaps: 0,
     accesses: 0,
@@ -461,7 +458,7 @@ export function generateSlidingWindowSteps(
 ): Step[] {
   const steps: Step[] = [];
   const values = [...arr];
-  let metrics: StepMetrics = {
+  const metrics: StepMetrics = {
     comparisons: 0,
     swaps: 0,
     accesses: 0,
@@ -507,7 +504,9 @@ export function generateSlidingWindowSteps(
 
     steps.push({
       id: generateStepId(steps.length, "slide"),
-      description: `Sliding window: Remove ${values[i - windowSize]}, Add ${values[i]}. Sum: ${currentSum}`,
+      description: `Sliding window: Remove ${values[i - windowSize]}, Add ${
+        values[i]
+      }. Sum: ${currentSum}`,
       state: {
         type: "array",
         values: [...values],

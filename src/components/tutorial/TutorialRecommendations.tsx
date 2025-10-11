@@ -30,7 +30,9 @@ const DifficultyBadge = ({ difficulty }: { difficulty: number }) => {
   const colorClass = colors[difficulty - 1] || colors[2];
 
   return (
-    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}>
+    <span
+      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}
+    >
       {level}
     </span>
   );
@@ -42,7 +44,9 @@ export function TutorialRecommendations({
   title = "Related Topics You Might Like",
   description,
 }: TutorialRecommendationsProps) {
-  const [recommendations, setRecommendations] = useState<TutorialWithCategory[]>([]);
+  const [recommendations, setRecommendations] = useState<
+    TutorialWithCategory[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -111,7 +115,7 @@ export function TutorialRecommendations({
               {/* Category Badge */}
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                  {tutorial.category.name}
+                  {tutorial.category.title}
                 </span>
                 <DifficultyBadge difficulty={tutorial.difficulty} />
               </div>

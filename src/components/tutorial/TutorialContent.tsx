@@ -16,6 +16,7 @@ import { UpgradeCTA } from "./UpgradeCTA";
 import { BubbleSortVisualizer } from "../visualizer/examples/BubbleSortVisualizer";
 import { SelectionSortVisualizer } from "../visualizer/examples/SelectionSortVisualizer";
 import { SortingComparisonVisualizer } from "../visualizer/examples/SortingComparisonVisualizer";
+import { TutorialRecommendations } from "./TutorialRecommendations";
 
 interface TutorialContentProps {
   tutorial: TutorialData;
@@ -128,6 +129,7 @@ const mdxComponents = {
   BubbleSortVisualizer,
   SelectionSortVisualizer,
   SortingComparisonVisualizer,
+  TutorialRecommendations,
   // Use custom heading components with anchor IDs
   h1: createHeadingComponent(1),
   h2: createHeadingComponent(2),

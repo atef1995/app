@@ -84,6 +84,7 @@ model User {
   userSettings             UserSettings?
   studyProgress            UserStudyProgress[]
   certificates             Certificate[]
+  tutorialFeedback         TutorialFeedback[]
 
   @@map("users")
 }
@@ -138,6 +139,7 @@ model Tutorial {
   progress         Progress[]
   quizzes          Quiz[]
   tutorialProgress TutorialProgress[]
+  feedback         TutorialFeedback[]
   category         Category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   // Performance indexes for frequently queried fields
@@ -155,10 +157,11 @@ model Quiz {
   questions    Json
   isPremium    Boolean       @default(false)
   requiredPlan String        @default("FREE")
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
   attempts     QuizAttempt[]
-  tutorial     Tutorial      @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  feedback     TutorialFeedback[]
+  tutorial     Tutorial           @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
 
   @@index([tutorialId]) // Index for tutorial-quiz relation queries
   @@map("quizzes")
@@ -255,6 +258,34 @@ model CodeExecution {
   createdAt  DateTime @default(now())
 
   @@map("code_executions")
+}
+
+model TutorialFeedback {
+  id               String    @id @default(cuid())
+  userId           String
+  tutorialId       String
+  quizId           String?
+  rating           Int // 1-5 scale
+  helpful          Boolean?
+  difficulty       String? // "too-easy" | "just-right" | "too-hard"
+  completion       String? // "finished" | "partial" | "abandoned"
+  feedback         String?
+  tags             Json? // Array of tags like ["too-easy", "loved-it"]
+  quizHelpful      Boolean?
+  improvementAreas Json? // Array of improvement areas
+  positiveAspects  Json? // Array of what user loved
+  isAnonymous      Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tutorial         Tutorial  @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+  quiz             Quiz?     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tutorialId]) // One feedback per tutorial per user
+  @@index([tutorialId]) // Index for tutorial feedback queries
+  @@index([rating]) // Index for rating aggregation
+  @@index([userId])
+  @@map("tutorial_feedback")
 }
 
 model Challenge {

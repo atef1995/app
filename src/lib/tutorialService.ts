@@ -51,7 +51,7 @@ export class TutorialService {
         skip: offset,
       });
 
-      return tutorials.filter(t => t.category !== null) as TutorialWithAll[];
+      return tutorials.filter((t) => t.category !== null) as TutorialWithAll[];
     } catch (error) {
       console.error("Error in getAllTutorials:", error);
       throw new Error("Failed to fetch tutorials from database");
@@ -85,7 +85,9 @@ export class TutorialService {
   /**
    * Get a tutorial by slug with its quiz and category
    */
-  static async getTutorialBySlug(slug: string): Promise<TutorialWithAll | null> {
+  static async getTutorialBySlug(
+    slug: string
+  ): Promise<TutorialWithAll | null> {
     try {
       const tutorial = await prisma.tutorial.findUnique({
         where: {
@@ -156,7 +158,7 @@ export class TutorialService {
         skip: offset,
       });
 
-      return tutorials.filter(t => t.category !== null) as TutorialWithAll[];
+      return tutorials.filter((t) => t.category !== null) as TutorialWithAll[];
     } catch (error) {
       console.error("Error in getTutorialsByCategory:", error);
       throw new Error("Failed to fetch tutorials by category");
@@ -185,10 +187,12 @@ export class TutorialService {
   /**
    * Get categories with tutorial counts and user progress stats
    */
-  static async getCategoriesWithStats(userId?: string): Promise<(Category & {
-    _count: { tutorials: number };
-    tutorialStats?: { total: number; completed: number };
-  })[]> {
+  static async getCategoriesWithStats(userId?: string): Promise<
+    (Category & {
+      _count: { tutorials: number };
+      tutorialStats?: { total: number; completed: number };
+    })[]
+  > {
     try {
       // Get categories with tutorial counts using Prisma _count
       const categoriesWithCounts = await prisma.category.findMany({
@@ -213,7 +217,7 @@ export class TutorialService {
 
       // If no user provided, just return categories with tutorial counts
       if (!userId) {
-        return categoriesWithCounts.map(category => ({
+        return categoriesWithCounts.map((category) => ({
           ...category,
           tutorialStats: {
             total: category._count.tutorials,
@@ -224,10 +228,10 @@ export class TutorialService {
 
       // Get user's completed tutorials grouped by category
       const userProgressByCategoryRaw = await prisma.tutorialProgress.groupBy({
-        by: ['tutorialId'],
+        by: ["tutorialId"],
         where: {
           userId,
-          status: 'COMPLETED',
+          status: "COMPLETED",
           quizPassed: true,
         },
         _count: {
@@ -236,7 +240,9 @@ export class TutorialService {
       });
 
       // Get tutorial category mappings for completed tutorials
-      const completedTutorialIds = userProgressByCategoryRaw.map(p => p.tutorialId);
+      const completedTutorialIds = userProgressByCategoryRaw.map(
+        (p) => p.tutorialId
+      );
       const tutorialCategoryMappings = await prisma.tutorial.findMany({
         where: {
           id: {
@@ -250,16 +256,19 @@ export class TutorialService {
       });
 
       // Group completed tutorials by category
-      const completedByCategory = tutorialCategoryMappings.reduce((acc, tutorial) => {
-        if (!acc[tutorial.categoryId]) {
-          acc[tutorial.categoryId] = 0;
-        }
-        acc[tutorial.categoryId]++;
-        return acc;
-      }, {} as Record<string, number>);
+      const completedByCategory = tutorialCategoryMappings.reduce(
+        (acc, tutorial) => {
+          if (!acc[tutorial.categoryId]) {
+            acc[tutorial.categoryId] = 0;
+          }
+          acc[tutorial.categoryId]++;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
 
       // Combine with category data
-      return categoriesWithCounts.map(category => ({
+      return categoriesWithCounts.map((category) => ({
         ...category,
         tutorialStats: {
           total: category._count.tutorials,
@@ -292,7 +301,9 @@ export class TutorialService {
   /**
    * Get tutorials grouped by category
    */
-  static async getTutorialsGroupedByCategory(): Promise<Record<string, TutorialWithAll[]>> {
+  static async getTutorialsGroupedByCategory(): Promise<
+    Record<string, TutorialWithAll[]>
+  > {
     const tutorials = await this.getAllTutorials();
 
     return tutorials.reduce((groups, tutorial) => {
@@ -343,7 +354,7 @@ export class TutorialService {
         skip: offset,
       });
 
-      return tutorials.filter(t => t.category !== null) as TutorialWithAll[];
+      return tutorials.filter((t) => t.category !== null) as TutorialWithAll[];
     } catch (error) {
       console.error("Error in searchTutorials:", error);
       throw new Error("Failed to search tutorials");
@@ -407,14 +418,15 @@ export class TutorialService {
       const allTutorials = await this.getAllTutorials();
 
       const scoredTutorials = allTutorials
-        .filter(tutorial => tutorial.slug !== currentTutorialSlug)
-        .map(tutorial => {
+        .filter((tutorial) => tutorial.slug !== currentTutorialSlug)
+        .map((tutorial) => {
           let score = 0;
 
-          const currentTopics = currentTutorial.topics as string[] || [];
-          const tutorialTopics = tutorial.topics as string[] || [];
+          const currentTopics =
+            (currentTutorial.category.topics as string[]) || [];
+          const tutorialTopics = (tutorial.category.topics as string[]) || [];
 
-          const sharedTopics = currentTopics.filter(topic =>
+          const sharedTopics = currentTopics.filter((topic) =>
             tutorialTopics.includes(topic)
           );
 
@@ -423,20 +435,17 @@ export class TutorialService {
 
           if (tutorial.categoryId === currentTutorial.categoryId) score += 1;
 
-          const diffDifference = Math.abs(tutorial.difficulty - currentTutorial.difficulty);
+          const diffDifference = Math.abs(
+            tutorial.difficulty - currentTutorial.difficulty
+          );
           if (diffDifference === 1) score += 1;
           else if (diffDifference === 0) score += 0.5;
-
-          const currentPrereqs = currentTutorial.prerequisites as string[] || [];
-          const tutorialPrereqs = tutorial.prerequisites as string[] || [];
-          if (tutorialPrereqs.includes(currentTutorial.title)) score += 2;
-          if (currentPrereqs.includes(tutorial.title)) score += 1.5;
 
           return { tutorial, score };
         })
         .sort((a, b) => b.score - a.score)
         .slice(0, limit)
-        .map(item => item.tutorial);
+        .map((item) => item.tutorial);
 
       return scoredTutorials;
     } catch (error) {

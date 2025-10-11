@@ -83,7 +83,10 @@ const COMPLEXITY_COLORS = {
   "O(2ⁿ)": "#dc2626", // red-600
 };
 
-export function ComplexityChart({ plan, className = "" }: ComplexityChartProps) {
+export function ComplexityChart({
+  plan,
+  className = "",
+}: ComplexityChartProps) {
   const isCracked = plan === "CRACKED";
 
   // State for interactive controls (CRACKED only)
@@ -97,9 +100,11 @@ export function ComplexityChart({ plan, className = "" }: ComplexityChartProps) 
     "O(n²)": true,
     "O(2ⁿ)": false, // Hidden by default (grows too fast)
   });
-
   // Generate chart data
-  const chartData = generateChartData(isCracked ? maxN : 50, isCracked ? step : 10);
+  const chartData = generateChartData(
+    isCracked ? maxN : 50,
+    isCracked ? step : 10
+  );
 
   /**
    * Toggle visibility of a complexity curve
@@ -108,7 +113,7 @@ export function ComplexityChart({ plan, className = "" }: ComplexityChartProps) 
     if (!isCracked) return;
     setVisibleCurves((prev) => ({
       ...prev,
-      [curve]: !prev[curve],
+      [curve]: !prev[curve as keyof typeof prev],
     }));
   };
 
@@ -239,7 +244,9 @@ export function ComplexityChart({ plan, className = "" }: ComplexityChartProps) 
                       }
                     `}
                     style={{
-                      backgroundColor: visibleCurves[curve as keyof typeof visibleCurves]
+                      backgroundColor: visibleCurves[
+                        curve as keyof typeof visibleCurves
+                      ]
                         ? color
                         : "#e5e7eb",
                       color: visibleCurves[curve as keyof typeof visibleCurves]
@@ -328,7 +335,9 @@ export function ComplexityChart({ plan, className = "" }: ComplexityChartProps) 
             Key Insights:
           </h4>
           <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
-            <li>• O(1) and O(log n) stay flat - these are the most efficient!</li>
+            <li>
+              • O(1) and O(log n) stay flat - these are the most efficient!
+            </li>
             <li>• O(n) grows linearly - still very manageable</li>
             <li>• O(n²) grows exponentially - avoid for large inputs</li>
             <li>• O(2ⁿ) explodes quickly - only use for tiny inputs</li>

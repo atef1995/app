@@ -467,6 +467,455 @@ const dsaQuizzes: QuizSeedData[] = [
     ],
   },
   {
+    slug: "02-why-sorting-matters-quiz",
+    title: "Why Sorting Matters Quiz",
+    tutorialSlug: "02-why-sorting-matters",
+    isPremium: false,
+    requiredPlan: "FREE",
+    questions: [
+      {
+        id: "sort-why-1",
+        question:
+          "How much faster can binary search be compared to linear search on 10,000 items?",
+        type: "multiple-choice",
+        options: [
+          "2x faster",
+          "10x faster",
+          "357x faster",
+          "The same speed",
+        ],
+        correct: 2,
+        explanation:
+          "With 10,000 items, linear search averages 5,000 checks while binary search takes only 14 checks, making it approximately 357x faster. This dramatic speedup is why sorting enables faster searching.",
+      },
+      {
+        id: "sort-why-2",
+        question: "What is the main reason sorting makes search faster?",
+        type: "multiple-choice",
+        options: [
+          "Sorting makes the data smaller",
+          "Sorted data has structure that allows eliminating half the search space each step",
+          "Sorting removes duplicates",
+          "Sorted arrays use less memory",
+        ],
+        correct: 1,
+        explanation:
+          "Sorting creates structure in the data. With sorted data, you can use algorithms like binary search that eliminate half the remaining items with each comparison, dramatically reducing search time.",
+      },
+      {
+        id: "sort-why-3",
+        question:
+          "In a sorted array, binary search checks how many items for 1,000,000 names?",
+        type: "multiple-choice",
+        options: [
+          "About 20 items",
+          "About 500,000 items",
+          "All 1,000,000 items",
+          "About 1,000 items",
+        ],
+        correct: 0,
+        explanation:
+          "Binary search on 1,000,000 items requires only about 20 checks (log₂(1,000,000) ≈ 20). This is why Google can search billions of web pages in milliseconds.",
+      },
+      {
+        id: "sort-why-4",
+        question:
+          "When should you definitely use sorting before searching?",
+        type: "multiple-choice",
+        options: [
+          "When searching only once",
+          "When searching the data repeatedly",
+          "When the data changes frequently",
+          "When you only need to find the maximum value",
+        ],
+        correct: 1,
+        explanation:
+          "Sorting has an upfront cost, but pays off when you search repeatedly. The initial sort cost is amortized across many fast searches, making the overall operation much more efficient.",
+      },
+      {
+        id: "sort-why-5",
+        question:
+          "Why does Instagram sort your feed by timestamp?",
+        type: "multiple-choice",
+        options: [
+          "To make the feed look prettier",
+          "To show newest posts first for better user experience",
+          "Because it's required by law",
+          "To use more server resources",
+        ],
+        correct: 1,
+        explanation:
+          "Sorting by timestamp (newest first) provides the best user experience by showing fresh content first. This is a real-world application where sorting directly improves product value.",
+      },
+      {
+        id: "sort-why-6",
+        question:
+          "In e-commerce, why do sites sort products by price?",
+        type: "multiple-choice",
+        options: [
+          "To confuse customers",
+          "To help customers find affordable options quickly, increasing conversions",
+          "Because it's easier to code",
+          "To hide expensive products",
+        ],
+        correct: 1,
+        explanation:
+          "Sorting by price (low to high or high to low) helps customers find what they can afford quickly, improving user experience and increasing sales conversions.",
+      },
+      {
+        id: "sort-why-7",
+        question:
+          "What problem does sorting help solve efficiently?",
+        type: "multiple-choice",
+        options: [
+          "Finding the maximum value",
+          "Finding duplicate values",
+          "Counting total elements",
+          "Adding new elements",
+        ],
+        correct: 1,
+        explanation:
+          "After sorting, duplicates appear next to each other, making them trivial to find in O(n) time. Without sorting, finding all duplicates would require checking every pair - O(n²) time.",
+      },
+      {
+        id: "sort-why-8",
+        question:
+          "When does sorting NOT help?",
+        type: "multiple-choice",
+        options: [
+          "When you need to search repeatedly",
+          "When you only search once",
+          "When finding pairs",
+          "When displaying ordered data",
+        ],
+        correct: 1,
+        explanation:
+          "If you only search once, the cost of sorting might not be worth it - a simple linear search could be faster overall. Sorting pays off when you perform multiple operations that benefit from order.",
+      },
+      {
+        id: "sort-why-9",
+        question:
+          "What is the trade-off when using sorting?",
+        type: "multiple-choice",
+        options: [
+          "Sorting requires more memory than the original data",
+          "Sorting has an upfront time cost but enables faster subsequent operations",
+          "Sorting makes the code harder to read",
+          "Sorting removes some data",
+        ],
+        correct: 1,
+        explanation:
+          "The key trade-off is upfront sorting cost vs. faster subsequent operations. For 10,000 items, sorting takes ~140,000 operations, but if you search more than 30 times, you break even and save time overall.",
+      },
+      {
+        id: "sort-why-10",
+        question:
+          "How does Google search billions of pages in milliseconds?",
+        type: "multiple-choice",
+        options: [
+          "By checking every page for each search",
+          "By maintaining sorted indexes that enable binary search",
+          "By caching every possible search query",
+          "By using quantum computers",
+        ],
+        correct: 1,
+        explanation:
+          "Google maintains massive sorted indexes (by relevance, keywords, etc.) that enable binary search and other efficient lookup algorithms, turning what would take hours into milliseconds.",
+      },
+      {
+        id: "sort-why-11",
+        question:
+          "Why is finding closest pairs easier in a sorted array?",
+        type: "multiple-choice",
+        options: [
+          "Because closest values appear next to each other after sorting",
+          "Because sorting makes numbers smaller",
+          "Because you can use binary search",
+          "It's not actually easier",
+        ],
+        correct: 0,
+        explanation:
+          "In a sorted array, the closest values are adjacent. You only need one pass comparing neighbors - O(n). Without sorting, you'd need to check all pairs - O(n²).",
+      },
+      {
+        id: "sort-why-12",
+        question:
+          "What is the SmartSearchFilter pattern's key optimization?",
+        type: "multiple-choice",
+        options: [
+          "Sorting on every search",
+          "Never sorting the data",
+          "Lazy sorting - only sort once when first needed",
+          "Using multiple sorts for accuracy",
+        ],
+        correct: 2,
+        explanation:
+          "Lazy sorting means you only sort the data once, when it's first needed, then reuse that sorted data for all subsequent searches. This optimizes the common case of multiple searches.",
+      },
+      {
+        id: "sort-why-13",
+        question:
+          "Why shouldn't you always sort everything?",
+        type: "multiple-choice",
+        options: [
+          "Sorting is always beneficial",
+          "Sorting has a cost and doesn't help for operations like finding max/min",
+          "Sorting corrupts the data",
+          "Sorted arrays use more memory",
+        ],
+        correct: 1,
+        explanation:
+          "Sorting has a time cost and doesn't help every operation. For finding max/min, a simple O(n) scan is faster than O(n log n) sorting. Only sort when it provides clear benefits for your use case.",
+      },
+      {
+        id: "sort-why-14",
+        question:
+          "What happens when you use sorting on frequently changing data?",
+        type: "multiple-choice",
+        options: [
+          "Perfect - sorting works best with dynamic data",
+          "The constant re-sorting becomes expensive",
+          "Sorting prevents changes",
+          "Data becomes corrupted",
+        ],
+        correct: 1,
+        explanation:
+          "If data changes frequently, you must re-sort often, making the constant sorting cost expensive. For highly dynamic data, consider specialized data structures like heaps or balanced trees instead.",
+      },
+      {
+        id: "sort-why-15",
+        question:
+          "In a game leaderboard, why is sorting essential?",
+        type: "multiple-choice",
+        options: [
+          "To hide player scores",
+          "To display players in rank order from highest to lowest score",
+          "Sorting isn't needed for leaderboards",
+          "To make the game harder",
+        ],
+        correct: 1,
+        explanation:
+          "Leaderboards need to display players in rank order by score. Sorting by score (descending) is essential for showing who's #1, #2, #3, etc. This is a case where sorted display is the primary goal.",
+      },
+    ],
+  },
+  {
+    slug: "03-simple-sorting-algorithms-quiz",
+    title: "Simple Sorting Algorithms Quiz",
+    tutorialSlug: "03-simple-sorting-algorithms",
+    isPremium: false,
+    requiredPlan: "FREE",
+    questions: [
+      {
+        id: "simple-sort-1",
+        question: "How does Bubble Sort get its name?",
+        type: "multiple-choice",
+        options: [
+          "Because it creates bubbles in memory",
+          "Because larger values 'bubble up' to the end with each pass",
+          "Because it was invented by someone named Bubble",
+          "Because it's a bubbly, fun algorithm",
+        ],
+        correct: 1,
+        explanation:
+          "Bubble Sort gets its name because larger values gradually 'bubble up' to their correct position at the end of the array through repeated swaps with adjacent elements.",
+      },
+      {
+        id: "simple-sort-2",
+        question: "What is the main operation in Bubble Sort?",
+        type: "multiple-choice",
+        options: [
+          "Finding the minimum element",
+          "Swapping adjacent elements if they're in wrong order",
+          "Dividing the array in half",
+          "Removing duplicate elements",
+        ],
+        correct: 1,
+        explanation:
+          "Bubble Sort repeatedly compares adjacent elements and swaps them if they're in the wrong order. This process continues until no more swaps are needed.",
+      },
+      {
+        id: "simple-sort-3",
+        question:
+          "After the first pass of Bubble Sort on [64, 34, 25, 12, 22, 11, 90], where is the largest element?",
+        type: "multiple-choice",
+        options: [
+          "At index 0 (beginning)",
+          "At index 6 (end)",
+          "Still at its original position",
+          "In the middle somewhere",
+        ],
+        correct: 1,
+        explanation:
+          "After each pass of Bubble Sort, the largest unsorted element 'bubbles' to its final position at the end. So after the first pass, 90 is guaranteed to be at the last position.",
+      },
+      {
+        id: "simple-sort-4",
+        question:
+          "What optimization can make Bubble Sort efficient for nearly-sorted data?",
+        type: "multiple-choice",
+        options: [
+          "Using a faster computer",
+          "Adding a flag to detect when no swaps occur",
+          "Sorting only half the array",
+          "Using binary search",
+        ],
+        correct: 1,
+        explanation:
+          "By tracking whether any swaps occurred in a pass, you can exit early if no swaps happen - meaning the array is already sorted. This makes Bubble Sort O(n) for nearly-sorted data.",
+      },
+      {
+        id: "simple-sort-5",
+        question: "How many swaps does Bubble Sort make in the worst case for 10 elements?",
+        type: "multiple-choice",
+        options: ["10 swaps", "45 swaps", "100 swaps", "9 swaps"],
+        correct: 1,
+        explanation:
+          "In the worst case (reverse sorted array), Bubble Sort makes approximately n²/2 swaps. For 10 elements, that's about 45 swaps - one for nearly every comparison.",
+      },
+      {
+        id: "simple-sort-6",
+        question: "What is Selection Sort's core strategy?",
+        type: "multiple-choice",
+        options: [
+          "Swap adjacent elements repeatedly",
+          "Find the minimum element in unsorted portion and swap it to the front",
+          "Divide the array and conquer",
+          "Insert elements one at a time",
+        ],
+        correct: 1,
+        explanation:
+          "Selection Sort finds the minimum element in the unsorted portion, then swaps it with the first unsorted element. This gradually builds a sorted portion at the beginning.",
+      },
+      {
+        id: "simple-sort-7",
+        question:
+          "In Selection Sort, what does the sorted/unsorted boundary represent?",
+        type: "multiple-choice",
+        options: [
+          "The middle of the array",
+          "The dividing line between sorted (left) and unsorted (right) portions",
+          "The largest element",
+          "An error in the algorithm",
+        ],
+        correct: 1,
+        explanation:
+          "Selection Sort maintains a boundary where everything to the left is sorted and everything to the right is unsorted. This boundary moves right with each pass.",
+      },
+      {
+        id: "simple-sort-8",
+        question: "How many swaps does Selection Sort make for an array of N elements?",
+        type: "multiple-choice",
+        options: [
+          "N² swaps",
+          "N/2 swaps",
+          "Exactly N-1 swaps",
+          "It depends on the input",
+        ],
+        correct: 2,
+        explanation:
+          "Selection Sort always makes exactly N-1 swaps (one per pass), regardless of the input. This is its key advantage - predictable, minimal swaps even in worst case.",
+      },
+      {
+        id: "simple-sort-9",
+        question:
+          "Why might Selection Sort be preferred for sorting data on Flash memory?",
+        type: "multiple-choice",
+        options: [
+          "It's faster than other algorithms",
+          "Flash memory has limited write cycles, and Selection Sort minimizes swaps",
+          "Selection Sort uses less memory",
+          "Flash memory requires Selection Sort specifically",
+        ],
+        correct: 1,
+        explanation:
+          "Flash memory has limited write cycles. Selection Sort makes only N-1 swaps compared to Bubble Sort's up to N² swaps, significantly reducing writes and extending Flash memory lifespan.",
+      },
+      {
+        id: "simple-sort-10",
+        question:
+          "What is the time complexity of both Bubble Sort and Selection Sort?",
+        type: "multiple-choice",
+        options: ["O(n)", "O(n log n)", "O(n²)", "O(log n)"],
+        correct: 2,
+        explanation:
+          "Both algorithms have O(n²) time complexity because they use nested loops - for each of n elements, they check up to n other elements. This quadratic growth makes them slow for large datasets.",
+      },
+      {
+        id: "simple-sort-11",
+        question: "Which statement about Bubble Sort vs Selection Sort is TRUE?",
+        type: "multiple-choice",
+        options: [
+          "Bubble Sort makes fewer swaps than Selection Sort",
+          "Selection Sort makes fewer swaps than Bubble Sort",
+          "Both make the same number of swaps",
+          "Selection Sort is always faster",
+        ],
+        correct: 1,
+        explanation:
+          "Selection Sort makes exactly N-1 swaps while Bubble Sort can make up to N²/2 swaps. This is Selection Sort's key advantage, though both have the same time complexity.",
+      },
+      {
+        id: "simple-sort-12",
+        question: "What does it mean that Bubble Sort is 'stable'?",
+        type: "multiple-choice",
+        options: [
+          "It never crashes",
+          "It preserves the relative order of equal elements",
+          "It always runs at the same speed",
+          "It works on all data types",
+        ],
+        correct: 1,
+        explanation:
+          "A stable sort preserves the original order of elements with equal values. Bubble Sort is stable because it only swaps adjacent elements when strictly greater. Selection Sort is not stable.",
+      },
+      {
+        id: "simple-sort-13",
+        question:
+          "For a nearly-sorted array [1, 2, 3, 5, 4], which algorithm is better?",
+        type: "multiple-choice",
+        options: [
+          "Selection Sort - always predictable",
+          "Optimized Bubble Sort - can exit after one pass",
+          "Both are equally good",
+          "Neither - use a different algorithm",
+        ],
+        correct: 1,
+        explanation:
+          "Optimized Bubble Sort with early exit flag can detect the array is nearly sorted and finish in O(n) time. Selection Sort always does O(n²) comparisons regardless of input.",
+      },
+      {
+        id: "simple-sort-14",
+        question: "What is a common mistake when implementing Bubble Sort?",
+        type: "multiple-choice",
+        options: [
+          "Using too many variables",
+          "Off-by-one errors causing array out-of-bounds access",
+          "Making it too fast",
+          "Not using enough memory",
+        ],
+        correct: 1,
+        explanation:
+          "The most common mistake is using 'i < n' instead of 'i < n - 1' in the loop, causing access to arr[i+1] when i equals n-1, which is out of bounds (arr[n] doesn't exist).",
+      },
+      {
+        id: "simple-sort-15",
+        question:
+          "When building a game leaderboard that needs only the top 10 players, which approach is most efficient?",
+        type: "multiple-choice",
+        options: [
+          "Bubble Sort the entire array",
+          "Selection Sort but only do 10 passes (partial sort)",
+          "Sort the entire array with any algorithm",
+          "Don't sort at all",
+        ],
+        correct: 1,
+        explanation:
+          "Partial Selection Sort is perfect here - only find and place the top 10 maximum values. You avoid sorting the entire array, making it efficient for 'top K' problems with minimal swaps.",
+      },
+    ],
+  },
+  {
     slug: "04-time-complexity-big-o-quiz",
     title: "Time Complexity & Big O Notation Quiz",
     tutorialSlug: "04-time-complexity-big-o",

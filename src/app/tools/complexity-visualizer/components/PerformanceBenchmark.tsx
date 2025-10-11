@@ -76,7 +76,7 @@ function runBenchmark(code: string, inputSizes: number[]): BenchmarkResult[] {
     if (hasNestedLoops) {
       // Simulate O(n²) performance
       runtime = (n * n) / 500;
-      iterations = Math.max(1, Math.floor(10000 / (n * n / 100)));
+      iterations = Math.max(1, Math.floor(10000 / ((n * n) / 100)));
     } else {
       // Simulate O(n) performance
       runtime = n / 1000;
@@ -152,7 +152,8 @@ export function PerformanceBenchmark({
   /**
    * Current data to display
    */
-  const displayData = isCracked && results ? results : EXAMPLE_BENCHMARKS[selectedExample];
+  const displayData =
+    isCracked && results ? results : EXAMPLE_BENCHMARKS[selectedExample];
 
   /**
    * Calculate performance grade
@@ -333,11 +334,19 @@ export function PerformanceBenchmark({
                     />
                     <XAxis
                       dataKey="inputSize"
-                      label={{ value: "Input Size", position: "insideBottom", offset: -5 }}
+                      label={{
+                        value: "Input Size",
+                        position: "insideBottom",
+                        offset: -5,
+                      }}
                       className="text-gray-600 dark:text-gray-400"
                     />
                     <YAxis
-                      label={{ value: "Runtime (ms)", angle: -90, position: "insideLeft" }}
+                      label={{
+                        value: "Runtime (ms)",
+                        angle: -90,
+                        position: "insideLeft",
+                      }}
                       className="text-gray-600 dark:text-gray-400"
                     />
                     <Tooltip
@@ -421,12 +430,19 @@ export function PerformanceBenchmark({
               </h4>
               <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
                 <li>
-                  • When input size increases {displayData[displayData.length - 1].inputSize / displayData[0].inputSize}x,
-                  runtime increases{" "}
-                  {(displayData[displayData.length - 1].runtime / displayData[0].runtime).toFixed(1)}x
+                  • When input size increases{" "}
+                  {displayData[displayData.length - 1].inputSize /
+                    displayData[0].inputSize}
+                  x, runtime increases{" "}
+                  {(
+                    displayData[displayData.length - 1].runtime /
+                    displayData[0].runtime
+                  ).toFixed(1)}
+                  x
                 </li>
                 <li>
-                  • Faster execution means fewer iterations needed for reliable measurement
+                  • Faster execution means fewer iterations needed for reliable
+                  measurement
                 </li>
                 <li>
                   • Look for linear growth (good) vs exponential growth (bad)
