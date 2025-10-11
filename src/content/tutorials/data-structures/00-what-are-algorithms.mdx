@@ -1,0 +1,696 @@
+---
+title: "What is an Algorithm? Your First Step into Problem Solving"
+description: "Discover algorithms through everyday examples and build your first real algorithm in 5 minutes. Perfect for absolute beginners starting their coding journey."
+category: "data-structures"
+difficulty: 1
+estimatedTime: "20 minutes"
+prerequisites: ["Basic JavaScript syntax", "Variables and functions"]
+learningObjectives:
+  - "Understand what algorithms are and why they matter"
+  - "Recognize algorithms in everyday life"
+  - "Write your first algorithm (FizzBuzz) step by step"
+  - "Identify the characteristics of good algorithms"
+topics: ["algorithms", "problem-solving", "fundamentals", "beginner"]
+interviewRelevance: "High"
+realWorldApplications: ["Every software application", "Data processing", "Automation", "Decision making"]
+---
+
+import { InteractiveCodeBlock } from '@/components/tutorial/InteractiveCodeBlock';
+import { ComparisonTable } from '@/components/tutorial/ComparisonTable';
+
+# What is an Algorithm? Your First Step into Problem Solving
+
+> **Transform in 20 minutes:**
+> - From "algorithms sound scary" → understanding them through everyday examples
+> - From passive learner → writing your first working algorithm
+> - From confused → confident about your problem-solving foundation
+
+## You've Been Using Algorithms Your Whole Life
+
+**Here's a secret**: You're already an algorithm expert. You just don't call it that.
+
+Ever followed a recipe to bake cookies? That's an algorithm.
+Ever given someone directions to your house? That's an algorithm.
+Ever followed your morning routine (alarm → shower → coffee → dressed)? That's an algorithm.
+
+**An algorithm is simply a step-by-step recipe for solving a problem.**
+
+The only difference between these everyday algorithms and programming algorithms? We write programming algorithms in a language computers understand (like JavaScript), instead of English.
+
+### Why Algorithms Matter
+
+Think about everything your phone does:
+- Autocorrect fixes your typos → **Algorithm**
+- Instagram sorts your feed → **Algorithm**
+- Netflix recommends shows → **Algorithm**
+- GPS finds the fastest route → **Algorithm**
+- Face ID unlocks your phone → **Algorithm**
+
+Without algorithms, computers are just expensive paperweights. **Algorithms are the instructions that bring code to life.**
+
+---
+
+## Your First Algorithm in 5 Minutes
+
+Let's solve a classic problem called **FizzBuzz**. It's simple enough for beginners but teaches you the foundation of algorithmic thinking.
+
+### The Problem
+
+Write a program that:
+1. Counts from 1 to 15
+2. For multiples of 3, print "Fizz" instead of the number
+3. For multiples of 5, print "Buzz" instead of the number
+4. For multiples of both 3 and 5, print "FizzBuzz"
+5. Otherwise, just print the number
+
+**Expected output:**
+```
+1, 2, Fizz, 4, Buzz, Fizz, 7, 8, Fizz, Buzz, 11, Fizz, 13, 14, FizzBuzz
+```
+
+### Let's Build It Step-by-Step
+
+**Step 1: Think Like a Human First**
+
+Before writing code, let's think through the logic:
+- "Is this number divisible by 3 AND 5? → FizzBuzz"
+- "Is this number divisible by 3? → Fizz"
+- "Is this number divisible by 5? → Buzz"
+- "Otherwise? → Just the number"
+
+**Step 2: Translate to Code**
+
+<InteractiveCodeBlock
+  code={`// FizzBuzz Algorithm
+function fizzBuzz() {
+  // Step 1: Loop from 1 to 15
+  for (let i = 1; i <= 15; i++) {
+
+    // Step 2: Check if divisible by both 3 AND 5 (must check this first!)
+    if (i % 3 === 0 && i % 5 === 0) {
+      console.log("FizzBuzz");
+    }
+    // Step 3: Check if divisible by 3
+    else if (i % 3 === 0) {
+      console.log("Fizz");
+    }
+    // Step 4: Check if divisible by 5
+    else if (i % 5 === 0) {
+      console.log("Buzz");
+    }
+    // Step 5: Otherwise, print the number
+    else {
+      console.log(i);
+    }
+  }
+}
+
+// Run it!
+fizzBuzz();`}
+  language="javascript"
+  showLineNumbers={true}
+/>
+
+**🎉 You just wrote your first algorithm!**
+
+Try modifying it:
+- Change the range to 1-30
+- Add "Jazz" for multiples of 7
+- Change 3 and 5 to different numbers
+
+---
+
+## What Makes Something an Algorithm?
+
+Not all code is an algorithm. An algorithm has **5 key characteristics**:
+
+### 1. Clear Input
+What information does the algorithm need to start?
+- FizzBuzz input: The range of numbers (1 to 15)
+- Recipe input: Ingredients and quantities
+- GPS input: Starting location and destination
+
+### 2. Clear Output
+What result does the algorithm produce?
+- FizzBuzz output: A list of numbers/words
+- Recipe output: Baked cookies
+- GPS output: Turn-by-turn directions
+
+### 3. Definiteness (Clear Steps)
+Every step must be precise and unambiguous.
+
+```javascript
+// ❌ BAD: Vague
+// "Add some salt"
+
+// ✅ GOOD: Precise
+// "Add 1 teaspoon of salt"
+
+// ❌ BAD: Ambiguous
+if (temperature > "hot") { ... }
+
+// ✅ GOOD: Definite
+if (temperature > 100) { ... }
+```
+
+### 4. Finiteness (Must End)
+The algorithm must complete in a finite number of steps.
+
+```javascript
+// ❌ BAD: Infinite loop (never ends)
+while (true) {
+  console.log("Forever!");
+}
+
+// ✅ GOOD: Finite (ends after 10 iterations)
+for (let i = 0; i < 10; i++) {
+  console.log(i);
+}
+```
+
+### 5. Effectiveness (Each Step is Achievable)
+Every step must be simple enough to execute.
+
+```javascript
+// ❌ BAD: Too complex (how do you "think deeply"?)
+function solveWorldPeace() {
+  thinkDeeply();
+  return solution;
+}
+
+// ✅ GOOD: Concrete, achievable steps
+function addNumbers(a, b) {
+  return a + b;
+}
+```
+
+---
+
+## Real-World Algorithm: Making a Sandwich
+
+Let's see how an everyday task becomes an algorithm:
+
+**Human Version (Vague):**
+> "Make a peanut butter and jelly sandwich"
+
+**Algorithm Version (Precise):**
+
+```javascript
+function makePBJSandwich() {
+  // Input: bread, peanut butter, jelly, knife
+
+  // Step 1: Get two slices of bread
+  const slice1 = getBread();
+  const slice2 = getBread();
+
+  // Step 2: Spread peanut butter on slice 1
+  spread(slice1, peanutButter, knife);
+
+  // Step 3: Spread jelly on slice 2
+  spread(slice2, jelly, knife);
+
+  // Step 4: Put slices together
+  const sandwich = combine(slice1, slice2);
+
+  // Output: Completed sandwich
+  return sandwich;
+}
+```
+
+**Why This Matters**: Computers are **literal**. If you tell a computer "make a sandwich" without precise steps, it won't know what to do. Algorithms teach you to think in clear, executable steps.
+
+---
+
+## Types of Everyday Algorithms
+
+You use these algorithm patterns constantly:
+
+<ComparisonTable
+  headers={['Algorithm Type', 'Everyday Example', 'Programming Example']}
+  rows={[
+    {
+      label: 'Sequential',
+      values: [
+        'Morning routine: wake up → shower → dress → eat',
+        'Read file → process data → save result'
+      ]
+    },
+    {
+      label: 'Conditional',
+      values: [
+        'If raining → bring umbrella, else → wear sunglasses',
+        'If user logged in → show dashboard, else → show login'
+      ]
+    },
+    {
+      label: 'Loop (Repetition)',
+      values: [
+        'Wash each dish until sink is empty',
+        'Process each item in shopping cart'
+      ]
+    },
+    {
+      label: 'Search',
+      values: [
+        'Find your keys by checking pockets one by one',
+        'Find user in database by ID'
+      ]
+    },
+    {
+      label: 'Sort',
+      values: [
+        'Organize books alphabetically on shelf',
+        'Sort products by price (low to high)'
+      ]
+    }
+  ]}
+  variant="bordered"
+/>
+
+---
+
+## Building Something Real: Password Strength Checker
+
+Let's apply algorithmic thinking to a real problem:
+
+### The Problem
+Create a function that checks if a password is strong. A strong password:
+- Has at least 8 characters
+- Contains at least one number
+- Contains at least one uppercase letter
+- Contains at least one lowercase letter
+
+### The Algorithm (Think First!)
+
+**Step-by-step logic:**
+1. Check length >= 8 characters
+2. Check for at least one number (0-9)
+3. Check for at least one uppercase letter (A-Z)
+4. Check for at least one lowercase letter (a-z)
+5. If ALL conditions true → Strong password
+6. Otherwise → Weak password
+
+### The Code
+
+<InteractiveCodeBlock
+  code={`/**
+ * Password Strength Checker Algorithm
+ * Input: password string
+ * Output: boolean (true = strong, false = weak)
+ */
+function isStrongPassword(password) {
+  // Step 1: Check minimum length
+  if (password.length < 8) {
+    return false;
+  }
+
+  // Step 2: Check for at least one number
+  const hasNumber = /[0-9]/.test(password);
+
+  // Step 3: Check for at least one uppercase letter
+  const hasUppercase = /[A-Z]/.test(password);
+
+  // Step 4: Check for at least one lowercase letter
+  const hasLowercase = /[a-z]/.test(password);
+
+  // Step 5: Return true only if ALL conditions met
+  return hasNumber && hasUppercase && hasLowercase;
+}
+
+// Test it!
+console.log(isStrongPassword("weak"));          // false (too short, no number, no uppercase)
+console.log(isStrongPassword("StrongPass123")); // true (meets all criteria)
+console.log(isStrongPassword("noNumbers"));     // false (no numbers)
+console.log(isStrongPassword("NOLOWERCASE1"));  // false (no lowercase)
+
+// Try it with your own passwords!
+console.log(isStrongPassword("YourPassword123"));`}
+  language="javascript"
+  showLineNumbers={true}
+/>
+
+**What You Just Learned:**
+- Breaking a problem into clear steps (the algorithm)
+- Using conditionals to make decisions
+- Combining multiple checks with logical operators
+- Writing production-ready validation code
+
+---
+
+## What Makes a GOOD Algorithm?
+
+Not all algorithms are created equal. Here's what separates great from mediocre:
+
+### 1. Correctness
+Does it always produce the right answer?
+
+```javascript
+// ❌ BAD: Incorrect for negative numbers
+function isEven(num) {
+  return num % 2 === 0; // Works for positive, fails for negatives like -3
+}
+
+// ✅ GOOD: Correct for all numbers
+function isEven(num) {
+  return Math.abs(num) % 2 === 0;
+}
+```
+
+### 2. Efficiency
+Does it solve the problem quickly?
+
+```javascript
+// ❌ BAD: Checks every number (slow for large n)
+function isPrime(n) {
+  for (let i = 2; i < n; i++) {
+    if (n % i === 0) return false;
+  }
+  return n > 1;
+}
+
+// ✅ GOOD: Only checks up to √n (much faster!)
+function isPrime(n) {
+  if (n <= 1) return false;
+  for (let i = 2; i <= Math.sqrt(n); i++) {
+    if (n % i === 0) return false;
+  }
+  return true;
+}
+```
+
+### 3. Readability
+Can other developers (or future you) understand it?
+
+```javascript
+// ❌ BAD: What does this do?
+function f(x) {
+  return x.reduce((a,c) => a+c,0)/x.length;
+}
+
+// ✅ GOOD: Clear purpose and logic
+function calculateAverage(numbers) {
+  const sum = numbers.reduce((total, current) => total + current, 0);
+  return sum / numbers.length;
+}
+```
+
+### 4. Robustness
+Does it handle edge cases and errors gracefully?
+
+```javascript
+// ❌ BAD: Crashes on empty array
+function getFirst(arr) {
+  return arr[0];
+}
+
+// ✅ GOOD: Handles edge cases
+function getFirst(arr) {
+  if (!Array.isArray(arr) || arr.length === 0) {
+    return null; // Or throw meaningful error
+  }
+  return arr[0];
+}
+```
+
+---
+
+## Common Mistakes to Avoid
+
+### ⚠️ Mistake #1: Not Thinking Before Coding
+
+```javascript
+// ❌ BAD: Jump straight to code without a plan
+function doSomething(data) {
+  // Umm... what was I trying to do again?
+}
+
+// ✅ GOOD: Think through the steps first
+/**
+ * Algorithm: Find largest number in array
+ * 1. Start with first number as current max
+ * 2. Compare each number to current max
+ * 3. If bigger, update max
+ * 4. Return max after checking all numbers
+ */
+function findMax(numbers) {
+  let max = numbers[0];
+  for (let i = 1; i < numbers.length; i++) {
+    if (numbers[i] > max) {
+      max = numbers[i];
+    }
+  }
+  return max;
+}
+```
+
+### ⚠️ Mistake #2: Overcomplicating Simple Problems
+
+```javascript
+// ❌ BAD: Overcomplicated
+function isAdult(age) {
+  if (age >= 18) {
+    return true;
+  } else if (age < 18) {
+    return false;
+  }
+}
+
+// ✅ GOOD: Simple and clear
+function isAdult(age) {
+  return age >= 18;
+}
+```
+
+### ⚠️ Mistake #3: Ignoring Edge Cases
+
+```javascript
+// ❌ BAD: Doesn't handle negative numbers or zero
+function factorial(n) {
+  if (n === 1) return 1;
+  return n * factorial(n - 1);
+}
+
+// ✅ GOOD: Handles edge cases
+function factorial(n) {
+  if (n < 0) throw new Error("Factorial not defined for negative numbers");
+  if (n === 0 || n === 1) return 1;
+  return n * factorial(n - 1);
+}
+```
+
+---
+
+## Practice Challenges
+
+Test your algorithmic thinking with these exercises:
+
+### Challenge 1: Reverse a String ⭐⭐⭐
+
+**Problem**: Write an algorithm that reverses a string.
+
+```javascript
+function reverseString(str) {
+  // Your code here
+  // Input: "hello"
+  // Output: "olleh"
+}
+```
+
+<details>
+<summary>💡 Hint</summary>
+Think about the steps: Start from the last character and build a new string by moving backwards.
+</details>
+
+<details>
+<summary>✅ Solution</summary>
+
+```javascript
+/**
+ * Algorithm: Reverse a String
+ * 1. Create empty result string
+ * 2. Loop through original string backwards
+ * 3. Add each character to result
+ * 4. Return result
+ */
+function reverseString(str) {
+  let result = "";
+  for (let i = str.length - 1; i >= 0; i--) {
+    result += str[i];
+  }
+  return result;
+}
+
+// Or use built-in methods (still an algorithm!)
+function reverseStringAlt(str) {
+  return str.split("").reverse().join("");
+}
+
+console.log(reverseString("hello"));    // "olleh"
+console.log(reverseString("algorithm")); // "mhtirogla"
+```
+
+**Key Learning**: There are often multiple algorithms to solve the same problem. Both solutions are correct!
+</details>
+
+---
+
+### Challenge 2: Count Vowels ⭐⭐⭐⭐
+
+**Problem**: Count the number of vowels (a, e, i, o, u) in a string.
+
+```javascript
+function countVowels(str) {
+  // Your code here
+  // Input: "hello world"
+  // Output: 3 (e, o, o)
+}
+```
+
+<details>
+<summary>💡 Hint</summary>
+Create a list of vowels to check against. Loop through each character and count matches.
+</details>
+
+<details>
+<summary>✅ Solution</summary>
+
+```javascript
+/**
+ * Algorithm: Count Vowels
+ * 1. Define vowels to check
+ * 2. Initialize counter to 0
+ * 3. Loop through each character
+ * 4. If character is vowel, increment counter
+ * 5. Return counter
+ */
+function countVowels(str) {
+  const vowels = "aeiouAEIOU";
+  let count = 0;
+
+  for (let char of str) {
+    if (vowels.includes(char)) {
+      count++;
+    }
+  }
+
+  return count;
+}
+
+console.log(countVowels("hello world")); // 3
+console.log(countVowels("algorithm"));   // 3
+console.log(countVowels("xyz"));         // 0
+```
+</details>
+
+---
+
+### Challenge 3: Find Largest Number ⭐⭐⭐⭐
+
+**Problem**: Find the largest number in an array.
+
+```javascript
+function findLargest(numbers) {
+  // Your code here
+  // Input: [3, 7, 2, 9, 1]
+  // Output: 9
+}
+```
+
+<details>
+<summary>💡 Hint</summary>
+Start by assuming the first number is the largest. Then check each remaining number.
+</details>
+
+<details>
+<summary>✅ Solution</summary>
+
+```javascript
+/**
+ * Algorithm: Find Largest Number
+ * 1. Handle edge case (empty array)
+ * 2. Start with first number as current max
+ * 3. Compare each remaining number to max
+ * 4. If bigger, update max
+ * 5. Return max
+ */
+function findLargest(numbers) {
+  if (numbers.length === 0) {
+    return null;
+  }
+
+  let max = numbers[0];
+
+  for (let i = 1; i < numbers.length; i++) {
+    if (numbers[i] > max) {
+      max = numbers[i];
+    }
+  }
+
+  return max;
+}
+
+console.log(findLargest([3, 7, 2, 9, 1]));  // 9
+console.log(findLargest([-5, -2, -10]));    // -2
+console.log(findLargest([42]));             // 42
+```
+
+**Pro Tip**: This is a fundamental algorithm pattern you'll use constantly!
+</details>
+
+---
+
+## What You've Mastered
+
+**In this tutorial, you learned:**
+✅ What algorithms are and why they're everywhere
+✅ The 5 key characteristics of algorithms
+✅ How to think algorithmically (problem → steps → code)
+✅ Writing real algorithms (FizzBuzz, password checker)
+✅ What makes algorithms good (correctness, efficiency, readability)
+✅ Common mistakes and how to avoid them
+
+**You can now:**
+- Break down problems into clear, executable steps
+- Write simple algorithms in JavaScript
+- Recognize algorithm patterns in everyday life
+- Think like a programmer before writing code
+
+---
+
+## What's Next?
+
+Now that you understand **what algorithms are**, you're ready to learn about the foundation they work with: **data structures**.
+
+**Next Tutorial**: [Introduction to Arrays and Array Methods](/tutorials/category/data-structures/01-introduction-to-arrays)
+
+**Coming Soon**:
+- Why Sorting Matters (see sorting algorithms in action)
+- Simple Sorting Algorithms (bubble sort, selection sort)
+- Time Complexity & Big O (measure algorithm efficiency)
+
+**Continue Learning (Free)**:
+- [Introduction to Arrays](/tutorials/category/data-structures/01-introduction-to-arrays)
+- [Two-Pointer Technique](/tutorials/category/data-structures/05-two-pointer-technique)
+
+---
+
+## Resources
+
+**For Everyone** 🌟:
+- Practice FizzBuzz variations on your own
+- Try creating algorithms for everyday tasks
+- Experiment with the code examples above
+
+**Free Resources**:
+- [MDN: Introduction to Algorithms](https://developer.mozilla.org/en-US/docs/Glossary/Algorithm)
+- [JavaScript Array Methods](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)
+
+---
+
+*Was this tutorial helpful? Share it with someone starting their coding journey!*
+
+**Questions or feedback?** Drop a comment below or join our [Discord community](/community).
+
+---
+
+**💡 Remember**: Every expert programmer started exactly where you are now. The difference? They practiced thinking algorithmically, one problem at a time. You're on your way!

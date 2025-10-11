@@ -12,6 +12,10 @@ import TableOfContents from "@/components/TableOfContents";
 import { type TutorialData } from "@/hooks/useTutorial";
 import DualPaneEditor from "../DualPaneEditor";
 import { ComparisonTable } from "./ComparisonTable";
+import { UpgradeCTA } from "./UpgradeCTA";
+import { BubbleSortVisualizer } from "../visualizer/examples/BubbleSortVisualizer";
+import { SelectionSortVisualizer } from "../visualizer/examples/SelectionSortVisualizer";
+import { SortingComparisonVisualizer } from "../visualizer/examples/SortingComparisonVisualizer";
 
 interface TutorialContentProps {
   tutorial: TutorialData;
@@ -120,6 +124,10 @@ const mdxComponents = {
   TwoPointerVisualizer,
   DualPaneEditor,
   ComparisonTable,
+  UpgradeCTA,
+  BubbleSortVisualizer,
+  SelectionSortVisualizer,
+  SortingComparisonVisualizer,
   // Use custom heading components with anchor IDs
   h1: createHeadingComponent(1),
   h2: createHeadingComponent(2),

@@ -8,6 +8,8 @@ Our tutorials are not just content—they are transformative learning experience
 
 ## Core Principles
 
+ABSOLUTELY Strictly No To AI Slop content
+
 ### 1. **Transformation Over Information**
 - Don't just teach concepts—transform beginners into confident practitioners
 - Every tutorial should have a clear "before and after" for the learner
@@ -23,6 +25,391 @@ Our tutorials are not just content—they are transformative learning experience
 - Professional diagrams and visualizations
 - No typos, no broken examples, no "left as exercise for reader"
 - Every code snippet must be tested and work perfectly
+
+---
+
+## Available Interactive Components
+
+We have a rich set of interactive components designed to make tutorials engaging and educational. Always use these components to enhance the learning experience.
+
+### Code Execution Components
+
+#### `<InteractiveCodeBlock>`
+Interactive code editor with live execution for tutorials.
+
+**Location:** `@/components/InteractiveCodeBlock`
+
+**Features:**
+- Live JavaScript/TypeScript execution
+- Monaco editor integration
+- Read-only or editable mode
+- Syntax highlighting
+- WebContainer support for Node.js code
+
+**Usage:**
+```mdx
+import InteractiveCodeBlock from '@/components/InteractiveCodeBlock';
+
+<InteractiveCodeBlock
+  title="Try This Example"
+  description="Click Run to see the output"
+  language="javascript"
+  height="300px"
+  editable={true}
+>
+{`
+function greet(name) {
+  console.log(\`Hello, \${name}!\`);
+}
+greet('World');
+`}
+</InteractiveCodeBlock>
+```
+
+**Props:**
+- `children` - Code string or React nodes
+- `initialCode` - Initial code to display
+- `editable` - Allow editing (default: true)
+- `title` - Optional title
+- `description` - Optional description
+- `language` - Language type (javascript, typescript, nodejs, html, css)
+- `height` - Editor height (default: "200px")
+
+#### `<DualPaneEditor>`
+Split-screen editor for frontend/backend code demonstrations.
+
+**Location:** `@/components/DualPaneEditor`
+
+**Features:**
+- Side-by-side frontend and backend editing
+- Live preview for HTML/JS
+- Backend execution with Node.js
+- Project download functionality
+- Real-time console output
+
+**Usage:**
+```mdx
+import DualPaneEditor from '@/components/DualPaneEditor';
+
+<DualPaneEditor
+  frontendCode={`
+    // Frontend code here
+    fetch('/api/data')
+      .then(res => res.json())
+      .then(data => console.log(data));
+  `}
+  backendCode={`
+    // Backend code here
+    const express = require('express');
+    const app = express();
+    app.get('/api/data', (req, res) => {
+      res.json({ message: 'Hello from backend' });
+    });
+  `}
+  height="600px"
+  title="Full-Stack Example"
+  showPreview={true}
+  previewType="full"
+/>
+```
+
+**Props:**
+- `frontendCode` - Frontend code string
+- `backendCode` - Backend code string
+- `height` - Editor height (default: "600px")
+- `title` - Editor title
+- `description` - Description text
+- `showPreview` - Show preview pane (default: true)
+- `previewType` - Preview type: "html" | "api" | "full"
+
+### Algorithm Visualization Components
+
+#### `<AlgorithmVisualizer>`
+Core visualization engine for algorithm animations.
+
+**Location:** `@/components/visualizer/AlgorithmVisualizer`
+
+**Features:**
+- Step-by-step algorithm animations
+- Playback controls (play, pause, step forward/backward)
+- Speed control (0.1x to 3x)
+- Performance metrics tracking
+- Mood-based theming (CHILL, RUSH, GRIND)
+
+**Usage:**
+```mdx
+import { AlgorithmVisualizer } from '@/components/visualizer';
+import { generateBubbleSortSteps } from '@/components/visualizer/utils/algorithmSteps';
+
+export const MyVisualizer = () => {
+  const steps = generateBubbleSortSteps([64, 34, 25, 12, 22]);
+  const config = {
+    type: 'array',
+    algorithm: 'Bubble Sort',
+    initialData: [64, 34, 25, 12, 22],
+    height: 500,
+  };
+  return <AlgorithmVisualizer config={config} steps={steps} />;
+};
+
+<MyVisualizer />
+```
+
+#### Pre-built Algorithm Visualizers
+
+**Location:** `@/components/visualizer/examples/`
+
+Ready-to-use visualizers for common algorithms:
+
+**`<BubbleSortVisualizer>`**
+```mdx
+import { BubbleSortVisualizer } from '@/components/visualizer/examples/BubbleSortVisualizer';
+
+<BubbleSortVisualizer
+  initialArray={[64, 34, 25, 12, 22, 11, 90]}
+  height={500}
+/>
+```
+
+**`<SelectionSortVisualizer>`**
+```mdx
+import { SelectionSortVisualizer } from '@/components/visualizer/examples/SelectionSortVisualizer';
+
+<SelectionSortVisualizer
+  initialArray={[29, 10, 14, 37, 13]}
+  height={500}
+/>
+```
+
+**`<SortingComparisonVisualizer>`**
+Compares multiple sorting algorithms side-by-side.
+```mdx
+import { SortingComparisonVisualizer } from '@/components/visualizer/examples/SortingComparisonVisualizer';
+
+<SortingComparisonVisualizer
+  initialArray={[15, 8, 23, 4, 16, 42, 11]}
+  algorithms={['bubble', 'selection', 'insertion']}
+/>
+```
+
+**`<TwoPointerVisualizer>`**
+Interactive two-pointer technique demonstration.
+```mdx
+import { TwoPointerVisualizer } from '@/components/visualizer/examples/TwoPointerVisualizer';
+
+<TwoPointerVisualizer
+  initialArray={[1, 2, 3, 4, 5, 6]}
+  target={7}
+  height={400}
+/>
+```
+
+### Comparison & Data Display
+
+#### `<ComparisonTable>`
+Professional comparison tables with complexity color-coding.
+
+**Location:** `@/components/tutorial/ComparisonTable`
+
+**⚠️ IMPORTANT:** Always use `<ComparisonTable>` instead of standard markdown tables (`| ... |`). Markdown tables have poor styling, limited responsiveness, and lack our custom Big-O color coding. The `ComparisonTable` component provides a superior user experience.
+
+**Features:**
+- Responsive (table on desktop, cards on mobile)
+- Automatic Big-O notation color coding
+- Row/column highlighting
+- Dark mode support
+- Multiple visual variants
+- Professional gradient headers
+- Zebra striping for readability
+
+**Usage:**
+```mdx
+import { ComparisonTable } from '@/components/tutorial/ComparisonTable';
+
+<ComparisonTable
+  caption="Algorithm Performance Comparison"
+  headers={['Algorithm', 'Time Complexity', 'Space Complexity', 'Best For']}
+  rows={[
+    {
+      label: 'Bubble Sort',
+      values: ['O(n²)', 'O(1)', 'Small datasets, educational']
+    },
+    {
+      label: 'Quick Sort',
+      values: ['O(n log n)', 'O(log n)', 'General purpose sorting'],
+      highlighted: true
+    },
+    {
+      label: 'Merge Sort',
+      values: ['O(n log n)', 'O(n)', 'Stable sorting required']
+    }
+  ]}
+  variant="bordered"
+/>
+```
+
+**Data Structure:**
+Each row must be an object with:
+- `label` (string) - First column value (row header)
+- `values` (string[]) - Array of remaining column values
+- `highlighted` (boolean, optional) - Highlight this row
+
+**Example - CORRECT vs INCORRECT:**
+```tsx
+// ✅ CORRECT - Object with label and values
+rows={[
+  { label: "Bubble Sort", values: ["O(n²)", "O(1)", "Educational"] },
+  { label: "Quick Sort", values: ["O(n log n)", "O(log n)", "Production"] }
+]}
+
+// ❌ INCORRECT - Plain arrays (will cause errors)
+rows={[
+  ["Bubble Sort", "O(n²)", "O(1)", "Educational"],
+  ["Quick Sort", "O(n log n)", "O(log n)", "Production"]
+]}
+```
+
+**Automatic Color Coding:**
+- `O(1)` - Green (Excellent)
+- `O(log n)` - Cyan (Very Good)
+- `O(n)` - Blue (Good)
+- `O(n log n)` - Yellow (Fair)
+- `O(n²)` - Orange (Slow)
+- `O(n³)`, `O(2ⁿ)` - Red (Very Slow)
+
+**Variants:**
+- `default` - Standard padding and styling
+- `compact` - Reduced padding for dense data
+- `bordered` - Stronger borders for visual separation
+
+### Conversion & Upgrade Components
+
+#### `<UpgradeCTA>`
+Subscription-aware call-to-action for premium content.
+
+**Location:** `@/components/tutorial/UpgradeCTA`
+
+**Features:**
+- Adapts to user's subscription status
+- Shows different messages for anonymous, free, and paid users
+- Beautiful gradient styling
+- Automatic plan hierarchy checking
+
+**Usage:**
+```mdx
+import { UpgradeCTA } from '@/components/tutorial/UpgradeCTA';
+
+<UpgradeCTA
+  features={[
+    "50+ practice problems with solutions",
+    "Video walkthroughs for each concept",
+    "Live code review sessions",
+    "Downloadable project templates",
+    "Priority community support"
+  ]}
+  requiredPlan="VIBED"
+  ctaText="Start Your Free 7-Day Trial"
+/>
+```
+
+**Props:**
+- `features` - Array of premium features to display
+- `requiredPlan` - Minimum plan required ("VIBED" | "CRACKED")
+- `ctaText` - Custom CTA button text (optional)
+
+**Behavior:**
+- Anonymous users: Shows sign-up CTA
+- FREE users: Shows upgrade/trial CTA
+- VIBED/CRACKED users: Shows access confirmation
+
+### Quiz Components
+
+**Location:** `@/components/quiz/`
+
+#### `<QuizCard>`
+Interactive quiz cards for knowledge checks.
+
+#### `<QuizQuestion>`
+Individual quiz question with multiple choice.
+
+#### `<QuizResults>`
+Display quiz results with score and feedback.
+
+#### `<QuizTimer>`
+Optional timer for time-based quizzes.
+
+**Usage in Tutorials:**
+Quizzes are automatically integrated when a tutorial has an associated quiz. Use the tutorial metadata to link quizzes:
+
+```mdx
+---
+title: "Arrays Introduction"
+quizId: "arrays-basics"
+---
+```
+
+### Complexity Analysis Tools
+
+**Location:** `@/app/tools/complexity-visualizer/components/`
+
+#### `<ComplexityChart>`
+Visual chart showing complexity growth.
+
+#### `<ComplexityCalculator>`
+Interactive Big-O complexity calculator.
+
+#### `<AlgorithmComparison>`
+Compare multiple algorithms' complexities.
+
+#### `<PerformanceBenchmark>`
+Real performance benchmarking tool.
+
+### Best Practices for Component Usage
+
+1. **Always Use Interactive Components**: Don't just show code - make it interactive
+2. **Visualize Algorithms**: Every algorithm tutorial should have a visualizer
+3. **Add Comparisons**: Use `<ComparisonTable>` to show trade-offs
+4. **Include CTAs**: Place `<UpgradeCTA>` strategically after valuable content
+5. **Test Interactivity**: Ensure all code examples run successfully
+6. **Mobile-First**: All components are responsive - test on mobile
+7. **Mood Awareness**: Components adapt to user mood (CHILL/RUSH/GRIND)
+
+### Component Combinations
+
+**Example 1: Algorithm Tutorial Structure**
+```mdx
+# Bubble Sort
+
+## Introduction
+<InteractiveCodeBlock language="javascript">
+{`// Basic implementation`}
+</InteractiveCodeBlock>
+
+## Visualization
+<BubbleSortVisualizer initialArray={[64, 34, 25, 12, 22]} />
+
+## Complexity Analysis
+<ComparisonTable
+  headers={['Case', 'Time', 'Space']}
+  rows={[...]}
+/>
+
+## Upgrade for More
+<UpgradeCTA features={[...]} />
+```
+
+**Example 2: Full-Stack Tutorial**
+```mdx
+# Building an API
+
+<DualPaneEditor
+  frontendCode={`// Frontend`}
+  backendCode={`// Backend`}
+  previewType="full"
+/>
+
+<UpgradeCTA features={["Full project templates", "Deployment guide"]} />
+```
 
 ---
 
@@ -99,7 +486,7 @@ GOOD: "Imagine ordering coffee. Instead of standing at the counter blocking
 
 ### Premium Content Teasing
 Every free tutorial should naturally lead to premium value:
-
+use <UpgradeCTA />
 ```
 Free Tutorial Delivers:
 → Working knowledge of the concept

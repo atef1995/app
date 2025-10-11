@@ -1,38 +1,11 @@
 import { PrismaClient } from "@prisma/client";
-import { quizzes, Quiz } from "../src/data/quizzes";
+import { quizzes, Quiz } from "./seeds/data/quizzes";
 import { slugify, generateUniqueSlug } from "../src/lib/slugify";
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log("Seeding quizzes and tutorials...");
-
-  // First, create Tutorial records
-  const tutorials = [
-    {
-      id: "5",
-      slug: "dom-manipulation",
-      title: "DOM Manipulation",
-      description: "Learn how to manipulate the DOM with JavaScript.",
-      content: "This tutorial covers DOM manipulation techniques.",
-      difficulty: 3,
-      order: 5,
-      published: true,
-      mdxFile: "dom/05-dom-manipulation",
-    },
-  ];
-
-  // Create tutorials
-  for (const tutorial of tutorials) {
-    await prisma.tutorial.upsert({
-      where: { id: tutorial.id },
-      update: tutorial,
-      create: tutorial,
-    });
-  }
-
-  console.log("Created tutorials...");
-
   // Get existing quiz slugs to avoid conflicts
   const existingQuizzes = await prisma.quiz.findMany({
     select: { slug: true },

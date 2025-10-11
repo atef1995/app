@@ -11,17 +11,91 @@ const prisma = new PrismaClient();
 /**
  * Data Structures & Algorithms Tutorials
  * Category: data-structures
+ *
+ * Linear Teaching Approach:
+ * 00 → What Are Algorithms? (Foundation)
+ * 01 → Introduction to Arrays (Data Structure)
+ * 02 → Why Sorting Matters (Motivation)
+ * 03 → Simple Sorting Algorithms (Implementation)
+ * 04 → Time Complexity & Big O (Analysis)
+ * 05 → Two-Pointer Technique (Optimization)
  */
 const dsaTutorials: TutorialSeedData[] = [
   {
-    slug: "02-two-pointer-technique",
+    slug: "00-what-are-algorithms",
+    title: "What Are Algorithms? Your First Step Into Programming Logic",
+    description:
+      "Learn what algorithms are through everyday examples, build your first algorithm in 5 minutes, and understand the foundation of all programming",
+    mdxFile: "data-structures/00-what-are-algorithms",
+    difficulty: 1,
+    order: 0,
+    published: true,
+    isPremium: false,
+    requiredPlan: "FREE",
+    estimatedTime: 20.0,
+  },
+  {
+    slug: "01-introduction-to-arrays",
+    title: "Introduction to Arrays: The Foundation of Data Structures",
+    description:
+      "Master arrays - the most fundamental data structure in programming. Learn creation, manipulation, and common patterns with real-world examples",
+    mdxFile: "data-structures/01-introduction-to-arrays",
+    difficulty: 2,
+    order: 1,
+    published: true,
+    isPremium: false,
+    requiredPlan: "FREE",
+    estimatedTime: 25.0,
+  },
+  {
+    slug: "02-why-sorting-matters",
+    title: "Why Sorting Matters: The Secret to 700x Faster Search",
+    description:
+      "Discover why sorting is one of the most important concepts in programming. See how it makes search 700x faster with real-world examples from Google, Instagram, and e-commerce",
+    mdxFile: "data-structures/02-why-sorting-matters",
+    difficulty: 2,
+    order: 2,
+    published: true,
+    isPremium: false,
+    requiredPlan: "FREE",
+    estimatedTime: 15.0,
+  },
+  {
+    slug: "03-simple-sorting-algorithms",
+    title: "Simple Sorting Algorithms: Bubble Sort & Selection Sort",
+    description:
+      "Learn how sorting algorithms work by implementing Bubble Sort and Selection Sort. Watch them in action with interactive visualizations and understand which algorithm is more efficient",
+    mdxFile: "data-structures/03-simple-sorting-algorithms",
+    difficulty: 2,
+    order: 3,
+    published: true,
+    isPremium: false,
+    requiredPlan: "FREE",
+    estimatedTime: 25.0,
+  },
+  {
+    slug: "04-time-complexity-big-o",
+    title:
+      "Understanding Time Complexity: Your Secret Weapon for Coding Interviews",
+    description:
+      "Master Big O notation and time complexity analysis - the foundation for writing efficient code and acing technical interviews",
+    mdxFile: "data-structures/04-time-complexity-big-o",
+    difficulty: 3,
+    order: 4,
+    published: true,
+    isPremium: false,
+    requiredPlan: "FREE",
+    estimatedTime: 30.0,
+  },
+  {
+    slug: "05-two-pointer-technique",
     title:
       "Master the Two-Pointer Technique: Solve Array Problems in O(n) Time",
     description:
       "Transform your array problem-solving skills from brute-force O(n²) to elegant O(n) solutions using the two-pointer technique",
-    mdxFile: "data-structures/02-two-pointer-technique",
+    mdxFile: "data-structures/05-two-pointer-technique",
     difficulty: 3,
-    order: 2,
+    order: 5,
     published: true,
     isPremium: false,
     requiredPlan: "FREE",
@@ -34,9 +108,185 @@ const dsaTutorials: TutorialSeedData[] = [
  */
 const dsaQuizzes: QuizSeedData[] = [
   {
-    slug: "02-two-pointer-technique-quiz",
+    slug: "04-time-complexity-big-o-quiz",
+    title: "Time Complexity & Big O Notation Quiz",
+    tutorialSlug: "04-time-complexity-big-o",
+    isPremium: false,
+    requiredPlan: "FREE",
+    questions: [
+      {
+        id: "big-o-1",
+        question: "What does Big O notation measure?",
+        type: "multiple-choice",
+        options: [
+          "The exact execution time of an algorithm",
+          "How runtime grows as input size increases",
+          "The amount of code written",
+          "The number of variables used",
+        ],
+        correct: 1,
+        explanation:
+          "Big O notation describes how an algorithm's runtime or space requirements grow relative to input size, ignoring constants and focusing on growth rate.",
+      },
+      {
+        id: "big-o-2",
+        question:
+          "What is the time complexity of accessing an element in an array by index?",
+        type: "multiple-choice",
+        options: ["O(n)", "O(log n)", "O(1)", "O(n²)"],
+        correct: 2,
+        explanation:
+          "Array access by index is O(1) - constant time. It takes the same amount of time regardless of array size because arrays store elements in contiguous memory.",
+      },
+      {
+        id: "big-o-3",
+        question: "Which complexity is fastest for large inputs?",
+        type: "multiple-choice",
+        options: ["O(n)", "O(n²)", "O(log n)", "O(n log n)"],
+        correct: 2,
+        explanation:
+          "O(log n) is the fastest among these options. Logarithmic time grows very slowly - even with 1 million items, it only requires about 20 operations.",
+      },
+      {
+        id: "big-o-4",
+        question:
+          "What is the time complexity of this code?\n\nfor (let i = 0; i < n; i++) {\n  console.log(i);\n}\nfor (let j = 0; j < n; j++) {\n  console.log(j);\n}",
+        type: "multiple-choice",
+        options: ["O(n)", "O(n²)", "O(2n)", "O(log n)"],
+        correct: 0,
+        explanation:
+          "Two sequential (non-nested) loops are O(n) + O(n) = O(2n), which simplifies to O(n) because we drop constants in Big O notation.",
+      },
+      {
+        id: "big-o-5",
+        question:
+          "What is the time complexity of nested loops?\n\nfor (let i = 0; i < n; i++) {\n  for (let j = 0; j < n; j++) {\n    console.log(i, j);\n  }\n}",
+        type: "multiple-choice",
+        options: ["O(n)", "O(n²)", "O(2n)", "O(log n)"],
+        correct: 1,
+        explanation:
+          "Nested loops where both iterate n times result in O(n²) - quadratic time. The inner loop runs n times for each of n iterations of the outer loop.",
+      },
+      {
+        id: "big-o-6",
+        question:
+          "What is the space complexity of this function?\n\nfunction double(arr) {\n  const result = [];\n  for (let num of arr) {\n    result.push(num * 2);\n  }\n  return result;\n}",
+        type: "multiple-choice",
+        options: ["O(1)", "O(log n)", "O(n)", "O(n²)"],
+        correct: 2,
+        explanation:
+          "Space complexity is O(n) because we create a new array 'result' that grows proportionally with the input array size.",
+      },
+      {
+        id: "big-o-7",
+        question: "Why do we drop constants in Big O notation?",
+        type: "multiple-choice",
+        options: [
+          "To make the math easier",
+          "Because we focus on growth rate, not exact time",
+          "Constants don't matter at all",
+          "To confuse beginners",
+        ],
+        correct: 1,
+        explanation:
+          "We drop constants because Big O focuses on how algorithms scale with input size, not exact runtime. O(2n) and O(n) have the same growth rate - both are linear.",
+      },
+      {
+        id: "big-o-8",
+        question: "What is the time complexity of binary search?",
+        type: "multiple-choice",
+        options: ["O(n)", "O(n²)", "O(log n)", "O(1)"],
+        correct: 2,
+        explanation:
+          "Binary search is O(log n) because it cuts the search space in half with each step. For 1000 items, it needs only ~10 comparisons (log₂(1000) ≈ 10).",
+      },
+      {
+        id: "big-o-9",
+        question: "Which scenario represents O(n²) complexity?",
+        type: "multiple-choice",
+        options: [
+          "Searching through a sorted array",
+          "Checking all pairs of elements in an array",
+          "Adding an element to the end of an array",
+          "Finding the maximum value in an array",
+        ],
+        correct: 1,
+        explanation:
+          "Checking all pairs requires nested loops - for each element, check it against all other elements. This is the classic O(n²) pattern.",
+      },
+      {
+        id: "big-o-10",
+        question:
+          "What is the complexity of this code?\n\nfunction example(arr) {\n  return arr[0] + arr[arr.length - 1];\n}",
+        type: "multiple-choice",
+        options: ["O(n)", "O(1)", "O(2)", "O(log n)"],
+        correct: 1,
+        explanation:
+          "This is O(1) - constant time. It performs exactly 3 operations (two array accesses and one addition) regardless of array size.",
+      },
+      {
+        id: "big-o-11",
+        question: "If an algorithm is O(n² + n), what do we simplify it to?",
+        type: "multiple-choice",
+        options: ["O(n² + n)", "O(n²)", "O(n)", "O(2n²)"],
+        correct: 1,
+        explanation:
+          "We drop lower order terms, so O(n² + n) becomes O(n²). When n is large, n² dominates completely (e.g., 1000² = 1,000,000 vs 1000).",
+      },
+      {
+        id: "big-o-12",
+        question:
+          "What is the time complexity of the naive recursive Fibonacci?",
+        type: "multiple-choice",
+        options: ["O(n)", "O(log n)", "O(2ⁿ)", "O(n²)"],
+        correct: 2,
+        explanation:
+          "Recursive Fibonacci without memoization is O(2ⁿ) - exponential time. Each call makes 2 more calls, creating an exponential tree of function calls.",
+      },
+      {
+        id: "big-o-13",
+        question: "What does O(1) space complexity mean?",
+        type: "multiple-choice",
+        options: [
+          "Uses exactly 1 byte of memory",
+          "Uses no memory at all",
+          "Uses constant memory regardless of input size",
+          "Uses 1 variable only",
+        ],
+        correct: 2,
+        explanation:
+          "O(1) space means the algorithm uses a constant amount of memory that doesn't grow with input size - it could be 5 variables or 100, but it's fixed.",
+      },
+      {
+        id: "big-o-14",
+        question: "Which is better for large datasets: O(n log n) or O(n²)?",
+        type: "multiple-choice",
+        options: [
+          "O(n²) because it's simpler",
+          "O(n log n) because it grows slower",
+          "They're the same",
+          "It depends on the constants",
+        ],
+        correct: 1,
+        explanation:
+          "O(n log n) is significantly better for large inputs. With 1000 items: O(n log n) ≈ 10,000 operations vs O(n²) = 1,000,000 operations - a 100x difference!",
+      },
+      {
+        id: "big-o-15",
+        question:
+          "What is the time complexity when you use .includes() inside a loop?\n\nfor (let i = 0; i < arr.length; i++) {\n  if (arr.includes(target)) { ... }\n}",
+        type: "multiple-choice",
+        options: ["O(n)", "O(n²)", "O(log n)", "O(1)"],
+        correct: 1,
+        explanation:
+          "This is O(n²) because .includes() is O(n) itself, and it's called inside an O(n) loop. Hidden complexity like this is a common mistake!",
+      },
+    ],
+  },
+  {
+    slug: "05-two-pointer-technique-quiz",
     title: "Two-Pointer Technique Quiz",
-    tutorialSlug: "02-two-pointer-technique",
+    tutorialSlug: "05-two-pointer-technique",
     isPremium: false,
     requiredPlan: "FREE",
     questions: [
@@ -265,6 +515,13 @@ export async function seedDsaTutorials() {
   console.log("🧠 Seeding Data Structures & Algorithms tutorials...");
 
   try {
+    // // Find the category
+    // const category = await prisma.category.findUnique({
+    //   where: { slug: "data-structres" },
+    // });
+    // await prisma.tutorial.deleteMany({
+    //   where: { categoryId: category?.id },
+    // });
     // Seed tutorials
     await seedTutorials("data-structures", dsaTutorials, prisma);
 

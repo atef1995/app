@@ -1,0 +1,1339 @@
+---
+title: "Understanding Time Complexity: Your Secret Weapon for Coding Interviews"
+description: "Master Big O notation and time complexity analysis - the foundation for writing efficient code and acing technical interviews. Transform from guessing performance to confidently analyzing any algorithm."
+category: "data-structures"
+difficulty: 3
+estimatedTime: "30 minutes"
+prerequisites: ["Introduction to Arrays", "Why Sorting Matters", "Simple Sorting Algorithms"]
+learningObjectives:
+  - "Understand what Big O notation is and why it matters for interviews"
+  - "Analyze code to determine time and space complexity"
+  - "Recognize common complexity patterns: O(1), O(log n), O(n), O(n log n), O(n²)"
+  - "Optimize slow algorithms by identifying bottlenecks"
+topics: ["big-o", "time-complexity", "space-complexity", "algorithm-analysis", "optimization", "interview-prep"]
+interviewRelevance: "High"
+realWorldApplications: ["Performance optimization", "Algorithm selection", "System design", "Code reviews"]
+---
+
+import { ComparisonTable } from '@/components/tutorial/ComparisonTable';
+import { UpgradeCTA } from '@/components/tutorial/UpgradeCTA';
+
+# Understanding Time Complexity: Your Secret Weapon for Coding Interviews
+
+> **Transform in 30 minutes:**
+> - From counting steps manually → analyzing algorithms mathematically
+> - From intuitive understanding → formal Big O notation
+> - From guessing performance → confidently explaining efficiency
+
+## You've Already Been Analyzing Complexity!
+
+**Remember in the last tutorial** when we compared Bubble Sort and Selection Sort? We counted comparisons and swaps:
+
+- **Bubble Sort with 100 elements**: ~4,950 comparisons, ~4,950 swaps
+- **Selection Sort with 100 elements**: ~4,950 comparisons, ~99 swaps
+
+You noticed a pattern: as the array size grew, the number of operations grew **quadratically**. 10 elements = ~100 operations, 100 elements = ~10,000 operations, 1000 elements = ~1,000,000 operations.
+
+**Here's the exciting news**: You've been doing complexity analysis all along! Now we're going to formalize what you already understand intuitively with **Big O notation**.
+
+Instead of saying "Bubble Sort does about n² operations," we'll say **"Bubble Sort is O(n²)"**. Same idea, just mathematical notation.
+
+---
+
+## From Counting Steps to Big O Notation
+
+```javascript
+// ❌ This takes 0.001 seconds with 10 items
+// 😱 But 10 SECONDS with 1,000 items!
+function findDuplicates(arr) {
+  const duplicates = [];
+
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = i + 1; j < arr.length; j++) {
+      if (arr[i] === arr[j] && !duplicates.includes(arr[i])) {
+        duplicates.push(arr[i]);
+      }
+    }
+  }
+
+  return duplicates;
+}
+```
+
+**Here's the problem**: This code has O(n²) time complexity. Every time you double the input size, the execution time **quadruples**. With 10,000 items? You're looking at 100 seconds or more.
+
+But what if I told you there's a way to solve the same problem in **0.001 seconds** regardless of input size? That's the power of understanding time complexity.
+
+**You're not alone.** Most developers write code without thinking about performance. But here's what separates good developers from great ones: **knowing how to analyze and optimize algorithms**.
+
+In this tutorial, you'll learn the #1 skill that interviewers test in coding interviews: **Big O notation and complexity analysis**. By the end, you'll be able to look at any piece of code and instantly know if it's fast or slow.
+
+---
+
+## Your First Complexity Analysis in 5 Minutes
+
+Let's solve a problem and see the performance difference with our own eyes:
+
+**Challenge**: Find if an array contains duplicate values.
+
+### Approach 1: The Slow Way (O(n²))
+
+```javascript
+// ❌ Nested loops = O(n²) = SLOW
+function hasDuplicatesSlow(arr) {
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = i + 1; j < arr.length; j++) {
+      if (arr[i] === arr[j]) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Test with 1,000 items
+const largeArray = Array.from({ length: 1000 }, (_, i) => i);
+largeArray.push(500); // Add one duplicate
+
+console.time('Slow');
+hasDuplicatesSlow(largeArray);
+console.timeEnd('Slow'); // ~5-10ms
+```
+
+### Approach 2: The Fast Way (O(n))
+
+```javascript
+// ✅ Single loop with Set = O(n) = FAST
+function hasDuplicatesFast(arr) {
+  const seen = new Set();
+
+  for (let item of arr) {
+    if (seen.has(item)) {
+      return true;
+    }
+    seen.add(item);
+  }
+  return false;
+}
+
+// Test with 1,000 items
+const largeArray = Array.from({ length: 1000 }, (_, i) => i);
+largeArray.push(500); // Add one duplicate
+
+// Test with same 1,000 items
+console.time('Fast');
+hasDuplicatesFast(largeArray);
+console.timeEnd('Fast'); // ~0.1-0.5ms
+```
+
+### The Results Speak for Themselves
+
+<ComparisonTable
+  headers={['Input Size', 'Slow O(n²)', 'Fast O(n)', 'Speed Improvement']}
+  rows={[
+    { label: '10 items', values: ['0.01ms', '0.01ms', 'Same'] },
+    { label: '100 items', values: ['0.5ms', '0.05ms', '10x faster'] },
+    { label: '1,000 items', values: ['50ms', '0.5ms', '100x faster'] },
+    { label: '10,000 items', values: ['5,000ms', '5ms', '1,000x faster'], highlighted: true }
+  ]}
+  variant="bordered"
+/>
+
+**🎉 You just witnessed the power of time complexity analysis!**
+
+The slow version checks every pair (nested loops). The fast version checks each item once using a Set for O(1) lookups.
+
+**Try it yourself**: Copy both functions into your browser console and test with different array sizes.
+
+---
+
+## Understanding Big O Notation from the Ground Up
+
+### The Mental Model
+
+Think of Big O notation like **fuel efficiency for code**. Just like you measure car efficiency in miles per gallon, we measure algorithm efficiency in **operations per input size**.
+
+**Big O answers one question**: *"How does the runtime grow as the input grows?"*
+
+<ComparisonTable
+  headers={['Complexity', 'Growth Rate', 'Example Use Case']}
+  rows={[
+    { label: 'O(1)', values: ['Stays the same', 'Accessing array[0]'] },
+    { label: 'O(log n)', values: ['Grows a tiny bit', 'Binary search'] },
+    { label: 'O(n)', values: ['Grows 10x when input grows 10x', 'Loop through array'], highlighted: true },
+    { label: 'O(n log n)', values: ['Grows 10x × a tiny bit', 'Efficient sorting'] },
+    { label: 'O(n²)', values: ['Grows 100x (10²)', 'Nested loops'] },
+    { label: 'O(2ⁿ)', values: ['Grows 1024x (2¹⁰)', 'Recursive fibonacci'] }
+  ]}
+  variant="compact"
+  caption="How runtime scales when input size grows 10x"
+/>
+
+### Why "Big O" and Not Exact Time?
+
+**Big O ignores:**
+- Constants (2n becomes n)
+- Lower terms (n² + n becomes n²)
+- Hardware differences (fast vs slow computers)
+
+**Big O focuses on:**
+- Growth rate (how runtime scales)
+- Worst-case scenario (planning for the worst)
+- Comparing algorithms fairly
+
+**Example**:
+```javascript
+function example(arr) {
+  console.log(arr[0]);           // 1 operation
+  console.log(arr[1]);           // 1 operation
+
+  for (let i = 0; i < arr.length; i++) {
+    console.log(arr[i]);         // n operations
+  }
+}
+
+// Total: 2 + n operations
+// Big O: O(n) — we drop the constant 2
+```
+
+### The "Why" Behind Big O
+
+**When you need it:**
+- Coding interviews (asked 90% of the time!)
+- Optimizing slow code
+- Choosing between algorithms
+- Explaining trade-offs to your team
+- System design decisions
+
+**When you might not need it:**
+- Small datasets (under 100 items)
+- Code that runs once
+- Premature optimization (make it work first!)
+
+---
+
+## The Essential Complexity Classes
+
+Let's break down each complexity class with real examples:
+
+### O(1) - Constant Time ⚡
+
+**The fastest possible**. Runtime doesn't change with input size.
+
+```javascript
+// All of these are O(1) - single operations
+function constantTime(arr) {
+  return arr[0];                    // Array access
+}
+
+function anotherConstant(arr) {
+  return arr[arr.length - 1];       // Still one operation
+}
+
+function multipleConstant(arr) {
+  const first = arr[0];             // 1 operation
+  const last = arr[arr.length - 1]; // 1 operation
+  return first + last;              // 1 operation
+  // Total: 3 operations, but still O(1)!
+}
+
+// Set and Map operations
+const map = new Map();
+map.set('key', 'value');            // O(1)
+map.get('key');                     // O(1)
+map.has('key');                     // O(1)
+```
+
+**Real-world examples**: Dictionary lookup, array access, hash table operations
+
+---
+
+### O(log n) - Logarithmic Time 📊
+
+**Very fast**. Cuts problem in half each step (like binary search).
+
+```javascript
+/**
+ * Binary search: O(log n)
+ * Searches sorted array by repeatedly halving search space
+ */
+function binarySearch(arr, target) {
+  let left = 0;
+  let right = arr.length - 1;
+
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+
+    if (arr[mid] === target) {
+      return mid;                    // Found it!
+    } else if (arr[mid] < target) {
+      left = mid + 1;                // Search right half
+    } else {
+      right = mid - 1;               // Search left half
+    }
+  }
+
+  return -1;                         // Not found
+}
+
+// Example: Find 67 in sorted array
+const sorted = [1, 5, 12, 23, 34, 45, 56, 67, 78, 89, 90];
+
+// Linear search (O(n)): Check 1, 5, 12, 23, 34, 45, 56, 67 → 8 checks
+// Binary search (O(log n)): Check 45, 78, 67 → 3 checks!
+```
+
+**Why it's called "log n"**: With 1,000 items, you need only ~10 steps (log₂(1000) ≈ 10).
+
+**Real-world examples**: Binary search, balanced tree operations, finding in sorted data
+
+---
+
+### O(n) - Linear Time 📈
+
+**Efficient**. Check each item once.
+
+```javascript
+/**
+ * Linear search: O(n)
+ * Must check each element once
+ */
+function findMax(arr) {
+  let max = arr[0];
+
+  for (let i = 1; i < arr.length; i++) {  // n iterations
+    if (arr[i] > max) {
+      max = arr[i];
+    }
+  }
+
+  return max;
+}
+
+// Other O(n) examples
+function sumArray(arr) {
+  let sum = 0;
+  arr.forEach(num => sum += num);    // Visit each element once
+  return sum;
+}
+
+function containsValue(arr, target) {
+  return arr.includes(target);       // Must check each item
+}
+
+// Even with multiple loops, if they're not nested:
+function twoLoops(arr) {
+  // First loop: O(n)
+  arr.forEach(item => console.log(item));
+
+  // Second loop: O(n)
+  arr.forEach(item => console.log(item * 2));
+
+  // Total: O(n) + O(n) = O(2n) = O(n)
+}
+```
+
+**Key insight**: Multiple non-nested loops are still O(n)!
+
+**Real-world examples**: Array iteration, counting, filtering, mapping
+
+---
+
+### O(n log n) - Linearithmic Time 📊📈
+
+**Good for sorting**. Most efficient general-purpose sorting algorithms.
+
+```javascript
+/**
+ * Merge sort: O(n log n)
+ * Divides array (log n) and merges (n) at each level
+ */
+function mergeSort(arr) {
+  // Base case
+  if (arr.length <= 1) return arr;
+
+  // Divide: O(log n) levels
+  const mid = Math.floor(arr.length / 2);
+  const left = mergeSort(arr.slice(0, mid));
+  const right = mergeSort(arr.slice(mid));
+
+  // Conquer: O(n) work at each level
+  return merge(left, right);
+}
+
+function merge(left, right) {
+  const result = [];
+  let i = 0, j = 0;
+
+  while (i < left.length && j < right.length) {
+    if (left[i] < right[j]) {
+      result.push(left[i++]);
+    } else {
+      result.push(right[j++]);
+    }
+  }
+
+  return result.concat(left.slice(i)).concat(right.slice(j));
+}
+
+// JavaScript's built-in sort is O(n log n)
+const numbers = [64, 34, 25, 12, 22, 11, 90];
+numbers.sort((a, b) => a - b);         // O(n log n)
+```
+
+**Real-world examples**: Merge sort, quick sort, heap sort, efficient sorting
+
+---
+
+### O(n²) - Quadratic Time 🐌
+
+**Slow**. Nested loops checking all pairs.
+
+**You've already seen this!** Both Bubble Sort and Selection Sort from the previous tutorial are O(n²):
+
+```javascript
+/**
+ * Bubble Sort: O(n²)
+ * Remember this from Tutorial 03?
+ */
+function bubbleSort(arr) {
+  const n = arr.length;
+
+  for (let i = 0; i < n; i++) {              // Outer loop: n times
+    for (let j = 0; j < n - i - 1; j++) {    // Inner loop: n times
+      if (arr[j] > arr[j + 1]) {
+        // Swap
+        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+      }
+    }
+  }
+
+  return arr;
+}
+
+/**
+ * Selection Sort: O(n²)
+ * Also from Tutorial 03 - fewer swaps, same comparisons!
+ */
+function selectionSort(arr) {
+  const n = arr.length;
+
+  for (let i = 0; i < n - 1; i++) {              // Outer loop: n times
+    let minIndex = i;
+
+    for (let j = i + 1; j < n; j++) {            // Inner loop: n times
+      if (arr[j] < arr[minIndex]) {
+        minIndex = j;
+      }
+    }
+
+    if (minIndex !== i) {
+      [arr[i], arr[minIndex]] = [arr[minIndex], arr[i]];
+    }
+  }
+
+  return arr;
+}
+```
+
+**Why are both O(n²)?**
+- Bubble Sort: Nested loops → n × n = n² comparisons
+- Selection Sort: Same nested structure → n × n = n² comparisons
+- **Even though Selection Sort has fewer swaps**, we only care about the growth rate!
+
+**Now you understand the tables from Tutorial 03**:
+
+<ComparisonTable
+  headers={['Array Size', 'Operations (n²)', 'Actual Count']}
+  rows={[
+    { label: '10 items', values: ['10² = 100', '~45-100'] },
+    { label: '100 items', values: ['100² = 10,000', '~4,950-10,000'] },
+    { label: '1,000 items', values: ['1,000² = 1,000,000', '~499,500-1,000,000'], highlighted: true },
+    { label: '10,000 items', values: ['10,000² = 100,000,000', '💥 Too slow!'] }
+  ]}
+  variant="bordered"
+  caption="O(n²) growth: This is why we need faster algorithms!"
+/>
+
+**Other O(n²) examples**:
+
+```javascript
+// Finding all pairs
+function findAllPairs(arr) {
+  const pairs = [];
+
+  for (let i = 0; i < arr.length; i++) {      // n iterations
+    for (let j = i + 1; j < arr.length; j++) { // n iterations
+      pairs.push([arr[i], arr[j]]);
+    }
+  }
+
+  return pairs;
+}
+
+// [1, 2, 3] → [[1,2], [1,3], [2,3]] = 3 pairs
+// [1, 2, 3, 4] → 6 pairs
+// [1...10] → 45 pairs (same as Bubble Sort comparisons!)
+// [1...100] → 4,950 pairs
+```
+
+**Warning**: O(n²) is usually too slow for production with large datasets!
+
+**Real-world examples**: Bubble Sort, Selection Sort, Insertion Sort, checking all pairs
+
+---
+
+### O(2ⁿ) - Exponential Time 💣
+
+**Very slow**. Doubles with each additional input. Avoid if possible!
+
+```javascript
+/**
+ * Recursive Fibonacci: O(2ⁿ)
+ * Each call makes 2 more calls - exponential growth
+ */
+function fibonacci(n) {
+  if (n <= 1) return n;
+
+  // Each call spawns 2 more calls!
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+// Call tree for fibonacci(5):
+//                    fib(5)
+//                  /        \
+//            fib(4)          fib(3)
+//           /      \        /      \
+//       fib(3)   fib(2)  fib(2)  fib(1)
+//       /    \   /    \  /    \
+//   fib(2) fib(1) ...
+
+// fib(5) = 15 calls
+// fib(10) = 177 calls
+// fib(20) = 21,891 calls
+// fib(40) = 331,160,281 calls (takes minutes!)
+```
+
+**Optimization**: Use memoization to reduce to O(n)!
+
+```javascript
+// ✅ Optimized with memoization: O(n)
+function fibonacciMemo(n, memo = {}) {
+  if (n <= 1) return n;
+  if (memo[n]) return memo[n];  // Already calculated!
+
+  memo[n] = fibonacciMemo(n - 1, memo) + fibonacciMemo(n - 2, memo);
+  return memo[n];
+}
+
+// fib(40) now takes milliseconds instead of minutes!
+```
+
+**Real-world examples**: Recursive fibonacci, generating all subsets, brute-force solutions
+
+---
+
+## Connecting the Dots: Why We Need Faster Sorting
+
+**Remember from Tutorial 03?** We learned that Bubble Sort and Selection Sort are both O(n²). Now you understand what that means mathematically!
+
+But here's the exciting question: **Can we sort faster than O(n²)?**
+
+**Yes!** The algorithms in the O(n log n) section above (Merge Sort, Quick Sort) are **much faster**:
+
+<ComparisonTable
+  headers={['Algorithm', 'Complexity', '1,000 items', '10,000 items', 'Speed Difference']}
+  rows={[
+    { label: 'Bubble Sort', values: ['O(n²)', '~1,000,000 ops', '~100,000,000 ops', 'Baseline'] },
+    { label: 'Selection Sort', values: ['O(n²)', '~1,000,000 ops', '~100,000,000 ops', 'Same as Bubble'] },
+    { label: 'Merge Sort', values: ['O(n log n)', '~10,000 ops', '~130,000 ops', '100x faster!'], highlighted: true },
+    { label: 'Quick Sort', values: ['O(n log n)', '~10,000 ops', '~130,000 ops', '100x faster!'], highlighted: true }
+  ]}
+  variant="bordered"
+  caption="This is why JavaScript's built-in sort() uses O(n log n) algorithms!"
+/>
+
+**Key insight**: Going from O(n²) to O(n log n) is a **game changer** for large datasets. This is why Merge Sort and Quick Sort are used in production, not Bubble Sort!
+
+---
+
+## Complexity Comparison: The Full Picture
+
+### Growth Rate Comparison
+
+<ComparisonTable
+  headers={['Complexity', '10 items', '100 items', '1,000 items', '10,000 items']}
+  rows={[
+    { label: 'O(1)', values: ['1', '1', '1', '1'] },
+    { label: 'O(log n)', values: ['3', '7', '10', '13'] },
+    { label: 'O(n)', values: ['10', '100', '1,000', '10,000'], highlighted: true },
+    { label: 'O(n log n)', values: ['30', '700', '10,000', '130,000'] },
+    { label: 'O(n²)', values: ['100', '10,000', '1,000,000', '100,000,000'] },
+    { label: 'O(2ⁿ)', values: ['1,024', '2⁶⁴', '💥', '💥💥💥'] }
+  ]}
+  variant="bordered"
+  caption="Operations count: How complexity grows with input size"
+/>
+
+---
+
+## How to Analyze Code: A Step-by-Step Guide
+
+### Rule 1: Count the Loops
+
+```javascript
+// No loops = O(1)
+function getFirst(arr) {
+  return arr[0];
+}
+
+// One loop = O(n)
+function printAll(arr) {
+  for (let item of arr) {
+    console.log(item);
+  }
+}
+
+// Nested loops = O(n²)
+function printPairs(arr) {
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = 0; j < arr.length; j++) {
+      console.log(arr[i], arr[j]);
+    }
+  }
+}
+
+// Three nested loops = O(n³)
+function printTriplets(arr) {
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = 0; j < arr.length; j++) {
+      for (let k = 0; k < arr.length; k++) {
+        console.log(arr[i], arr[j], arr[k]);
+      }
+    }
+  }
+}
+```
+
+### Rule 2: Drop Constants and Lower Terms
+
+```javascript
+// O(2n) → O(n)
+function twoLoops(arr) {
+  arr.forEach(item => console.log(item));     // O(n)
+  arr.forEach(item => console.log(item * 2)); // O(n)
+  // Total: O(2n) → simplified to O(n)
+}
+
+// O(n² + n) → O(n²)
+function complexFunction(arr) {
+  // First part: O(n)
+  for (let i = 0; i < arr.length; i++) {
+    console.log(arr[i]);
+  }
+
+  // Second part: O(n²)
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = 0; j < arr.length; j++) {
+      console.log(arr[i], arr[j]);
+    }
+  }
+
+  // Total: O(n + n²) → O(n²) because n² dominates
+}
+```
+
+### Rule 3: Different Inputs = Different Variables
+
+```javascript
+// O(a + b) not O(n)
+function twoArrays(arr1, arr2) {
+  arr1.forEach(item => console.log(item));  // O(a)
+  arr2.forEach(item => console.log(item));  // O(b)
+  // Total: O(a + b)
+}
+
+// O(a × b) not O(n²)
+function nestedDifferentArrays(arr1, arr2) {
+  for (let item1 of arr1) {                 // O(a)
+    for (let item2 of arr2) {               // O(b)
+      console.log(item1, item2);
+    }
+  }
+  // Total: O(a × b)
+}
+```
+
+### Rule 4: Recursive Functions
+
+```javascript
+/**
+ * For recursion, ask: "How many times does it call itself?"
+ */
+
+// O(n) - calls itself n times
+function countDown(n) {
+  if (n <= 0) return;
+  console.log(n);
+  countDown(n - 1);  // One recursive call
+}
+
+// O(2ⁿ) - each call makes 2 calls
+function fibonacci(n) {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);  // Two recursive calls
+}
+
+// O(log n) - cuts problem in half each time
+function binarySearchRecursive(arr, target, left = 0, right = arr.length - 1) {
+  if (left > right) return -1;
+
+  const mid = Math.floor((left + right) / 2);
+
+  if (arr[mid] === target) return mid;
+  if (arr[mid] < target) {
+    return binarySearchRecursive(arr, target, mid + 1, right);  // Half the problem
+  } else {
+    return binarySearchRecursive(arr, target, left, mid - 1);   // Half the problem
+  }
+}
+```
+
+---
+
+## Space Complexity: Memory Matters Too
+
+**Time complexity** = How long it takes
+**Space complexity** = How much memory it uses
+
+### Common Space Complexities
+
+```javascript
+// O(1) space - constant memory
+function sumArray(arr) {
+  let sum = 0;           // 1 variable
+  for (let num of arr) {
+    sum += num;
+  }
+  return sum;
+  // Only uses 'sum' variable regardless of array size
+}
+
+// O(n) space - proportional to input
+function doubleArray(arr) {
+  const doubled = [];    // New array of size n
+  for (let num of arr) {
+    doubled.push(num * 2);
+  }
+  return doubled;
+  // Creates new array with n elements
+}
+
+// O(n) space - recursion stack
+function factorial(n) {
+  if (n <= 1) return 1;
+  return n * factorial(n - 1);
+  // Each call adds to call stack (n calls = O(n) space)
+}
+
+// O(n²) space - 2D array
+function createMatrix(n) {
+  const matrix = [];
+  for (let i = 0; i < n; i++) {
+    matrix[i] = [];
+    for (let j = 0; j < n; j++) {
+      matrix[i][j] = i * j;
+    }
+  }
+  return matrix;
+  // n × n matrix = O(n²) space
+}
+```
+
+### Time vs Space Trade-offs
+
+```javascript
+/**
+ * Example: Find if array has duplicates
+ */
+
+// Approach 1: Low space, high time
+// Time: O(n²), Space: O(1)
+function hasDuplicatesSpaceOptimized(arr) {
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = i + 1; j < arr.length; j++) {
+      if (arr[i] === arr[j]) return true;
+    }
+  }
+  return false;
+}
+
+// Approach 2: High space, low time
+// Time: O(n), Space: O(n)
+function hasDuplicatesTimeOptimized(arr) {
+  const seen = new Set();  // Extra space!
+
+  for (let item of arr) {
+    if (seen.has(item)) return true;
+    seen.add(item);
+  }
+  return false;
+}
+
+// Trade-off: We used extra space to get faster time
+```
+
+---
+
+## Building Something Real: Performance Analyzer
+
+Let's build a tool that measures and compares algorithm performance:
+
+```javascript
+/**
+ * Performance Analyzer
+ * Measures actual execution time and compares algorithms
+ */
+class PerformanceAnalyzer {
+  /**
+   * Measure execution time of a function
+   */
+  static measure(fn, ...args) {
+    const start = performance.now();
+    const result = fn(...args);
+    const end = performance.now();
+    const time = (end - start).toFixed(4);
+
+    return { result, time: `${time}ms` };
+  }
+
+  /**
+   * Compare multiple algorithms
+   */
+  static compare(algorithms, input) {
+    console.log(`\n📊 Performance Comparison (${input.length} items)\n`);
+    console.log('─'.repeat(60));
+
+    const results = [];
+
+    algorithms.forEach(({ name, fn }) => {
+      const { result, time } = this.measure(fn, input);
+      results.push({ name, time, result });
+      console.log(`${name.padEnd(30)} ${time.padStart(10)}`);
+    });
+
+    console.log('─'.repeat(60) + '\n');
+
+    return results;
+  }
+
+  /**
+   * Test with multiple input sizes
+   */
+  static scalabilityTest(fn, name, sizes = [100, 1000, 10000]) {
+    console.log(`\n📈 Scalability Test: ${name}\n`);
+    console.log('─'.repeat(60));
+    console.log('Input Size'.padEnd(20) + 'Time'.padStart(15));
+    console.log('─'.repeat(60));
+
+    sizes.forEach(size => {
+      const input = Array.from({ length: size }, (_, i) => i);
+      const { time } = this.measure(fn, input);
+      console.log(`${size.toString().padEnd(20)}${time.padStart(15)}`);
+    });
+
+    console.log('─'.repeat(60) + '\n');
+  }
+}
+
+// Example: Compare sorting algorithms
+const unsorted = Array.from({ length: 1000 }, () =>
+  Math.floor(Math.random() * 1000)
+);
+
+PerformanceAnalyzer.compare([
+  {
+    name: 'Bubble Sort (O(n²))',
+    fn: (arr) => {
+      const sorted = [...arr];
+      for (let i = 0; i < sorted.length; i++) {
+        for (let j = 0; j < sorted.length - i - 1; j++) {
+          if (sorted[j] > sorted[j + 1]) {
+            [sorted[j], sorted[j + 1]] = [sorted[j + 1], sorted[j]];
+          }
+        }
+      }
+      return sorted;
+    }
+  },
+  {
+    name: 'Native Sort (O(n log n))',
+    fn: (arr) => [...arr].sort((a, b) => a - b)
+  }
+], unsorted);
+
+// Output:
+// 📊 Performance Comparison (1000 items)
+// ────────────────────────────────────────────────────────────
+// Bubble Sort (O(n²))              25.4567ms
+// Native Sort (O(n log n))          0.8923ms
+// ────────────────────────────────────────────────────────────
+```
+
+### Real-World Application: Choosing the Right Data Structure
+
+```javascript
+/**
+ * Problem: Store user permissions and check if user has permission
+ * Compare Array vs Set performance
+ */
+
+const PERMISSIONS = [
+  'read', 'write', 'delete', 'admin', 'moderator',
+  'create', 'update', 'view', 'edit', 'publish'
+];
+
+// Approach 1: Array (O(n) lookup)
+class PermissionsArray {
+  constructor() {
+    this.permissions = [];
+  }
+
+  add(permission) {
+    if (!this.permissions.includes(permission)) {
+      this.permissions.push(permission);
+    }
+  }
+
+  has(permission) {
+    return this.permissions.includes(permission);  // O(n)
+  }
+}
+
+// Approach 2: Set (O(1) lookup)
+class PermissionsSet {
+  constructor() {
+    this.permissions = new Set();
+  }
+
+  add(permission) {
+    this.permissions.add(permission);
+  }
+
+  has(permission) {
+    return this.permissions.has(permission);  // O(1)
+  }
+}
+
+// Test performance
+const arrayPerms = new PermissionsArray();
+const setPerms = new PermissionsSet();
+
+PERMISSIONS.forEach(p => {
+  arrayPerms.add(p);
+  setPerms.add(p);
+});
+
+// Check permission 1 million times
+console.time('Array (O(n))');
+for (let i = 0; i < 1000000; i++) {
+  arrayPerms.has('admin');
+}
+console.timeEnd('Array (O(n))');  // ~150ms
+
+console.time('Set (O(1))');
+for (let i = 0; i < 1000000; i++) {
+  setPerms.has('admin');
+}
+console.timeEnd('Set (O(1))');    // ~5ms
+
+// Set is 30x faster! This matters at scale.
+```
+
+---
+
+## Common Mistakes to Avoid
+
+### ⚠️ Mistake #1: Confusing O(n) with O(n²)
+
+```javascript
+// ❌ WRONG: This is NOT O(n²)
+function example(arr) {
+  arr.forEach(item => console.log(item));   // O(n)
+  arr.forEach(item => console.log(item));   // O(n)
+  // Total: O(n) + O(n) = O(2n) = O(n)
+}
+
+// ✅ CORRECT: THIS is O(n²)
+function example2(arr) {
+  arr.forEach(item1 => {
+    arr.forEach(item2 => {
+      console.log(item1, item2);
+    });
+  });
+  // Nested loops = O(n²)
+}
+```
+
+### ⚠️ Mistake #2: Ignoring Hidden Complexity
+
+```javascript
+// ❌ This looks like O(n) but it's O(n²)!
+function containsDuplicate(arr) {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr.includes(arr[i])) {  // includes() is O(n)!
+      return true;
+    }
+  }
+  return false;
+}
+// Total: O(n) loop × O(n) includes = O(n²)
+
+// ✅ Fixed: Actually O(n)
+function containsDuplicateFixed(arr) {
+  const seen = new Set();
+  for (let item of arr) {
+    if (seen.has(item)) {  // has() is O(1)
+      return true;
+    }
+    seen.add(item);
+  }
+  return false;
+}
+```
+
+### ⚠️ Mistake #3: Not Considering Best/Average/Worst Case
+
+```javascript
+/**
+ * Quick sort has different complexities:
+ * - Best/Average: O(n log n)
+ * - Worst case: O(n²) (when array is already sorted!)
+ */
+
+// In interviews, discuss all three cases:
+function quickSort(arr) {
+  // "This is O(n log n) on average,
+  //  but O(n²) in the worst case when
+  //  the array is already sorted or reverse sorted."
+}
+```
+
+---
+
+## Test Your Understanding
+
+### Challenge 1: Analyze This Code ⭐⭐⭐
+
+What's the time complexity?
+
+```javascript
+function mystery(arr) {
+  for (let i = 0; i < arr.length; i++) {
+    console.log(arr[i]);
+  }
+
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = 0; j < arr.length; j++) {
+      console.log(arr[i], arr[j]);
+    }
+  }
+}
+```
+
+<details>
+<summary>💡 Hint</summary>
+
+Look at each loop separately, then add them together. Remember to drop lower terms!
+
+</details>
+
+<details>
+<summary>✅ Solution</summary>
+
+**Answer: O(n²)**
+
+**Step-by-step analysis**:
+1. First loop: O(n)
+2. Nested loops: O(n²)
+3. Total: O(n) + O(n²) = O(n²)
+
+**Why?** We drop the lower term (n) because n² grows much faster. When n = 1000:
+- O(n) = 1,000 operations
+- O(n²) = 1,000,000 operations
+
+The n² term dominates, so we simplify to O(n²).
+
+</details>
+
+---
+
+### Challenge 2: Optimize This Code ⭐⭐⭐⭐
+
+Improve from O(n²) to O(n):
+
+```javascript
+// ❌ Current: O(n²)
+function sumOfPairs(arr, target) {
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = i + 1; j < arr.length; j++) {
+      if (arr[i] + arr[j] === target) {
+        return [arr[i], arr[j]];
+      }
+    }
+  }
+  return null;
+}
+```
+
+<details>
+<summary>💡 Hint</summary>
+
+Use a Set or Map to store values you've seen. For each number, check if (target - number) exists in the set.
+
+</details>
+
+<details>
+<summary>✅ Solution</summary>
+
+```javascript
+// ✅ Optimized: O(n)
+function sumOfPairsOptimized(arr, target) {
+  const seen = new Set();
+
+  for (let num of arr) {
+    const complement = target - num;
+
+    if (seen.has(complement)) {
+      return [complement, num];
+    }
+
+    seen.add(num);
+  }
+
+  return null;
+}
+
+// Time: O(n) - single pass through array
+// Space: O(n) - storing numbers in Set
+```
+
+**How it works**:
+- For target = 10, num = 3, we check if 7 exists in seen
+- If yes, we found our pair [7, 3]
+- If no, add 3 to seen and continue
+- Only one loop = O(n)!
+
+</details>
+
+---
+
+### Challenge 3: Compare Algorithms ⭐⭐⭐⭐⭐
+
+Rank these from fastest to slowest for n = 1,000,000:
+
+```javascript
+// Algorithm A
+function algorithmA(n) {
+  return n * 2;
+}
+
+// Algorithm B
+function algorithmB(n) {
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    sum += i;
+  }
+  return sum;
+}
+
+// Algorithm C
+function algorithmC(n) {
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      console.log(i, j);
+    }
+  }
+}
+
+// Algorithm D
+function algorithmD(n) {
+  if (n <= 1) return n;
+  return algorithmD(n - 1) + algorithmD(n - 2);
+}
+```
+
+<details>
+<summary>✅ Solution</summary>
+
+**Ranking (fastest → slowest)**:
+
+1. **Algorithm A**: O(1) - constant time
+   - 1 operation regardless of n
+
+2. **Algorithm B**: O(n) - linear time
+   - 1,000,000 operations
+
+3. **Algorithm C**: O(n²) - quadratic time
+   - 1,000,000,000,000 operations (1 trillion!)
+
+4. **Algorithm D**: O(2ⁿ) - exponential time
+   - Would take years to complete for n = 1,000,000!
+
+**Complexity comparison**:
+```
+A: O(1)       →  1 operation
+B: O(n)       →  1,000,000 operations
+C: O(n²)      →  1,000,000,000,000 operations
+D: O(2ⁿ)      →  💥 (more atoms than in universe)
+```
+
+</details>
+
+---
+
+## Interview Tips: How to Discuss Complexity
+
+### The Framework Interviewers Love
+
+**1. State the complexity**
+> "This solution has O(n) time complexity and O(1) space complexity."
+
+**2. Explain why**
+> "We iterate through the array once with a single loop, making it O(n). We only use a few variables regardless of input size, making it O(1) space."
+
+**3. Discuss trade-offs**
+> "We could reduce time to O(1) by using a hash map, but that would increase space complexity to O(n)."
+
+**4. Mention edge cases**
+> "In the worst case, if all elements are unique, we'd check every element. Best case is O(1) if we find it immediately."
+
+### Common Interview Questions
+
+**Q: "Can you optimize this?"**
+- Analyze current complexity
+- Identify bottlenecks (nested loops? redundant operations?)
+- Suggest data structure changes (array → set/map)
+- Explain new complexity
+
+**Q: "What's the time complexity?"**
+- Count loops (nested = multiply)
+- Identify recursive patterns
+- Don't forget hidden complexity (array methods!)
+- State final answer with explanation
+
+**Q: "Why is this approach better?"**
+- Compare complexities
+- Show scalability (1000 vs 10000 items)
+- Discuss real-world impact
+- Mention trade-offs (time vs space)
+
+---
+
+## What You've Mastered
+
+**In this tutorial, you learned**:
+✅ What Big O notation means and why it matters
+✅ The essential complexity classes: O(1), O(log n), O(n), O(n log n), O(n²), O(2ⁿ)
+✅ How to analyze code to determine time complexity
+✅ Space complexity and time-space trade-offs
+✅ How to optimize slow algorithms
+✅ How to discuss complexity in interviews like a pro
+
+**You can now**:
+- Look at any code and determine its complexity
+- Identify performance bottlenecks
+- Choose optimal data structures
+- Ace the complexity analysis part of coding interviews
+- Write more efficient code from the start
+
+---
+
+## Level Up Your Algorithm Skills
+
+**Ready to apply complexity analysis to real problems?**
+
+Our **Premium DSA Course** includes:
+
+🎯 **50+ Complexity Analysis Problems**:
+- Analyze complex recursive algorithms
+- Optimize real production code
+- Master amortized analysis
+- Advanced space-time trade-offs
+
+🎯 **Algorithm Optimization Workshop**:
+- Transform O(n²) to O(n) systematically
+- When to use dynamic programming
+- Cache-aware algorithms
+- Parallel algorithm complexity
+
+🎯 **Interview Preparation**:
+- 100 FAANG complexity questions with video solutions
+- Live mock interviews
+- Complexity analysis cheat sheet
+- System design complexity considerations
+
+🎯 **Real-World Projects**:
+- Build a performance profiler
+- Optimize slow database queries
+- Create algorithm visualizer
+- Benchmark testing framework
+
+<UpgradeCTA
+  features={[
+    "50+ Complexity Analysis Problems with step-by-step solutions",
+    "Algorithm Optimization Workshop: Transform O(n²) to O(n)",
+    "100 FAANG complexity questions with video walkthroughs",
+    "Live mock interviews with experienced engineers",
+    "Downloadable complexity analysis cheat sheet (PDF)",
+    "Real-world projects: Build a performance profiler & algorithm visualizer"
+  ]}
+  requiredPlan="VIBED"
+/>
+
+---
+
+## Continue Learning (Free)
+
+**Next Tutorial**: [Two-Pointer Technique](/tutorials/category/data-structures/05-two-pointer-technique)
+
+**Previous Tutorials**:
+- [What Are Algorithms?](/tutorials/category/data-structures/00-what-are-algorithms)
+- [Introduction to Arrays](/tutorials/category/data-structures/01-introduction-to-arrays)
+- [Why Sorting Matters](/tutorials/category/data-structures/02-why-sorting-matters)
+- [Simple Sorting Algorithms](/tutorials/category/data-structures/03-simple-sorting-algorithms) - Start here if you haven't yet!
+
+**Coming Soon**:
+- Hash Tables and Sets
+- Recursion and Backtracking
+
+**Practice More**:
+- [Big O Cheat Sheet (Premium)](/resources/big-o-cheat-sheet)
+- [LeetCode Complexity Questions](https://leetcode.com/tag/complexity-analysis/)
+- [Interactive Complexity Visualizer](/tools/complexity-visualizer)
+
+---
+
+## Resources
+
+**For Subscribers** 🎁:
+- 📹 Video walkthrough of this tutorial (45 min)
+- 📊 Downloadable Big O complexity cheat sheet (PDF)
+- 💻 Performance Analyzer source code with tests
+- 🎯 50 additional complexity analysis problems
+- 💬 Community support and code reviews
+
+**Free Resources**:
+- [Big O Notation - Wikipedia](https://en.wikipedia.org/wiki/Big_O_notation)
+- [Time Complexity Guide - Interview Cake](https://www.interviewcake.com/article/python/big-o-notation-time-and-space-complexity)
+- [JavaScript Performance Tips - MDN](https://developer.mozilla.org/en-US/docs/Web/Performance)
+
+---
+
+*Was this tutorial helpful? Share it with someone preparing for coding interviews!*
+
+**Questions or feedback?** Drop a comment below or [join our Discord community](/community).
+
+---
+
+**💡 Pro Tip**: Before writing any code in an interview, analyze the expected complexity. It shows you're thinking about efficiency from the start!

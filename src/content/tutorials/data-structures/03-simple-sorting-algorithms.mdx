@@ -1,0 +1,623 @@
+---
+title: "Simple Sorting Algorithms: Bubble Sort & Selection Sort"
+description: "Learn how sorting algorithms work by implementing Bubble Sort and Selection Sort. Watch them in action with interactive visualizations and understand which algorithm is more efficient."
+publishedAt: "2025-10-10"
+category: "data-structures"
+tier: "FREE"
+prerequisites:
+  - "Introduction to Arrays"
+  - "Why Sorting Matters"
+readingTime: 25
+learningObjectives:
+  - "Understand how Bubble Sort works step-by-step"
+  - "Implement Selection Sort from scratch"
+  - "Compare two different sorting approaches"
+  - "Count algorithm steps to measure efficiency"
+  - "Choose the right algorithm for your data"
+---
+
+import { BubbleSortVisualizer } from "@/components/visualizer/examples/BubbleSortVisualizer";
+import { SelectionSortVisualizer } from "@/components/visualizer/examples/SelectionSortVisualizer";
+import { SortingComparisonVisualizer } from "@/components/visualizer/examples/SortingComparisonVisualizer";
+import { ComparisonTable } from "@/components/tutorial/ComparisonTable";
+import { InteractiveCodeBlock } from "@/components/tutorial/InteractiveCodeBlock";
+
+# Simple Sorting Algorithms: Watch Sorting Come to Life
+
+**By the end of this tutorial**, you'll understand how sorting algorithms work at a fundamental level. More importantly, you'll be able to implement them yourself and explain why one algorithm might be better than another.
+
+Remember from our last tutorial—**sorting makes search 700x faster**. But HOW does sorting actually work? Let's find out!
+
+---
+
+## The Quick Win: Bubble Sort in 5 Minutes
+
+Let's start by watching Bubble Sort in action. Click **Play** below:
+
+<BubbleSortVisualizer mood="CHILL" />
+
+### What Just Happened?
+
+Bubble Sort works like this:
+
+1. **Compare** two adjacent elements
+2. **Swap** them if they're in the wrong order
+3. **Repeat** until no more swaps are needed
+
+Think of it like bubbles rising to the surface—larger values "bubble up" to the end of the array!
+
+<InteractiveCodeBlock
+  initialCode={`// Bubble Sort - The Simplest Sorting Algorithm
+function bubbleSort(arr) {
+  const n = arr.length;
+
+  // Keep going until no swaps happen
+  for (let i = 0; i < n - 1; i++) {
+    // Compare adjacent elements
+    for (let j = 0; j < n - i - 1; j++) {
+      // If left is bigger than right, swap them
+      if (arr[j] > arr[j + 1]) {
+        // Swap using destructuring
+        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+      }
+    }
+  }
+
+  return arr;
+}
+
+// Try it!
+const numbers = [64, 34, 25, 12, 22, 11, 90];
+console.log("Before:", numbers);
+bubbleSort(numbers);
+console.log("After:", numbers);
+// Output: [11, 12, 22, 25, 34, 64, 90]`}
+  language="javascript"
+  title="Bubble Sort Implementation"
+/>
+
+**🎉 Quick Win Achieved!** You now understand your first sorting algorithm!
+
+---
+
+## Understanding Bubble Sort: The Details
+
+### The Algorithm Explained
+
+Bubble Sort makes **multiple passes** through the array. On each pass:
+
+1. **Start at the beginning** of the array
+2. **Compare each pair** of adjacent elements
+3. **Swap if needed** (if left > right)
+4. **After each pass**, the largest unsorted element "bubbles" to its correct position
+
+### Visual Breakdown
+
+```
+Pass 1: [64, 34, 25, 12, 22, 11, 90]
+        Compare 64 & 34 → Swap → [34, 64, 25, 12, 22, 11, 90]
+        Compare 64 & 25 → Swap → [34, 25, 64, 12, 22, 11, 90]
+        Compare 64 & 12 → Swap → [34, 25, 12, 64, 22, 11, 90]
+        Compare 64 & 22 → Swap → [34, 25, 12, 22, 64, 11, 90]
+        Compare 64 & 11 → Swap → [34, 25, 12, 22, 11, 64, 90]
+        Compare 64 & 90 → No swap → [34, 25, 12, 22, 11, 64, 90]
+        ✅ 90 is now in its final position!
+
+Pass 2: [34, 25, 12, 22, 11, 64, 90]
+        (Repeat for remaining elements)
+        ✅ 64 is now in its final position!
+
+... continues until sorted ...
+```
+
+### Counting the Steps
+
+Here's where it gets interesting. Let's count what Bubble Sort does:
+
+<ComparisonTable
+  headers={["Array Size", "Comparisons", "Swaps (Worst Case)", "Total Operations"]}
+  rows={[
+    { label: "5 elements", values: ["10", "10", "20"] },
+    { label: "10 elements", values: ["45", "45", "90"] },
+    { label: "20 elements", values: ["190", "190", "380"] },
+    { label: "100 elements", values: ["4,950", "4,950", "9,900"] },
+  ]}
+  caption="Bubble Sort grows quadratically - notice how operations explode as size increases!"
+/>
+
+**Key Insight**: As the array gets bigger, Bubble Sort does MANY more operations. This is important—we'll come back to this!
+
+### When to Use Bubble Sort
+
+✅ **Good for:**
+- **Small datasets** (less than 10-20 elements)
+- **Nearly sorted data** (can optimize with early exit)
+- **Educational purposes** (easy to understand and explain)
+- **Simple implementations** (minimal code required)
+
+❌ **Bad for:**
+- **Large datasets** (too many operations)
+- **Performance-critical applications**
+- **Production systems** (better alternatives exist)
+
+---
+
+## Selection Sort: A Different Approach
+
+Now let's learn a different way to sort. Watch Selection Sort in action:
+
+<SelectionSortVisualizer mood="CHILL" />
+
+### How Selection Sort Works
+
+Selection Sort uses a completely different strategy:
+
+1. **Find the minimum** element in the unsorted portion
+2. **Swap it** with the first unsorted element
+3. **Move the boundary** between sorted and unsorted portions
+4. **Repeat** until everything is sorted
+
+Think of it like **picking cards** to build a sorted hand—you select the smallest card and add it to your sorted pile!
+
+<InteractiveCodeBlock
+  initialCode={`// Selection Sort - Find Minimum and Swap
+function selectionSort(arr) {
+  const n = arr.length;
+
+  // Move the boundary of unsorted portion
+  for (let i = 0; i < n - 1; i++) {
+    // Find the minimum element in unsorted portion
+    let minIndex = i;
+
+    for (let j = i + 1; j < n; j++) {
+      if (arr[j] < arr[minIndex]) {
+        minIndex = j;
+      }
+    }
+
+    // Swap the found minimum with first unsorted element
+    if (minIndex !== i) {
+      [arr[i], arr[minIndex]] = [arr[minIndex], arr[i]];
+    }
+  }
+
+  return arr;
+}
+
+// Try it!
+const numbers = [64, 34, 25, 12, 22, 11, 90];
+console.log("Before:", numbers);
+selectionSort(numbers);
+console.log("After:", numbers);
+// Output: [11, 12, 22, 25, 34, 64, 90]`}
+  language="javascript"
+  title="Selection Sort Implementation"
+/>
+
+### Visual Breakdown
+
+```
+Initial: [64, 34, 25, 12, 22, 11, 90]
+          ↑ sorted boundary
+
+Pass 1:  Find minimum in [64, 34, 25, 12, 22, 11, 90]
+         Minimum is 11 at index 5
+         Swap with position 0
+         Result: [11, 34, 25, 12, 22, 64, 90]
+                ✅↑ sorted boundary moves
+
+Pass 2:  Find minimum in [34, 25, 12, 22, 64, 90]
+         Minimum is 12 at index 3
+         Swap with position 1
+         Result: [11, 12, 25, 34, 22, 64, 90]
+                  ✅✅↑ sorted boundary moves
+
+Pass 3:  Find minimum in [25, 34, 22, 64, 90]
+         Minimum is 22 at index 4
+         Swap with position 2
+         Result: [11, 12, 22, 25, 34, 64, 90]
+                   ✅✅✅↑ sorted boundary moves
+
+... continues until fully sorted ...
+```
+
+### Counting Selection Sort's Steps
+
+<ComparisonTable
+  headers={["Array Size", "Comparisons", "Swaps (Always)", "Total Operations"]}
+  rows={[
+    { label: "5 elements", values: ["10", "4", "14"] },
+    { label: "10 elements", values: ["45", "9", "54"] },
+    { label: "20 elements", values: ["190", "19", "209"] },
+    { label: "100 elements", values: ["4,950", "99", "5,049"] },
+  ]}
+  caption="Selection Sort: Same comparisons as Bubble Sort, but way fewer swaps!"
+/>
+
+**Key Difference**: Selection Sort makes the **same number of comparisons** but **far fewer swaps**!
+
+---
+
+## The Ultimate Showdown: Bubble vs Selection
+
+Let's run both algorithms side-by-side on the same data and see who wins:
+
+<SortingComparisonVisualizer mood="CHILL" />
+
+### Head-to-Head Comparison
+
+<ComparisonTable
+  headers={["Aspect", "Bubble Sort", "Selection Sort"]}
+  rows={[
+    { label: "Strategy", values: ["Swap adjacent elements", "Find minimum and swap"] },
+    { label: "Comparisons", values: ["Many", "Same as Bubble Sort"] },
+    { label: "Swaps", values: ["Many (up to n²)", "Few (exactly n-1)"] },
+    { label: "Best Case", values: ["O(n) if nearly sorted*", "O(n²) always"] },
+    { label: "Worst Case", values: ["O(n²)", "O(n²)"] },
+    { label: "Space Used", values: ["O(1) - in-place", "O(1) - in-place"] },
+    { label: "Stable?", values: ["Yes (preserves order)", "No (may change order)"] },
+    { label: "When to Use", values: ["Small, nearly sorted data", "Minimize swaps (e.g., Flash memory)"] },
+  ]}
+  caption="Both are O(n²) algorithms, but with different trade-offs"
+/>
+
+### The Winner? It Depends!
+
+**Selection Sort wins when:**
+- Swaps are expensive (e.g., writing to Flash memory, moving large objects)
+- You want predictable performance (always same comparisons)
+
+**Bubble Sort wins when:**
+- Data is nearly sorted (can exit early with optimization)
+- Stability matters (maintaining original order of equal elements)
+
+**Both lose when:**
+- You have large datasets (thousands of elements)
+- Performance is critical (both are too slow)
+
+> **🔮 Sneak Peek**: There are MUCH faster sorting algorithms (Merge Sort, Quick Sort) that we'll explore later. But understanding these simple ones first is crucial!
+
+---
+
+## Real-World Example: Sorting Game Leaderboard
+
+Let's build something practical. Imagine you're building a game leaderboard with scores:
+
+<InteractiveCodeBlock
+  initialCode={`class GameLeaderboard {
+  constructor() {
+    this.players = [];
+  }
+
+  addScore(playerName, score) {
+    this.players.push({ name: playerName, score });
+  }
+
+  // Use Selection Sort - we need top 10, swaps are expensive
+  getTopPlayers(count = 10) {
+    // Only sort what we need!
+    const sorted = [...this.players];
+    const n = Math.min(count, sorted.length);
+
+    for (let i = 0; i < n; i++) {
+      let maxIndex = i;
+
+      // Find highest score in remaining
+      for (let j = i + 1; j < sorted.length; j++) {
+        if (sorted[j].score > sorted[maxIndex].score) {
+          maxIndex = j;
+        }
+      }
+
+      // Swap if needed
+      if (maxIndex !== i) {
+        [sorted[i], sorted[maxIndex]] = [sorted[maxIndex], sorted[i]];
+      }
+    }
+
+    return sorted.slice(0, count);
+  }
+}
+
+// Usage
+const leaderboard = new GameLeaderboard();
+leaderboard.addScore("Alice", 1250);
+leaderboard.addScore("Bob", 980);
+leaderboard.addScore("Charlie", 1450);
+leaderboard.addScore("Diana", 1100);
+leaderboard.addScore("Eve", 2000);
+
+const topPlayers = leaderboard.getTopPlayers(3);
+console.log(topPlayers);
+/*
+Output:
+[
+  { name: "Eve", score: 2000 },
+  { name: "Charlie", score: 1450 },
+  { name: "Alice", score: 1250 }
+]
+*/`}
+  language="javascript"
+  title="Game Leaderboard with Selection Sort"
+/>
+
+**Why Selection Sort here?**
+- We only need top 10, not all sorted (partial sort optimization)
+- Fewer swaps = better performance for small N
+- Simple implementation = fewer bugs
+
+---
+
+## Common Mistakes & How to Avoid Them
+
+### Mistake 1: Off-by-One Errors
+
+```javascript
+// ❌ WRONG - will access arr[n] which is undefined
+for (let i = 0; i < n; i++) {
+  if (arr[i] > arr[i + 1]) { // i+1 can be n!
+    // ...
+  }
+}
+
+// ✅ CORRECT - stops before accessing out of bounds
+for (let i = 0; i < n - 1; i++) {
+  if (arr[i] > arr[i + 1]) {
+    // ...
+  }
+}
+```
+
+### Mistake 2: Forgetting to Return/Modify
+
+```javascript
+// ❌ WRONG - doesn't modify original or return
+function bubbleSort(arr) {
+  // ... sorting logic ...
+  // Oops! Forgot to return!
+}
+
+// ✅ CORRECT - explicitly return
+function bubbleSort(arr) {
+  // ... sorting logic ...
+  return arr;
+}
+```
+
+### Mistake 3: Not Handling Edge Cases
+
+```javascript
+// ❌ WRONG - crashes on empty or single element
+function selectionSort(arr) {
+  for (let i = 0; i < arr.length - 1; i++) {
+    // ...
+  }
+  return arr;
+}
+
+// ✅ CORRECT - early exit for edge cases
+function selectionSort(arr) {
+  if (arr.length <= 1) return arr; // Already sorted!
+
+  for (let i = 0; i < arr.length - 1; i++) {
+    // ...
+  }
+  return arr;
+}
+```
+
+---
+
+## Practice Challenges
+
+### Challenge 1: Optimized Bubble Sort
+
+Bubble Sort can be optimized to detect when the array is already sorted:
+
+```javascript
+function optimizedBubbleSort(arr) {
+  // TODO: Add a flag that tracks if any swaps happened
+  // If no swaps happened in a pass, the array is sorted!
+  // Exit early to save time
+}
+
+// Test cases:
+optimizedBubbleSort([1, 2, 3, 4, 5]); // Should only do 1 pass
+optimizedBubbleSort([5, 4, 3, 2, 1]); // Should do full passes
+```
+
+<details>
+<summary>💡 Click to see solution</summary>
+
+```javascript
+function optimizedBubbleSort(arr) {
+  const n = arr.length;
+
+  for (let i = 0; i < n - 1; i++) {
+    let swapped = false; // Track if any swaps happen
+
+    for (let j = 0; j < n - i - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+        swapped = true;
+      }
+    }
+
+    // If no swaps happened, array is sorted!
+    if (!swapped) {
+      console.log(`Array sorted after ${i + 1} passes!`);
+      break;
+    }
+  }
+
+  return arr;
+}
+
+// For [1,2,3,4,5], exits after just 1 pass!
+// For [5,4,3,2,1], does all passes
+```
+
+**Key Insight**: This optimization makes Bubble Sort efficient for nearly-sorted data!
+
+</details>
+
+### Challenge 2: Reverse Selection Sort
+
+Modify Selection Sort to sort in **descending order** (largest to smallest):
+
+```javascript
+function reverseSelectionSort(arr) {
+  // TODO: Find MAXIMUM instead of minimum
+  // Result should be [90, 64, 34, 25, 22, 12, 11]
+}
+
+// Test:
+reverseSelectionSort([64, 34, 25, 12, 22, 11, 90]);
+```
+
+<details>
+<summary>💡 Click to see solution</summary>
+
+```javascript
+function reverseSelectionSort(arr) {
+  const n = arr.length;
+
+  for (let i = 0; i < n - 1; i++) {
+    let maxIndex = i; // Find MAX instead of MIN
+
+    for (let j = i + 1; j < n; j++) {
+      // Change < to > for descending order
+      if (arr[j] > arr[maxIndex]) {
+        maxIndex = j;
+      }
+    }
+
+    if (maxIndex !== i) {
+      [arr[i], arr[maxIndex]] = [arr[maxIndex], arr[i]];
+    }
+  }
+
+  return arr;
+}
+
+// Output: [90, 64, 34, 25, 22, 12, 11]
+```
+
+**Just one character change** (`<` to `>`) reverses the sort!
+
+</details>
+
+### Challenge 3: Count Operations
+
+Modify Bubble Sort to count and return how many comparisons and swaps it made:
+
+```javascript
+function countingBubbleSort(arr) {
+  // TODO: Return an object like:
+  // { sorted: [...], comparisons: 21, swaps: 15 }
+}
+```
+
+<details>
+<summary>💡 Click to see solution</summary>
+
+```javascript
+function countingBubbleSort(arr) {
+  const n = arr.length;
+  let comparisons = 0;
+  let swaps = 0;
+
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = 0; j < n - i - 1; j++) {
+      comparisons++; // Every comparison counts
+
+      if (arr[j] > arr[j + 1]) {
+        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+        swaps++; // Count swaps
+      }
+    }
+  }
+
+  return {
+    sorted: arr,
+    comparisons,
+    swaps
+  };
+}
+
+// Try it:
+const result = countingBubbleSort([64, 34, 25, 12, 22, 11, 90]);
+console.log(result);
+// { sorted: [...], comparisons: 21, swaps: 15 }
+```
+
+**This counting is the foundation of complexity analysis!** 🚀
+
+</details>
+
+---
+
+## Key Takeaways
+
+✅ **Bubble Sort**: Repeatedly swaps adjacent elements until sorted
+- Simple to understand and implement
+- Many swaps, can be optimized for nearly-sorted data
+- Good for small datasets or teaching
+
+✅ **Selection Sort**: Finds minimum and swaps it to the front
+- Fewer swaps than Bubble Sort
+- Predictable performance
+- Good when swaps are expensive
+
+✅ **Counting Steps**: Both algorithms do roughly n² operations
+- 10 elements = ~100 operations
+- 100 elements = ~10,000 operations
+- 1000 elements = ~1,000,000 operations (too slow!)
+
+✅ **Trade-offs**: Different algorithms have different strengths
+- Choose based on your specific needs
+- No "one size fits all" solution
+
+---
+
+## What's Next?
+
+You've now learned **how sorting algorithms work** and **how to count their steps**. But there's a question we haven't answered yet:
+
+> **Is there a mathematical way to describe how fast an algorithm is?**
+
+The answer is **YES**—and it's called **Big O Notation**!
+
+In the next tutorial, you'll learn:
+- How to analyze algorithm efficiency mathematically
+- What O(n²), O(n log n), and O(n) mean
+- Why some algorithms are 1000x faster than others
+- How to choose the best algorithm for your needs
+
+**Next Tutorial**: [Time Complexity & Big O](/tutorials/category/data-structures/04-time-complexity-big-o)
+
+**Related Topics**:
+- [What Are Algorithms?](/tutorials/category/data-structures/00-what-are-algorithms)
+- [Introduction to Arrays](/tutorials/category/data-structures/01-introduction-to-arrays)
+- [Why Sorting Matters](/tutorials/category/data-structures/02-why-sorting-matters)
+
+---
+
+## Summary
+
+You've learned two fundamental sorting algorithms and how to compare them:
+
+<ComparisonTable
+  caption="Quick Reference Summary"
+  headers={['Concept', 'Key Point']}
+  rows={[
+    { label: 'Bubble Sort', values: ['Swap adjacent elements, many swaps'] },
+    { label: 'Selection Sort', values: ['Find minimum, fewer swaps'] },
+    { label: 'Efficiency', values: ['Both do ~n² operations'] },
+    { label: 'Counting Steps', values: ['Foundation for complexity analysis'] },
+    { label: 'Trade-offs', values: ['Different algorithms for different needs'] },
+  ]}
+  variant="compact"
+/>
+
+**🎉 Congratulations!** You can now implement sorting algorithms from scratch and understand their performance characteristics. You're ready for complexity analysis!

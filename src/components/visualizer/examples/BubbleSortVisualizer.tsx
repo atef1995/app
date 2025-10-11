@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { AlgorithmVisualizer } from "../AlgorithmVisualizer";
 import { generateBubbleSortSteps } from "../utils/algorithmSteps";
 import { VisualizerConfig, Mood } from "../types/visualizer.types";
@@ -27,19 +27,22 @@ export function BubbleSortVisualizer({
   height = 500,
   className,
 }: BubbleSortVisualizerProps) {
-  // Generate steps for the algorithm
-  const steps = generateBubbleSortSteps(initialArray);
+  // Memoize steps generation to prevent infinite re-renders
+  const steps = useMemo(() => generateBubbleSortSteps(initialArray), [initialArray]);
 
-  // Configuration
-  const config: VisualizerConfig = {
-    type: "array",
-    algorithm: "Bubble Sort",
-    initialData: initialArray,
-    showCode: false,
-    showComplexity: true,
-    interactive: false,
-    height,
-  };
+  // Memoize config to prevent recreating on every render
+  const config: VisualizerConfig = useMemo(
+    () => ({
+      type: "array" as const,
+      algorithm: "Bubble Sort",
+      initialData: initialArray,
+      showCode: false,
+      showComplexity: true,
+      interactive: false,
+      height,
+    }),
+    [initialArray, height]
+  );
 
   return (
     <div className={className}>

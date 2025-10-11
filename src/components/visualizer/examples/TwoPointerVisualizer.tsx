@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { AlgorithmVisualizer } from "../AlgorithmVisualizer";
 import { generateTwoPointerSteps } from "../utils/algorithmSteps";
 import { VisualizerConfig, Mood } from "../types/visualizer.types";
@@ -37,19 +37,22 @@ export function TwoPointerVisualizer({
   const [targetSum, setTargetSum] = useState(target);
   const [key, setKey] = useState(0); // Force re-render
 
-  // Generate steps for the algorithm
-  const steps = generateTwoPointerSteps(array, targetSum);
+  // Memoize steps generation to prevent infinite re-renders
+  const steps = useMemo(() => generateTwoPointerSteps(array, targetSum), [array, targetSum]);
 
-  // Configuration
-  const config: VisualizerConfig = {
-    type: "array",
-    algorithm: "Two Pointer Technique",
-    initialData: array,
-    showCode: false,
-    showComplexity: true,
-    interactive,
-    height,
-  };
+  // Memoize config to prevent recreating on every render
+  const config: VisualizerConfig = useMemo(
+    () => ({
+      type: "array" as const,
+      algorithm: "Two Pointer Technique",
+      initialData: array,
+      showCode: false,
+      showComplexity: true,
+      interactive,
+      height,
+    }),
+    [array, interactive, height]
+  );
 
   const handleUpdateArray = (newArray: string) => {
     try {

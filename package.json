@@ -15,7 +15,6 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "db:migrate": "npx prisma migrate deploy",
-    "db:seed": "npx tsx prisma/seed.ts",
     "db:seed:css": "npx tsx prisma/seedCssTutorials.ts",
     "db:seed:html": "npx tsx prisma/seedHtmlTutorials.ts",
     "db:seed:dsa": "npx tsx prisma/seedDsaTutorials.ts",
@@ -67,6 +66,7 @@
     "react-dom": "19.1.0",
     "react-email": "^4.2.8",
     "react-syntax-highlighter": "^15.6.1",
+    "recharts": "^3.2.1",
     "stripe": "^18.3.0"
   },
   "devDependencies": {
