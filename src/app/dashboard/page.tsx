@@ -5,7 +5,7 @@ import { MoodSelector } from "@/components/MoodSelector";
 import { useProgressStats } from "@/hooks/useProgress";
 import { ProgressStats } from "@/components/ProgressComponents";
 import { AnonymousDashboard } from "@/components/AnonymousDashboard";
-import { BookOpen, Code, Brain, Hand, Building, ToolCase } from "lucide-react";
+import { BookOpen, Code, Brain, Hand, Building, ToolCase, GitPullRequest } from "lucide-react";
 import Link from "next/link";
 
 interface ProgressStats {
@@ -78,7 +78,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Learning Paths */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           <Link
             href="/tutorials"
             className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-blue-200 dark:hover:border-blue-400 dark:shadow-xl"
@@ -151,7 +151,27 @@ export default function DashboardPage() {
             </div>
           </Link>
         </div>
-        <div className="flex flex-col mt-5">
+
+        {/* Additional Features */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <Link
+            href="/contributions"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-cyan-200 dark:hover:border-cyan-400 dark:shadow-xl"
+          >
+            <div className="mb-4 flex justify-center">
+              <GitPullRequest className="h-8 w-8 text-cyan-600 dark:text-cyan-400" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              Contributions
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Contribute to real projects, earn XP, and build your portfolio
+            </p>
+            <div className="text-sm text-cyan-600 dark:text-cyan-400 font-semibold">
+              Start Contributing →
+            </div>
+          </Link>
+
           <Link
             href="/tools/complexity-visualizer"
             className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-red-200 dark:hover:border-red-400 dark:shadow-xl"

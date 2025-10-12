@@ -1,0 +1,242 @@
+# Getting Started: Project Setup and Contribution Guide
+
+Welcome to the Portfolio Template project! Before diving into feature implementations, please read this guide carefully. It will walk you through the process of setting up your development environment and understanding our contribution workflow.
+
+## Prerequisites
+- Git installed on your machine
+- GitHub account
+- Node.js (LTS version) installed
+- Basic understanding of Git and GitHub
+- Code editor (VS Code recommended)
+
+## Initial Repository Setup
+
+### 1. Fork the Repository
+
+1. Navigate to the main project repository:
+   ```
+   https://github.com/atef1995/portfolio-template
+   ```
+
+2. Click the "Fork" button in the top right corner
+   - This creates your own copy of the repository
+   - All your work will be done in this fork
+
+### 2. Clone Your Fork
+
+1. Clone your forked repository:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/portfolio-template.git
+   cd portfolio-template
+   ```
+
+2. Set up the upstream remote to keep your fork updated:
+   ```bash
+   git remote add upstream https://github.com/atef1995/portfolio-template.git
+   ```
+
+### 3. Project Dependencies
+
+1. Install project dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Set up environment variables:
+   - Copy `.env.example` to `.env.local`
+   - Fill in required values (see documentation)
+
+## Development Workflow
+
+### 1. Keeping Your Fork Updated
+
+Before starting any new feature:
+
+1. Switch to main branch:
+   ```bash
+   git checkout main
+   ```
+
+2. Get latest changes:
+   ```bash
+   git pull upstream main
+   ```
+
+3. Update your fork:
+   ```bash
+   git push origin main
+   ```
+
+### 2. Feature Branch Workflow
+
+For each feature you work on:
+
+1. Create a new branch:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+   
+   Branch naming conventions:
+   - `feature/` - for new features
+   - `fix/` - for bug fixes
+   - `docs/` - for documentation
+   - `refactor/` - for code refactoring
+
+2. Make your changes:
+   - Work on your feature
+   - Follow coding standards
+   - Write tests if required
+
+3. Commit your changes:
+   ```bash
+   git add .
+   git commit -m "feat: describe your changes"
+   ```
+
+   Commit message conventions:
+   - `feat:` - new feature
+   - `fix:` - bug fix
+   - `docs:` - documentation changes
+   - `refactor:` - code refactoring
+   - `test:` - adding tests
+   - `chore:` - maintenance tasks
+
+4. Keep your branch updated:
+   ```bash
+   git pull upstream main
+   git rebase main  # resolve any conflicts
+   ```
+
+### 3. Submitting Pull Requests
+
+1. Push your changes:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+2. Create Pull Request:
+   - Go to your fork on GitHub
+   - Click "Pull Request"
+   - Base repository: `atef1995/portfolio-template`
+   - Base: `main`
+   - Compare: `feature/your-feature-name`
+
+3. Fill out PR template:
+   ```markdown
+   ## Description
+   [Describe your changes]
+
+   ## Feature Checklist
+   - [ ] Feature implementation
+   - [ ] Tests added/updated
+   - [ ] Documentation updated
+   - [ ] Code follows style guide
+   - [ ] All checks passing
+
+   ## Testing Steps
+   1. [How to test your changes]
+   2. [Expected results]
+
+   ## Screenshots
+   [If applicable]
+   ```
+
+### 4. PR Review Process
+
+1. Automated Checks:
+   - Wait for CI/CD pipelines to complete
+   - Fix any failing checks
+
+2. Code Review:
+   - Maintainers will review your code
+   - Address feedback promptly
+   - Make requested changes
+   - Update your branch:
+     ```bash
+     git add .
+     git commit -m "fix: address PR feedback"
+     git push origin feature/your-feature-name
+     ```
+
+3. Merge:
+   - Once approved, maintainers will merge
+   - Delete your feature branch
+   - Pull latest main to start next feature
+
+## Best Practices
+
+### Code Quality
+- Follow the project's coding style
+- Write meaningful commit messages
+- Keep commits focused and atomic
+- Add comments for complex logic
+- Update documentation as needed
+
+### Testing
+- Test your changes thoroughly
+- Add unit tests where applicable
+- Test edge cases
+- Verify in different browsers
+
+### Communication
+- Ask questions in PR comments
+- Join project discussions
+- Help review other PRs
+- Report issues properly
+
+## Common Issues
+
+1. Merge Conflicts
+   ```bash
+   git pull upstream main
+   git rebase main
+   # Fix conflicts in editor
+   git add .
+   git rebase --continue
+   git push origin feature/your-feature-name -f
+   ```
+
+2. Undoing Last Commit
+   ```bash
+   git reset HEAD~1  # soft reset
+   # or
+   git reset --hard HEAD~1  # hard reset
+   ```
+
+3. Squashing Commits
+   ```bash
+   git rebase -i HEAD~N  # N is number of commits
+   # Change 'pick' to 'squash' in editor
+   ```
+
+## Need Help?
+
+- Check existing issues
+- Ask in discussions
+- Join our Discord channel
+- Contact maintainers
+
+## Next Steps
+
+Once you're set up:
+1. Browse available features to implement
+2. Pick a feature to work on
+3. Follow feature-specific tutorial
+4. Create your implementation
+5. Submit your PR
+
+Remember: Quality over speed! Take time to understand requirements and create solid implementations.
+
+## Resources
+
+1. Git & GitHub:
+   - [Pro Git Book](https://git-scm.com/book/en/v2)
+   - [GitHub Flow](https://guides.github.com/introduction/flow/)
+   - [GitHub Pull Request Guide](https://docs.github.com/en/github/collaborating-with-pull-requests)
+
+2. Development:
+   - [Next.js Documentation](https://nextjs.org/docs)
+   - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+   - [React Documentation](https://reactjs.org/docs/getting-started.html)
+
+Welcome aboard! We're excited to see your contributions to the project.

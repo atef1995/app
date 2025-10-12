@@ -312,6 +312,7 @@ import { UpgradeCTA } from '@/components/tutorial/UpgradeCTA';
 />
 ```
 
+
 **Props:**
 - `features` - Array of premium features to display
 - `requiredPlan` - Minimum plan required ("VIBED" | "CRACKED")
@@ -321,6 +322,11 @@ import { UpgradeCTA } from '@/components/tutorial/UpgradeCTA';
 - Anonymous users: Shows sign-up CTA
 - FREE users: Shows upgrade/trial CTA
 - VIBED/CRACKED users: Shows access confirmation
+
+### Tutorial recommendations
+- Dynamic recommendations
+<TutorialRecommendations />
+
 
 ### Quiz Components
 

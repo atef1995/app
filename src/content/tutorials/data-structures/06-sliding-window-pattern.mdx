@@ -1,0 +1,940 @@
+---
+title: "Master the Sliding Window Pattern: Transform O(n²) to O(n)"
+description: "Learn the sliding window technique to solve substring and subarray problems efficiently. Transform nested loops into elegant single-pass solutions that interviewers love."
+category: "data-structures"
+difficulty: 4
+estimatedTime: "35 minutes"
+prerequisites: ["Introduction to Arrays", "Two-Pointer Technique", "Time Complexity & Big O"]
+learningObjectives:
+  - "Identify when the sliding window pattern applies to array and string problems"
+  - "Implement fixed-size and variable-size sliding window solutions"
+  - "Optimize O(n²) brute-force solutions to O(n) using sliding windows"
+  - "Solve maximum/minimum subarray and substring problems efficiently"
+topics: ["arrays", "strings", "sliding-window", "optimization", "interview-prep", "two-pointer"]
+interviewRelevance: "High"
+realWorldApplications: ["Rate limiting", "Moving averages", "Network packet analysis", "Stream processing"]
+requiredPlan: "VIBED"
+---
+
+import { ComparisonTable } from '@/components/tutorial/ComparisonTable';
+import { UpgradeCTA } from '@/components/tutorial/UpgradeCTA';
+import { TutorialRecommendations } from '@/components/tutorial/TutorialRecommendations';
+import { SlidingWindowVisualizer } from '@/components/visualizer/examples/SlidingWindowVisualizer';
+
+# Master the Sliding Window Pattern: Transform O(n²) to O(n)
+
+> **Transform in 35 minutes:**
+> - From O(n²) nested loops → O(n) single-pass sliding window solutions
+> - From checking every subarray → intelligently "sliding" through valid ranges
+> - From brute-force substring searches → elegant window-based algorithms
+
+## The Pattern That Changes Everything
+
+You're in a coding interview. The problem: *"Find the maximum sum of any contiguous subarray of size k."*
+
+Your first instinct? Two nested loops—check every k-element window. It works, but the interviewer asks: *"Can you do better than O(n·k)?"*
+
+**Here's where most candidates stumble.** They don't realize there's a pattern that eliminates the inner loop entirely.
+
+**The sliding window technique** is one of the most powerful optimization patterns in computer science. It's used by:
+- **Netflix**: Analyzing streaming data in real-time
+- **Trading systems**: Calculating moving averages
+- **Network routers**: Rate limiting and packet analysis
+- **Search engines**: Finding patterns in text streams
+
+Here's the good news: **In the next 10 minutes, you'll solve a problem** that would take 100 lines of nested loops in just 10 lines with a sliding window. Then we'll master both fixed and variable-size windows for any interview scenario.
+
+---
+
+## Your First Sliding Window in 5 Minutes
+
+Let's solve a real problem RIGHT NOW:
+
+**Challenge**: Given an array of integers, find the maximum sum of any contiguous subarray of size `k`.
+
+### The Slow Way (Don't Do This!)
+
+```javascript
+// ❌ Brute Force: O(n·k) - Check every window from scratch
+function maxSumBruteForce(arr, k) {
+  let maxSum = -Infinity;
+
+  // For each possible starting position
+  for (let i = 0; i <= arr.length - k; i++) {
+    let windowSum = 0;
+
+    // Sum k elements starting at position i
+    for (let j = 0; j < k; j++) {
+      windowSum += arr[i + j];
+    }
+
+    maxSum = Math.max(maxSum, windowSum);
+  }
+
+  return maxSum;
+}
+
+// Example: [2, 1, 5, 1, 3, 2], k = 3
+// Check [2,1,5]=8, [1,5,1]=7, [5,1,3]=9, [1,3,2]=6
+// Result: 9
+
+// Time: O(n·k) - For n=10000, k=1000 → 10 million operations!
+```
+
+### The Fast Way: Sliding Window ✨
+
+```javascript
+// ✅ Sliding Window: O(n) - Reuse computation!
+function maxSumSlidingWindow(arr, k) {
+  if (arr.length < k) return null;
+
+  // Step 1: Calculate sum of first window
+  let windowSum = 0;
+  for (let i = 0; i < k; i++) {
+    windowSum += arr[i];
+  }
+
+  let maxSum = windowSum;
+
+  // Step 2: Slide the window one element at a time
+  for (let i = k; i < arr.length; i++) {
+    // Add new element entering window, remove old element leaving
+    windowSum = windowSum + arr[i] - arr[i - k];
+    maxSum = Math.max(maxSum, windowSum);
+  }
+
+  return maxSum;
+}
+
+// Example: [2, 1, 5, 1, 3, 2], k = 3
+// Initial window [2,1,5]=8
+// Slide: [1,5,1] = 8 + 1 - 2 = 7
+// Slide: [5,1,3] = 7 + 3 - 1 = 9  ← Maximum!
+// Slide: [1,3,2] = 9 + 2 - 5 = 6
+// Result: 9
+
+// Time: O(n) - Only 10,000 operations for n=10000!
+```
+
+**🎉 You just optimized from O(n·k) to O(n)!**
+
+### Watch It in Action
+
+<SlidingWindowVisualizer
+  initialArray={[2, 1, 5, 1, 3, 2]}
+  windowSize={3}
+  interactive={true}
+  mood="CHILL"
+/>
+
+### Why This Works: The Mental Model
+
+Think of sliding window like **looking through a moving picture frame**:
+
+```
+Array: [2, 1, 5, 1, 3, 2]  k=3
+
+Window 1:  [2, 1, 5]  → sum = 8
+           └─────┘
+
+Window 2:     [1, 5, 1]  → Instead of recalculating (1+5+1),
+              └─────┘      we do: 8 - 2 + 1 = 7
+                          (Remove left, add right!)
+
+Window 3:        [5, 1, 3]  → 7 - 1 + 3 = 9
+                 └─────┘
+
+Window 4:           [1, 3, 2]  → 9 - 5 + 2 = 6
+                    └─────┘
+```
+
+**Key insight**: We don't recalculate the entire window each time. We just subtract the element leaving and add the element entering!
+
+<ComparisonTable
+  headers={['Approach', 'Time Complexity', 'Operations (n=10000, k=1000)', 'Speed']}
+  rows={[
+    { label: 'Brute Force', values: ['O(n·k)', '~10,000,000', 'Slow'] },
+    { label: 'Sliding Window', values: ['O(n)', '~10,000', '1000x faster!'], highlighted: true }
+  ]}
+  variant="bordered"
+/>
+
+---
+
+## Understanding Sliding Windows from the Ground Up
+
+### The Two Types of Sliding Windows
+
+There are **two fundamental patterns**, and recognizing which one to use is crucial:
+
+<ComparisonTable
+  headers={['Pattern', 'Window Size', 'When to Use', 'Typical Problems']}
+  rows={[
+    { label: 'Fixed Size', values: ['Constant (given k)', 'Window size is specified in problem', 'Max sum of k elements, Average of k numbers'], highlighted: true },
+    { label: 'Variable Size', values: ['Dynamic (changes)', 'Find optimal window meeting a condition', 'Longest substring without repeating chars'], highlighted: true }
+  ]}
+  variant="bordered"
+/>
+
+### When to Use Sliding Window
+
+**Perfect for sliding window:**
+✅ Array or string problems with **contiguous** subarrays/substrings
+✅ Need to find **max/min/optimal** of all possible windows
+✅ Current brute force uses **nested loops**
+✅ Problem asks about **subarrays of size k** or **longest/shortest substring**
+
+**Not suitable for sliding window:**
+❌ Need **non-contiguous** elements
+❌ Need to find **all subsets** or **combinations**
+❌ Problem requires **sorting** or **tree structure**
+❌ Random access pattern (not sequential)
+
+---
+
+## Pattern 1: Fixed-Size Sliding Window
+
+The window size **stays constant** throughout. We slide it one position at a time.
+
+### Template: Fixed-Size Window
+
+```javascript
+/**
+ * Generic fixed-size sliding window template
+ * Time: O(n), Space: O(1)
+ */
+function fixedWindowTemplate(arr, k) {
+  if (arr.length < k) return null;
+
+  // Step 1: Initialize first window
+  let windowState = initializeWindow(arr, k);
+  let result = computeResult(windowState);
+
+  // Step 2: Slide window through rest of array
+  for (let i = k; i < arr.length; i++) {
+    // Remove element leaving window
+    removeFromWindow(windowState, arr[i - k]);
+
+    // Add element entering window
+    addToWindow(windowState, arr[i]);
+
+    // Update result
+    result = updateResult(result, windowState);
+  }
+
+  return result;
+}
+```
+
+### Example 1: Average of Subarrays of Size K
+
+**Problem**: Given an array, find the average of all contiguous subarrays of size K.
+
+```javascript
+/**
+ * Find averages of all k-sized subarrays
+ * Example: [1, 3, 2, 6, -1, 4, 1, 8, 2], k=5
+ * Output: [2.2, 2.8, 2.4, 3.6, 2.8]
+ */
+function findAverages(arr, k) {
+  const result = [];
+  let windowSum = 0;
+
+  // Build first window
+  for (let i = 0; i < k; i++) {
+    windowSum += arr[i];
+  }
+  result.push(windowSum / k);
+
+  // Slide window
+  for (let i = k; i < arr.length; i++) {
+    windowSum = windowSum + arr[i] - arr[i - k];
+    result.push(windowSum / k);
+  }
+
+  return result;
+}
+
+// Test
+const arr = [1, 3, 2, 6, -1, 4, 1, 8, 2];
+console.log(findAverages(arr, 5));
+// Output: [2.2, 2.8, 2.4, 3.6, 2.8]
+```
+
+**Why it's O(n)**: We touch each element exactly twice—once when it enters the window, once when it leaves.
+
+### Example 2: Maximum of All Subarrays of Size K
+
+**Problem**: Find the maximum value in every contiguous subarray of size K.
+
+```javascript
+/**
+ * Find maximum in each k-sized window
+ * Example: [1, 3, -1, -3, 5, 3, 6, 7], k=3
+ * Output: [3, 3, 5, 5, 6, 7]
+ */
+function maxSlidingWindow(nums, k) {
+  const result = [];
+  const deque = []; // Store indices
+
+  for (let i = 0; i < nums.length; i++) {
+    // Remove indices outside current window
+    if (deque.length && deque[0] <= i - k) {
+      deque.shift();
+    }
+
+    // Remove smaller elements (they'll never be max)
+    while (deque.length && nums[deque[deque.length - 1]] < nums[i]) {
+      deque.pop();
+    }
+
+    deque.push(i);
+
+    // Add to result once we have a full window
+    if (i >= k - 1) {
+      result.push(nums[deque[0]]);
+    }
+  }
+
+  return result;
+}
+
+// Test
+console.log(maxSlidingWindow([1, 3, -1, -3, 5, 3, 6, 7], 3));
+// Output: [3, 3, 5, 5, 6, 7]
+```
+
+**Advanced technique**: Using a deque (double-ended queue) to maintain the maximum in O(1) amortized time per slide.
+
+---
+
+## Pattern 2: Variable-Size Sliding Window
+
+The window size **changes dynamically** to meet a condition. This is trickier but incredibly powerful!
+
+### Template: Variable-Size Window
+
+```javascript
+/**
+ * Generic variable-size sliding window template
+ * Time: O(n), Space: depends on condition tracking
+ */
+function variableWindowTemplate(arr, condition) {
+  let left = 0;
+  let windowState = {};
+  let result = 0; // or -Infinity/Infinity depending on problem
+
+  for (let right = 0; right < arr.length; right++) {
+    // Expand window: add arr[right]
+    addToWindow(windowState, arr[right]);
+
+    // Shrink window while condition is violated
+    while (violatesCondition(windowState, condition)) {
+      removeFromWindow(windowState, arr[left]);
+      left++;
+    }
+
+    // Update result with current valid window
+    result = updateResult(result, right - left + 1);
+  }
+
+  return result;
+}
+```
+
+### Example 3: Longest Substring Without Repeating Characters
+
+**Problem**: Find the length of the longest substring without repeating characters.
+
+```javascript
+/**
+ * Longest substring without repeating chars
+ * Example: "abcabcbb" → "abc" (length 3)
+ * Example: "bbbbb" → "b" (length 1)
+ * Example: "pwwkew" → "wke" (length 3)
+ */
+function lengthOfLongestSubstring(s) {
+  const charSet = new Set();
+  let left = 0;
+  let maxLength = 0;
+
+  for (let right = 0; right < s.length; right++) {
+    // Shrink window until no duplicates
+    while (charSet.has(s[right])) {
+      charSet.delete(s[left]);
+      left++;
+    }
+
+    // Add current character
+    charSet.add(s[right]);
+
+    // Update max length
+    maxLength = Math.max(maxLength, right - left + 1);
+  }
+
+  return maxLength;
+}
+
+// Visualization for "abcabcbb":
+// Step 1: "a" → length 1
+// Step 2: "ab" → length 2
+// Step 3: "abc" → length 3  ← Maximum
+// Step 4: "abca" → duplicate! Shrink: "bca"
+// Step 5: "bcab" → duplicate! Shrink: "cab"
+// ...
+
+console.log(lengthOfLongestSubstring("abcabcbb")); // 3
+console.log(lengthOfLongestSubstring("pwwkew"));   // 3
+```
+
+**Key technique**: Use a Set to track characters in current window. When we find a duplicate, shrink from the left until it's gone.
+
+### Example 4: Minimum Window Substring
+
+**Problem**: Find the smallest substring containing all characters from a target string.
+
+```javascript
+/**
+ * Minimum window substring (LeetCode Hard!)
+ * Example: s = "ADOBECODEBANC", t = "ABC"
+ * Output: "BANC"
+ */
+function minWindow(s, t) {
+  if (s.length < t.length) return "";
+
+  // Count required characters
+  const required = {};
+  for (let char of t) {
+    required[char] = (required[char] || 0) + 1;
+  }
+
+  let left = 0;
+  let minLen = Infinity;
+  let minStart = 0;
+  let formed = 0; // Number of unique chars with correct frequency
+  const windowCounts = {};
+  const requiredChars = Object.keys(required).length;
+
+  for (let right = 0; right < s.length; right++) {
+    // Add character from right
+    const char = s[right];
+    windowCounts[char] = (windowCounts[char] || 0) + 1;
+
+    // Check if frequency matches required
+    if (required[char] && windowCounts[char] === required[char]) {
+      formed++;
+    }
+
+    // Try to shrink window while still valid
+    while (formed === requiredChars && left <= right) {
+      // Update result
+      if (right - left + 1 < minLen) {
+        minLen = right - left + 1;
+        minStart = left;
+      }
+
+      // Remove character from left
+      const leftChar = s[left];
+      windowCounts[leftChar]--;
+      if (required[leftChar] && windowCounts[leftChar] < required[leftChar]) {
+        formed--;
+      }
+      left++;
+    }
+  }
+
+  return minLen === Infinity ? "" : s.substring(minStart, minStart + minLen);
+}
+
+// Test
+console.log(minWindow("ADOBECODEBANC", "ABC")); // "BANC"
+```
+
+**Interview tip**: This is a LeetCode Hard problem! Mastering this pattern makes you interview-ready.
+
+---
+
+## The Five Essential Sliding Window Patterns
+
+### Pattern Summary
+
+<ComparisonTable
+  headers={['Pattern', 'Window Type', 'Key Technique', 'Example Problem']}
+  rows={[
+    { label: '1. Fixed Sum/Average', values: ['Fixed', 'Running sum', 'Max sum of k elements'] },
+    { label: '2. Fixed Max/Min', values: ['Fixed', 'Deque for extremes', 'Max of all k-windows'] },
+    { label: '3. Variable with Set', values: ['Variable', 'Set for uniqueness', 'Longest substring no repeats'], highlighted: true },
+    { label: '4. Variable with Map', values: ['Variable', 'Frequency map', 'Minimum window substring'], highlighted: true },
+    { label: '5. Variable with Counter', values: ['Variable', 'Condition counter', 'Longest subarray sum ≤ k'] }
+  ]}
+  variant="bordered"
+/>
+
+### Pattern 5: Longest Subarray with Sum ≤ K
+
+```javascript
+/**
+ * Find longest subarray with sum ≤ K
+ * Example: [1, 2, 3, 4, 5], K=8 → length 3 ([1,2,3] or [3,4] or [1,2,3])
+ */
+function longestSubarrayWithSumK(nums, k) {
+  let left = 0;
+  let windowSum = 0;
+  let maxLength = 0;
+
+  for (let right = 0; right < nums.length; right++) {
+    windowSum += nums[right];
+
+    // Shrink while sum exceeds K
+    while (windowSum > k) {
+      windowSum -= nums[left];
+      left++;
+    }
+
+    maxLength = Math.max(maxLength, right - left + 1);
+  }
+
+  return maxLength;
+}
+
+console.log(longestSubarrayWithSumK([1, 2, 3, 4, 5], 8)); // 3
+```
+
+---
+
+## Building Something Real: Rate Limiter with Sliding Window
+
+Let's apply sliding windows to a **production problem**: implementing a rate limiter that allows N requests per time window.
+
+### The Problem
+
+You're building an API that should allow:
+- Maximum 100 requests per minute per user
+- If exceeded, reject with 429 (Too Many Requests)
+- Use a sliding window (not fixed 1-minute buckets)
+
+### Why Sliding Window?
+
+Fixed windows have a problem:
+```
+Fixed 1-min windows:
+[Minute 1]        [Minute 2]
+0:00 ─ 1:00      1:00 ─ 2:00
+  99 requests       99 requests
+
+User can make 99 at 0:59 and 99 at 1:00 = 198 in 1 second!
+```
+
+Sliding window solves this:
+```
+Sliding window: Always check last 60 seconds
+At 1:00: Count requests from 0:00.001 to 1:00.000
+At 1:01: Count requests from 0:01.001 to 1:01.000
+```
+
+### Implementation
+
+```javascript
+/**
+ * Production-ready rate limiter using sliding window
+ */
+class SlidingWindowRateLimiter {
+  constructor(maxRequests, windowMs) {
+    this.maxRequests = maxRequests;
+    this.windowMs = windowMs;
+    this.requests = new Map(); // userId -> array of timestamps
+  }
+
+  /**
+   * Check if request is allowed
+   * Time: O(n) where n = requests in window (usually small)
+   * Space: O(u * r) where u = users, r = requests per window
+   */
+  allowRequest(userId) {
+    const now = Date.now();
+    const windowStart = now - this.windowMs;
+
+    // Get user's request history
+    if (!this.requests.has(userId)) {
+      this.requests.set(userId, []);
+    }
+
+    const userRequests = this.requests.get(userId);
+
+    // Remove requests outside current window (sliding the window!)
+    while (userRequests.length > 0 && userRequests[0] < windowStart) {
+      userRequests.shift();
+    }
+
+    // Check if limit exceeded
+    if (userRequests.length >= this.maxRequests) {
+      return {
+        allowed: false,
+        retryAfter: userRequests[0] - windowStart, // ms until oldest request expires
+        requestsInWindow: userRequests.length
+      };
+    }
+
+    // Allow request and record timestamp
+    userRequests.push(now);
+
+    return {
+      allowed: true,
+      requestsInWindow: userRequests.length,
+      remainingRequests: this.maxRequests - userRequests.length
+    };
+  }
+
+  /**
+   * Get current status for user
+   */
+  getStatus(userId) {
+    const now = Date.now();
+    const windowStart = now - this.windowMs;
+
+    if (!this.requests.has(userId)) {
+      return {
+        requestsInWindow: 0,
+        remainingRequests: this.maxRequests
+      };
+    }
+
+    const userRequests = this.requests.get(userId);
+    const requestsInWindow = userRequests.filter(t => t >= windowStart).length;
+
+    return {
+      requestsInWindow,
+      remainingRequests: Math.max(0, this.maxRequests - requestsInWindow)
+    };
+  }
+
+  /**
+   * Cleanup old data (call periodically)
+   */
+  cleanup() {
+    const now = Date.now();
+    const windowStart = now - this.windowMs;
+
+    for (const [userId, timestamps] of this.requests.entries()) {
+      const validTimestamps = timestamps.filter(t => t >= windowStart);
+
+      if (validTimestamps.length === 0) {
+        this.requests.delete(userId);
+      } else {
+        this.requests.set(userId, validTimestamps);
+      }
+    }
+  }
+}
+
+// Example usage
+const limiter = new SlidingWindowRateLimiter(5, 60000); // 5 requests per minute
+
+// Simulate requests
+function makeRequest(userId) {
+  const result = limiter.allowRequest(userId);
+
+  if (result.allowed) {
+    console.log(`✅ Request allowed for ${userId}`);
+    console.log(`   Remaining: ${result.remainingRequests}`);
+    return true;
+  } else {
+    console.log(`❌ Rate limit exceeded for ${userId}`);
+    console.log(`   Retry after: ${result.retryAfter}ms`);
+    return false;
+  }
+}
+
+// Test scenario
+console.log("Making 7 requests rapidly:");
+for (let i = 1; i <= 7; i++) {
+  makeRequest("user123");
+}
+
+// Output:
+// ✅ Request allowed for user123 (Remaining: 4)
+// ✅ Request allowed for user123 (Remaining: 3)
+// ✅ Request allowed for user123 (Remaining: 2)
+// ✅ Request allowed for user123 (Remaining: 1)
+// ✅ Request allowed for user123 (Remaining: 0)
+// ❌ Rate limit exceeded for user123
+// ❌ Rate limit exceeded for user123
+```
+
+### Real-World Applications
+
+This pattern is used by:
+- **Stripe API**: 100 requests per second per API key
+- **Twitter API**: 15 requests per 15 minutes for certain endpoints
+- **GitHub API**: 5,000 requests per hour
+- **Redis**: Built-in rate limiting with sliding windows
+
+---
+
+## Common Mistakes to Avoid
+
+### ⚠️ Mistake #1: Off-by-One Errors with Window Boundaries
+
+```javascript
+// ❌ WRONG: Window size is k+1!
+for (let i = 0; i <= arr.length - k; i++) {
+  // Window from i to i+k (k+1 elements!)
+}
+
+// ✅ CORRECT: Window size is exactly k
+for (let i = 0; i <= arr.length - k; i++) {
+  // Window from i to i+k-1 (k elements)
+}
+
+// Or better: Use right pointer
+for (let right = k - 1; right < arr.length; right++) {
+  // Window from (right - k + 1) to right
+}
+```
+
+### ⚠️ Mistake #2: Not Shrinking Variable Window Properly
+
+```javascript
+// ❌ WRONG: Only shrink by one
+if (violatesCondition(window)) {
+  left++;
+}
+
+// ✅ CORRECT: Shrink UNTIL condition is met
+while (violatesCondition(window)) {
+  removeFromWindow(arr[left]);
+  left++;
+}
+```
+
+### ⚠️ Mistake #3: Forgetting Edge Cases
+
+```javascript
+// Always check:
+if (arr.length < k) return null;        // Array too small
+if (k <= 0) return null;                // Invalid window size
+if (k > arr.length) return null;        // Window larger than array
+```
+
+---
+
+## Test Your Understanding
+
+### Challenge 1: Maximum Average Subarray ⭐⭐⭐
+
+**Problem**: Find the contiguous subarray of length k with the maximum average.
+
+```javascript
+function maxAverageSubarray(nums, k) {
+  // Your code here
+  // Example: [1,12,-5,-6,50,3], k=4 → 12.75
+}
+```
+
+<details>
+<summary>💡 Hint</summary>
+
+Use fixed-size sliding window. Maximum average = maximum sum / k.
+
+</details>
+
+<details>
+<summary>✅ Solution</summary>
+
+```javascript
+function maxAverageSubarray(nums, k) {
+  let windowSum = 0;
+
+  // Build first window
+  for (let i = 0; i < k; i++) {
+    windowSum += nums[i];
+  }
+
+  let maxSum = windowSum;
+
+  // Slide window
+  for (let i = k; i < nums.length; i++) {
+    windowSum = windowSum + nums[i] - nums[i - k];
+    maxSum = Math.max(maxSum, windowSum);
+  }
+
+  return maxSum / k;
+}
+
+// Time: O(n), Space: O(1)
+```
+
+</details>
+
+---
+
+### Challenge 2: Longest Substring with K Distinct Characters ⭐⭐⭐⭐
+
+**Problem**: Find the longest substring with at most K distinct characters.
+
+```javascript
+function longestSubstringKDistinct(s, k) {
+  // Your code here
+  // Example: "eceba", k=2 → "ece" (length 3)
+}
+```
+
+<details>
+<summary>💡 Hint</summary>
+
+Use variable-size window with a Map to track character frequencies. Shrink when distinct count > k.
+
+</details>
+
+<details>
+<summary>✅ Solution</summary>
+
+```javascript
+function longestSubstringKDistinct(s, k) {
+  if (k === 0) return 0;
+
+  const charCount = new Map();
+  let left = 0;
+  let maxLength = 0;
+
+  for (let right = 0; right < s.length; right++) {
+    // Add right character
+    const rightChar = s[right];
+    charCount.set(rightChar, (charCount.get(rightChar) || 0) + 1);
+
+    // Shrink while too many distinct chars
+    while (charCount.size > k) {
+      const leftChar = s[left];
+      charCount.set(leftChar, charCount.get(leftChar) - 1);
+      if (charCount.get(leftChar) === 0) {
+        charCount.delete(leftChar);
+      }
+      left++;
+    }
+
+    maxLength = Math.max(maxLength, right - left + 1);
+  }
+
+  return maxLength;
+}
+
+// Time: O(n), Space: O(k)
+```
+
+</details>
+
+---
+
+### Challenge 3: Subarray Product Less Than K ⭐⭐⭐⭐
+
+**Problem**: Count number of contiguous subarrays where product of all elements is less than k.
+
+```javascript
+function numSubarrayProductLessThanK(nums, k) {
+  // Your code here
+  // Example: [10,5,2,6], k=100 → 8
+}
+```
+
+<details>
+<summary>✅ Solution</summary>
+
+```javascript
+function numSubarrayProductLessThanK(nums, k) {
+  if (k <= 1) return 0;
+
+  let left = 0;
+  let product = 1;
+  let count = 0;
+
+  for (let right = 0; right < nums.length; right++) {
+    product *= nums[right];
+
+    // Shrink window while product >= k
+    while (product >= k) {
+      product /= nums[left];
+      left++;
+    }
+
+    // All subarrays ending at right with start >= left are valid
+    count += right - left + 1;
+  }
+
+  return count;
+}
+
+// Time: O(n), Space: O(1)
+```
+
+**Key insight**: For window [left...right], there are (right - left + 1) valid subarrays ending at right.
+
+</details>
+
+---
+
+## What You've Mastered
+
+**In this tutorial, you learned**:
+✅ Fixed-size and variable-size sliding window patterns
+✅ How to optimize O(n²) nested loops to O(n) single pass
+✅ Using Sets and Maps to track window state efficiently
+✅ Real-world applications like rate limiting and moving averages
+✅ Common pitfalls and how to avoid them
+
+**You can now solve**:
+- LeetCode Easy/Medium sliding window problems
+- Substring and subarray optimization problems
+- Real interview questions about contiguous ranges
+- Production problems requiring efficient stream processing
+
+---
+
+## Level Up: Master All Sliding Window Patterns
+
+**Ready to become a sliding window expert?**
+
+<UpgradeCTA
+  features={[
+    "20+ Advanced sliding window problems with video solutions",
+    "Multi-dimensional sliding windows (2D arrays, matrices)",
+    "Circular buffer implementation for fixed-size windows",
+    "Real-world projects: Build stream processors and analytics engines",
+    "Interview mock sessions focused on sliding window problems",
+    "Downloadable sliding window pattern cheat sheet (PDF)"
+  ]}
+  requiredPlan="VIBED"
+/>
+
+---
+
+## Continue Learning
+
+<TutorialRecommendations />
+
+**Next Tutorial**: Hash Tables Deep Dive - Learn the data structure that makes sliding windows even more powerful
+
+**Related Topics**:
+- [Two-Pointer Technique](/tutorials/category/data-structures/05-two-pointer-technique)
+- [Time Complexity & Big O](/tutorials/category/data-structures/04-time-complexity-big-o)
+- [Introduction to Arrays](/tutorials/category/data-structures/01-introduction-to-arrays)
+
+---
+
+## Resources
+
+**For VIBED Subscribers** 🎁:
+- 📹 Video walkthrough with live coding (45 min)
+- 📊 Sliding window pattern cheat sheet with all variations
+- 💻 Rate limiter production code with tests
+- 🎯 20 additional practice problems
+- 💬 Private Discord channel with expert help
+
+---
+
+*Was this tutorial helpful? Share it with someone preparing for coding interviews!*
+
+**Questions or feedback?** [Join our VIBED community](/subscribe) for live Q&A sessions.
+
+---
+
+**💡 Pro Tip**: Practice recognizing "contiguous subarray/substring" keywords in problems. They almost always signal a sliding window opportunity!

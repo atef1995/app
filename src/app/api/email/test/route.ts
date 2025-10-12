@@ -38,6 +38,10 @@ export async function POST(req: NextRequest) {
       conversionCampaign: null,
       firstLandingPage: null,
       anonymousSessionId: null,
+      // GitHub integration fields
+      githubUsername: null,
+      githubAccessToken: null,
+      githubProfileUrl: null,
     };
 
     let result;

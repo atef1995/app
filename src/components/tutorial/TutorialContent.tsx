@@ -17,6 +17,8 @@ import { BubbleSortVisualizer } from "../visualizer/examples/BubbleSortVisualize
 import { SelectionSortVisualizer } from "../visualizer/examples/SelectionSortVisualizer";
 import { SortingComparisonVisualizer } from "../visualizer/examples/SortingComparisonVisualizer";
 import { TutorialRecommendations } from "./TutorialRecommendations";
+import { SlidingWindowVisualizer } from "../visualizer/examples/SlidingWindowVisualizer";
+import { HashTableVisualizer } from "../visualizer/examples/HashTableVisualizer";
 
 interface TutorialContentProps {
   tutorial: TutorialData;
@@ -130,6 +132,8 @@ const mdxComponents = {
   SelectionSortVisualizer,
   SortingComparisonVisualizer,
   TutorialRecommendations,
+  SlidingWindowVisualizer,
+  HashTableVisualizer,
   // Use custom heading components with anchor IDs
   h1: createHeadingComponent(1),
   h2: createHeadingComponent(2),

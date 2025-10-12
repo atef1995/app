@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 /**
  * Tutorial seed data structure (without categoryId)
@@ -72,16 +73,17 @@ export async function seedTutorial(
     );
   }
 
-  // Create or update the tutorial
-  const tutorial = await prisma.tutorial.upsert({
+  const existingTutorial = await prisma.tutorial.findUnique({
     where: { slug: tutorialData.slug },
-    update: {
-      ...tutorialData,
-      category: {
-        connect: { id: category.id },
-      },
-    },
-    create: {
+  });
+
+  if (existingTutorial) {
+    return;
+  }
+
+  // Create or update the tutorial
+  const tutorial = await prisma.tutorial.create({
+    data: {
       ...tutorialData,
       category: {
         connect: { id: category.id },
@@ -112,7 +114,9 @@ export async function seedTutorials(
   tutorials: TutorialSeedData[],
   prisma: PrismaClient
 ) {
-  console.log(`📚 Seeding ${tutorials.length} tutorials for '${categorySlug}'...`);
+  console.log(
+    `📚 Seeding ${tutorials.length} tutorials for '${categorySlug}'...`
+  );
 
   const createdTutorials = [];
 
@@ -126,50 +130,53 @@ export async function seedTutorials(
 }
 
 /**
- * Seeds a single quiz
+ * Seeds a single quiz (create only, does not update existing quizzes)
  *
- * @param tutorialSlug - The tutorial slug this quiz belongs to
  * @param quizData - Quiz data including tutorialSlug
  * @param prisma - PrismaClient instance
- * @returns The created or updated quiz, or null if tutorial not found
+ * @returns The created quiz, or null if tutorial not found or quiz already exists
  *
  * @example
- * const quiz = await seedQuiz('02-two-pointer-technique', {
+ * const quiz = await seedQuiz({
  *   slug: '02-two-pointer-quiz',
  *   title: 'Two Pointer Quiz',
+ *   tutorialSlug: '02-two-pointer-technique',
  *   questions: [...],
  *   // ... other fields
  * }, prisma);
  */
-export async function seedQuiz(
-  quizData: QuizSeedData,
-  prisma: PrismaClient
-) {
+export async function seedQuiz(quizData: QuizSeedData, prisma: PrismaClient) {
+  // Check if quiz already exists
+  const existingQuiz = await prisma.quiz.findUnique({
+    where: { slug: quizData.slug },
+  });
+
+  if (existingQuiz) {
+    console.log(`⏭️  Quiz already exists: ${existingQuiz.title}`);
+    return null;
+  }
+
   // Find the tutorial this quiz belongs to
   const tutorial = await prisma.tutorial.findUnique({
     where: { slug: quizData.tutorialSlug },
   });
 
   if (!tutorial) {
-    console.warn(`⚠️  Quiz skipped: Tutorial '${quizData.tutorialSlug}' not found for quiz '${quizData.slug}'`);
+    console.warn(
+      `⚠️  Quiz skipped: Tutorial '${quizData.tutorialSlug}' not found for quiz '${quizData.slug}'`
+    );
     return null;
   }
 
   // Extract tutorialSlug and create quiz data
-  const { tutorialSlug, ...quizDataWithoutSlug } = quizData;
+  const { tutorialSlug, questions, ...quizDataWithoutSlug } = quizData;
 
-  // Create or update the quiz
-  const quiz = await prisma.quiz.upsert({
-    where: { slug: quizData.slug },
-    update: {
-      title: quizDataWithoutSlug.title,
-      questions: quizDataWithoutSlug.questions,
-      isPremium: quizDataWithoutSlug.isPremium,
-      requiredPlan: quizDataWithoutSlug.requiredPlan,
-    },
-    create: {
+  // Create the quiz (only create, never update)
+  const quiz = await prisma.quiz.create({
+    data: {
       ...quizDataWithoutSlug,
       tutorialId: tutorial.id,
+      questions: questions as unknown as Prisma.InputJsonValue,
     },
   });
 
@@ -204,7 +211,9 @@ export async function seedQuizzes(
   }
 
   const successCount = createdQuizzes.filter((q) => q !== null).length;
-  console.log(`🎉 Successfully seeded ${successCount}/${quizzes.length} quizzes!`);
+  console.log(
+    `🎉 Successfully seeded ${successCount}/${quizzes.length} quizzes!`
+  );
 
   return createdQuizzes;
 }

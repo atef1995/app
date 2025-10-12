@@ -1,0 +1,241 @@
+# Implementing Dark Mode in Portfolio Site
+
+Welcome to this hands-on tutorial! You'll be implementing a dynamic dark mode toggle in the portfolio site template. This feature will allow users to switch between light and dark themes, remember their preference, and provide a smooth transition experience.
+
+## Prerequisites
+- Basic understanding of React and Next.js
+- Familiarity with Tailwind CSS
+- Git and GitHub account
+- Node.js installed locally
+
+## Learning Objectives
+By completing this tutorial, you will learn:
+- How to implement dark mode using Tailwind CSS
+- State management for theme switching
+- Browser storage for persisting user preferences
+- CSS transitions for smooth theme changes
+- Accessibility considerations in theme switching
+- System theme preference detection
+
+## Project Setup
+
+1. First, fork and clone the repository:
+   - Visit https://github.com/vibed-to-cracked/portfolio-template
+   - Fork the repository to your account
+   - Clone your fork locally
+   - Create a new branch called `feature/dark-mode`
+
+2. Install the project dependencies using your preferred package manager.
+
+## Implementation Guide
+
+### 1. Planning Your Implementation
+
+Before writing any code, let's break down what we need:
+
+1. A toggle button component that:
+   - Shows different icons for light/dark modes
+   - Maintains state of current theme
+   - Is accessible via keyboard and screen readers
+
+2. Theme persistence that:
+   - Saves user preference
+   - Respects system theme preference
+   - Prevents theme flashing on page load
+
+3. Smooth transitions that:
+   - Don't feel jarring to users
+   - Apply to all themed elements
+   - Work consistently across pages
+
+### 2. Creating the Toggle Component
+
+Create a new file called `DarkModeToggle.tsx` in your components folder.
+
+Think about:
+- What React hooks will you need for state management?
+- How will you handle the initial theme state?
+- What props (if any) should the component accept?
+
+**Challenge:** Create the basic toggle component structure. It should:
+- Use the `useState` hook for theme state
+- Have a button that toggles between themes
+- Include proper ARIA labels for accessibility
+
+Need help? 💡 Check the [React useState documentation](https://react.dev/reference/react/useState) and [ARIA button practices](https://www.w3.org/WAI/ARIA/apg/patterns/button/).
+
+### 3. Theme Persistence
+
+Now that you have a basic toggle, let's make it persist the user's choice.
+
+Research and implement:
+1. How to use localStorage in React
+2. How to detect system color scheme preference
+3. How to handle the initial theme on page load
+
+**Challenge:** Implement theme persistence using localStorage. Consider:
+- When should you check the stored preference?
+- What happens if there's no stored preference?
+- How do you handle system preference?
+
+### 4. Adding Smooth Transitions
+
+Users expect smooth transitions when switching themes. 
+
+Think about:
+- Which properties need to transition?
+- How long should transitions take?
+- How to avoid transition on initial page load?
+
+**Challenge:** Add CSS transitions for theme changes. Consider:
+- Which elements should transition?
+- What timing and easing functions feel natural?
+- How to prevent transitions during page load?
+
+### 5. Implementing System Theme Detection
+
+Many users prefer their apps to match their system theme.
+
+Research:
+- The `prefers-color-scheme` media query
+- How to watch for system theme changes
+- How to prioritize between user and system preference
+
+**Challenge:** Implement system theme detection that:
+- Checks system preference on load
+- Updates theme when system preference changes
+- Allows user preference to override system preference
+
+### 6. Testing Your Implementation
+
+Before submitting your PR, thoroughly test your implementation:
+
+1. Functionality Testing:
+   **Challenge:** Create a testing checklist and verify:
+   - Theme toggle works consistently
+   - Theme persists after page refresh
+   - System theme preference is respected
+   - No theme flash on page load
+   - Transitions feel smooth
+
+2. Accessibility Testing:
+   **Challenge:** Use these tools to test accessibility:
+   - Keyboard navigation (Tab, Enter, Space)
+   - Screen reader compatibility
+   - Color contrast in both themes
+   - ARIA labels and roles
+
+3. Edge Case Testing:
+   **Challenge:** Think about and test:
+   - What happens when localStorage is disabled?
+   - How does it behave in incognito mode?
+   - What happens during page transitions?
+   - How does it handle rapid theme switching?
+
+### 7. Common Pitfalls and Solutions
+
+While implementing dark mode, you might encounter these challenges:
+
+1. **Theme Flash on Load**
+   - Why it happens: Initial render before JavaScript loads
+   - Think about: Server-side rendering considerations
+   - Research: Script injection techniques
+
+2. **Hydration Mismatch**
+   - Why it happens: Server/client theme difference
+   - Think about: When theme detection should occur
+   - Research: Next.js hydration strategies
+
+3. **Inconsistent Transitions**
+   - Why it happens: Incomplete transition properties
+   - Think about: Which elements need transitions
+   - Research: CSS transition best practices
+
+## Submission Guidelines
+
+Your implementation will be reviewed based on:
+
+1. **Code Quality**
+   - Clean, readable code
+   - Proper TypeScript types
+   - Meaningful component and variable names
+   - Effective comments explaining complex logic
+
+2. **Functionality**
+   - Reliable theme switching
+   - Proper persistence
+   - Smooth transitions
+   - System theme support
+
+3. **Accessibility**
+   - Keyboard navigation
+   - Screen reader support
+   - Proper ARIA attributes
+   - Sufficient color contrast
+
+4. **Documentation**
+   - Clear PR description
+   - Implementation notes
+   - Testing notes
+   - Screenshots/GIFs of the feature
+
+### Creating Your Pull Request
+
+1. Review your changes:
+   - Run all tests
+   - Check for console errors
+   - Verify all acceptance criteria
+
+2. Create your PR:
+   - Use a clear title
+   - Follow the PR template
+   - Link to any related issues
+   - Request review from mentors
+
+## Next Steps & Enhancements
+
+After completing the basic implementation, consider these challenges:
+
+1. **Advanced Features:**
+   - Multiple theme support (light, dark, system, custom)
+   - Theme switch animations
+   - Keyboard shortcuts
+   - Theme transition timing settings
+
+2. **Performance Optimizations:**
+   - Reduce theme switch latency
+   - Minimize CLS during theme changes
+   - Optimize transition performance
+
+3. **User Experience:**
+   - Add theme preview
+   - Remember theme per-device
+   - Add theme scheduling
+
+## Resources
+
+To help with your implementation:
+
+1. **Official Documentation:**
+   - [Tailwind Dark Mode Guide](https://tailwindcss.com/docs/dark-mode)
+   - [React useState Hook](https://react.dev/reference/react/useState)
+   - [MDN CSS Transitions](https://developer.mozilla.org/en-US/docs/Web/CSS/transition)
+
+2. **Accessibility Guidelines:**
+   - [WAI-ARIA Button Practices](https://www.w3.org/WAI/ARIA/apg/patterns/button/)
+   - [Color Contrast Guidelines](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html)
+
+3. **Browser APIs:**
+   - [Window.matchMedia()](https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia)
+   - [localStorage API](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)
+
+## Need Help?
+
+If you get stuck:
+1. Break down the problem into smaller steps
+2. Review the relevant documentation
+3. Ask specific questions in our Discord community
+4. Attend our weekly office hours
+5. Request a mentor review
+
+Remember: The goal is to learn and understand, not just to complete the feature. Take time to experiment and understand why each part of your implementation works the way it does.

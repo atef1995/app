@@ -13,6 +13,8 @@ declare module "next-auth" {
       subscription?: Plan;
       username: string;
       role: string;
+      xp?: number;
+      level?: number;
       /** Full subscription info cached in session to prevent repeated DB queries */
       subscriptionInfo?: SubscriptionInfo;
     };
@@ -22,6 +24,8 @@ declare module "next-auth" {
     id: string;
     mood?: Mood;
     subscription?: Plan;
+    xp?: number;
+    level?: number;
   }
 }
 

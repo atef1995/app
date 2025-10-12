@@ -20,6 +20,12 @@ export const authOptions: NextAuthOptions = {
     GitHubProvider({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
+      authorization: {
+        params: {
+          // Request repo scope to access PR information for contribution system
+          scope: "read:user user:email repo",
+        },
+      },
     }),
   ],
   callbacks: {
@@ -35,7 +41,7 @@ export const authOptions: NextAuthOptions = {
           // This eliminates the need for repeated subscription API calls
           const subscriptionInfo = await SubscriptionService.getUserSubscription(user.id);
 
-          // Add mood, subscription, and role to session
+          // Add mood, subscription, role, xp, and level to session
           const dbUser = await prisma.user.findUnique({
             where: { id: user.id },
             select: {
@@ -43,12 +49,16 @@ export const authOptions: NextAuthOptions = {
               subscription: true,
               username: true,
               role: true,
+              xp: true,
+              level: true,
             },
           });
 
           session.user.mood = dbUser?.mood || "CHILL";
           session.user.subscription = dbUser?.subscription || "FREE";
           session.user.role = dbUser?.role || "USER";
+          session.user.xp = dbUser?.xp || 0;
+          session.user.level = dbUser?.level || 1;
 
           // Store full subscription info in session to prevent repeated DB queries
           session.user.subscriptionInfo = subscriptionInfo;
@@ -85,8 +95,34 @@ export const authOptions: NextAuthOptions = {
       if (debugMode) {
         console.log("SignIn callback - user:", user, "account:", account);
       }
-      // For new users, we'll generate username after they're created
-      // The session callback will handle it for both new and existing users
+
+      // Capture GitHub access token and username for contribution system
+      if (account?.provider === "github" && account.access_token && user.id) {
+        try {
+          // Use Octokit to get the GitHub username
+          const { Octokit } = await import("@octokit/rest");
+          const octokit = new Octokit({ auth: account.access_token });
+          const { data: ghUser } = await octokit.rest.users.getAuthenticated();
+
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              githubUsername: ghUser.login,
+              githubAccessToken: account.access_token,
+              githubProfileUrl: ghUser.html_url,
+            },
+          });
+
+          if (debugMode) {
+            console.log(
+              `Stored GitHub credentials for user ${user.id} (${ghUser.login})`
+            );
+          }
+        } catch (error) {
+          console.error("Failed to store GitHub credentials:", error);
+        }
+      }
+
       return true;
     },
   },

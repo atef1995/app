@@ -101,6 +101,32 @@ const dsaTutorials: TutorialSeedData[] = [
     requiredPlan: "FREE",
     estimatedTime: 30.0,
   },
+  {
+    slug: "06-sliding-window-pattern",
+    title: "Master the Sliding Window Pattern: Transform O(n²) to O(n)",
+    description:
+      "Learn the sliding window technique to solve substring and subarray problems efficiently. Transform nested loops into elegant single-pass solutions that interviewers love.",
+    mdxFile: "data-structures/06-sliding-window-pattern",
+    difficulty: 4,
+    order: 6,
+    published: true,
+    isPremium: true,
+    requiredPlan: "VIBED",
+    estimatedTime: 35.0,
+  },
+  {
+    slug: "07-hash-tables-deep-dive",
+    title: "Hash Tables Deep Dive: From O(n) to O(1) Lookups",
+    description:
+      "Master hash tables - the data structure behind JavaScript objects and Maps. Learn how they achieve constant-time lookups, handle collisions, and power real-world applications like caches and databases.",
+    mdxFile: "data-structures/07-hash-tables-deep-dive",
+    difficulty: 4,
+    order: 7,
+    published: true,
+    isPremium: true,
+    requiredPlan: "VIBED",
+    estimatedTime: 40.0,
+  },
 ];
 
 /**
@@ -1311,6 +1337,444 @@ const dsaQuizzes: QuizSeedData[] = [
         correct: 1,
         explanation:
           "Remove duplicates uses same-direction pointers - both move left to right, but at different speeds (slow and fast pointer). The others use converging pointers from opposite ends.",
+      },
+    ],
+  },
+  {
+    slug: "06-sliding-window-pattern-quiz",
+    title: "Sliding Window Pattern Quiz",
+    tutorialSlug: "06-sliding-window-pattern",
+    isPremium: true,
+    requiredPlan: "VIBED",
+    questions: [
+      {
+        id: "sliding-1",
+        question:
+          "What is the main advantage of the sliding window pattern?",
+        type: "multiple-choice",
+        options: [
+          "It works on unsorted arrays",
+          "It reduces time complexity from O(n·k) to O(n)",
+          "It uses more memory",
+          "It's easier to implement than nested loops",
+        ],
+        correct: 1,
+        explanation:
+          "The sliding window pattern optimizes problems by reusing computations from the previous window instead of recalculating from scratch, reducing O(n·k) nested loops to O(n) single pass.",
+      },
+      {
+        id: "sliding-2",
+        question:
+          "What is the key insight behind the sliding window technique?",
+        type: "multiple-choice",
+        options: [
+          "Sort the array first",
+          "Reuse previous window's result when moving one element",
+          "Use binary search on each window",
+          "Check every possible window independently",
+        ],
+        correct: 1,
+        explanation:
+          "The key insight is: newSum = oldSum - leftElement + rightElement. We don't recalculate the entire window; we just adjust by removing the element leaving and adding the element entering.",
+      },
+      {
+        id: "sliding-3",
+        question:
+          "What are the two main types of sliding window patterns?",
+        type: "multiple-choice",
+        options: [
+          "Fast and slow",
+          "Fixed-size and variable-size",
+          "Sorted and unsorted",
+          "Forward and backward",
+        ],
+        correct: 1,
+        explanation:
+          "Fixed-size windows maintain a constant size k throughout (e.g., max sum of k elements). Variable-size windows expand and shrink dynamically based on conditions (e.g., longest substring without repeats).",
+      },
+      {
+        id: "sliding-4",
+        question:
+          "For finding max sum of k consecutive elements in array [2,1,5,1,3,2], k=3, how many operations does brute force take?",
+        type: "multiple-choice",
+        options: [
+          "6 operations",
+          "12 operations (4 windows × 3 sums)",
+          "3 operations",
+          "18 operations",
+        ],
+        correct: 1,
+        explanation:
+          "Brute force checks 4 windows: [2,1,5], [1,5,1], [5,1,3], [1,3,2]. Each window requires 3 additions, totaling 4 × 3 = 12 operations. Sliding window reduces this to 6 operations.",
+      },
+      {
+        id: "sliding-5",
+        question:
+          "In a fixed-size sliding window, what do we do when the window slides one position right?",
+        type: "multiple-choice",
+        options: [
+          "Recalculate sum of all k elements",
+          "Subtract left element leaving, add right element entering",
+          "Reset window to start",
+          "Sort the window",
+        ],
+        correct: 1,
+        explanation:
+          "When sliding right by one position, we remove the leftmost element (no longer in window) and add the new rightmost element (just entered window). This O(1) operation replaces O(k) recalculation.",
+      },
+      {
+        id: "sliding-6",
+        question:
+          "What is the time complexity of finding the maximum sum of k elements using sliding window?",
+        type: "multiple-choice",
+        options: ["O(k)", "O(n)", "O(n·k)", "O(n²)"],
+        correct: 1,
+        explanation:
+          "Sliding window solution is O(n): O(k) to build first window + O(n-k) to slide through rest = O(n) total. Each slide is O(1) because we only adjust by two elements.",
+      },
+      {
+        id: "sliding-7",
+        question:
+          "For variable-size sliding window, when do we shrink the window?",
+        type: "multiple-choice",
+        options: [
+          "After every expansion",
+          "When window violates the required condition",
+          "When window size exceeds n/2",
+          "Randomly to check different sizes",
+        ],
+        correct: 1,
+        explanation:
+          "Variable windows shrink (move left pointer right) when they violate the condition - e.g., when we have duplicate characters in 'longest substring without repeats' problem.",
+      },
+      {
+        id: "sliding-8",
+        question:
+          "What data structure is commonly used with variable-size sliding windows to track window contents?",
+        type: "multiple-choice",
+        options: ["Array", "Set or Map", "Stack", "Queue"],
+        correct: 1,
+        explanation:
+          "Set tracks unique elements (for 'no repeating chars' problems), while Map tracks frequencies (for 'contains all chars' problems). Both provide O(1) lookups needed for efficient window validation.",
+      },
+      {
+        id: "sliding-9",
+        question:
+          "In 'longest substring without repeating characters', why use a Set?",
+        type: "multiple-choice",
+        options: [
+          "Sets are faster than arrays",
+          "Sets automatically prevent duplicates, making it easy to detect when we have one",
+          "Sets sort the characters",
+          "Sets use less memory",
+        ],
+        correct: 1,
+        explanation:
+          "A Set naturally enforces uniqueness. When set.has(char) returns true, we know char is duplicate. We then shrink window (removing from set) until duplicate is gone.",
+      },
+      {
+        id: "sliding-10",
+        question:
+          "What's the space complexity of sliding window with a Set tracking characters?",
+        type: "multiple-choice",
+        options: ["O(1)", "O(k) or O(1)", "O(n)", "O(n²)"],
+        correct: 1,
+        explanation:
+          "Space is O(k) for fixed-size window tracking k elements, or O(min(n, m)) for variable-size where m is character set size (e.g., O(26) for lowercase letters = O(1)).",
+      },
+      {
+        id: "sliding-11",
+        question:
+          "Which problem is NOT well-suited for sliding window?",
+        type: "multiple-choice",
+        options: [
+          "Maximum sum of k consecutive elements",
+          "Finding all pairs that sum to target",
+          "Longest substring with k distinct characters",
+          "Minimum window containing all characters",
+        ],
+        correct: 1,
+        explanation:
+          "Finding ALL pairs requires checking non-contiguous elements throughout the array. Sliding window works on contiguous subarrays/substrings. Use two-pointer or hash map for pair problems instead.",
+      },
+      {
+        id: "sliding-12",
+        question:
+          "In a rate limiter using sliding window, what do we remove from the window?",
+        type: "multiple-choice",
+        options: [
+          "The newest requests",
+          "Requests outside the time window (older than t seconds)",
+          "Every other request",
+          "Random requests",
+        ],
+        correct: 1,
+        explanation:
+          "Sliding time window removes timestamps that have aged out. For 'max 5 requests per 60 seconds', we remove requests older than (now - 60 seconds), keeping only recent requests.",
+      },
+      {
+        id: "sliding-13",
+        question:
+          "What's a common mistake when implementing fixed-size sliding window?",
+        type: "multiple-choice",
+        options: [
+          "Using too many variables",
+          "Off-by-one errors in window boundaries",
+          "Not sorting the array first",
+          "Using the wrong data structure",
+        ],
+        correct: 1,
+        explanation:
+          "Common mistakes: starting slide at wrong index (should be k, not k-1), incorrect loop condition (i < n vs i <= n), or accessing arr[i+k] instead of arr[i] when i is already the right boundary.",
+      },
+      {
+        id: "sliding-14",
+        question:
+          "Why is sliding window more efficient than checking every subarray separately?",
+        type: "multiple-choice",
+        options: [
+          "It uses less memory",
+          "It leverages overlap between consecutive windows to avoid redundant work",
+          "It sorts the data first",
+          "It uses better hardware",
+        ],
+        correct: 1,
+        explanation:
+          "Consecutive windows share k-1 elements. Sliding window reuses these shared elements' contributions, only computing the delta. This eliminates redundant recalculation, reducing complexity by a factor of k.",
+      },
+      {
+        id: "sliding-15",
+        question:
+          "For 'minimum window substring' problem, when do we have a valid window?",
+        type: "multiple-choice",
+        options: [
+          "When window size equals target string length",
+          "When window contains all required characters with correct frequencies",
+          "When window is sorted",
+          "When left pointer equals 0",
+        ],
+        correct: 1,
+        explanation:
+          "Window is valid when it contains all characters from target with at least their required frequencies. We track this with a Map counting frequencies and a 'formed' counter showing how many unique chars meet requirements.",
+      },
+    ],
+  },
+  {
+    slug: "07-hash-tables-deep-dive-quiz",
+    title: "Hash Tables Deep Dive Quiz",
+    tutorialSlug: "07-hash-tables-deep-dive",
+    isPremium: true,
+    requiredPlan: "VIBED",
+    questions: [
+      {
+        id: "hash-1",
+        question: "What is the primary advantage of hash tables?",
+        type: "multiple-choice",
+        options: [
+          "They sort data automatically",
+          "They provide O(1) average-case lookup, insert, and delete",
+          "They use less memory than arrays",
+          "They maintain insertion order",
+        ],
+        correct: 1,
+        explanation:
+          "Hash tables achieve O(1) average-case time complexity for lookup, insert, and delete operations by using a hash function to map keys directly to array indices.",
+      },
+      {
+        id: "hash-2",
+        question: "What are the three essential components of a hash table?",
+        type: "multiple-choice",
+        options: [
+          "Key, Value, Index",
+          "Array, Hash Function, Collision Resolution",
+          "Map, Set, Object",
+          "Insert, Delete, Search",
+        ],
+        correct: 1,
+        explanation:
+          "A hash table requires: (1) an array for storage, (2) a hash function to convert keys to indices, and (3) a collision resolution strategy to handle when different keys hash to the same index.",
+      },
+      {
+        id: "hash-3",
+        question: "What makes a good hash function?",
+        type: "multiple-choice",
+        options: [
+          "Returns random values each time",
+          "Always returns 0",
+          "Deterministic, uniform distribution, fast (O(1)), avalanche effect",
+          "Only works with strings",
+        ],
+        correct: 2,
+        explanation:
+          "A good hash function must be: (1) Deterministic (same input → same output), (2) Uniform (distributes keys evenly), (3) Fast (computes in O(1)), and (4) Has avalanche effect (small input changes → big hash changes).",
+      },
+      {
+        id: "hash-4",
+        question: "What is a collision in a hash table?",
+        type: "multiple-choice",
+        options: [
+          "When the hash table runs out of memory",
+          "When two different keys hash to the same index",
+          "When a key is deleted",
+          "When the array is full",
+        ],
+        correct: 1,
+        explanation:
+          "A collision occurs when two different keys produce the same hash value (map to the same array index). Collisions are inevitable with enough keys (pigeonhole principle) and must be handled with a resolution strategy.",
+      },
+      {
+        id: "hash-5",
+        question: "In chaining collision resolution, what does each array slot contain?",
+        type: "multiple-choice",
+        options: [
+          "A single key-value pair",
+          "A linked list or array of key-value pairs",
+          "Only the hash value",
+          "Nothing - collisions aren't allowed",
+        ],
+        correct: 1,
+        explanation:
+          "In chaining, each bucket (array slot) holds a list (linked list or array) of key-value pairs that hashed to the same index. When searching, we hash to find the bucket, then search within that bucket's chain.",
+      },
+      {
+        id: "hash-6",
+        question: "What is the main advantage of chaining over open addressing?",
+        type: "multiple-choice",
+        options: [
+          "Uses less memory",
+          "Never degrades performance",
+          "Simple to implement and never runs out of space",
+          "Always faster",
+        ],
+        correct: 2,
+        explanation:
+          "Chaining is simple to implement and can't 'run out of space' - chains just grow longer. Performance degrades gracefully (longer chains = slower search) rather than catastrophically.",
+      },
+      {
+        id: "hash-7",
+        question: "In open addressing (linear probing), what happens when a slot is occupied?",
+        type: "multiple-choice",
+        options: [
+          "The insert fails",
+          "We try the next slot, then the next, until we find an empty one",
+          "We delete the existing entry",
+          "We create a linked list",
+        ],
+        correct: 1,
+        explanation:
+          "Linear probing tries the next slot sequentially until finding an empty one: hash(key), hash(key)+1, hash(key)+2, etc. (wrapping around). This keeps all entries in the main array.",
+      },
+      {
+        id: "hash-8",
+        question: "Why do we use tombstones (deleted markers) in open addressing?",
+        type: "multiple-choice",
+        options: [
+          "To save memory",
+          "To speed up inserts",
+          "To preserve probe sequences during search after deletion",
+          "To mark empty slots",
+        ],
+        correct: 2,
+        explanation:
+          "Tombstones preserve probe sequences. If we set a deleted slot to null, subsequent searches might stop early and miss keys that probed past it. Tombstones say 'keep searching, something was here'.",
+      },
+      {
+        id: "hash-9",
+        question: "What is the load factor of a hash table?",
+        type: "multiple-choice",
+        options: [
+          "The number of collisions",
+          "The ratio of entries to array size (entries/size)",
+          "The speed of the hash function",
+          "The maximum chain length",
+        ],
+        correct: 1,
+        explanation:
+          "Load factor = number of entries / array size. For example, 70 entries in a size-100 array = 0.7 load factor. Higher load factors mean more collisions and slower operations.",
+      },
+      {
+        id: "hash-10",
+        question: "When should you resize a hash table?",
+        type: "multiple-choice",
+        options: [
+          "Never - fixed size is better",
+          "When load factor exceeds 0.75 (75% full)",
+          "When any collision occurs",
+          "When it reaches maximum size",
+        ],
+        correct: 1,
+        explanation:
+          "Resize when load factor exceeds ~0.75. At this point, performance starts degrading significantly. Resizing doubles the array size and rehashes all entries to maintain O(1) average performance.",
+      },
+      {
+        id: "hash-11",
+        question: "Why is resizing expensive but acceptable?",
+        type: "multiple-choice",
+        options: [
+          "It's O(1) time",
+          "It happens so rarely that amortized cost per insert remains O(1)",
+          "It's not expensive",
+          "Users don't notice it",
+        ],
+        correct: 1,
+        explanation:
+          "Resizing is O(n) - must rehash all entries. But it happens exponentially less often (at 1, 2, 4, 8... entries). Amortized analysis shows average insert cost remains O(1).",
+      },
+      {
+        id: "hash-12",
+        question: "When should you use Map instead of a plain Object in JavaScript?",
+        type: "multiple-choice",
+        options: [
+          "Never - Objects are always better",
+          "When keys are not strings, need insertion order, or frequent add/delete",
+          "Only for small datasets",
+          "When you need JSON serialization",
+        ],
+        correct: 1,
+        explanation:
+          "Use Map when: (1) keys aren't strings (can be any type, including objects), (2) you need guaranteed insertion order, (3) frequent add/delete operations, or (4) you need accurate size tracking.",
+      },
+      {
+        id: "hash-13",
+        question: "What is the key difference between Map and WeakMap?",
+        type: "multiple-choice",
+        options: [
+          "WeakMap is faster",
+          "WeakMap only accepts object keys and doesn't prevent garbage collection",
+          "WeakMap has more methods",
+          "Map is deprecated",
+        ],
+        correct: 1,
+        explanation:
+          "WeakMap: (1) only accepts objects as keys, (2) doesn't prevent GC (weak references), (3) not iterable. Use for private data or metadata about objects without creating memory leaks.",
+      },
+      {
+        id: "hash-14",
+        question: "In the LRU Cache implementation, why use hash table + doubly linked list?",
+        type: "multiple-choice",
+        options: [
+          "To use more memory",
+          "Hash table gives O(1) lookup, linked list gives O(1) move-to-front and eviction",
+          "Arrays don't work",
+          "It's the only way",
+        ],
+        correct: 1,
+        explanation:
+          "Hash table provides O(1) lookup of nodes by key. Doubly linked list allows O(1) removal from anywhere and O(1) insertion at head (most recent). Together, they achieve O(1) for all LRU operations.",
+      },
+      {
+        id: "hash-15",
+        question: "What is a common mistake when using objects as hash tables?",
+        type: "multiple-choice",
+        options: [
+          "Not using enough memory",
+          "Using object keys - they get converted to '[object Object]' string",
+          "Making them too large",
+          "Using string keys",
+        ],
+        correct: 1,
+        explanation:
+          "Objects convert all keys to strings. Two different objects as keys both become '[object Object]', causing collisions. Use Map for object keys - it compares keys by reference, not string conversion.",
       },
     ],
   },

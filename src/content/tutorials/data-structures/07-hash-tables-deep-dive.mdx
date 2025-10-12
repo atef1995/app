@@ -1,0 +1,1073 @@
+---
+title: "Hash Tables Deep Dive: From O(n) to O(1) Lookups"
+description: "Master hash tables - the data structure behind JavaScript objects and Maps. Learn how they achieve constant-time lookups, handle collisions, and power real-world applications like caches and databases."
+category: "data-structures"
+difficulty: 4
+estimatedTime: "40 minutes"
+prerequisites: ["Introduction to Arrays", "Time Complexity & Big O"]
+learningObjectives:
+  - "Understand how hash functions convert keys to array indices"
+  - "Implement collision resolution strategies: chaining and open addressing"
+  - "Build a production-quality hash table from scratch"
+  - "Recognize when to use Map, Set, WeakMap, and WeakSet"
+  - "Optimize hash table performance with load factor management"
+topics: ["hash-table", "hash-function", "collision-resolution", "map", "set", "optimization", "interview-prep"]
+interviewRelevance: "High"
+realWorldApplications: ["Caching systems", "Database indexing", "Symbol tables", "LRU cache"]
+requiredPlan: "VIBED"
+---
+
+import { ComparisonTable } from '@/components/tutorial/ComparisonTable';
+import { UpgradeCTA } from '@/components/tutorial/UpgradeCTA';
+import { TutorialRecommendations } from '@/components/tutorial/TutorialRecommendations';
+import { HashTableVisualizer } from '@/components/visualizer/examples/HashTableVisualizer';
+
+# Hash Tables Deep Dive: From O(n) to O(1) Lookups
+
+> **Transform in 40 minutes:**
+> - From O(n) linear searches → O(1) constant-time lookups
+> - From array indices only → any key type (strings, objects, anything!)
+> - From basic object usage → understanding how JavaScript's fastest data structure works under the hood
+
+## The Data Structure Behind JavaScript's Speed
+
+You use them every day without thinking:
+
+```javascript
+const user = { name: "Alice", age: 25 }; // Hash table!
+const scores = new Map([["Alice", 95]]); // Hash table!
+const uniqueIds = new Set([1, 2, 3]);    // Hash table!
+```
+
+**But here's what separates beginners from senior developers**: Understanding *how* hash tables achieve O(1) lookups, *why* they sometimes don't, and *when* to use which variant.
+
+In coding interviews, hash tables appear in **60% of problems**. Companies like Google, Amazon, and Facebook expect you to:
+- Implement a hash table from scratch
+- Handle collision resolution
+- Optimize for performance
+- Choose the right built-in (Map vs Object vs Set)
+
+**Here's the promise**: In the next 10 minutes, you'll see how a simple array becomes the fastest lookup data structure in computer science. Then we'll build a production-ready hash table that handles millions of entries.
+
+---
+
+## Your First Hash Table in 5 Minutes
+
+Let's solve a real problem RIGHT NOW:
+
+**Challenge**: Given an array, find the first duplicate element.
+
+### The Slow Way (O(n²))
+
+```javascript
+// ❌ Nested loops: Check every element against every other
+function findFirstDuplicate(arr) {
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = i + 1; j < arr.length; j++) {
+      if (arr[i] === arr[j]) {
+        return arr[i];
+      }
+    }
+  }
+  return null;
+}
+
+// [1, 2, 3, 2, 4] → Takes 10 comparisons
+// For n=1000 → 500,000 comparisons!
+```
+
+### The Fast Way: Hash Table (O(n))
+
+```javascript
+// ✅ Hash table: Track what we've seen in O(1) time
+function findFirstDuplicateFast(arr) {
+  const seen = new Set(); // Hash table!
+
+  for (const num of arr) {
+    if (seen.has(num)) {    // O(1) lookup!
+      return num;
+    }
+    seen.add(num);          // O(1) insert!
+  }
+
+  return null;
+}
+
+// [1, 2, 3, 2, 4] → Takes 4 operations
+// For n=1000 → 1,000 operations!
+// 500x faster! 🚀
+```
+
+**🎉 You just used a hash table!**
+
+The magic: `Set.has()` checks in **O(1) constant time**, not O(n) linear time. With 1 million elements, it's still just one operation!
+
+### Try It Yourself
+
+<HashTableVisualizer
+  initialSize={10}
+  mood="CHILL"
+/>
+
+---
+
+## What Is a Hash Table?
+
+### The Core Concept
+
+A **hash table** is a data structure that maps **keys** to **values** using a **hash function**.
+
+```
+Key → [Hash Function] → Index → Value
+
+"Alice" → hash("Alice") → 3 → { age: 25, score: 95 }
+"Bob"   → hash("Bob")   → 7 → { age: 30, score: 88 }
+"Carol" → hash("Carol") → 1 → { age: 22, score: 92 }
+```
+
+**The three critical pieces:**
+
+1. **Array** (the storage): Fixed-size array to hold values
+2. **Hash Function** (the magic): Converts any key → array index
+3. **Collision Resolution** (the reality): Handles when two keys hash to same index
+
+### Why Hash Tables Are Fast
+
+<ComparisonTable
+  headers={['Data Structure', 'Search', 'Insert', 'Delete', 'Use Case']}
+  rows={[
+    { label: 'Array (unsorted)', values: ['O(n)', 'O(1)', 'O(n)', 'Simple lists'] },
+    { label: 'Array (sorted)', values: ['O(log n)', 'O(n)', 'O(n)', 'Binary search'] },
+    { label: 'Linked List', values: ['O(n)', 'O(1)', 'O(1)', 'Frequent insert/delete'] },
+    { label: 'Hash Table', values: ['O(1)*', 'O(1)*', 'O(1)*', 'Fast lookups'], highlighted: true }
+  ]}
+  variant="bordered"
+/>
+
+*O(1) average case with good hash function and load factor management
+
+**Key insight**: Hash tables trade **space for speed**. They use extra memory to achieve constant-time operations.
+
+---
+
+## Hash Functions: The Heart of the Magic
+
+A **hash function** takes any input and returns a fixed-size number (the hash code).
+
+### Properties of a Good Hash Function
+
+```javascript
+/**
+ * A good hash function must be:
+ * 1. Deterministic: Same input → always same output
+ * 2. Uniform: Distributes keys evenly across array
+ * 3. Fast: Computes in O(1) time
+ * 4. Avalanche effect: Small input change → big hash change
+ */
+
+// ❌ Bad hash function (terrible distribution)
+function badHash(key, arraySize) {
+  return key.length % arraySize; // All same-length keys collide!
+}
+
+// ✅ Good hash function (djb2 algorithm)
+function goodHash(key, arraySize) {
+  let hash = 5381;
+
+  for (let i = 0; i < key.length; i++) {
+    // hash * 33 + charCode
+    hash = ((hash << 5) + hash) + key.charCodeAt(i);
+  }
+
+  // Convert to positive index
+  return Math.abs(hash % arraySize);
+}
+
+// Examples:
+goodHash("Alice", 10);  // 3
+goodHash("Bob", 10);    // 7
+goodHash("Carol", 10);  // 1
+goodHash("Alice", 10);  // 3 (same input → same output!)
+```
+
+### Why This Works
+
+```javascript
+// The djb2 hash function explained:
+
+function hashExplained(key, arraySize) {
+  let hash = 5381; // Magic prime number (good distribution)
+
+  for (let i = 0; i < key.length; i++) {
+    // Left shift by 5 is same as multiply by 32
+    // hash << 5 === hash * 32
+    // (hash * 32) + hash === hash * 33
+
+    hash = (hash * 33) + key.charCodeAt(i);
+
+    // Each character affects the final hash
+    // Small input changes create big hash changes (avalanche)
+  }
+
+  // Modulo maps hash to array bounds [0, arraySize)
+  return Math.abs(hash % arraySize);
+}
+```
+
+**Interview tip**: You don't need to memorize hash functions, but you should understand:
+- They convert keys to array indices
+- Good distribution prevents clustering
+- Must be fast (O(1) computation)
+
+---
+
+## Collision Resolution: Handling the Inevitable
+
+**Problem**: Two different keys can hash to the same index!
+
+```javascript
+hash("Alice", 10);  // 3
+hash("Dave", 10);   // 3  ← Collision!
+```
+
+With enough keys, collisions are **guaranteed** (pigeonhole principle). We need strategies to handle them.
+
+### Strategy 1: Chaining (Separate Chaining)
+
+**Idea**: Each array slot holds a linked list (or array) of entries.
+
+```
+Index 0: []
+Index 1: [("Carol", 92)]
+Index 2: []
+Index 3: [("Alice", 95) → ("Dave", 78)]  ← Both hash to 3
+Index 4: []
+...
+Index 7: [("Bob", 88)]
+```
+
+**Implementation**:
+
+```javascript
+/**
+ * Hash Table with Chaining
+ * Each bucket is an array of [key, value] pairs
+ */
+class HashTableChaining {
+  constructor(size = 10) {
+    this.size = size;
+    this.buckets = Array(size).fill(null).map(() => []);
+    this.count = 0;
+  }
+
+  hash(key) {
+    let hash = 5381;
+    for (let i = 0; i < key.length; i++) {
+      hash = ((hash << 5) + hash) + key.charCodeAt(i);
+    }
+    return Math.abs(hash % this.size);
+  }
+
+  set(key, value) {
+    const index = this.hash(key);
+    const bucket = this.buckets[index];
+
+    // Check if key exists (update)
+    for (let i = 0; i < bucket.length; i++) {
+      if (bucket[i][0] === key) {
+        bucket[i][1] = value; // Update value
+        return;
+      }
+    }
+
+    // Key doesn't exist (insert)
+    bucket.push([key, value]);
+    this.count++;
+
+    // Resize if load factor too high
+    if (this.count / this.size > 0.75) {
+      this.resize();
+    }
+  }
+
+  get(key) {
+    const index = this.hash(key);
+    const bucket = this.buckets[index];
+
+    // Search in chain
+    for (const [k, v] of bucket) {
+      if (k === key) return v;
+    }
+
+    return undefined;
+  }
+
+  delete(key) {
+    const index = this.hash(key);
+    const bucket = this.buckets[index];
+
+    for (let i = 0; i < bucket.length; i++) {
+      if (bucket[i][0] === key) {
+        bucket.splice(i, 1);
+        this.count--;
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  has(key) {
+    return this.get(key) !== undefined;
+  }
+
+  resize() {
+    const oldBuckets = this.buckets;
+    this.size *= 2;
+    this.buckets = Array(this.size).fill(null).map(() => []);
+    this.count = 0;
+
+    // Rehash all entries
+    for (const bucket of oldBuckets) {
+      for (const [key, value] of bucket) {
+        this.set(key, value);
+      }
+    }
+  }
+}
+
+// Usage
+const scores = new HashTableChaining();
+scores.set("Alice", 95);
+scores.set("Bob", 88);
+scores.set("Carol", 92);
+scores.set("Dave", 78);  // Might collide with Alice
+
+console.log(scores.get("Alice")); // 95
+console.log(scores.has("Eve"));   // false
+scores.delete("Bob");
+console.log(scores.has("Bob"));   // false
+```
+
+**Pros of Chaining**:
+- ✅ Simple to implement
+- ✅ Never runs out of space
+- ✅ Performance degrades gracefully (chains just get longer)
+
+**Cons of Chaining**:
+- ❌ Extra memory for chain storage
+- ❌ Poor cache locality (following pointers)
+- ❌ Can degrade to O(n) if all keys hash to same bucket
+
+---
+
+### Strategy 2: Open Addressing (Linear Probing)
+
+**Idea**: If a slot is taken, try the next slot, then the next, until you find an empty one.
+
+```
+Index 0: null
+Index 1: ("Carol", 92)
+Index 2: null
+Index 3: ("Alice", 95)      ← Alice hashes here
+Index 4: ("Dave", 78)       ← Dave also hashed to 3, placed in next available
+Index 5: null
+...
+Index 7: ("Bob", 88)
+```
+
+**Implementation**:
+
+```javascript
+/**
+ * Hash Table with Open Addressing (Linear Probing)
+ * Stores entries directly in array, probes for next available slot
+ */
+class HashTableOpenAddressing {
+  constructor(size = 10) {
+    this.size = size;
+    this.keys = Array(size).fill(null);
+    this.values = Array(size).fill(null);
+    this.count = 0;
+    this.DELETED = Symbol('deleted'); // Tombstone marker
+  }
+
+  hash(key) {
+    let hash = 5381;
+    for (let i = 0; i < key.length; i++) {
+      hash = ((hash << 5) + hash) + key.charCodeAt(i);
+    }
+    return Math.abs(hash % this.size);
+  }
+
+  set(key, value) {
+    if (this.count / this.size > 0.75) {
+      this.resize();
+    }
+
+    let index = this.hash(key);
+    let probeCount = 0;
+
+    // Linear probe until we find empty slot or matching key
+    while (this.keys[index] !== null &&
+           this.keys[index] !== this.DELETED &&
+           this.keys[index] !== key) {
+      index = (index + 1) % this.size; // Wrap around
+      probeCount++;
+
+      if (probeCount >= this.size) {
+        throw new Error('Hash table is full');
+      }
+    }
+
+    // Update existing or insert new
+    const isNewKey = this.keys[index] === null || this.keys[index] === this.DELETED;
+    this.keys[index] = key;
+    this.values[index] = value;
+
+    if (isNewKey) {
+      this.count++;
+    }
+  }
+
+  get(key) {
+    let index = this.hash(key);
+    let probeCount = 0;
+
+    // Probe until we find key or null
+    while (this.keys[index] !== null && probeCount < this.size) {
+      if (this.keys[index] === key) {
+        return this.values[index];
+      }
+      index = (index + 1) % this.size;
+      probeCount++;
+    }
+
+    return undefined;
+  }
+
+  delete(key) {
+    let index = this.hash(key);
+    let probeCount = 0;
+
+    while (this.keys[index] !== null && probeCount < this.size) {
+      if (this.keys[index] === key) {
+        // Use tombstone marker instead of null
+        // (preserves probe sequences)
+        this.keys[index] = this.DELETED;
+        this.values[index] = null;
+        this.count--;
+        return true;
+      }
+      index = (index + 1) % this.size;
+      probeCount++;
+    }
+
+    return false;
+  }
+
+  has(key) {
+    return this.get(key) !== undefined;
+  }
+
+  resize() {
+    const oldKeys = this.keys;
+    const oldValues = this.values;
+
+    this.size *= 2;
+    this.keys = Array(this.size).fill(null);
+    this.values = Array(this.size).fill(null);
+    this.count = 0;
+
+    for (let i = 0; i < oldKeys.length; i++) {
+      if (oldKeys[i] !== null && oldKeys[i] !== this.DELETED) {
+        this.set(oldKeys[i], oldValues[i]);
+      }
+    }
+  }
+}
+
+// Usage
+const cache = new HashTableOpenAddressing();
+cache.set("page1", "<html>...</html>");
+cache.set("page2", "<html>...</html>");
+cache.set("page3", "<html>...</html>");
+
+console.log(cache.get("page1")); // "<html>...</html>"
+cache.delete("page2");
+console.log(cache.has("page2"));  // false
+```
+
+**Pros of Open Addressing**:
+- ✅ Better cache locality (contiguous memory)
+- ✅ No extra memory for pointers
+- ✅ Can be faster for small values
+
+**Cons of Open Addressing**:
+- ❌ More complex deletion (need tombstones)
+- ❌ Performance degrades faster as table fills
+- ❌ Must resize more aggressively
+
+---
+
+## Load Factor: The Performance Killer
+
+**Load factor** = number of entries / array size
+
+```javascript
+// Load factor = 7 / 10 = 0.7
+
+const table = new HashTable(10);
+table.set("key1", "value1");
+table.set("key2", "value2");
+// ... 5 more entries
+// Load factor: 7/10 = 0.7
+```
+
+<ComparisonTable
+  headers={['Load Factor', 'Chaining Performance', 'Open Addressing Performance', 'Action']}
+  rows={[
+    { label: '< 0.5', values: ['Excellent (short chains)', 'Excellent (few probes)', 'Optimal'] },
+    { label: '0.5 - 0.75', values: ['Good (1-2 items per chain)', 'Good (2-3 probes avg)', 'Monitor'], highlighted: true },
+    { label: '0.75 - 1.0', values: ['Degrading (longer chains)', 'Poor (many probes)', 'Resize!'], highlighted: true },
+    { label: '> 1.0', values: ['Bad (O(n) lookups)', 'Impossible (array full)', 'Critical!'] }
+  ]}
+  variant="bordered"
+/>
+
+**Best practice**: Resize when load factor exceeds **0.75** (75% full).
+
+```javascript
+resize() {
+  if (this.count / this.size > 0.75) {
+    // Double the size
+    const newSize = this.size * 2;
+
+    // Rehash all entries (expensive but rare)
+    // ...
+  }
+}
+```
+
+**Amortized analysis**: Resizing is O(n), but happens so rarely that average insert is still O(1).
+
+---
+
+## Building Something Real: LRU Cache
+
+Let's use hash tables to build a **Least Recently Used (LRU) Cache** - used by browsers, databases, and operating systems.
+
+**Requirements**:
+- Get/Set in O(1) time
+- Fixed capacity
+- Evict least recently used item when full
+
+**Solution**: Hash table + doubly linked list
+
+```javascript
+/**
+ * LRU Cache Implementation
+ * O(1) get, O(1) set, O(1) eviction
+ *
+ * Used by: Chrome browser cache, Redis, CDNs
+ */
+
+class LRUNode {
+  constructor(key, value) {
+    this.key = key;
+    this.value = value;
+    this.prev = null;
+    this.next = null;
+  }
+}
+
+class LRUCache {
+  constructor(capacity) {
+    this.capacity = capacity;
+    this.cache = new Map(); // Hash table: key → node
+
+    // Doubly linked list (most recent at head)
+    this.head = new LRUNode(null, null);
+    this.tail = new LRUNode(null, null);
+    this.head.next = this.tail;
+    this.tail.prev = this.head;
+  }
+
+  get(key) {
+    if (!this.cache.has(key)) {
+      return -1;
+    }
+
+    const node = this.cache.get(key);
+
+    // Move to front (most recently used)
+    this.removeNode(node);
+    this.addToFront(node);
+
+    return node.value;
+  }
+
+  set(key, value) {
+    // Update existing
+    if (this.cache.has(key)) {
+      const node = this.cache.get(key);
+      node.value = value;
+      this.removeNode(node);
+      this.addToFront(node);
+      return;
+    }
+
+    // Add new
+    const newNode = new LRUNode(key, value);
+    this.cache.set(key, newNode);
+    this.addToFront(newNode);
+
+    // Evict if over capacity
+    if (this.cache.size > this.capacity) {
+      const lru = this.tail.prev;
+      this.removeNode(lru);
+      this.cache.delete(lru.key);
+    }
+  }
+
+  removeNode(node) {
+    node.prev.next = node.next;
+    node.next.prev = node.prev;
+  }
+
+  addToFront(node) {
+    node.next = this.head.next;
+    node.prev = this.head;
+    this.head.next.prev = node;
+    this.head.next = node;
+  }
+}
+
+// Usage
+const cache = new LRUCache(3); // Capacity: 3 items
+
+cache.set("page1", "Home Page");
+cache.set("page2", "About Page");
+cache.set("page3", "Contact Page");
+
+console.log(cache.get("page1")); // "Home Page" (now most recent)
+
+cache.set("page4", "Blog Page"); // Evicts "page2" (least recent)
+
+console.log(cache.get("page2")); // -1 (evicted)
+console.log(cache.get("page4")); // "Blog Page"
+```
+
+**Why this works**:
+- **Hash table**: O(1) lookup of nodes
+- **Doubly linked list**: O(1) move to front, O(1) remove tail
+- **Combined**: O(1) for all operations!
+
+**Real-world impact**:
+- Chrome uses LRU cache for 100MB+ of web pages
+- Redis uses it for in-memory caching
+- CDNs use it to cache popular content
+
+---
+
+## Map vs Object vs Set vs WeakMap
+
+JavaScript has multiple hash-table-based structures. When to use which?
+
+<ComparisonTable
+  headers={['Type', 'Key Types', 'Iteration Order', 'Use Case', 'Memory']}
+  rows={[
+    { label: 'Object', values: ['String/Symbol', 'Not guaranteed', 'Simple data storage', 'Manual GC'] },
+    { label: 'Map', values: ['Any type', 'Insertion order', 'Frequent add/delete', 'Manual GC'], highlighted: true },
+    { label: 'Set', values: ['Any type (unique)', 'Insertion order', 'Unique values', 'Manual GC'] },
+    { label: 'WeakMap', values: ['Objects only', 'No iteration', 'Private data/metadata', 'Auto GC'], highlighted: true },
+    { label: 'WeakSet', values: ['Objects only (unique)', 'No iteration', 'Object tracking', 'Auto GC'] }
+  ]}
+  variant="bordered"
+/>
+
+### When to Use Each
+
+**Use `Map` when:**
+- Keys are not strings
+- Need insertion order
+- Frequent add/delete operations
+- Size tracking is important
+
+```javascript
+const userScores = new Map();
+userScores.set(userObject, 95); // Object as key!
+userScores.set("total", 100);   // String as key!
+
+console.log(userScores.size); // 2
+```
+
+**Use `Object` when:**
+- Keys are always strings/symbols
+- Simple data storage
+- JSON serialization needed
+
+```javascript
+const config = {
+  apiKey: "abc123",
+  timeout: 5000
+};
+
+// Easy JSON
+JSON.stringify(config);
+```
+
+**Use `Set` when:**
+- Need unique values
+- Membership testing
+
+```javascript
+const uniqueIds = new Set([1, 2, 2, 3, 3, 3]);
+console.log(uniqueIds); // Set(3) {1, 2, 3}
+
+uniqueIds.has(2); // true - O(1)!
+```
+
+**Use `WeakMap` when:**
+- Store metadata about objects
+- Don't want to prevent garbage collection
+
+```javascript
+// Store private data without memory leaks
+const privateData = new WeakMap();
+
+class User {
+  constructor(name) {
+    privateData.set(this, { name, password: "secret" });
+  }
+
+  getName() {
+    return privateData.get(this).name;
+  }
+}
+
+let user = new User("Alice");
+// When user is garbage collected, privateData entry is too!
+```
+
+---
+
+## Common Mistakes to Avoid
+
+### ⚠️ Mistake #1: Using Objects as Hash Tables with Non-String Keys
+
+```javascript
+// ❌ WRONG: Object keys are always strings
+const obj = {};
+const key1 = { id: 1 };
+const key2 = { id: 2 };
+
+obj[key1] = "value1"; // Converts to "[object Object]"
+obj[key2] = "value2"; // Same string!
+
+console.log(obj[key1]); // "value2" - Oops!
+
+// ✅ CORRECT: Use Map for object keys
+const map = new Map();
+map.set(key1, "value1");
+map.set(key2, "value2");
+
+console.log(map.get(key1)); // "value1" ✓
+console.log(map.get(key2)); // "value2" ✓
+```
+
+### ⚠️ Mistake #2: Forgetting to Handle Collisions
+
+```javascript
+// ❌ WRONG: Overwrites colliding keys
+class BadHashTable {
+  set(key, value) {
+    const index = this.hash(key);
+    this.array[index] = value; // Lost previous value!
+  }
+}
+
+// ✅ CORRECT: Use chaining or open addressing
+class GoodHashTable {
+  set(key, value) {
+    const index = this.hash(key);
+    if (!this.buckets[index]) {
+      this.buckets[index] = [];
+    }
+    this.buckets[index].push([key, value]);
+  }
+}
+```
+
+### ⚠️ Mistake #3: Not Resizing When Load Factor Is High
+
+```javascript
+// ❌ WRONG: Never resize
+class SlowHashTable {
+  set(key, value) {
+    // ... insert logic
+    // Performance degrades as table fills!
+  }
+}
+
+// ✅ CORRECT: Resize at 75% capacity
+class FastHashTable {
+  set(key, value) {
+    // ... insert logic
+
+    if (this.count / this.size > 0.75) {
+      this.resize(); // Keep performance optimal
+    }
+  }
+}
+```
+
+---
+
+## Test Your Understanding
+
+### Challenge 1: Two Sum Problem ⭐⭐⭐
+
+**Problem**: Given an array and a target, find two numbers that add up to target.
+
+```javascript
+function twoSum(nums, target) {
+  // Your code here
+  // Example: [2, 7, 11, 15], target = 9 → [0, 1]
+}
+```
+
+<details>
+<summary>💡 Hint</summary>
+
+Use a hash table to store numbers you've seen. For each number, check if `target - number` exists in the hash table.
+
+</details>
+
+<details>
+<summary>✅ Solution</summary>
+
+```javascript
+function twoSum(nums, target) {
+  const seen = new Map(); // num → index
+
+  for (let i = 0; i < nums.length; i++) {
+    const complement = target - nums[i];
+
+    if (seen.has(complement)) {
+      return [seen.get(complement), i];
+    }
+
+    seen.set(nums[i], i);
+  }
+
+  return [];
+}
+
+// Time: O(n), Space: O(n)
+// Hash table reduces from O(n²) nested loops to O(n) single pass!
+```
+
+</details>
+
+---
+
+### Challenge 2: Group Anagrams ⭐⭐⭐⭐
+
+**Problem**: Group words that are anagrams of each other.
+
+```javascript
+function groupAnagrams(words) {
+  // Your code here
+  // Example: ["eat", "tea", "tan", "ate", "nat", "bat"]
+  // Output: [["eat", "tea", "ate"], ["tan", "nat"], ["bat"]]
+}
+```
+
+<details>
+<summary>✅ Solution</summary>
+
+```javascript
+function groupAnagrams(words) {
+  const groups = new Map();
+
+  for (const word of words) {
+    // Sorted word as key
+    const key = word.split('').sort().join('');
+
+    if (!groups.has(key)) {
+      groups.set(key, []);
+    }
+
+    groups.get(key).push(word);
+  }
+
+  return Array.from(groups.values());
+}
+
+// Time: O(n * k log k) where k = avg word length
+// Space: O(n)
+// Hash table groups anagrams by their sorted form!
+```
+
+</details>
+
+---
+
+### Challenge 3: Implement LFU Cache ⭐⭐⭐⭐⭐
+
+**Problem**: Implement a Least Frequently Used cache (evicts least frequently accessed item).
+
+```javascript
+
+```
+
+<details>
+<summary>💡 Approach</summary>
+
+Use two hash tables:
+1. Key → (value, frequency)
+2. Frequency → list of keys with that frequency
+
+Track minimum frequency for O(1) eviction.
+
+```javascript
+class LFUCache {
+  constructor(capacity) {
+    this.capacity = capacity;
+    this.values = new Map(); // Stores key-value pairs
+    this.freqMap = new Map(); // Tracks frequency of keys
+    this.minFreq = 0; // Tracks the minimum frequency
+  }
+
+  get(key) {
+    if (!this.values.has(key)) return -1;
+
+    // Update frequency
+    const { value, freq } = this.values.get(key);
+    this.freqMap.get(freq).delete(key);
+
+    if (this.freqMap.get(freq).size === 0) {
+      this.freqMap.delete(freq);
+      if (this.minFreq === freq) this.minFreq++;
+    }
+
+    const newFreq = freq + 1;
+    if (!this.freqMap.has(newFreq)) this.freqMap.set(newFreq, new Set());
+    this.freqMap.get(newFreq).add(key);
+
+    this.values.set(key, { value, freq: newFreq });
+    return value;
+  }
+
+  put(key, value) {
+    if (this.capacity === 0) return;
+
+    if (this.values.has(key)) {
+      // Update value and frequency
+      this.get(key); // This updates the frequency
+      this.values.get(key).value = value;
+      return;
+    }
+
+    if (this.values.size >= this.capacity) {
+      // Evict least frequently used key
+      const leastFreqKeys = this.freqMap.get(this.minFreq);
+      const evictKey = leastFreqKeys.values().next().value; // Get any key from the set
+      leastFreqKeys.delete(evictKey);
+
+      if (leastFreqKeys.size === 0) this.freqMap.delete(this.minFreq);
+      this.values.delete(evictKey);
+    }
+
+    // Add new key-value pair
+    this.values.set(key, { value, freq: 1 });
+    if (!this.freqMap.has(1)) this.freqMap.set(1, new Set());
+    this.freqMap.get(1).add(key);
+    this.minFreq = 1; // Reset minimum frequency
+  }
+}
+
+// Example Usage
+const cache = new LFUCache(2);
+cache.put(1, 10);
+cache.put(2, 20);
+console.log(cache.get(1)); // Output: 10
+cache.put(3, 30); // Evicts key 2 (least frequently used)
+console.log(cache.get(2)); // Output: -1 (not found)
+console.log(cache.get(3)); // Output: 30
+```
+
+</details>
+
+---
+
+## What You've Mastered
+
+**In this tutorial, you learned**:
+✅ How hash functions convert keys to indices
+✅ Collision resolution with chaining and open addressing
+✅ Load factor management for optimal performance
+✅ Implementing a production-quality hash table from scratch
+✅ Building an LRU cache with O(1) operations
+✅ When to use Map, Set, WeakMap, and WeakSet
+✅ Common hash table interview problems
+
+**You can now**:
+- Explain why hash tables are O(1) (and when they're not)
+- Implement collision resolution strategies
+- Optimize hash table performance
+- Solve interview problems using hash tables
+- Choose the right built-in data structure
+
+---
+
+## Level Up: Advanced Hash Table Mastery
+
+**Ready to become a hash table expert?**
+
+<UpgradeCTA
+  features={[
+    "Advanced collision strategies: Quadratic probing, double hashing, cuckoo hashing",
+    "Perfect hashing for static datasets (O(1) worst case!)",
+    "Distributed hash tables (consistent hashing for distributed systems)",
+    "Real-world projects: Build Redis-like cache, bloom filter, count-min sketch",
+    "Interview deep dives: 30+ FAANG hash table problems with video walkthroughs",
+    "Performance profiling: Measure hash function quality and optimize"
+  ]}
+  requiredPlan="VIBED"
+/>
+
+---
+
+## Continue Learning
+
+<TutorialRecommendations />
+
+**Next Tutorial**: Stacks Deep Dive - Learn the LIFO data structure behind undo/redo, expression parsing, and browser history
+
+**Related Topics**:
+- [Sliding Window Pattern](/tutorials/category/data-structures/06-sliding-window-pattern)
+- [Two-Pointer Technique](/tutorials/category/data-structures/05-two-pointer-technique)
+- [Time Complexity & Big O](/tutorials/category/data-structures/04-time-complexity-big-o)
+
+---
+
+## Resources
+
+**For VIBED Subscribers** 🎁:
+- 📹 Video walkthrough with hash table visualization (50 min)
+- 📊 Hash function comparison chart (djb2, FNV, MurmurHash)
+- 💻 Production LRU/LFU cache implementations with tests
+- 🎯 30 additional hash table practice problems
+- 💬 Private Discord channel with expert help
+
+---
+
+*Was this tutorial helpful? Share it with someone preparing for coding interviews!*
+
+**Questions or feedback?** [Join our VIBED community](/subscribe) for live Q&A sessions.
+
+---
+
+**💡 Pro Tip**: In interviews, always start with "I'll use a hash table" for any problem involving lookups, counting, or grouping. It's the right answer 60% of the time!

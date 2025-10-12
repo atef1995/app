@@ -56,6 +56,16 @@ model User {
   conversionMedium         String?
   conversionSource         String?
   firstLandingPage         String?
+
+  // GitHub integration for contribution system
+  githubUsername           String?
+  githubAccessToken        String?                   // Encrypted token for API access
+  githubProfileUrl         String?
+
+  // XP and leveling system
+  xp                       Int                       @default(0)
+  level                    Int                       @default(1)
+
   accounts                 Account[]
   certificates             Certificate[]
   challengeAttempts        ChallengeAttempt[]
@@ -82,6 +92,10 @@ model User {
   achievements             UserAchievement[]
   userSettings             UserSettings?
   studyProgress            UserStudyProgress[]
+
+  // Contribution system relations
+  contributionSubmissions  ContributionSubmission[]
+  contributionReviews      ContributionReview[]
 
   @@map("users")
 }
@@ -768,4 +782,142 @@ model AnonymousSession {
 enum CertificateType {
   TUTORIAL
   CATEGORY
+}
+
+// ============================================================================
+// Contribution System Models
+// GitHub PR-based project submission and code review system
+// ============================================================================
+
+model ContributionProject {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  description     String
+  githubRepoUrl   String   // Main template repo students fork from
+  githubOwner     String   // e.g., "vibed-to-cracked"
+  githubRepo      String   // e.g., "student-portfolio-site"
+  category        String   // "frontend", "backend", "fullstack"
+  difficulty      Int      // 1-5
+  estimatedHours  Int
+
+  // Feature-based assignments (JSON array of feature specs)
+  features        Json     // Array of feature specifications
+
+  // PR Requirements
+  prTemplate      String   // Template for PR descriptions
+  requiredChecks  Json     // CI/CD checks required
+  reviewCriteria  Json     // What reviewers should look for
+
+  // Gamification
+  xpReward        Int      @default(100)
+  badgeId         String?  // Award badge on completion
+
+  isPremium       Boolean  @default(false)
+  requiredPlan    String   @default("FREE")
+  published       Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  submissions     ContributionSubmission[]
+
+  @@map("contribution_projects")
+}
+
+model ContributionSubmission {
+  id                  String   @id @default(cuid())
+  userId              String
+  projectId           String
+
+  // GitHub Integration
+  githubPrUrl         String   // Full PR URL
+  githubPrNumber      Int
+  githubBranch        String   // Their feature branch
+  githubForkUrl       String   // Their fork URL
+
+  // PR Status
+  prStatus            String   @default("OPEN") // OPEN, MERGED, CLOSED, CHANGES_REQUESTED
+  prTitle             String
+  prDescription       String   @db.Text
+
+  // Feature Implementation
+  featureId           String   // Which feature they implemented
+  featureTitle        String
+
+  // Automated Checks
+  ciPassed            Boolean  @default(false)
+  lintPassed          Boolean  @default(false)
+  testsPassed         Boolean  @default(false)
+
+  // Review Process
+  peerReviewsNeeded   Int      @default(2)
+  peerReviewsReceived Int      @default(0)
+  mentorReviewStatus  String   @default("PENDING") // PENDING, APPROVED, CHANGES_REQUESTED
+
+  // Grading
+  codeQuality         Float?   // 0-100
+  implementsSpec      Boolean  @default(false)
+  followsStandards    Boolean  @default(false)
+  grade               Float?   // Final grade
+
+  // Timestamps
+  submittedAt         DateTime @default(now())
+  mergedAt            DateTime?
+  completedAt         DateTime?
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  project             ContributionProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user                User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviews             ContributionReview[]
+
+  @@unique([userId, projectId, featureId])
+  @@index([userId])
+  @@index([projectId])
+  @@index([prStatus])
+  @@map("contribution_submissions")
+}
+
+model ContributionReview {
+  id                String   @id @default(cuid())
+  submissionId      String
+  reviewerId        String
+
+  // Review Content
+  type              String   @default("PEER") // PEER or MENTOR
+  status            String   @default("PENDING") // PENDING, APPROVED, CHANGES_REQUESTED, COMPLETED
+
+  // Code Review
+  filesReviewed     Int      @default(0)
+  commentsAdded     Int      @default(0)
+  githubReviewUrl   String?  // Link to GitHub review
+
+  // Scoring (using rubric)
+  codeQualityScore  Float?   // 0-100
+  functionalityScore Float?  // 0-100
+  documentationScore Float?  // 0-100
+  bestPracticesScore Float?  // 0-100
+  overallScore      Float?   // 0-100
+
+  // Feedback
+  strengths         String?  @db.Text
+  improvements      String?  @db.Text
+  suggestions       String?  @db.Text
+
+  // XP Rewards
+  xpAwarded         Int      @default(25) // Reviewer gets XP too!
+
+  submittedAt       DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  submission        ContributionSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  reviewer          User @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+  @@index([reviewerId])
+  @@index([type])
+  @@map("contribution_reviews")
 }
