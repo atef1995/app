@@ -105,7 +105,7 @@ export default function ContributionsPage() {
                       Review Queue
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Review others' contributions
+                      Review others&apos; contributions
                     </p>
                   </div>
                 </div>

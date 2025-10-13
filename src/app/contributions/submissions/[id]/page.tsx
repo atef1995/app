@@ -64,7 +64,7 @@ interface Review {
   };
 }
 
-export default function SubmissionDetailPage({ params }: { params: { id: string } }) {
+export default function SubmissionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { data: session } = useSession();
   const router = useRouter();
   const [submission, setSubmission] = useState<Submission | null>(null);
@@ -72,25 +72,34 @@ export default function SubmissionDetailPage({ params }: { params: { id: string 
   const [error, setError] = useState("");
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [submissionId, setSubmissionId] = useState<string | null>(null);
 
   useEffect(() => {
-    loadSubmission();
-  }, [params.id]);
+    params.then(p => setSubmissionId(p.id));
+  }, [params]);
+
+  useEffect(() => {
+    if (submissionId) {
+      loadSubmission();
+    }
+  }, [submissionId]);
 
   useEffect(() => {
     // Show celebration if just merged
-    if (submission?.prStatus === "MERGED" && !localStorage.getItem(`celebrated-${params.id}`)) {
+    if (submission?.prStatus === "MERGED" && submissionId && !localStorage.getItem(`celebrated-${submissionId}`)) {
       setShowCelebration(true);
-      localStorage.setItem(`celebrated-${params.id}`, "true");
+      localStorage.setItem(`celebrated-${submissionId}`, "true");
     }
-  }, [submission, params.id]);
+  }, [submission, submissionId]);
 
   const loadSubmission = async () => {
+    if (!submissionId) return;
+
     try {
       setLoading(true);
       setError("");
 
-      const response = await fetch(`/api/contributions/submissions/${params.id}`);
+      const response = await fetch(`/api/contributions/submissions/${submissionId}`);
       const data = await response.json();
 
       if (!data.success) {
@@ -105,13 +114,23 @@ export default function SubmissionDetailPage({ params }: { params: { id: string 
     }
   };
 
-  const handleSubmitReview = async (reviewData: any) => {
+  const handleSubmitReview = async (reviewData: {
+    codeQualityScore: number;
+    functionalityScore: number;
+    documentationScore: number;
+    bestPracticesScore: number;
+    strengths: string;
+    improvements: string;
+    suggestions: string;
+  }) => {
+    if (!submissionId) return;
+
     try {
       const response = await fetch(`/api/contributions/reviews`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          submissionId: params.id,
+          submissionId: submissionId,
           ...reviewData,
         }),
       });

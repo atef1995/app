@@ -36,7 +36,7 @@ export async function awardXP(
   userId: string,
   amount: number,
   reason: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): Promise<XPAwardResult> {
   try {
     // Fetch current user XP and level

@@ -12,7 +12,7 @@ import { createGitHubService } from "@/lib/services/githubService";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -24,7 +24,8 @@ export async function GET(
       );
     }
 
-    const submissionId = params.id;
+    const resolvedParams = await params;
+    const submissionId = resolvedParams.id;
 
     // Fetch submission
     const submission = await prisma.contributionSubmission.findUnique({
