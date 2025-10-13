@@ -116,8 +116,8 @@ const InteractiveCodeBlock: React.FC<InteractiveCodeBlockProps> = ({
       />
 
       {editable && (
-        <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-          <Lightbulb className="h-3 w-3" />
+        <div className="mt-2 text-xs text-wrap text-gray-500 dark:text-gray-400 flex flex-wrap items-center gap-1">
+          <Lightbulb className="h-3 w-3 " />
           Tip: Modify the code above and click &ldquo;Run&rdquo; to see the
           results
         </div>

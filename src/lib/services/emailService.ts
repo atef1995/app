@@ -220,6 +220,22 @@ class EmailService {
     return await this.sendEmail(email, subject, html);
   }
 
+  async sendBroadcastEmail(
+    recipient: { email: string; name: string | null; username: string | null },
+    subject: string,
+    message: string,
+    includeUnsubscribe: boolean = true
+  ) {
+    const html = this.generateBroadcastTemplate(
+      recipient,
+      subject,
+      message,
+      includeUnsubscribe
+    );
+
+    return await this.sendEmail(recipient.email, subject, html);
+  }
+
   private generateWelcomeTemplate(user: User): string {
     const moodEmojis: Record<string, string> = {
       CHILL: "😎",
@@ -1301,6 +1317,67 @@ document.querySelector('#increment').addEventListener('click', () => {
           <h1>Day ${day} Content</h1>
           <p>Hello ${userName},</p>
           <p>Your Day ${day} content will be available soon!</p>
+        </body>
+      </html>
+    `;
+  }
+
+  private generateBroadcastTemplate(
+    recipient: { email: string; name: string | null; username: string | null },
+    subject: string,
+    message: string,
+    includeUnsubscribe: boolean
+  ): string {
+    const displayName = recipient.name || recipient.username || "there";
+    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+
+    // Replace variables in message
+    let processedMessage = message;
+    processedMessage = processedMessage.replace(/{username}/g, displayName);
+    processedMessage = processedMessage.replace(/{email}/g, recipient.email);
+
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>${subject}</title>
+          <style>
+            body { font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: white; padding: 30px; border: 1px solid #ddd; }
+            .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 10px 10px; }
+            .unsubscribe { margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
+            a { color: #667eea; text-decoration: none; }
+            a:hover { text-decoration: underline; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>${subject}</h1>
+            <p>Message from Vibed to Cracked</p>
+          </div>
+
+          <div class="content">
+            ${processedMessage}
+          </div>
+
+          <div class="footer">
+            ${
+              includeUnsubscribe
+                ? `
+              <div class="unsubscribe">
+                <p>Don't want to receive emails like this?</p>
+                <p><a href="${baseUrl}/unsubscribe?email=${encodeURIComponent(
+                    recipient.email
+                  )}">Unsubscribe from promotional emails</a></p>
+              </div>
+            `
+                : ""
+            }
+            <p>Vibed to Cracked<br>Learn JavaScript at Your Own Pace</p>
+            <p><a href="${baseUrl}">Visit Our Platform</a> | <a href="${baseUrl}/contact">Contact Support</a></p>
+          </div>
         </body>
       </html>
     `;

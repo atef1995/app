@@ -56,7 +56,9 @@ export default function ContributionsDashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState<"submissions" | "reviews">("submissions");
+  const [activeTab, setActiveTab] = useState<"submissions" | "reviews">(
+    "submissions"
+  );
 
   useEffect(() => {
     if (!session) {
@@ -107,7 +109,9 @@ export default function ContributionsDashboardPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            Loading dashboard...
+          </p>
         </div>
       </div>
     );
@@ -117,7 +121,9 @@ export default function ContributionsDashboardPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 max-w-md">
-          <p className="text-red-800 dark:text-red-400">{error || "Failed to load dashboard"}</p>
+          <p className="text-red-800 dark:text-red-400">
+            {error || "Failed to load dashboard"}
+          </p>
           <button
             onClick={loadDashboardData}
             className="mt-4 text-blue-600 dark:text-blue-400 hover:underline"
@@ -193,7 +199,7 @@ export default function ContributionsDashboardPage() {
         {/* Quick Actions */}
         <div className="flex items-center gap-4">
           <Link
-            href="/contributions/projects"
+            href="/contributions"
             className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium shadow-lg"
           >
             Browse Projects
@@ -267,7 +273,11 @@ export default function ContributionsDashboardPage() {
                         {submission.projectTitle} • {submission.featureTitle}
                       </p>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(submission.prStatus)}`}>
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                        submission.prStatus
+                      )}`}
+                    >
                       {submission.prStatus}
                     </span>
                   </div>
@@ -275,31 +285,76 @@ export default function ContributionsDashboardPage() {
                   <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-2">
                       {submission.ciPassed ? (
-                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-5 h-5 text-green-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       ) : (
-                        <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        <svg
+                          className="w-5 h-5 text-red-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
                         </svg>
                       )}
-                      <span>CI {submission.ciPassed ? "Passing" : "Failing"}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                      </svg>
                       <span>
-                        {submission.peerReviewsReceived}/{submission.peerReviewsNeeded} Reviews
+                        CI {submission.ciPassed ? "Passing" : "Failing"}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                        />
                       </svg>
-                      <span>{new Date(submission.submittedAt).toLocaleDateString()}</span>
+                      <span>
+                        {submission.peerReviewsReceived}/
+                        {submission.peerReviewsNeeded} Reviews
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <span>
+                        {new Date(submission.submittedAt).toLocaleDateString()}
+                      </span>
                     </div>
                   </div>
                 </Link>
@@ -334,20 +389,35 @@ export default function ContributionsDashboardPage() {
                         {assignment.projectTitle} • {assignment.featureTitle}
                       </p>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      assignment.status === "COMPLETED"
-                        ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-                    }`}>
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        assignment.status === "COMPLETED"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                          : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                      }`}
+                    >
                       {assignment.status}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
                     </svg>
-                    <span>Assigned {new Date(assignment.assignedAt).toLocaleDateString()}</span>
+                    <span>
+                      Assigned{" "}
+                      {new Date(assignment.assignedAt).toLocaleDateString()}
+                    </span>
                   </div>
                 </Link>
               ))

@@ -66,6 +66,10 @@ model User {
   xp                       Int                       @default(0)
   level                    Int                       @default(1)
 
+  // Email preferences
+  emailUnsubscribed        Boolean                   @default(false)
+  emailUnsubscribedAt      DateTime?
+
   accounts                 Account[]
   certificates             Certificate[]
   challengeAttempts        ChallengeAttempt[]
@@ -920,4 +924,20 @@ model ContributionReview {
   @@index([reviewerId])
   @@index([type])
   @@map("contribution_reviews")
+}
+
+model EmailLog {
+  id             String   @id @default(cuid())
+  type           String   // BROADCAST, PROMOTIONAL, REMINDER, etc.
+  subject        String
+  recipientCount Int
+  sentCount      Int
+  failedCount    Int
+  recipientType  String?  // all, free, premium, specific
+  sentBy         String   // Admin email who sent it
+  createdAt      DateTime @default(now())
+
+  @@index([type])
+  @@index([createdAt])
+  @@map("email_logs")
 }

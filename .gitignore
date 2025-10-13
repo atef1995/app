@@ -47,3 +47,11 @@ src/content/tutorials/nodejs/TUTORIAL-PLAN.md
 src/content/tutorials/github/GITHUB_TUTORIALS_PLAN.md
 .claude/agents/nextjs-expert-engineer.md
 .claude/settings.local.json
+email-templates/broadcast-new-features.html
+email-templates/new-features-announcement-personal.html
+email-templates/new-features-announcement.html
+email-templates/new-features-announcement-personal.txt
+email-templates/new-features-announcement.txt
+email-templates/READY_TO_SEND.md
+email-templates/WHICH_VERSION.md
+email-templates/HOW_TO_USE.md

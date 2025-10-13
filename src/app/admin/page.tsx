@@ -8,6 +8,7 @@ import StudyReminderForm from '@/components/admin/StudyReminderForm';
 import EmailStatsDashboard from '@/components/admin/EmailStatsDashboard';
 import CronJobMonitor from '@/components/admin/CronJobMonitor';
 import PeerReviewDashboard from '@/components/admin/PeerReviewDashboard';
+import BroadcastEmailForm from '@/components/admin/BroadcastEmailForm';
 
 export default function AdminPage() {
   const { data: session, status } = useSession();
@@ -31,6 +32,7 @@ export default function AdminPage() {
     { id: 'promotional', label: '📧 Promotional Emails', component: PromotionalEmailForm },
     { id: 'reminders', label: '⏰ Study Reminders', component: StudyReminderForm },
     { id: 'cron', label: '🤖 Cron Jobs', component: CronJobMonitor },
+    { id: 'broadcast', label: '📢 Broadcast Emails', component: BroadcastEmailForm },
   ];
 
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || EmailStatsDashboard;
