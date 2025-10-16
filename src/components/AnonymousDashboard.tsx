@@ -2,7 +2,15 @@
 
 import { MoodSelector } from "@/components/MoodSelector";
 import { SignupCTA } from "@/components/SignupCTA";
-import { BookOpen, Code, Brain, Building, Sparkles } from "lucide-react";
+import {
+  BookOpen,
+  Code,
+  Brain,
+  Building,
+  Sparkles,
+  GitPullRequest,
+  ToolCase,
+} from "lucide-react";
 import Link from "next/link";
 
 export function AnonymousDashboard() {
@@ -40,7 +48,8 @@ export function AnonymousDashboard() {
             How are you feeling today?
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
-            Your mood shapes your learning experience - choose what fits your vibe
+            Your mood shapes your learning experience - choose what fits your
+            vibe
           </p>
           <MoodSelector showDescription={true} />
         </div>
@@ -137,6 +146,61 @@ export function AnonymousDashboard() {
               </p>
               <div className="text-sm text-orange-600 dark:text-orange-400 font-semibold text-center">
                 Start Building →
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        {/* Additional Features */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
+            Additional Features
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Link
+              href="/auth/signin?feature=contributions"
+              className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-cyan-200 dark:hover:border-cyan-400 dark:shadow-xl group relative"
+            >
+              <div className="absolute top-4 right-4 bg-cyan-100 dark:bg-cyan-900 text-cyan-600 dark:text-cyan-300 text-xs font-bold px-2 py-1 rounded-full">
+                Signup Required
+              </div>
+              <div className="mb-4 flex justify-center">
+                <GitPullRequest className="h-12 w-12 text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 text-center">
+                Contributions
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4 text-center text-sm">
+                Contribute to real projects, earn XP, and build your portfolio
+              </p>
+              <div className="text-sm text-cyan-600 dark:text-cyan-400 font-semibold text-center">
+                Start Contributing →
+              </div>
+            </Link>
+
+            <Link
+              href="/tools/complexity-visualizer"
+              className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-red-200 dark:hover:border-red-400 dark:shadow-xl group"
+            >
+              <div className="mb-4 flex justify-center">
+                <ToolCase className="h-12 w-12 text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 text-center">
+                Algorithms Visualisation Tool
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4 text-center text-sm">
+                Take a look at our new algorithms time complexity visualiser
+              </p>
+              <div className="text-sm text-red-600 dark:text-red-400 font-semibold text-center">
+                Explore →
+              </div>
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-center text-gray-500 dark:text-gray-500">
+                  <span className="font-semibold text-green-600 dark:text-green-400">
+                    Free tool
+                  </span>{" "}
+                  - no signup needed
+                </p>
               </div>
             </Link>
           </div>

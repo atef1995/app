@@ -290,20 +290,11 @@ async function checkTutorialAccessLimits(
     }
 
     const { access } = subscriptionData.data;
-    const { subscription, tutorialLimits } = access;
+    const { subscription } = access;
 
     // If user has premium access, allow all tutorials
     if (subscription.canAccessPremium) {
       return { hasAccess: true };
-    }
-
-    // Check if user has reached tutorial limits
-    if (!tutorialLimits.withinLimits) {
-      return {
-        hasAccess: false,
-        reason: `You've reached the limit of ${tutorialLimits.max} tutorials on the ${subscription.plan} plan`,
-        suggestedPlan: "VIBED",
-      };
     }
 
     // Get tutorial info to check if it's premium
