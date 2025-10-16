@@ -148,16 +148,15 @@ async function seedContributionTutorials() {
 }
 
 // Run the seeding if this file is executed directly
-if (require.main === module) {
-  seedContributionTutorials()
-    .catch((error) => {
-      console.error(error);
-      process.exit(1);
-    })
-    .finally(async () => {
-      await prisma.$disconnect();
-    });
-}
+
+seedContributionTutorials()
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
 
 export {
   seedContributionTutorials,

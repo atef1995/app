@@ -224,6 +224,7 @@ function isProtectedRoute(pathname: string): boolean {
     "/practice",
     "/settings",
     "/quiz/", // Individual quiz attempts (not /quizzes listing)
+    "/cheat-sheets", // Cheat sheets require authentication
   ];
 
   return protectedRoutes.some((route) => {
@@ -352,6 +353,7 @@ export const config = {
     "/practice/:path*",
     "/quiz/:path*",
     "/settings/:path*",
+    "/cheat-sheets/:path*", // Protected - requires authentication
     "/tutorials/category/:path*", // Keep for anonymous limit checking
     "/auth/signin",
     "/auth/signin/:path*",

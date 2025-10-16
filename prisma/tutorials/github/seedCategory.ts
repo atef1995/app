@@ -29,4 +29,8 @@ const seedGithubCategory = async () => {
   return categoryRecord;
 };
 
+seedGithubCategory()
+  .then(() => console.log("success"))
+  .catch((e) => console.log(e));
+
 export { seedGithubCategory };
