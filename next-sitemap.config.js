@@ -34,7 +34,7 @@ async function safeFetch(url, options = {}) {
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
   siteUrl: process.env.NODE_ENV === 'production'
-    ? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.NEXTAUTH_URL || "https://vibed-to-cracked.com")
+    ? (process.env.NEXTAUTH_URL || "https://vibed-to-cracked.com")
     : "https://vibed-to-cracked.com",
   generateRobotsTxt: true,
   sitemapSize: 7000,
