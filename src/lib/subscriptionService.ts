@@ -60,10 +60,10 @@ export interface PlanLimits {
 // Plan configurations
 export const PLAN_CONFIGS: Record<Plan, PlanLimits> = {
   FREE: {
-    maxTutorials: 15,
+    maxTutorials: 25,
     maxChallenges: Infinity,
     hasQuizzes: true,
-    maxQuizzes: 5,
+    maxQuizzes: 25,
     hasMoodAdaptation: true,
     hasProgressTracking: true,
     hasAdvancedFeatures: false,
