@@ -5,7 +5,10 @@ import { ComplexityChart } from "./components/ComplexityChart";
 import { AlgorithmComparison } from "./components/AlgorithmComparison";
 import { ComplexityCalculator } from "./components/ComplexityCalculator";
 import { PerformanceBenchmark } from "./components/PerformanceBenchmark";
-import { FeaturePreviewCard, FeatureBadge } from "./components/FeaturePreviewCard";
+import {
+  FeaturePreviewCard,
+  FeatureBadge,
+} from "./components/FeaturePreviewCard";
 import {
   LineChart,
   BarChart3,
@@ -16,6 +19,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
+import { TutorialRecommendations } from "@/components/tutorial/TutorialRecommendations";
 
 /**
  * ComplexityVisualizerClient Component
@@ -43,7 +47,9 @@ interface Tab {
   locked: boolean;
 }
 
-export function ComplexityVisualizerClient({ plan }: ComplexityVisualizerClientProps) {
+export function ComplexityVisualizerClient({
+  plan,
+}: ComplexityVisualizerClientProps) {
   const [activeTab, setActiveTab] = useState<TabId>("chart");
 
   const isCracked = plan === "CRACKED";
@@ -101,8 +107,12 @@ export function ComplexityVisualizerClient({ plan }: ComplexityVisualizerClientP
                   <Calculator className="w-8 h-8 text-white" />
                 </div>
                 Complexity Visualizer
-                {!isCracked && <FeatureBadge locked={true} text="PREVIEW" size="lg" />}
-                {isCracked && <FeatureBadge locked={false} text="CRACKED" size="lg" />}
+                {!isCracked && (
+                  <FeatureBadge locked={true} text="PREVIEW" size="lg" />
+                )}
+                {isCracked && (
+                  <FeatureBadge locked={false} text="CRACKED" size="lg" />
+                )}
               </h1>
               <p className="mt-2 text-gray-600 dark:text-gray-400">
                 {isCracked
@@ -237,44 +247,12 @@ export function ComplexityVisualizerClient({ plan }: ComplexityVisualizerClientP
 
         {/* Related Resources */}
         <div className="mt-12">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <BookOpen className="w-5 h-5" />
-            Related Learning Resources
-          </h2>
-          <div className="grid md:grid-cols-3 gap-4">
-            <Link
-              href="/tutorials/data-structures/00-time-complexity-big-o"
-              className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-purple-500 dark:hover:border-purple-500 transition-colors"
-            >
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                Big O Notation Tutorial
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Learn the fundamentals of time and space complexity
-              </p>
-            </Link>
-            <Link
-              href="/tutorials/data-structures/02-two-pointer-technique"
-              className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-purple-500 dark:hover:border-purple-500 transition-colors"
-            >
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                Two-Pointer Technique
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Master O(n) algorithms for array problems
-              </p>
-            </Link>
-            <Link
-              href="/challenges"
-              className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-purple-500 dark:hover:border-purple-500 transition-colors"
-            >
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                Practice Challenges
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Apply what you learned with real coding problems
-              </p>
-            </Link>
+          <div className="grid md:grid-cols-1 gap-4">
+            <TutorialRecommendations
+              title="Related Learning Resources"
+              currentTutorialSlug="02-why-sorting-matters"
+              limit={4}
+            />
           </div>
         </div>
       </main>
@@ -285,7 +263,10 @@ export function ComplexityVisualizerClient({ plan }: ComplexityVisualizerClientP
           <p>
             Part of the <strong>Vibed to Cracked</strong> learning platform.{" "}
             {!isCracked && (
-              <Link href="/subscription/upgrade" className="text-purple-600 dark:text-purple-400 hover:underline">
+              <Link
+                href="/subscription/upgrade"
+                className="text-purple-600 dark:text-purple-400 hover:underline"
+              >
                 Upgrade to CRACKED
               </Link>
             )}{" "}

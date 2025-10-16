@@ -1,5 +1,6 @@
 import React from "react";
 import { CheckCircle, Clock, XCircle, Target } from "lucide-react";
+import Link from "next/link";
 
 interface ProgressBadgeProps {
   status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "FAILED";
@@ -131,9 +132,11 @@ export function ProgressStats({
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl">
-      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-        Your Progress
-      </h3>
+      <Link href={"/study-plan"} className="hover:cursor-pointer ">
+        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6 hover:text-blue-500">
+          Your Progress
+        </h3>
+      </Link>
 
       <div className="space-y-6">
         {/* Tutorial Progress */}
@@ -207,8 +210,8 @@ export function ProgressStats({
           </div>
           <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
             <span>
-              {projectStats.inProgress} in progress •{" "}
-              {projectStats.notStarted} not started
+              {projectStats.inProgress} in progress • {projectStats.notStarted}{" "}
+              not started
             </span>
             <span>{Math.round(projectProgress)}% complete</span>
           </div>

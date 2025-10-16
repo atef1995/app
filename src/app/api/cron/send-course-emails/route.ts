@@ -15,64 +15,125 @@ export async function GET(req: NextRequest) {
       totalProcessed: 0,
       emailsSent: 0,
       errors: 0,
+      skipped: 0,
+      completed: 0,
     };
-
-    // TODO: You need a CourseSubscriber model to track who signed up when
-    // For now, this is a placeholder showing the logic you'd implement
 
     console.log(`🕐 Running course email cron at ${now.toISOString()}`);
 
-    // Example logic (you'd need to implement the CourseSubscriber model):
-    /*
+    // Get all active subscribers
     const subscribers = await prisma.courseSubscriber.findMany({
       where: {
-        // Find users who need their next email
-        // e.g., signed up 1 day ago and haven't received day 2 yet
-      }
+        status: "ACTIVE",
+      },
     });
 
+    console.log(`📊 Found ${subscribers.length} active subscribers`);
+
     for (const subscriber of subscribers) {
+      stats.totalProcessed++;
+
+      // Calculate days since signup
       const daysSinceSignup = Math.floor(
         (now.getTime() - subscriber.createdAt.getTime()) / (1000 * 60 * 60 * 24)
       );
 
+      // Determine which day's email they should receive next
+      // Day 1 is sent immediately on signup
+      // Days 2-5 are sent by cron job
       const nextDay = daysSinceSignup + 1;
 
-      if (nextDay >= 2 && nextDay <= 5 && !subscriber.emailsSent.includes(nextDay)) {
+      // Check if they need an email today
+      if (nextDay >= 2 && nextDay <= 5) {
+        // Check if they already received this day's email
+        if (subscriber.emailsSent.includes(nextDay)) {
+          console.log(
+            `⏭️  Subscriber ${subscriber.email} already received day ${nextDay}`
+          );
+          stats.skipped++;
+          continue;
+        }
+
+        // Send the email
         try {
-          await emailService.sendFreeCourseEmail(subscriber.email, nextDay, subscriber.name);
+          console.log(`📧 Sending day ${nextDay} to ${subscriber.email}`);
+
+          const result = await emailService.sendFreeCourseEmail(
+            subscriber.email,
+            nextDay,
+            subscriber.name || undefined
+          );
+
+          if (!result.success) {
+            throw new Error(result.error || "Failed to send email");
+          }
 
           // Mark email as sent
           await prisma.courseSubscriber.update({
             where: { id: subscriber.id },
             data: {
-              emailsSent: [...subscriber.emailsSent, nextDay]
-            }
+              emailsSent: [...subscriber.emailsSent, nextDay],
+              // Mark as completed if this was day 5
+              ...(nextDay === 5
+                ? {
+                    status: "COMPLETED",
+                    completedAt: new Date(),
+                  }
+                : {}),
+            },
           });
 
           stats.emailsSent++;
+          console.log(
+            `✅ Successfully sent day ${nextDay} to ${subscriber.email}`
+          );
+
+          if (nextDay === 5) {
+            stats.completed++;
+            console.log(
+              `🎉 Subscriber ${subscriber.email} completed the course!`
+            );
+          }
         } catch (error) {
-          console.error(`Failed to send day ${nextDay} to ${subscriber.email}:`, error);
+          console.error(
+            `❌ Failed to send day ${nextDay} to ${subscriber.email}:`,
+            error
+          );
           stats.errors++;
         }
+      } else if (nextDay > 5) {
+        // Course is complete, mark if not already
+        if (subscriber.status === "ACTIVE") {
+          await prisma.courseSubscriber.update({
+            where: { id: subscriber.id },
+            data: {
+              status: "COMPLETED",
+              completedAt: new Date(),
+            },
+          });
+          stats.completed++;
+        }
+      } else {
+        // Too early for next email
+        stats.skipped++;
       }
-
-      stats.totalProcessed++;
     }
-    */
 
     console.log(`✅ Course email cron completed:`, stats);
 
     return NextResponse.json({
       success: true,
-      message: "Course emails processed",
+      message: "Course emails processed successfully",
       stats,
       timestamp: now.toISOString(),
     });
   } catch (error) {
     console.error("Error in course email cron:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }

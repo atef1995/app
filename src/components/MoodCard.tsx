@@ -74,7 +74,7 @@ export function MoodCard({
 
   // Homepage variant styling
   if (variant === "homepage") {
-    const homepageClasses = `
+    const homepageClasses = `min-h-full
       p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-600 
       hover:border-gray-300 dark:hover:border-gray-500 
       transition-all hover:shadow-lg cursor-pointer transform hover:scale-105

@@ -37,38 +37,38 @@ model Session {
 }
 
 model User {
-  id                       String                    @id @default(cuid())
-  name                     String?
-  username                 String?                   @unique
-  email                    String                    @unique
-  emailVerified            DateTime?
-  image                    String?
-  mood                     String                    @default("CHILL")
-  subscription             String                    @default("FREE")
-  subscriptionStatus       String                    @default("INACTIVE")
-  subscriptionEndsAt       DateTime?
-  stripeCustomerId         String?
-  createdAt                DateTime                  @default(now())
-  updatedAt                DateTime                  @updatedAt
-  role                     String                    @default("USER")
-  anonymousSessionId       String?
-  conversionCampaign       String?
-  conversionMedium         String?
-  conversionSource         String?
-  firstLandingPage         String?
+  id                 String    @id @default(cuid())
+  name               String?
+  username           String?   @unique
+  email              String    @unique
+  emailVerified      DateTime?
+  image              String?
+  mood               String    @default("CHILL")
+  subscription       String    @default("FREE")
+  subscriptionStatus String    @default("INACTIVE")
+  subscriptionEndsAt DateTime?
+  stripeCustomerId   String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  role               String    @default("USER")
+  anonymousSessionId String?
+  conversionCampaign String?
+  conversionMedium   String?
+  conversionSource   String?
+  firstLandingPage   String?
 
   // GitHub integration for contribution system
-  githubUsername           String?
-  githubAccessToken        String?                   // Encrypted token for API access
-  githubProfileUrl         String?
+  githubUsername    String?
+  githubAccessToken String? // Encrypted token for API access
+  githubProfileUrl  String?
 
   // XP and leveling system
-  xp                       Int                       @default(0)
-  level                    Int                       @default(1)
+  xp    Int @default(0)
+  level Int @default(1)
 
   // Email preferences
-  emailUnsubscribed        Boolean                   @default(false)
-  emailUnsubscribedAt      DateTime?
+  emailUnsubscribed   Boolean   @default(false)
+  emailUnsubscribedAt DateTime?
 
   accounts                 Account[]
   certificates             Certificate[]
@@ -98,8 +98,8 @@ model User {
   studyProgress            UserStudyProgress[]
 
   // Contribution system relations
-  contributionSubmissions  ContributionSubmission[]
-  contributionReviews      ContributionReview[]
+  contributionSubmissions ContributionSubmission[]
+  contributionReviews     ContributionReview[]
 
   @@map("users")
 }
@@ -794,88 +794,88 @@ enum CertificateType {
 // ============================================================================
 
 model ContributionProject {
-  id              String   @id @default(cuid())
-  slug            String   @unique
-  title           String
-  description     String
-  githubRepoUrl   String   // Main template repo students fork from
-  githubOwner     String   // e.g., "vibed-to-cracked"
-  githubRepo      String   // e.g., "student-portfolio-site"
-  category        String   // "frontend", "backend", "fullstack"
-  difficulty      Int      // 1-5
-  estimatedHours  Int
+  id             String @id @default(cuid())
+  slug           String @unique
+  title          String
+  description    String
+  githubRepoUrl  String // Main template repo students fork from
+  githubOwner    String // e.g., "vibed-to-cracked"
+  githubRepo     String // e.g., "student-portfolio-site"
+  category       String // "frontend", "backend", "fullstack"
+  difficulty     Int // 1-5
+  estimatedHours Int
 
   // Feature-based assignments (JSON array of feature specs)
-  features        Json     // Array of feature specifications
+  features Json // Array of feature specifications
 
   // PR Requirements
-  prTemplate      String   // Template for PR descriptions
-  requiredChecks  Json     // CI/CD checks required
-  reviewCriteria  Json     // What reviewers should look for
+  prTemplate     String // Template for PR descriptions
+  requiredChecks Json // CI/CD checks required
+  reviewCriteria Json // What reviewers should look for
 
   // Gamification
-  xpReward        Int      @default(100)
-  badgeId         String?  // Award badge on completion
+  xpReward Int     @default(100)
+  badgeId  String? // Award badge on completion
 
-  isPremium       Boolean  @default(false)
-  requiredPlan    String   @default("FREE")
-  published       Boolean  @default(true)
+  isPremium    Boolean @default(false)
+  requiredPlan String  @default("FREE")
+  published    Boolean @default(true)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  submissions     ContributionSubmission[]
+  submissions ContributionSubmission[]
 
   @@map("contribution_projects")
 }
 
 model ContributionSubmission {
-  id                  String   @id @default(cuid())
-  userId              String
-  projectId           String
+  id        String @id @default(cuid())
+  userId    String
+  projectId String
 
   // GitHub Integration
-  githubPrUrl         String   // Full PR URL
-  githubPrNumber      Int
-  githubBranch        String   // Their feature branch
-  githubForkUrl       String   // Their fork URL
+  githubPrUrl    String // Full PR URL
+  githubPrNumber Int
+  githubBranch   String // Their feature branch
+  githubForkUrl  String // Their fork URL
 
   // PR Status
-  prStatus            String   @default("OPEN") // OPEN, MERGED, CLOSED, CHANGES_REQUESTED
-  prTitle             String
-  prDescription       String   @db.Text
+  prStatus      String @default("OPEN") // OPEN, MERGED, CLOSED, CHANGES_REQUESTED
+  prTitle       String
+  prDescription String @db.Text
 
   // Feature Implementation
-  featureId           String   // Which feature they implemented
-  featureTitle        String
+  featureId    String // Which feature they implemented
+  featureTitle String
 
   // Automated Checks
-  ciPassed            Boolean  @default(false)
-  lintPassed          Boolean  @default(false)
-  testsPassed         Boolean  @default(false)
+  ciPassed    Boolean @default(false)
+  lintPassed  Boolean @default(false)
+  testsPassed Boolean @default(false)
 
   // Review Process
-  peerReviewsNeeded   Int      @default(2)
-  peerReviewsReceived Int      @default(0)
-  mentorReviewStatus  String   @default("PENDING") // PENDING, APPROVED, CHANGES_REQUESTED
+  peerReviewsNeeded   Int    @default(2)
+  peerReviewsReceived Int    @default(0)
+  mentorReviewStatus  String @default("PENDING") // PENDING, APPROVED, CHANGES_REQUESTED
 
   // Grading
-  codeQuality         Float?   // 0-100
-  implementsSpec      Boolean  @default(false)
-  followsStandards    Boolean  @default(false)
-  grade               Float?   // Final grade
+  codeQuality      Float? // 0-100
+  implementsSpec   Boolean @default(false)
+  followsStandards Boolean @default(false)
+  grade            Float? // Final grade
 
   // Timestamps
-  submittedAt         DateTime @default(now())
-  mergedAt            DateTime?
-  completedAt         DateTime?
+  submittedAt DateTime  @default(now())
+  mergedAt    DateTime?
+  completedAt DateTime?
 
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  project             ContributionProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  user                User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reviews             ContributionReview[]
+  project ContributionProject  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviews ContributionReview[]
 
   @@unique([userId, projectId, featureId])
   @@index([userId])
@@ -885,40 +885,40 @@ model ContributionSubmission {
 }
 
 model ContributionReview {
-  id                String   @id @default(cuid())
-  submissionId      String
-  reviewerId        String
+  id           String @id @default(cuid())
+  submissionId String
+  reviewerId   String
 
   // Review Content
-  type              String   @default("PEER") // PEER or MENTOR
-  status            String   @default("PENDING") // PENDING, APPROVED, CHANGES_REQUESTED, COMPLETED
+  type   String @default("PEER") // PEER or MENTOR
+  status String @default("PENDING") // PENDING, APPROVED, CHANGES_REQUESTED, COMPLETED
 
   // Code Review
-  filesReviewed     Int      @default(0)
-  commentsAdded     Int      @default(0)
-  githubReviewUrl   String?  // Link to GitHub review
+  filesReviewed   Int     @default(0)
+  commentsAdded   Int     @default(0)
+  githubReviewUrl String? // Link to GitHub review
 
   // Scoring (using rubric)
-  codeQualityScore  Float?   // 0-100
-  functionalityScore Float?  // 0-100
-  documentationScore Float?  // 0-100
-  bestPracticesScore Float?  // 0-100
-  overallScore      Float?   // 0-100
+  codeQualityScore   Float? // 0-100
+  functionalityScore Float? // 0-100
+  documentationScore Float? // 0-100
+  bestPracticesScore Float? // 0-100
+  overallScore       Float? // 0-100
 
   // Feedback
-  strengths         String?  @db.Text
-  improvements      String?  @db.Text
-  suggestions       String?  @db.Text
+  strengths    String? @db.Text
+  improvements String? @db.Text
+  suggestions  String? @db.Text
 
   // XP Rewards
-  xpAwarded         Int      @default(25) // Reviewer gets XP too!
+  xpAwarded Int @default(25) // Reviewer gets XP too!
 
-  submittedAt       DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  submittedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  submission        ContributionSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-  reviewer          User @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+  submission ContributionSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  reviewer   User                   @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
 
   @@index([submissionId])
   @@index([reviewerId])
@@ -928,16 +928,44 @@ model ContributionReview {
 
 model EmailLog {
   id             String   @id @default(cuid())
-  type           String   // BROADCAST, PROMOTIONAL, REMINDER, etc.
+  type           String // BROADCAST, PROMOTIONAL, REMINDER, etc.
   subject        String
   recipientCount Int
   sentCount      Int
   failedCount    Int
-  recipientType  String?  // all, free, premium, specific
-  sentBy         String   // Admin email who sent it
+  recipientType  String? // all, free, premium, specific
+  sentBy         String // Admin email who sent it
   createdAt      DateTime @default(now())
 
   @@index([type])
   @@index([createdAt])
   @@map("email_logs")
+}
+
+model CourseSubscriber {
+  id    String  @id @default(cuid())
+  email String  @unique
+  name  String?
+
+  // Track which day emails have been sent
+  emailsSent Int[] @default([]) // Array of day numbers (1-5)
+
+  // Subscription status
+  status String @default("ACTIVE") // ACTIVE, COMPLETED, UNSUBSCRIBED
+
+  // Track completion
+  completedAt    DateTime?
+  unsubscribedAt DateTime?
+
+  // Metadata
+  source    String? // Where they signed up from
+  ipAddress String? // For abuse prevention
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+  @@map("course_subscribers")
 }
