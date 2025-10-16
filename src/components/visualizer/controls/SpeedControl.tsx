@@ -36,13 +36,13 @@ export function SpeedControl({
   ];
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-2 sm:p-3">
       <div className="flex items-center gap-2 mb-2">
-        <Gauge className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <Gauge className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-400" />
+        <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
           Speed
         </span>
-        <span className="ml-auto text-sm font-semibold text-blue-600 dark:text-blue-400">
+        <span className="ml-auto text-xs sm:text-sm font-semibold text-blue-600 dark:text-blue-400">
           {speed.toFixed(1)}x
         </span>
       </div>
@@ -56,7 +56,7 @@ export function SpeedControl({
         value={speed}
         onChange={handleChange}
         disabled={disabled}
-        className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500 disabled:opacity-50 disabled:cursor-not-allowed touch-none"
         aria-label="Animation speed"
       />
 
@@ -67,7 +67,7 @@ export function SpeedControl({
             key={preset.value}
             onClick={() => onSpeedChange(preset.value)}
             disabled={disabled}
-            className={`flex-1 px-2 py-1 text-xs rounded transition-colors ${
+            className={`flex-1 px-2 py-1.5 sm:py-1 text-xs rounded transition-colors touch-manipulation cursor-pointer min-h-[36px] sm:min-h-0 ${
               speed === preset.value
                 ? "bg-blue-500 text-white"
                 : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"

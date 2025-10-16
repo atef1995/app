@@ -228,23 +228,23 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   return (
     <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
       {/* Header */}
-      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-        <div className="flex items-center space-x-2">
-          <div className="flex space-x-1">
+      <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+        <div className="flex items-center space-x-1.5 sm:space-x-2">
+          <div className="hidden sm:flex space-x-1">
             <div className="w-3 h-3 rounded-full bg-red-400"></div>
             <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
             <div className="w-3 h-3 rounded-full bg-green-400"></div>
           </div>
-          <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+          <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
             {lang}
           </span>
         </div>
 
         {!readOnly && (
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1.5 sm:space-x-2">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="px-2 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-xs rounded border border-gray-300 dark:border-gray-500 transition-colors flex items-center gap-1 cursor-pointer"
+              className="px-2 py-1 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-xs rounded border border-gray-300 dark:border-gray-500 transition-colors flex items-center justify-center gap-1 cursor-pointer touch-manipulation"
               title={
                 isExpanded
                   ? "Exit fullscreen (ESC)"
@@ -254,12 +254,12 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
               {isExpanded ? (
                 <>
                   <span className="text-xs">⤓</span>
-                  <span>Collapse</span>
+                  <span className="hidden sm:inline">Collapse</span>
                 </>
               ) : (
                 <>
                   <span className="text-xs">⤢</span>
-                  <span>Expand</span>
+                  <span className="hidden sm:inline">Expand</span>
                 </>
               )}
             </button>
@@ -267,7 +267,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
               <button
                 onClick={handleRunCode}
                 disabled={isRunning || !code.trim()}
-                className="px-3 py-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white text-sm rounded font-medium transition-colors cursor-pointer"
+                className="px-3 py-1 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-gray-400 text-white text-xs sm:text-sm rounded font-medium transition-colors cursor-pointer touch-manipulation"
               >
                 {isRunning ? "⏳" : "▶"} Run
               </button>
@@ -283,17 +283,17 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         }`}
       >
         {isExpanded && (
-          <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-              JavaScript Console - Fullscreen
+          <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+            <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300 truncate">
+              {lang} Console - Fullscreen
             </span>
             <button
               onClick={() => setIsExpanded(false)}
-              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-sm rounded border border-gray-300 dark:border-gray-500 transition-colors flex items-center gap-1 cursor-pointer"
+              className="px-3 py-1 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-xs sm:text-sm rounded border border-gray-300 dark:border-gray-500 transition-colors flex items-center justify-center gap-1 cursor-pointer touch-manipulation flex-shrink-0"
               title="Exit fullscreen (ESC)"
             >
               <span>✕</span>
-              <span>Close</span>
+              <span className="hidden sm:inline">Close</span>
             </button>
           </div>
         )}
@@ -310,7 +310,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
           theme={resolvedTheme === "dark" ? "vs-dark" : "light"}
           options={{
             minimap: { enabled: false },
-            fontSize: 16,
+            fontSize: 14,
             lineNumbers: "on",
             roundedSelection: false,
             scrollBeyondLastLine: false,
@@ -330,6 +330,18 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
               comments: true,
               strings: true,
             },
+            scrollbar: {
+              vertical: "auto",
+              horizontal: "auto",
+              useShadows: false,
+              verticalScrollbarSize: 10,
+              horizontalScrollbarSize: 10,
+            },
+            overviewRulerLanes: 0,
+            hideCursorInOverviewRuler: true,
+            lineNumbersMinChars: 3,
+            glyphMargin: false,
+            folding: true,
             ...(placeholder && !code
               ? {
                   renderLineHighlight: "none",

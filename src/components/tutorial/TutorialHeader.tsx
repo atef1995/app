@@ -1,15 +1,15 @@
 "use client";
 
 import React from "react";
-import { 
-  Sprout, 
-  Target, 
-  BarChart3, 
-  BookOpen, 
-  Clock, 
-  Crown, 
-  Star, 
-  Zap 
+import {
+  Sprout,
+  Target,
+  BarChart3,
+  BookOpen,
+  Clock,
+  Crown,
+  Star,
+  Zap,
 } from "lucide-react";
 import { type TutorialData } from "@/hooks/useTutorial";
 
@@ -18,7 +18,10 @@ interface TutorialHeaderProps {
   category: string;
 }
 
-export default function TutorialHeader({ tutorial, category }: TutorialHeaderProps) {
+export default function TutorialHeader({
+  tutorial,
+  category,
+}: TutorialHeaderProps) {
   // Helper function to get premium badge
   const getPremiumBadge = (tutorial: TutorialData) => {
     const requiredPlan = tutorial.requiredPlan || tutorial.meta.requiredPlan;
@@ -91,10 +94,12 @@ export default function TutorialHeader({ tutorial, category }: TutorialHeaderPro
     let text = "";
 
     if (level === "beginner" || difficulty === 1) {
-      badgeClass = "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
+      badgeClass =
+        "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
       text = "Beginner";
     } else if (level === "intermediate" || difficulty === 2) {
-      badgeClass = "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200";
+      badgeClass =
+        "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200";
       text = "Intermediate";
     } else {
       badgeClass = "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200";
@@ -114,7 +119,7 @@ export default function TutorialHeader({ tutorial, category }: TutorialHeaderPro
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-xl mb-8">
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center gap-4 mb-4 flex-wrap">
         <div className="flex-shrink-0">{getTutorialIcon(tutorial)}</div>
         <div>
           <div className="flex items-center gap-2 mb-2">
@@ -123,13 +128,13 @@ export default function TutorialHeader({ tutorial, category }: TutorialHeaderPro
             </span>
             {getPremiumBadge(tutorial)}
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 text-balance">
             {tutorial.meta.title || tutorial.title}
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-600 dark:text-gray-300 text-balance">
             {tutorial.meta.description || tutorial.description}
           </p>
-          <div className="flex items-center gap-4 mt-2">
+          <div className="flex flex-wrap items-center gap-4 mt-5">
             {getDifficultyBadge()}
             {tutorial.meta.estimatedTime && (
               <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
@@ -138,7 +143,7 @@ export default function TutorialHeader({ tutorial, category }: TutorialHeaderPro
               </span>
             )}
             {tutorial.meta.topics && tutorial.meta.topics.length > 0 && (
-              <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+              <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                 <BookOpen className="w-4 h-4" />
                 {tutorial.meta.topics.join(", ")}
               </span>

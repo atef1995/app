@@ -82,16 +82,16 @@ const InteractiveCodeBlock: React.FC<InteractiveCodeBlockProps> = ({
   const code = initialCode || codeFromChildren;
 
   return (
-    <div className="my-6">
+    <div className="my-4 sm:my-6">
       {(title || description) && (
-        <div className="mb-4">
+        <div className="mb-3 sm:mb-4 px-2 sm:px-0">
           {title && (
-            <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
+            <h4 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
               {title}
             </h4>
           )}
           {description && (
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
+            <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm">
               {description}
             </p>
           )}
@@ -116,10 +116,12 @@ const InteractiveCodeBlock: React.FC<InteractiveCodeBlockProps> = ({
       />
 
       {editable && (
-        <div className="mt-2 text-xs text-wrap text-gray-500 dark:text-gray-400 flex flex-wrap items-center gap-1">
-          <Lightbulb className="h-3 w-3 " />
-          Tip: Modify the code above and click &ldquo;Run&rdquo; to see the
-          results
+        <div className="mt-2 px-2 sm:px-0 text-xs text-wrap text-gray-500 dark:text-gray-400 flex flex-wrap items-start sm:items-center gap-1">
+          <Lightbulb className="h-3 w-3 flex-shrink-0 mt-0.5 sm:mt-0" />
+          <span className="leading-relaxed">
+            Tip: Modify the code above and click &ldquo;Run&rdquo; to see the
+            results
+          </span>
         </div>
       )}
     </div>

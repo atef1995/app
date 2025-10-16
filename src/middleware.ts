@@ -1,23 +1,70 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
+import type { JWT } from "next-auth/jwt";
 import { devMode } from "./lib/services/envService";
 const debugMode = devMode();
+
+// Request timeout constant
+const FETCH_TIMEOUT = 5000; // 5 seconds
+
+// Helper function to fetch with timeout
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit = {}
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if ((error as Error).name === "AbortError") {
+      throw new Error("Request timeout");
+    }
+    throw error;
+  }
+}
+
+// Helper to generate anonymous ID
+function generateAnonymousId(): string {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 15);
+  return `anon_${random}_${timestamp}`;
+}
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (debugMode) {
     console.log("Middleware executed for:", pathname);
-  } // Check for session token in cookies (NextAuth uses different cookie names)
+  }
+
+  // Use NextAuth's getToken for proper session validation
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
+  // Legacy cookie check as fallback
   const sessionToken =
     req.cookies.get("next-auth.session-token") ||
     req.cookies.get("__Secure-next-auth.session-token");
 
+  const isAuthenticated = !!token || !!sessionToken;
+
   if (debugMode) {
-    console.log("Session token exists:", !!sessionToken, "for path:", pathname);
+    console.log("User authenticated:", isAuthenticated, "for path:", pathname);
   }
-  // If we have a session token and user is trying to access signin page, redirect to dashboard
-  if (sessionToken && pathname.startsWith("/auth/signin")) {
+
+  // If we have a valid token and user is trying to access signin page, redirect to dashboard
+  if (isAuthenticated && pathname.startsWith("/auth/signin")) {
     const callbackUrl =
       req.nextUrl.searchParams.get("callbackUrl") || "/dashboard";
     if (debugMode) {
@@ -31,20 +78,21 @@ export async function middleware(req: NextRequest) {
 
   // Handle tutorial access - both anonymous and authenticated
   if (pathname.startsWith("/tutorials/category/")) {
-    if (!sessionToken) {
+    if (!isAuthenticated) {
       // Anonymous user trying to view tutorial - check anonymous limit
       const anonymousCheckResult = await handleAnonymousTutorialAccess(
         req,
         pathname
       );
       if (anonymousCheckResult) {
-        return anonymousCheckResult; // Redirect to signup if limit reached
+        return anonymousCheckResult; // Redirect to signup if limit reached or set cookie
       }
       // Allow access if under limit
       return NextResponse.next();
     } else {
       // Authenticated user - check subscription limits
       const limitCheckResult = await checkTutorialAccessLimits(
+        token,
         sessionToken,
         pathname,
         req
@@ -75,7 +123,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // Check if the route requires authentication (non-tutorial routes)
-  if (isProtectedRoute(pathname) && !sessionToken) {
+  if (isProtectedRoute(pathname) && !isAuthenticated) {
     if (debugMode) {
       console.log("Redirecting unauthenticated user to signin for:", pathname);
     }
@@ -99,14 +147,28 @@ async function handleAnonymousTutorialAccess(
   const ANONYMOUS_TUTORIAL_LIMIT = 5;
 
   // Check anonymous session in cookies
-  const anonymousId = req.cookies.get("vibed_anonymous_id")?.value;
+  let anonymousId = req.cookies.get("vibed_anonymous_id")?.value;
 
   if (!anonymousId) {
-    // First-time anonymous visitor - allow access
+    // First-time anonymous visitor - generate and set cookie
+    anonymousId = generateAnonymousId();
+
     if (debugMode) {
-      console.log("✅ First-time anonymous visitor, allowing tutorial access");
+      console.log(
+        "✅ First-time anonymous visitor, setting cookie and allowing tutorial access"
+      );
     }
-    return null;
+
+    const response = NextResponse.next();
+    response.cookies.set("vibed_anonymous_id", anonymousId, {
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+    });
+
+    return response;
   }
 
   // Check how many tutorials they've viewed
@@ -114,10 +176,13 @@ async function handleAnonymousTutorialAccess(
     const baseUrl = new URL(req.url).origin;
     const trackingUrl = `${baseUrl}/api/anonymous/check-limit?anonymousId=${anonymousId}`;
 
-    const response = await fetch(trackingUrl);
+    const response = await fetchWithTimeout(trackingUrl);
 
     if (!response.ok) {
       // If check fails, allow access (fail open)
+      if (debugMode) {
+        console.log("⚠️ Anonymous check failed, allowing access");
+      }
       return null;
     }
 
@@ -158,9 +223,17 @@ function isProtectedRoute(pathname: string): boolean {
   const protectedRoutes = [
     "/practice",
     "/settings",
-    "/quiz/",  // Individual quiz attempts (note the trailing slash to avoid matching /quizzes)
+    "/quiz/", // Individual quiz attempts (not /quizzes listing)
   ];
-  return protectedRoutes.some((route) => pathname.startsWith(route));
+
+  return protectedRoutes.some((route) => {
+    // Exact match for routes with trailing slash
+    if (route.endsWith("/")) {
+      // Match /quiz/123 but not /quizzes
+      return pathname.startsWith(route) && pathname !== route.slice(0, -1);
+    }
+    return pathname.startsWith(route);
+  });
 }
 
 interface TutorialAccessResult {
@@ -170,20 +243,21 @@ interface TutorialAccessResult {
 }
 
 async function checkTutorialAccessLimits(
+  token: JWT | null,
   sessionToken: { name: string; value: string } | undefined,
   pathname: string,
   req: NextRequest
 ): Promise<TutorialAccessResult> {
   try {
     // Extract tutorial slug from pathname (e.g., /tutorials/category/javascript/variables -> variables)
-    const pathParts = pathname.split("/");
+    const pathParts = pathname.split("/").filter(Boolean);
     const tutorialSlug = pathParts[pathParts.length - 1];
 
     if (!tutorialSlug) {
       if (debugMode) {
         console.log("🔧 No tutorial slug found, allowing category page");
-        return { hasAccess: true }; // Allow category pages
       }
+      return { hasAccess: true }; // Allow category pages
     }
 
     // Get user subscription info - use the request origin instead of NEXTAUTH_URL for internal calls
@@ -194,7 +268,7 @@ async function checkTutorialAccessLimits(
     const sessionTokenCookie = sessionToken?.value;
     const sessionTokenName = sessionToken?.name;
 
-    const subscriptionResponse = await fetch(subscriptionUrl, {
+    const subscriptionResponse = await fetchWithTimeout(subscriptionUrl, {
       headers: {
         Cookie: `${sessionTokenName}=${sessionTokenCookie}`,
       },
@@ -233,7 +307,7 @@ async function checkTutorialAccessLimits(
     }
 
     // Get tutorial info to check if it's premium
-    const tutorialResponse = await fetch(
+    const tutorialResponse = await fetchWithTimeout(
       `${baseUrl}/api/tutorials?slug=${tutorialSlug}`
     );
 
@@ -287,7 +361,7 @@ export const config = {
     "/practice/:path*",
     "/quiz/:path*",
     "/settings/:path*",
-    "/tutorials/category/:path*",  // Keep for anonymous limit checking
+    "/tutorials/category/:path*", // Keep for anonymous limit checking
     "/auth/signin",
     "/auth/signin/:path*",
     // Catch all auth routes

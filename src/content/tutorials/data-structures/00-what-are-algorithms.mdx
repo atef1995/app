@@ -160,6 +160,7 @@ The algorithm must complete in a finite number of steps.
 // ❌ BAD: Infinite loop (never ends)
 while (true) {
   console.log("Forever!");
+  break; // if you remove the break it will crash your browser page
 }
 
 // ✅ GOOD: Finite (ends after 10 iterations)
@@ -495,12 +496,12 @@ function reverseString(str) {
   // Output: "olleh"
 }
 ```
-
 <details>
 <summary>💡 Hint</summary>
-Think about the steps: Start from the last character and build a new string by moving backwards.
-</details>
 
+Think about the steps: Start from the last character and build a new string by moving backwards.
+
+</details>
 <details>
 <summary>✅ Solution</summary>
 
@@ -545,12 +546,12 @@ function countVowels(str) {
   // Output: 3 (e, o, o)
 }
 ```
-
 <details>
 <summary>💡 Hint</summary>
-Create a list of vowels to check against. Loop through each character and count matches.
-</details>
 
+Create a list of vowels to check against. Loop through each character and count matches.
+
+</details>
 <details>
 <summary>✅ Solution</summary>
 
@@ -595,12 +596,12 @@ function findLargest(numbers) {
   // Output: 9
 }
 ```
-
 <details>
 <summary>💡 Hint</summary>
-Start by assuming the first number is the largest. Then check each remaining number.
-</details>
 
+Start by assuming the first number is the largest. Then check each remaining number.
+
+</details>
 <details>
 <summary>✅ Solution</summary>
 
