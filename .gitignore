@@ -73,3 +73,16 @@ backup-database.ts
 restore-database.ts
 .github/instructions/instructions.instructions.md
 prisma/migrations/20251016185345_add_cheat_sheet_model/migration.sql
+docs/DYNAMIC_METADATA_GUIDE.md
+docs/DYNAMIC_METADATA_PATTERN.md
+docs/DYNAMIC_METADATA_QUICK_REFERENCE.md
+docs/IMPLEMENTATION_COMPLETE.md
+docs/PUBLIC_CONTENT_STRATEGY.md
+docs/QUIZ_PUBLIC_ACCESS_COMPLETE.md
+docs/QUIZ_SEO_IMPLEMENTATION.md
+docs/SEO_DEPLOYMENT_CHECKLIST.md
+docs/SEO_DOCUMENTATION_INDEX.md
+docs/SEO_OPTIMIZATION_SUMMARY.md
+docs/SEO_QUICK_REFERENCE.md
+docs/STATIC_VS_DYNAMIC_METADATA.md
+docs/TUTORIALS_SEO_IMPLEMENTATION.md

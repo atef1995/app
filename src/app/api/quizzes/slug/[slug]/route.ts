@@ -19,7 +19,13 @@ export async function GET(
       return NextResponse.json({ error: "Quiz not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ quiz });
+    const response = NextResponse.json({ quiz });
+    // Cache for 5 minutes for individual quizzes
+    response.headers.set(
+      "Cache-Control",
+      "public, s-maxage=300, stale-while-revalidate=600"
+    );
+    return response;
   } catch (error) {
     console.error("Error fetching quiz by slug:", error);
     return NextResponse.json(

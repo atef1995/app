@@ -24,6 +24,7 @@ import {
   Check,
 } from "lucide-react";
 import { MOODS } from "@/lib/moods";
+import { getMoodIcon } from "@/lib/getMoodIcon";
 import { MoodCard } from "@/components/MoodCard";
 import CrackedGlitch from "@/components/ui/CrackedGlitch";
 
@@ -151,8 +152,8 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             Master JavaScript and build 10 real portfolio projects in 12 weeks.
-            Mood-adaptive learning that fits YOUR energy level - no burnout, just
-            results.
+            Mood-adaptive learning that fits YOUR energy level - no burnout,
+            just results.
           </motion.p>
           <motion.div
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
@@ -295,7 +296,13 @@ export default function HomePage() {
                       stiffness: 150,
                     }}
                   >
-                    {MOODS[selectedMood as keyof typeof MOODS]?.emoji}
+                    {(() => {
+                      const Icon = getMoodIcon(
+                        MOODS[selectedMood as keyof typeof MOODS]?.icon ||
+                          "Cloud"
+                      );
+                      return <Icon className="w-12 h-12" />;
+                    })()}
                   </motion.div>
 
                   {/* Animated Particles */}
@@ -408,7 +415,8 @@ export default function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            A structured curriculum that takes you from complete beginner to job-ready developer
+            A structured curriculum that takes you from complete beginner to
+            job-ready developer
           </motion.p>
 
           <div className="max-w-5xl mx-auto">
@@ -428,9 +436,21 @@ export default function HomePage() {
               </div>
               <div className="grid md:grid-cols-3 gap-4">
                 {[
-                  { title: "JavaScript Fundamentals", duration: "4-6 hrs", topics: "Variables, Functions, Arrays" },
-                  { title: "HTML Essentials", duration: "2-3 hrs", topics: "Structure, Forms, Semantic HTML" },
-                  { title: "CSS Styling", duration: "3-4 hrs", topics: "Flexbox, Grid, Animations" },
+                  {
+                    title: "JavaScript Fundamentals",
+                    duration: "4-6 hrs",
+                    topics: "Variables, Functions, Arrays",
+                  },
+                  {
+                    title: "HTML Essentials",
+                    duration: "2-3 hrs",
+                    topics: "Structure, Forms, Semantic HTML",
+                  },
+                  {
+                    title: "CSS Styling",
+                    duration: "3-4 hrs",
+                    topics: "Flexbox, Grid, Animations",
+                  },
                 ].map((module, idx) => (
                   <motion.div
                     key={module.title}
@@ -442,11 +462,17 @@ export default function HomePage() {
                     whileHover={{ y: -3, transition: { duration: 0.2 } }}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">{module.title}</h3>
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                        {module.title}
+                      </h3>
                       <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
                     </div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{module.topics}</p>
-                    <div className="text-xs text-gray-500 dark:text-gray-500">{module.duration}</div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                      {module.topics}
+                    </p>
+                    <div className="text-xs text-gray-500 dark:text-gray-500">
+                      {module.duration}
+                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -468,10 +494,26 @@ export default function HomePage() {
               </div>
               <div className="grid md:grid-cols-4 gap-4">
                 {[
-                  { title: "DOM Manipulation", duration: "2-3 hrs", topics: "Events, Dynamic Pages" },
-                  { title: "OOP JavaScript", duration: "3-4 hrs", topics: "Classes, Inheritance" },
-                  { title: "Async Programming", duration: "2-3 hrs", topics: "Promises, Async/Await" },
-                  { title: "Data Structures", duration: "4-6 hrs", topics: "Arrays, Objects, Maps" },
+                  {
+                    title: "DOM Manipulation",
+                    duration: "2-3 hrs",
+                    topics: "Events, Dynamic Pages",
+                  },
+                  {
+                    title: "OOP JavaScript",
+                    duration: "3-4 hrs",
+                    topics: "Classes, Inheritance",
+                  },
+                  {
+                    title: "Async Programming",
+                    duration: "2-3 hrs",
+                    topics: "Promises, Async/Await",
+                  },
+                  {
+                    title: "Data Structures",
+                    duration: "4-6 hrs",
+                    topics: "Arrays, Objects, Maps",
+                  },
                 ].map((module, idx) => (
                   <motion.div
                     key={module.title}
@@ -483,11 +525,17 @@ export default function HomePage() {
                     whileHover={{ y: -3, transition: { duration: 0.2 } }}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">{module.title}</h3>
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                        {module.title}
+                      </h3>
                       <Check className="w-5 h-5 text-blue-500 flex-shrink-0" />
                     </div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{module.topics}</p>
-                    <div className="text-xs text-gray-500 dark:text-gray-500">{module.duration}</div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                      {module.topics}
+                    </p>
+                    <div className="text-xs text-gray-500 dark:text-gray-500">
+                      {module.duration}
+                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -508,9 +556,21 @@ export default function HomePage() {
               </div>
               <div className="grid md:grid-cols-3 gap-4">
                 {[
-                  { title: "Advanced JavaScript", duration: "5-8 hrs", topics: "Closures, Patterns, Performance" },
-                  { title: "Node.js & APIs", duration: "6-8 hrs", topics: "Express, REST APIs, Databases" },
-                  { title: "Git & GitHub", duration: "2-3 hrs", topics: "Version Control, Collaboration" },
+                  {
+                    title: "Advanced JavaScript",
+                    duration: "5-8 hrs",
+                    topics: "Closures, Patterns, Performance",
+                  },
+                  {
+                    title: "Node.js & APIs",
+                    duration: "6-8 hrs",
+                    topics: "Express, REST APIs, Databases",
+                  },
+                  {
+                    title: "Git & GitHub",
+                    duration: "2-3 hrs",
+                    topics: "Version Control, Collaboration",
+                  },
                 ].map((module, idx) => (
                   <motion.div
                     key={module.title}
@@ -522,11 +582,17 @@ export default function HomePage() {
                     whileHover={{ y: -3, transition: { duration: 0.2 } }}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">{module.title}</h3>
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                        {module.title}
+                      </h3>
                       <Check className="w-5 h-5 text-purple-500 flex-shrink-0" />
                     </div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{module.topics}</p>
-                    <div className="text-xs text-gray-500 dark:text-gray-500">{module.duration}</div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                      {module.topics}
+                    </p>
+                    <div className="text-xs text-gray-500 dark:text-gray-500">
+                      {module.duration}
+                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -669,8 +735,8 @@ export default function HomePage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
-                Get our 5-day JavaScript crash course delivered to your inbox — absolutely free.
-                No credit card required.
+                Get our 5-day JavaScript crash course delivered to your inbox —
+                absolutely free. No credit card required.
               </motion.p>
               <motion.div
                 className="flex flex-col sm:flex-row gap-4 justify-center"
@@ -728,21 +794,67 @@ export default function HomePage() {
               <thead className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
                 <tr>
                   <th className="px-6 py-4 text-left font-semibold">Feature</th>
-                  <th className="px-6 py-4 text-center font-semibold">YouTube/Free</th>
-                  <th className="px-6 py-4 text-center font-semibold">Bootcamps</th>
-                  <th className="px-6 py-4 text-center font-semibold bg-white/20">Vibed to Cracked</th>
+                  <th className="px-6 py-4 text-center font-semibold">
+                    YouTube/Free
+                  </th>
+                  <th className="px-6 py-4 text-center font-semibold">
+                    Bootcamps
+                  </th>
+                  <th className="px-6 py-4 text-center font-semibold bg-white/20">
+                    Vibed to Cracked
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {[
-                  { feature: "Structured Curriculum", youtube: false, bootcamp: true, us: true },
-                  { feature: "Mood-Adaptive Learning", youtube: false, bootcamp: false, us: true },
-                  { feature: "Learn at Your Pace", youtube: true, bootcamp: false, us: true },
-                  { feature: "Portfolio Projects", youtube: false, bootcamp: true, us: true },
-                  { feature: "Interactive Code Editor", youtube: false, bootcamp: true, us: true },
-                  { feature: "Progress Tracking", youtube: false, bootcamp: true, us: true },
-                  { feature: "Cost", youtube: "Free", bootcamp: "$15k-20k", us: "$9.98/mo" },
-                  { feature: "Time Commitment", youtube: "Self-paced", bootcamp: "3-6 months full-time", us: "12 weeks part-time" },
+                  {
+                    feature: "Structured Curriculum",
+                    youtube: false,
+                    bootcamp: true,
+                    us: true,
+                  },
+                  {
+                    feature: "Mood-Adaptive Learning",
+                    youtube: false,
+                    bootcamp: false,
+                    us: true,
+                  },
+                  {
+                    feature: "Learn at Your Pace",
+                    youtube: true,
+                    bootcamp: false,
+                    us: true,
+                  },
+                  {
+                    feature: "Portfolio Projects",
+                    youtube: false,
+                    bootcamp: true,
+                    us: true,
+                  },
+                  {
+                    feature: "Interactive Code Editor",
+                    youtube: false,
+                    bootcamp: true,
+                    us: true,
+                  },
+                  {
+                    feature: "Progress Tracking",
+                    youtube: false,
+                    bootcamp: true,
+                    us: true,
+                  },
+                  {
+                    feature: "Cost",
+                    youtube: "Free",
+                    bootcamp: "$15k-20k",
+                    us: "$9.98/mo",
+                  },
+                  {
+                    feature: "Time Commitment",
+                    youtube: "Self-paced",
+                    bootcamp: "3-6 months full-time",
+                    us: "12 weeks part-time",
+                  },
                 ].map((row, idx) => (
                   <motion.tr
                     key={row.feature}
@@ -756,36 +868,42 @@ export default function HomePage() {
                       {row.feature}
                     </td>
                     <td className="px-6 py-4 text-center">
-                      {typeof row.youtube === 'boolean' ? (
+                      {typeof row.youtube === "boolean" ? (
                         row.youtube ? (
                           <Check className="w-5 h-5 text-green-500 mx-auto" />
                         ) : (
                           <span className="text-gray-400">—</span>
                         )
                       ) : (
-                        <span className="text-gray-600 dark:text-gray-400 text-sm">{row.youtube}</span>
+                        <span className="text-gray-600 dark:text-gray-400 text-sm">
+                          {row.youtube}
+                        </span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-center">
-                      {typeof row.bootcamp === 'boolean' ? (
+                      {typeof row.bootcamp === "boolean" ? (
                         row.bootcamp ? (
                           <Check className="w-5 h-5 text-green-500 mx-auto" />
                         ) : (
                           <span className="text-gray-400">—</span>
                         )
                       ) : (
-                        <span className="text-gray-600 dark:text-gray-400 text-sm">{row.bootcamp}</span>
+                        <span className="text-gray-600 dark:text-gray-400 text-sm">
+                          {row.bootcamp}
+                        </span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-center bg-blue-50 dark:bg-blue-900/20">
-                      {typeof row.us === 'boolean' ? (
+                      {typeof row.us === "boolean" ? (
                         row.us ? (
                           <Check className="w-5 h-5 text-blue-600 dark:text-blue-400 mx-auto" />
                         ) : (
                           <span className="text-gray-400">—</span>
                         )
                       ) : (
-                        <span className="text-blue-600 dark:text-blue-400 font-semibold text-sm">{row.us}</span>
+                        <span className="text-blue-600 dark:text-blue-400 font-semibold text-sm">
+                          {row.us}
+                        </span>
                       )}
                     </td>
                   </motion.tr>
@@ -882,8 +1000,18 @@ export default function HomePage() {
               <span>30-day money-back guarantee</span>
             </div>
             <div className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              <svg
+                className="w-4 h-4 text-blue-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
               </svg>
               <span>Secure payment via Stripe</span>
             </div>

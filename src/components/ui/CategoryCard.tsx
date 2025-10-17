@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { 
-  BookOpen, 
-  Users, 
-  Clock, 
+import {
+  BookOpen,
+  Users,
+  Clock,
   ChevronRight,
   Layers,
   Zap,
@@ -11,9 +11,10 @@ import {
   Code,
   Palette,
   Database,
-  Loader2
+  Loader2,
 } from "lucide-react";
 import { useMood } from "@/components/providers/MoodProvider";
+import { getMoodIcon } from "@/lib/getMoodIcon";
 
 interface CategoryCardProps {
   category: string;
@@ -80,17 +81,24 @@ export default function CategoryCard({
   const [isHovered, setIsHovered] = useState(false);
   const { currentMood } = useMood();
   const styles = difficultyStyles[difficulty];
-  const progressPercentage = tutorialCount > 0 ? (completedCount / tutorialCount) * 100 : 0;
+  const progressPercentage =
+    tutorialCount > 0 ? (completedCount / tutorialCount) * 100 : 0;
+  const Icon = getMoodIcon(currentMood.icon);
 
   // Get category icon or fallback
-  const categoryIcon = categoryIcons[category as keyof typeof categoryIcons] || 
-                      <BookOpen className="w-8 h-8" />;
+  const categoryIcon = categoryIcons[
+    category as keyof typeof categoryIcons
+  ] || <BookOpen className="w-8 h-8" />;
 
   return (
     <div
       className={`
         relative overflow-hidden rounded-2xl border-2 transition-all duration-300 
-        ${isLoading ? 'cursor-not-allowed opacity-80' : 'cursor-pointer hover:shadow-xl hover:scale-[1.02] hover:-translate-y-1'}
+        ${
+          isLoading
+            ? "cursor-not-allowed opacity-80"
+            : "cursor-pointer hover:shadow-xl hover:scale-[1.02] hover:-translate-y-1"
+        }
         ${styles.bg} ${styles.border}
         ${className}
       `}
@@ -100,7 +108,7 @@ export default function CategoryCard({
     >
       {/* Progress bar */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-700">
-        <div 
+        <div
           className={`h-full ${styles.accent} transition-all duration-500`}
           style={{ width: `${progressPercentage}%` }}
         />
@@ -110,27 +118,25 @@ export default function CategoryCard({
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className={`${styles.icon} flex-shrink-0`}>
-              {categoryIcon}
-            </div>
+            <div className={`${styles.icon} flex-shrink-0`}>{categoryIcon}</div>
             <div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                {title || category.replace(/([A-Z])/g, ' $1').trim()}
+                {title || category.replace(/([A-Z])/g, " $1").trim()}
               </h3>
               <p className={`text-sm font-medium capitalize ${styles.text}`}>
                 {difficulty} Level
               </p>
             </div>
           </div>
-          
+
           {isLoading ? (
             <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
           ) : (
-            <ChevronRight 
+            <ChevronRight
               className={`
                 w-5 h-5 text-gray-400 transition-transform duration-300
-                ${isHovered ? 'translate-x-1' : ''}
-              `} 
+                ${isHovered ? "translate-x-1" : ""}
+              `}
             />
           )}
         </div>
@@ -145,18 +151,22 @@ export default function CategoryCard({
           <div className="flex items-center gap-2">
             <BookOpen className="w-4 h-4 text-gray-500 dark:text-gray-400" />
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Tutorials</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Tutorials
+              </p>
               <p className="font-semibold text-gray-900 dark:text-gray-100">
                 {tutorialCount}
               </p>
             </div>
           </div>
-          
+
           {totalDuration && (
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-gray-500 dark:text-gray-400" />
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Duration</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Duration
+                </p>
                 <p className="font-semibold text-gray-900 dark:text-gray-100">
                   {totalDuration}
                 </p>
@@ -169,13 +179,15 @@ export default function CategoryCard({
         {completedCount > 0 && (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-gray-500 dark:text-gray-400">Progress</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                Progress
+              </span>
               <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
                 {completedCount}/{tutorialCount}
               </span>
             </div>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-              <div 
+              <div
                 className={`h-1.5 rounded-full ${styles.accent} transition-all duration-500`}
                 style={{ width: `${progressPercentage}%` }}
               />
@@ -210,7 +222,9 @@ export default function CategoryCard({
         {/* Mood-specific enhancement */}
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-2">
-            <div className="text-lg">{currentMood.emoji}</div>
+            <div className="text-lg">
+              <Icon className="w-5 h-5" />
+            </div>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               Optimized for {currentMood.name.toLowerCase()} mode
             </p>
@@ -219,12 +233,12 @@ export default function CategoryCard({
       </div>
 
       {/* Hover effect overlay */}
-      <div 
+      <div
         className={`
           absolute inset-0 bg-gradient-to-br from-white/10 to-transparent 
           transition-opacity duration-300 pointer-events-none
-          ${isHovered && !isLoading ? 'opacity-100' : 'opacity-0'}
-        `} 
+          ${isHovered && !isLoading ? "opacity-100" : "opacity-0"}
+        `}
       />
 
       {/* Loading overlay */}

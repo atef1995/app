@@ -3,6 +3,7 @@
 import { Crown, Sparkles, Lock, ArrowRight, Clock } from "lucide-react";
 import { useMood } from "@/components/providers/MoodProvider";
 import getMoodColors from "@/lib/getMoodColors";
+import { useMoodColors } from "@/hooks/useMoodColors";
 
 interface CardProps {
   children: React.ReactNode;
@@ -32,7 +33,7 @@ export const CardAction = {
     <button
       onClick={onClick}
       disabled={disabled}
-      className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer active:scale-95"
+      className={`bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer active:scale-95 `}
     >
       {children}
       <ArrowRight className="h-4 w-4" />
@@ -92,8 +93,7 @@ export default function Card({
   actions,
 }: CardProps) {
   const { currentMood } = useMood();
-
-  const moodColors = getMoodColors(currentMood.id);
+  const { bg, border, gradient, text, button } = useMoodColors();
 
   const handleClick = () => {
     if (disabled) return;
@@ -115,11 +115,7 @@ export default function Card({
     }
     ${(onClick || onPremiumClick) && !disabled ? "cursor-pointer" : ""}
     ${disabled ? "opacity-50 cursor-not-allowed" : ""}
-    ${
-      isPremium
-        ? `${moodColors.bg} hover:bg-yellow-500 ${moodColors.border}`
-        : ""
-    }
+    ${isPremium ? `${bg} hover:bg-yellow-500 ${border}` : ""}
     ${className}
   `;
 
@@ -141,11 +137,19 @@ export default function Card({
 
       {/* Premium Lock Overlay */}
       {isPremium && (
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 flex items-center justify-center backdrop-blur-sm z-20 h-full min-h-max">
+        <div
+          className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 flex items-center justify-center backdrop-blur-sm z-20 h-full min-h-max cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onPremiumClick) {
+              onPremiumClick();
+            }
+          }}
+        >
           <div className="text-center p-6">
             {/* Lock Icon */}
             <div
-              className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r ${moodColors.gradient} text-white shadow-lg mb-4`}
+              className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r ${gradient} text-white shadow-lg mb-4`}
             >
               <Lock className="w-8 h-8" />
             </div>
@@ -167,7 +171,9 @@ export default function Card({
               </p>
             )}
 
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p
+              className={`text-sm text-gray-600 dark:text-gray-400 mb-4 ${text}`}
+            >
               {currentMood.id === "rush" &&
                 "🔥 Click to unlock premium features!"}
               {currentMood.id === "grind" && "💪 Upgrade for advanced content"}
@@ -176,7 +182,7 @@ export default function Card({
 
             {/* Click hint */}
             <div
-              className={`inline-block px-3 py-1 rounded-full text-xs font-medium text-white ${moodColors.lockBg} animate-pulse`}
+              className={`inline-block px-3 py-1 rounded-full text-xs font-medium text-white ${bg} animate-pulse`}
             >
               Click to upgrade
             </div>

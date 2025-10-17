@@ -221,9 +221,7 @@ async function handleAnonymousTutorialAccess(
 
 function isProtectedRoute(pathname: string): boolean {
   const protectedRoutes = [
-    "/practice",
     "/settings",
-    "/quiz/", // Individual quiz attempts (not /quizzes listing)
     "/cheat-sheets", // Cheat sheets require authentication
   ];
 
@@ -349,9 +347,7 @@ async function checkTutorialAccessLimits(
 
 export const config = {
   matcher: [
-    // Note: /dashboard and /tutorials removed to allow anonymous access
-    "/practice/:path*",
-    "/quiz/:path*",
+    // Quizzes and practice are now public (SEO friendly)
     "/settings/:path*",
     "/cheat-sheets/:path*", // Protected - requires authentication
     "/tutorials/category/:path*", // Keep for anonymous limit checking
@@ -359,5 +355,6 @@ export const config = {
     "/auth/signin/:path*",
     // Catch all auth routes
     "/auth/:path*",
+    // Quizzes are public for viewing/indexing
   ],
 };

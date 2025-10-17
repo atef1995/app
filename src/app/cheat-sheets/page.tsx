@@ -4,12 +4,21 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Download, Eye, FileText, Loader, Search } from "lucide-react";
+import {
+  Download,
+  Eye,
+  FileText,
+  Loader,
+  Search,
+  Lock,
+  Crown,
+} from "lucide-react";
 import { PageLayout } from "@/components/ui/PageLayout";
 import { ContentGrid } from "@/components/ui/ContentGrid";
 import Pagination from "@/components/ui/Pagination";
 import Card from "@/components/ui/Card";
 import { useMood } from "@/components/providers/MoodProvider";
+import { useMoodColors } from "@/hooks/useMoodColors";
 import {
   MoodImpactIndicator,
   QuickMoodSwitcher,
@@ -34,6 +43,7 @@ interface CheatSheet {
 export default function CheatSheetsPage() {
   const { data: session } = useSession();
   const { currentMood } = useMood();
+  const moodColors = useMoodColors();
   const router = useRouter();
 
   const [cheatSheets, setCheatSheets] = useState<CheatSheet[]>([]);
@@ -47,6 +57,7 @@ export default function CheatSheetsPage() {
   );
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [previewingId, setPreviewingId] = useState<string | null>(null);
+  const [premiumModalId, setPremiumModalId] = useState<string | null>(null);
   const [totalItems, setTotalItems] = useState(0);
   const [categories, setCategories] = useState<string[]>([]);
 
@@ -161,30 +172,15 @@ export default function CheatSheetsPage() {
     );
   }
 
-  const moodBgClass =
-    currentMood?.name === "CHILL"
-      ? "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950"
-      : currentMood?.name === "GRIND"
-      ? "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950"
-      : "border-pink-200 bg-pink-50 dark:border-pink-800 dark:bg-pink-950";
-
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   return (
     <PageLayout title="📚 Cheat Sheets" subtitle="Quick reference guides">
       {/* Header with Mood Section */}
       <div
-        className={`mb-8 rounded-lg border p-6 transition-colors duration-300 ${moodBgClass}`}
+        className={`mb-8 rounded-lg border p-6 transition-colors duration-300 ${moodColors.border} ${moodColors.gradient}`}
       >
         <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-          <div className="flex-1">
-            <h1 className="mb-2 text-3xl font-bold dark:text-white">
-              📚 Cheat Sheets
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300">
-              Quick reference guides for programming concepts and best practices
-            </p>
-          </div>
           <MoodImpactIndicator />
           <QuickMoodSwitcher />
         </div>
@@ -293,9 +289,18 @@ export default function CheatSheetsPage() {
           <ContentGrid columns="3">
             {cheatSheets.map((sheet) => (
               <Card
+                description={sheet.description}
                 key={sheet.id}
                 isPremium={sheet.isPremium}
                 requiredPlan={sheet.requiredPlan}
+                onPremiumClick={() => {
+                  if (
+                    sheet.isPremium &&
+                    session?.user?.subscription === "FREE"
+                  ) {
+                    setPremiumModalId(sheet.id);
+                  }
+                }}
               >
                 <div className="space-y-4">
                   {/* Difficulty Badge */}
@@ -353,20 +358,36 @@ export default function CheatSheetsPage() {
 
                   {/* Action Buttons */}
                   <div className="flex gap-2 border-t border-gray-100 pt-4 dark:border-gray-700">
-                    <button
-                      onClick={() => setPreviewingId(sheet.id)}
-                      className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-gray-100 py-2 font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                    >
-                      <Eye className="h-4 w-4" />
-                      Preview
-                    </button>
-                    <button
-                      onClick={() => handleDownload(sheet)}
-                      className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-blue-500 py-2 font-medium text-white hover:bg-blue-600"
-                    >
-                      <Download className="h-4 w-4" />
-                      Download
-                    </button>
+                    {sheet.isPremium &&
+                    session?.user?.subscription === "FREE" ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPremiumModalId(sheet.id);
+                        }}
+                        className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 py-2 font-medium text-white hover:from-yellow-500 hover:to-orange-600"
+                      >
+                        <Crown className="h-4 w-4" />
+                        Unlock Premium
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => setPreviewingId(sheet.id)}
+                          className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-gray-100 py-2 font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                        >
+                          <Eye className="h-4 w-4" />
+                          Preview
+                        </button>
+                        <button
+                          onClick={() => handleDownload(sheet)}
+                          className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-blue-500 py-2 font-medium text-white hover:bg-blue-600"
+                        >
+                          <Download className="h-4 w-4" />
+                          Download
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               </Card>
@@ -402,6 +423,71 @@ export default function CheatSheetsPage() {
               Clear Filters
             </button>
           )}
+        </div>
+      )}
+
+      {/* Premium Lock Modal */}
+      {premiumModalId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          onClick={() => setPremiumModalId(null)}
+        >
+          <div
+            className={`w-full max-w-md rounded-lg bg-white p-8 dark:bg-gray-800 shadow-2xl border-2 ${moodColors.border}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Lock Icon */}
+            <div className={`flex justify-center mb-6`}>
+              <div
+                className={`inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r ${moodColors.gradient} text-white shadow-lg`}
+              >
+                <Lock className="w-10 h-10" />
+              </div>
+            </div>
+
+            {/* Cheat Sheet Title */}
+            <h3 className="text-center text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              {cheatSheets.find((s) => s.id === premiumModalId)?.title}
+            </h3>
+
+            {/* Premium Required Text */}
+            <p className="text-center text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
+              {cheatSheets.find((s) => s.id === premiumModalId)?.requiredPlan}{" "}
+              Content
+            </p>
+
+            {/* Description */}
+            <p className="text-center text-sm text-gray-600 dark:text-gray-400 mb-6">
+              {cheatSheets.find((s) => s.id === premiumModalId)?.description}
+            </p>
+
+            {/* Mood-based message */}
+            <p className="text-center text-sm text-gray-600 dark:text-gray-400 mb-6">
+              {currentMood.id === "rush" && "🔥 Unlock all premium resources!"}
+              {currentMood.id === "grind" &&
+                "💪 Level up with premium content!"}
+              {currentMood.id === "chill" && "✨ Explore premium content!"}
+            </p>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPremiumModalId(null)}
+                className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-3 font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  setPremiumModalId(null);
+                  router.push("/subscription/upgrade");
+                }}
+                className={`flex-1 rounded-lg bg-gradient-to-r ${moodColors.gradient} px-4 py-3 font-medium text-white hover:shadow-lg transition-all`}
+              >
+                Upgrade Now
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

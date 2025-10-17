@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useMood } from "@/components/providers/MoodProvider";
+import { getMoodIcon } from "@/lib/getMoodIcon";
 import {
   User,
   LogOut,
@@ -201,7 +202,10 @@ export function Header() {
                 <span className="font-semibold text-gray-900 dark:text-gray-100">
                   {currentMood.name}
                 </span>
-                <span>{currentMood.emoji}</span>
+                {(() => {
+                  const Icon = getMoodIcon(currentMood.icon);
+                  return <Icon className="w-5 h-5" />;
+                })()}
               </div>
             )}
 
@@ -325,7 +329,10 @@ export function Header() {
                   <span className="font-semibold text-gray-900 dark:text-gray-100">
                     {currentMood.name}
                   </span>
-                  <span>{currentMood.emoji}</span>
+                  {(() => {
+                    const Icon = getMoodIcon(currentMood.icon);
+                    return <Icon className="w-4 h-4" />;
+                  })()}
                 </div>
               </div>
             </nav>

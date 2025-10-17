@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useToastContext } from "@/components/providers/ToastProvider";
 import { useProgressSync } from "@/hooks/useProgressSync";
 import { submitQuizAction } from "@/lib/actions";
@@ -33,6 +35,8 @@ interface UseQuizProps {
 
 export function useQuiz({ slug, currentMoodId }: UseQuizProps) {
   const toast = useToastContext();
+  const router = useRouter();
+  const { data: session } = useSession();
   const { syncProgress, forceRefresh } = useProgressSync();
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [loadingQuiz, setLoadingQuiz] = useState(true);
@@ -130,6 +134,15 @@ export function useQuiz({ slug, currentMoodId }: UseQuizProps) {
   const handleQuizComplete = useCallback(async () => {
     if (!quiz || !shuffledQuestions.length) return;
 
+    // Check if user is authenticated - if not, redirect to signup
+    if (!session) {
+      router.push(
+        "/auth/signin?callbackUrl=" +
+          encodeURIComponent(window.location.pathname)
+      );
+      return;
+    }
+
     const timeTaken = Math.round((Date.now() - quizState.startTime) / 1000);
 
     setSubmitting(true);
@@ -151,15 +164,15 @@ export function useQuiz({ slug, currentMoodId }: UseQuizProps) {
         if (debugMode) {
           console.log("Quiz submitted successfully:", result);
         }
-        
+
         // Immediately sync all progress-related data
         await syncProgress();
-        
+
         // Force immediate refresh of critical components if quiz was passed
         if (result.passed) {
           await forceRefresh();
         }
-        
+
         toast.success(
           "Quiz submitted successfully!",
           `Score: ${result.score.toPrecision(4)}% - ${
@@ -170,7 +183,7 @@ export function useQuiz({ slug, currentMoodId }: UseQuizProps) {
         if (result.achievements && result.achievements.length > 0) {
           result.achievements.forEach((achievement: UnlockedAchievement) => {
             toast.achievement(
-              `🏆 Achievement Unlocked!`,
+              `Achievement Unlocked!`,
               `${achievement.achievement.icon} ${achievement.achievement.title} - ${achievement.achievement.description}`
             );
           });
@@ -217,6 +230,8 @@ export function useQuiz({ slug, currentMoodId }: UseQuizProps) {
     submitError,
     syncProgress,
     forceRefresh,
+    session,
+    router,
   ]);
 
   const handleAnswerSelect = useCallback(

@@ -13,18 +13,36 @@ export async function GET(request: NextRequest) {
       if (!quiz) {
         return NextResponse.json({ error: "Quiz not found" }, { status: 404 });
       }
-      return NextResponse.json({ quiz });
+
+      const response = NextResponse.json({ quiz });
+      // Cache for 5 minutes for individual quizzes
+      response.headers.set(
+        "Cache-Control",
+        "public, s-maxage=300, stale-while-revalidate=600"
+      );
+      return response;
     }
 
     if (tutorialId) {
       // Get quizzes by tutorial ID
       const quizzes = await QuizService.getQuizzesByTutorialId(tutorialId);
-      return NextResponse.json({ quizzes });
+      const response = NextResponse.json({ quizzes });
+      response.headers.set(
+        "Cache-Control",
+        "public, s-maxage=300, stale-while-revalidate=600"
+      );
+      return response;
     }
 
     // Get all quizzes
     const quizzes = await QuizService.getAllQuizzes();
-    return NextResponse.json({ quizzes });
+    const response = NextResponse.json({ quizzes });
+    // Cache for 10 minutes for all quizzes
+    response.headers.set(
+      "Cache-Control",
+      "public, s-maxage=600, stale-while-revalidate=1200"
+    );
+    return response;
   } catch (error) {
     console.error("Error fetching quizzes:", error);
     return NextResponse.json(

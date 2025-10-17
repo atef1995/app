@@ -1,5 +1,6 @@
 "use client";
 
+import getMoodColors from "@/lib/getMoodColors";
 import { MoodConfig } from "@/types/mood";
 import {
   Waves,
@@ -36,41 +37,7 @@ export function MoodCard({
     }
   };
 
-  const moodClasses = {
-    chill: {
-      bg: "bg-blue-50 dark:bg-blue-900/20",
-      text: "text-slate-800 dark:text-slate-200",
-      primary: "text-blue-500 dark:text-blue-400",
-      accent: "text-cyan-500 dark:text-cyan-400",
-      border: isSelected ? "border-blue-500 dark:border-blue-400" : "",
-      gradient: "from-blue-500 to-blue-300",
-      badge: "bg-cyan-100 dark:bg-cyan-900 text-cyan-600 dark:text-cyan-300",
-      hover: "hover:bg-blue-100 dark:hover:bg-blue-900/30",
-    },
-    rush: {
-      bg: "bg-amber-50 dark:bg-amber-900/20",
-      text: "text-slate-800 dark:text-slate-200",
-      primary: "text-amber-500 dark:text-amber-400",
-      accent: "text-red-500 dark:text-red-400",
-      border: isSelected ? "border-amber-500 dark:border-amber-400" : "",
-      gradient: "from-amber-500 to-amber-300",
-      badge: "bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300",
-      hover: "hover:bg-amber-100 dark:hover:bg-amber-900/30",
-    },
-    grind: {
-      bg: "bg-gray-800 dark:bg-gray-700",
-      text: "text-gray-50",
-      primary: "text-red-600 dark:text-red-400",
-      accent: "text-violet-500 dark:text-violet-400",
-      border: isSelected ? "border-red-600 dark:border-red-400" : "",
-      gradient: "from-red-600 to-red-300",
-      badge:
-        "bg-violet-100 dark:bg-violet-900 text-violet-600 dark:text-violet-300",
-      hover: "hover:bg-gray-700 dark:hover:bg-gray-600",
-    },
-  };
-
-  const currentClasses = moodClasses[mood.id as keyof typeof moodClasses];
+  const currentClasses = getMoodColors(mood.id);
 
   // Homepage variant styling
   if (variant === "homepage") {
@@ -106,7 +73,7 @@ export function MoodCard({
     return (
       <div onClick={handleClick} className={homepageClasses}>
         <div className="flex justify-center mb-4">{getMoodIcon()}</div>
-        <h3 className={`text-2xl font-bold mb-2 ${currentClasses.primary}`}>
+        <h3 className={`text-2xl font-bold mb-2 ${currentClasses.text}`}>
           {mood.name}
         </h3>
         {showDescription && (
@@ -153,11 +120,7 @@ export function MoodCard({
   const cardClasses = `
     relative overflow-hidden rounded-xl p-6 transition-all duration-300 transform
     border-2 hover:scale-105 hover:shadow-lg w-full
-    ${
-      isSelected
-        ? "border-blue-500 dark:border-blue-400 shadow-lg scale-105"
-        : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
-    }
+    ${isSelected ? currentClasses.border : "border-transparent"}
     group ${currentClasses.bg} ${currentClasses.text} ${currentClasses.hover}
     ${className}
   `;
@@ -185,7 +148,7 @@ export function MoodCard({
                 <Target className="w-8 h-8 text-red-500 dark:text-red-400" />
               )}
             </div>
-            <h3 className={`text-xl font-bold ${currentClasses.primary}`}>
+            <h3 className={`text-xl font-bold ${currentClasses.text}`}>
               {mood.name}
             </h3>
           </div>
@@ -201,14 +164,14 @@ export function MoodCard({
           <div className="space-y-2 text-xs">
             <div className="flex justify-between items-center">
               <span className="opacity-70">Questions:</span>
-              <span className={`font-semibold ${currentClasses.accent}`}>
+              <span className={`font-semibold ${currentClasses.text}`}>
                 {mood.quizSettings.questionsPerTutorial}
               </span>
             </div>
 
             <div className="flex justify-between items-center">
               <span className="opacity-70">Time limit:</span>
-              <span className={`font-semibold ${currentClasses.accent}`}>
+              <span className={`font-semibold ${currentClasses.text}`}>
                 {mood.quizSettings.timeLimit
                   ? `${mood.quizSettings.timeLimit}s/question`
                   : "No limit"}
@@ -229,7 +192,7 @@ export function MoodCard({
           {isSelected && (
             <div className="absolute -top-1 -right-1">
               <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-white ${currentClasses.accent.replace(
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-white ${currentClasses.text.replace(
                   "text-",
                   "bg-"
                 )}`}

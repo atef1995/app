@@ -2,7 +2,7 @@ export interface MoodConfig {
   id: MoodId;
   name: string;
   description: string;
-  emoji: string;
+  icon: string;
   theme: {
     primary: string;
     secondary: string;

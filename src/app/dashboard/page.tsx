@@ -5,7 +5,16 @@ import { MoodSelector } from "@/components/MoodSelector";
 import { useProgressStats } from "@/hooks/useProgress";
 import { ProgressStats } from "@/components/ProgressComponents";
 import { AnonymousDashboard } from "@/components/AnonymousDashboard";
-import { BookOpen, Code, Brain, Hand, Building, ToolCase, GitPullRequest } from "lucide-react";
+import {
+  BookOpen,
+  Code,
+  Brain,
+  Hand,
+  Building,
+  ToolCase,
+  GitPullRequest,
+  FileText,
+} from "lucide-react";
 import Link from "next/link";
 
 interface ProgressStats {
@@ -153,7 +162,26 @@ export default function DashboardPage() {
         </div>
 
         {/* Additional Features */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
+          <Link
+            href="/cheat-sheets"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-yellow-200 dark:hover:border-yellow-400 dark:shadow-xl"
+          >
+            <div className="mb-4 flex justify-center">
+              <FileText className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              Cheat Sheets
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Quick reference guides and complexity cheat sheets for coding
+              interviews
+            </p>
+            <div className="text-sm text-yellow-600 dark:text-yellow-400 font-semibold">
+              View Sheets →
+            </div>
+          </Link>
+
           <Link
             href="/contributions"
             className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-cyan-200 dark:hover:border-cyan-400 dark:shadow-xl"

@@ -87,12 +87,9 @@ export function AnonymousDashboard() {
             </Link>
 
             <Link
-              href="/auth/signin?feature=practice"
+              href="/practice"
               className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-purple-200 dark:hover:border-purple-400 dark:shadow-xl group relative"
             >
-              <div className="absolute top-4 right-4 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 text-xs font-bold px-2 py-1 rounded-full">
-                Signup Required
-              </div>
               <div className="mb-4 flex justify-center">
                 <Code className="h-12 w-12 text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform" />
               </div>
@@ -108,12 +105,9 @@ export function AnonymousDashboard() {
             </Link>
 
             <Link
-              href="/auth/signin?feature=quizzes"
+              href="/quizzes"
               className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-green-200 dark:hover:border-green-400 dark:shadow-xl group relative"
             >
-              <div className="absolute top-4 right-4 bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 text-xs font-bold px-2 py-1 rounded-full">
-                Signup Required
-              </div>
               <div className="mb-4 flex justify-center">
                 <Brain className="h-12 w-12 text-green-600 dark:text-green-400 group-hover:scale-110 transition-transform" />
               </div>
@@ -129,7 +123,7 @@ export function AnonymousDashboard() {
             </Link>
 
             <Link
-              href="/auth/signin?feature=projects"
+              href="/projects"
               className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-orange-200 dark:hover:border-orange-400 dark:shadow-xl group relative"
             >
               <div className="absolute top-4 right-4 bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 text-xs font-bold px-2 py-1 rounded-full">

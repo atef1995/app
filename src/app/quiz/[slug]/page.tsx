@@ -3,7 +3,6 @@
 import { useEffect, use } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { MOODS } from "@/lib/moods";
 import { useMood } from "@/components/providers/MoodProvider";
 import { QuizTimer } from "@/components/quiz/QuizTimer";
@@ -24,7 +23,6 @@ export default function QuizPage({
 }) {
   const resolvedParams = use(params);
   const { data: session } = useSession();
-  const router = useRouter();
   const { currentMood } = useMood();
 
   const {
@@ -42,17 +40,10 @@ export default function QuizPage({
     handlePreviousQuestion,
   } = useQuiz({ slug: resolvedParams.slug, currentMoodId: currentMood.id });
 
-  const { cheatAttempts: _cheatAttempts } = useAntiCheat({
+  useAntiCheat({
     tutorialNavigation,
     quizSlug: resolvedParams.slug,
   });
-
-  useEffect(() => {
-    if (!session) {
-      router.push("/auth/signin");
-      return;
-    }
-  }, [session, router]);
 
   useEffect(() => {
     // Set up total timer based on user's mood and number of questions
@@ -109,18 +100,6 @@ export default function QuizPage({
   }
 
   console.log({ quiz, session });
-
-  if (!session) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600 dark:text-gray-300">
-            Please sign in to take quizzes.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   const currentMoodConfig = MOODS[currentMood.id.toLowerCase()];
 
@@ -192,6 +171,15 @@ export default function QuizPage({
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 select-none">
       <div className="container mx-auto px-4 py-8">
+        {!session && (
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <p className="text-blue-900 dark:text-blue-100 text-sm">
+              You&apos;re taking this quiz as a guest. Sign up to save your
+              score and track your progress!
+            </p>
+          </div>
+        )}
+
         <QuizTimer
           timeLeft={quizState.timeLeft || 0}
           onTimeUp={handleQuizComplete}

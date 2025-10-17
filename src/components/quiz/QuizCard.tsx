@@ -5,6 +5,7 @@ import { Target } from "lucide-react";
 import { Quiz } from "@/app/quizzes/page";
 import { useRouter } from "next/navigation";
 import { devMode } from "@/lib/services/envService";
+import { getMoodIcon } from "@/lib/getMoodIcon";
 
 interface QuizCardProps {
   quiz: Quiz;
@@ -42,6 +43,7 @@ const QuizCard: React.FC<QuizCardProps> = ({
 }) => {
   const router = useRouter();
   const moodConfig = MOODS[userMood.toLowerCase()];
+  const Icon = getMoodIcon(moodConfig.icon);
 
   const difficultyColors = {
     easy: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
@@ -152,7 +154,7 @@ const QuizCard: React.FC<QuizCardProps> = ({
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="flex items-center space-x-2">
               <span className="text-gray-400 dark:text-gray-500">
-                {moodConfig.emoji}
+                <Icon className="w-5 h-5" />
               </span>
               <span className="text-gray-600 dark:text-gray-300">
                 {moodConfig.name} Mode

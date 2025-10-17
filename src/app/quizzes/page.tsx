@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Clock,
@@ -24,6 +23,7 @@ import { useTutorialProgress } from "@/hooks/useProgress";
 import { usePagination } from "@/hooks/usePagination";
 import Pagination from "@/components/ui/Pagination";
 import QuizCard from "@/components/quiz/QuizCard";
+import { SignupCTA } from "@/components/SignupCTA";
 
 // Types for database quiz data
 interface Question {
@@ -48,7 +48,6 @@ export interface Quiz {
 export default function QuizzesPage() {
   const { data: session } = useSession();
   const { currentMood } = useMood();
-  const router = useRouter();
 
   // Use TanStack Query hooks
   const {
@@ -89,25 +88,6 @@ export default function QuizzesPage() {
     isPremiumLocked,
   } = usePremiumContentHandler();
 
-  useEffect(() => {
-    if (!session) {
-      router.push("/auth/signin");
-      return;
-    }
-  }, [session, router]);
-
-  if (!session) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600 dark:text-gray-300">
-            Please sign in to access quizzes.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   // Handle quiz loading error
   if (hasQuizzesError) {
     return (
@@ -136,11 +116,22 @@ export default function QuizzesPage() {
 
   return (
     <PageLayout
-      title="JavaScript Quizzes"
-      subtitle="Test your knowledge and track your progress"
+      title="Coding Quizzes"
+      subtitle="Test your knowledge across JavaScript, HTML, CSS, DSA, OOP, GitHub and more"
     >
+      {/* Show signup CTA for anonymous users */}
+      {!session && (
+        <div className="mb-12">
+          <SignupCTA
+            variant="banner"
+            showBenefits={true}
+            message="Start Taking Quizzes to Master JavaScript"
+          />
+        </div>
+      )}
+
       {/* Progress Summary */}
-      {!loadingProgress && (
+      {!loadingProgress && session && (
         <div className="mb-6">
           <div className="inline-flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-300 bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-lg">
             <BarChart3 className="w-4 h-4" />
@@ -172,7 +163,7 @@ export default function QuizzesPage() {
       )}
 
       {/* Mood Info Card */}
-      <MoodInfoCard showQuizSettings={true} className="mb-12" />
+      {session && <MoodInfoCard showQuizSettings={true} className="mb-12" />}
 
       {/* Quizzes Grid */}
       {loadingProgress || loadingQuizzes ? (
@@ -189,7 +180,9 @@ export default function QuizzesPage() {
               // Calculate the actual index based on current page
               const actualIndex = (currentPage - 1) * pageSize + index;
               // The tutorialId in progress matches the quiz's tutorialId
-              const quizProgress = tutorialProgress[quiz.tutorialId.toString()];
+              const quizProgress = session
+                ? tutorialProgress[quiz.tutorialId.toString()]
+                : undefined;
               return (
                 <QuizCard
                   key={quiz.id}

@@ -5,6 +5,7 @@ import { PartyPopper, ThumbsUp, Dumbbell, Star, Book } from "lucide-react";
 import { ProgressBadge } from "@/components/ProgressComponents";
 import { QuizState, TutorialNavigation, Question } from "@/types/quiz";
 import { MoodConfig } from "@/lib/moods";
+import { getMoodIcon } from "@/lib/getMoodIcon";
 
 interface QuizResultsProps {
   quizState: QuizState;
@@ -32,6 +33,7 @@ export function QuizResults({
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
+  const Icon = getMoodIcon(currentMoodConfig.icon);
 
   // Find incorrect answers
   const incorrectAnswers = shuffledQuestions
@@ -110,7 +112,7 @@ export function QuizResults({
                   </span>
                   <br />
                   <span className="font-semibold text-black dark:text-white">
-                    {currentMoodConfig.name} {currentMoodConfig.emoji}
+                    {currentMoodConfig.name} <Icon className="w-5 h-5" />;
                   </span>
                 </div>
                 <div>
@@ -163,17 +165,21 @@ export function QuizResults({
                           {item.question.question}
                         </p>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <div className="flex items-start gap-2">
-                          <span className="text-red-600 dark:text-red-400 font-medium min-w-fit">Your answer:</span>
+                          <span className="text-red-600 dark:text-red-400 font-medium min-w-fit">
+                            Your answer:
+                          </span>
                           <span className="text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/20 px-2 py-1 rounded text-sm">
                             {item.question.options[item.userAnswer]}
                           </span>
                         </div>
-                        
+
                         <div className="flex items-start gap-2">
-                          <span className="text-green-600 dark:text-green-400 font-medium min-w-fit">Correct answer:</span>
+                          <span className="text-green-600 dark:text-green-400 font-medium min-w-fit">
+                            Correct answer:
+                          </span>
                           <span className="text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/20 px-2 py-1 rounded text-sm">
                             {item.question.options[item.correctAnswer]}
                           </span>
@@ -182,7 +188,8 @@ export function QuizResults({
                         {item.question.explanation && (
                           <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 dark:border-blue-500">
                             <p className="text-sm text-blue-800 dark:text-blue-300">
-                              <strong>Explanation:</strong> {item.question.explanation}
+                              <strong>Explanation:</strong>{" "}
+                              {item.question.explanation}
                             </p>
                           </div>
                         )}
@@ -225,8 +232,8 @@ export function QuizResults({
                     Keep practicing!
                   </p>
                   <p className="text-red-700 dark:text-red-400">
-                    Review the tutorial carefully and try again when
-                    you&apos;re ready.
+                    Review the tutorial carefully and try again when you&apos;re
+                    ready.
                   </p>
                 </div>
               )}

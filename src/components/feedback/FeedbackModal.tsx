@@ -1,9 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Check, Sparkles, ThumbsUp, ThumbsDown, MessageSquare } from "lucide-react";
+import {
+  X,
+  Check,
+  Sparkles,
+  ThumbsUp,
+  ThumbsDown,
+  MessageSquare,
+} from "lucide-react";
 import { useMood } from "@/components/providers/MoodProvider";
 import { MOODS } from "@/lib/moods";
+import { getMoodIcon } from "@/lib/getMoodIcon";
 import {
   FeedbackFormData,
   FeedbackRating,
@@ -22,13 +30,14 @@ interface FeedbackModalProps {
   onSubmit: (data: FeedbackFormData) => Promise<void>;
 }
 
-const RATING_EMOJIS: Record<FeedbackRating, { emoji: string; label: string }> = {
-  1: { emoji: "😞", label: "Poor" },
-  2: { emoji: "😐", label: "Fair" },
-  3: { emoji: "😊", label: "Good" },
-  4: { emoji: "😃", label: "Great" },
-  5: { emoji: "😍", label: "Excellent" },
-};
+const RATING_EMOJIS: Record<FeedbackRating, { emoji: string; label: string }> =
+  {
+    1: { emoji: "😞", label: "Poor" },
+    2: { emoji: "😐", label: "Fair" },
+    3: { emoji: "😊", label: "Good" },
+    4: { emoji: "😃", label: "Great" },
+    5: { emoji: "😍", label: "Excellent" },
+  };
 
 export function FeedbackModal({
   isOpen,
@@ -40,6 +49,7 @@ export function FeedbackModal({
 }: FeedbackModalProps) {
   const { currentMood } = useMood();
   const moodConfig = MOODS[currentMood.id.toLowerCase()];
+  const Icon = getMoodIcon(moodConfig.icon);
 
   const [step, setStep] = useState<number>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -160,7 +170,7 @@ export function FeedbackModal({
         >
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <span className="text-2xl">{moodConfig.emoji}</span>
+              <Icon className="w-6 h-6" />
               <div>
                 <h3
                   className="text-lg font-bold"
@@ -168,7 +178,10 @@ export function FeedbackModal({
                 >
                   Help Us Improve
                 </h3>
-                <p className="text-sm opacity-80" style={{ color: moodConfig.theme.text }}>
+                <p
+                  className="text-sm opacity-80"
+                  style={{ color: moodConfig.theme.text }}
+                >
                   {tutorialTitle}
                 </p>
               </div>
@@ -199,7 +212,10 @@ export function FeedbackModal({
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto" style={{ maxHeight: "calc(90vh - 120px)" }}>
+        <div
+          className="p-6 overflow-y-auto"
+          style={{ maxHeight: "calc(90vh - 120px)" }}
+        >
           {/* Step 1: Rating */}
           {step === 1 && (
             <div className="space-y-4 animate-fade-in">
@@ -224,14 +240,18 @@ export function FeedbackModal({
                     }`}
                     style={{
                       borderColor:
-                        formData.rating === rating ? moodConfig.theme.primary : "#e5e7eb",
+                        formData.rating === rating
+                          ? moodConfig.theme.primary
+                          : "#e5e7eb",
                       backgroundColor:
                         formData.rating === rating
                           ? `${moodConfig.theme.primary}10`
                           : "transparent",
                     }}
                   >
-                    <span className="text-4xl mb-1">{RATING_EMOJIS[rating].emoji}</span>
+                    <span className="text-4xl mb-1">
+                      {RATING_EMOJIS[rating].emoji}
+                    </span>
                     <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
                       {RATING_EMOJIS[rating].label}
                     </span>
@@ -267,10 +287,14 @@ export function FeedbackModal({
                             : "hover:border-gray-300 dark:hover:border-gray-600"
                         }`}
                         style={{
-                          borderColor: formData.improvementAreas?.includes(area.id)
+                          borderColor: formData.improvementAreas?.includes(
+                            area.id
+                          )
                             ? moodConfig.theme.primary
                             : "#e5e7eb",
-                          backgroundColor: formData.improvementAreas?.includes(area.id)
+                          backgroundColor: formData.improvementAreas?.includes(
+                            area.id
+                          )
                             ? `${moodConfig.theme.primary}10`
                             : "transparent",
                         }}
@@ -310,10 +334,14 @@ export function FeedbackModal({
                             : "hover:border-gray-300 dark:hover:border-gray-600"
                         }`}
                         style={{
-                          borderColor: formData.improvementAreas?.includes(area.id)
+                          borderColor: formData.improvementAreas?.includes(
+                            area.id
+                          )
                             ? moodConfig.theme.primary
                             : "#e5e7eb",
-                          backgroundColor: formData.improvementAreas?.includes(area.id)
+                          backgroundColor: formData.improvementAreas?.includes(
+                            area.id
+                          )
                             ? `${moodConfig.theme.primary}10`
                             : "transparent",
                         }}
@@ -353,10 +381,14 @@ export function FeedbackModal({
                             : "hover:border-gray-300 dark:hover:border-gray-600"
                         }`}
                         style={{
-                          borderColor: formData.positiveAspects?.includes(aspect.id)
+                          borderColor: formData.positiveAspects?.includes(
+                            aspect.id
+                          )
                             ? moodConfig.theme.primary
                             : "#e5e7eb",
-                          backgroundColor: formData.positiveAspects?.includes(aspect.id)
+                          backgroundColor: formData.positiveAspects?.includes(
+                            aspect.id
+                          )
                             ? `${moodConfig.theme.primary}10`
                             : "transparent",
                         }}
@@ -381,7 +413,9 @@ export function FeedbackModal({
                   </h5>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => setFormData({ ...formData, quizHelpful: true })}
+                      onClick={() =>
+                        setFormData({ ...formData, quizHelpful: true })
+                      }
                       className={`flex-1 p-3 rounded-lg border-2 transition-all ${
                         formData.quizHelpful === true ? "ring-2" : ""
                       }`}
@@ -400,7 +434,9 @@ export function FeedbackModal({
                       <span className="text-sm font-medium">Yes</span>
                     </button>
                     <button
-                      onClick={() => setFormData({ ...formData, quizHelpful: false })}
+                      onClick={() =>
+                        setFormData({ ...formData, quizHelpful: false })
+                      }
                       className={`flex-1 p-3 rounded-lg border-2 transition-all ${
                         formData.quizHelpful === false ? "ring-2" : ""
                       }`}
@@ -428,16 +464,26 @@ export function FeedbackModal({
                   Difficulty level?
                 </h5>
                 <div className="grid grid-cols-3 gap-2">
-                  {(["too-easy", "just-right", "too-hard"] as FeedbackDifficulty[]).map((diff) => (
+                  {(
+                    [
+                      "too-easy",
+                      "just-right",
+                      "too-hard",
+                    ] as FeedbackDifficulty[]
+                  ).map((diff) => (
                     <button
                       key={diff}
-                      onClick={() => setFormData({ ...formData, difficulty: diff })}
+                      onClick={() =>
+                        setFormData({ ...formData, difficulty: diff })
+                      }
                       className={`p-3 rounded-lg border-2 transition-all ${
                         formData.difficulty === diff ? "ring-2" : ""
                       }`}
                       style={{
                         borderColor:
-                          formData.difficulty === diff ? moodConfig.theme.primary : "#e5e7eb",
+                          formData.difficulty === diff
+                            ? moodConfig.theme.primary
+                            : "#e5e7eb",
                         backgroundColor:
                           formData.difficulty === diff
                             ? `${moodConfig.theme.primary}10`
@@ -487,7 +533,9 @@ export function FeedbackModal({
 
               <textarea
                 value={formData.feedback || ""}
-                onChange={(e) => setFormData({ ...formData, feedback: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, feedback: e.target.value })
+                }
                 placeholder="Share your thoughts, suggestions, or what could be better..."
                 className="w-full p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:outline-none"
                 style={{ borderColor: moodConfig.theme.primary }}
@@ -495,7 +543,7 @@ export function FeedbackModal({
                 maxLength={500}
               />
               <div className="text-xs text-gray-500 dark:text-gray-400 text-right">
-                {(formData.feedback?.length || 0)}/500 characters
+                {formData.feedback?.length || 0}/500 characters
               </div>
 
               {/* Quick tags */}
@@ -582,7 +630,10 @@ export function FeedbackModal({
                 className="p-4 rounded-lg"
                 style={{ backgroundColor: `${moodConfig.theme.primary}10` }}
               >
-                <p className="text-sm" style={{ color: moodConfig.theme.primary }}>
+                <p
+                  className="text-sm"
+                  style={{ color: moodConfig.theme.primary }}
+                >
                   <strong>+10 XP</strong> for helping improve our content!
                 </p>
               </div>

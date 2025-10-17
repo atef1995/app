@@ -2,6 +2,8 @@
 
 import { MOODS, MoodConfig } from "@/lib/moods";
 import { useMood } from "@/components/providers/MoodProvider";
+import { getMoodIcon } from "@/lib/getMoodIcon";
+import { Sparkles, Music, Bell, Lightbulb } from "lucide-react";
 
 interface MoodImpactIndicatorProps {
   showFullDetails?: boolean;
@@ -21,7 +23,7 @@ export function MoodImpactIndicator({
     switch (context) {
       case "quiz":
         return {
-          icon: "🧠",
+          icon: "Brain",
           title: "Quiz Experience",
           details: [
             `${moodConfig.quizSettings.questionsPerTutorial} questions at ${moodConfig.quizSettings.difficulty} difficulty`,
@@ -32,7 +34,7 @@ export function MoodImpactIndicator({
         };
       case "tutorial":
         return {
-          icon: "📚",
+          icon: "Book",
           title: "Learning Mode",
           details: [
             `${
@@ -46,7 +48,7 @@ export function MoodImpactIndicator({
         };
       case "settings":
         return {
-          icon: "⚙️",
+          icon: "Settings",
           title: "Current Configuration",
           details: [
             `${moodConfig.quizSettings.questionsPerTutorial} quiz questions`,
@@ -58,7 +60,7 @@ export function MoodImpactIndicator({
         };
       default:
         return {
-          icon: "🎯",
+          icon: "Target",
           title: "Learning Style",
           details: [
             moodConfig.description,
@@ -80,7 +82,10 @@ export function MoodImpactIndicator({
           color: moodConfig.theme.text,
         }}
       >
-        <span className="text-lg">{moodConfig.emoji}</span>
+        {(() => {
+          const Icon = getMoodIcon(moodConfig.icon);
+          return <Icon className="w-5 h-5" />;
+        })()}
         <span className="font-medium">{moodConfig.name} Mode</span>
       </div>
     );
@@ -95,13 +100,20 @@ export function MoodImpactIndicator({
       }}
     >
       <div className="flex items-center gap-3 mb-3">
-        <span className="text-2xl">{moodConfig.emoji}</span>
+        {(() => {
+          const Icon = getMoodIcon(moodConfig.icon);
+          return <Icon className="w-6 h-6" />;
+        })()}
         <div>
           <h3
             className="font-semibold text-lg"
             style={{ color: moodConfig.theme.text }}
           >
-            {contextInfo.icon} {contextInfo.title}
+            {(() => {
+              const ContextIcon = getMoodIcon(contextInfo.icon);
+              return <ContextIcon className="w-5 h-5 inline mr-2" />;
+            })()}
+            {contextInfo.title}
           </h3>
           <p
             className="text-sm opacity-80"
@@ -129,26 +141,29 @@ export function MoodImpactIndicator({
       <div className="flex flex-wrap gap-2 mt-3">
         {moodConfig.features.animations && (
           <span
-            className="inline-flex items-center px-2 py-1 rounded text-xs bg-white/20 backdrop-blur-sm"
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-white/20 backdrop-blur-sm"
             style={{ color: moodConfig.theme.text }}
           >
-            ✨ Animations
+            <Sparkles className="w-3 h-3" />
+            Animations
           </span>
         )}
         {moodConfig.features.music && (
           <span
-            className="inline-flex items-center px-2 py-1 rounded text-xs bg-white/20 backdrop-blur-sm"
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-white/20 backdrop-blur-sm"
             style={{ color: moodConfig.theme.text }}
           >
-            🎵 {moodConfig.features.music}
+            <Music className="w-3 h-3" />
+            {moodConfig.features.music}
           </span>
         )}
         {moodConfig.features.notifications && (
           <span
-            className="inline-flex items-center px-2 py-1 rounded text-xs bg-white/20 backdrop-blur-sm"
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-white/20 backdrop-blur-sm"
             style={{ color: moodConfig.theme.text }}
           >
-            🔔 Notifications
+            <Bell className="w-3 h-3" />
+            Notifications
           </span>
         )}
       </div>
@@ -156,10 +171,11 @@ export function MoodImpactIndicator({
       {/* Quick mood switch hint */}
       <div className="mt-3 pt-3 border-t border-white/20">
         <p
-          className="text-xs opacity-60"
+          className="text-xs opacity-60 flex items-center gap-2"
           style={{ color: moodConfig.theme.text }}
         >
-          💡 Change your mood anytime in Settings to adjust your learning
+          <Lightbulb className="w-3 h-3" />
+          Change your mood anytime in Settings to adjust your learning
           experience
         </p>
       </div>
@@ -185,7 +201,10 @@ export function QuickMoodSwitcher({ className = "" }: { className?: string }) {
             }`}
             title={`Switch to ${mood.name} mode: ${mood.description}`}
           >
-            <span className="text-lg">{mood.emoji}</span>
+            {(() => {
+              const Icon = getMoodIcon(mood.icon);
+              return <Icon className="w-5 h-5" />;
+            })()}
           </button>
         ))}
       </div>

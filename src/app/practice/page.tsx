@@ -12,6 +12,7 @@ import { usePremiumContentHandler } from "@/hooks/usePremiumContentHandler";
 import { useMoodColors } from "@/hooks/useMoodColors";
 import { useChallengesWithFilters } from "@/hooks/useChallenges";
 import { useChallengeProgress } from "@/hooks/useProgress";
+import { SignupCTA } from "@/components/SignupCTA";
 import {
   Search,
   Monitor,
@@ -146,10 +147,6 @@ export default function PracticePage() {
     }
   };
 
-  if (!session) {
-    return null; // Middleware will handle redirect
-  }
-
   // Handle challenges loading error
   if (hasChallengesError) {
     return (
@@ -186,8 +183,19 @@ export default function PracticePage() {
         <Monitor className="h-10 w-10 text-purple-600 dark:text-purple-400" />
       </div>
 
+      {/* Show signup CTA for anonymous users */}
+      {!session && (
+        <div className="mb-12">
+          <SignupCTA
+            variant="banner"
+            showBenefits={true}
+            message="Start Coding Challenges to Build Real Skills"
+          />
+        </div>
+      )}
+
       {/* Mood Info Card */}
-      <MoodInfoCard className="mb-8" />
+      {session && <MoodInfoCard className="mb-8" />}
 
       {/* Filters */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:shadow-xl mb-8">
@@ -307,11 +315,11 @@ export default function PracticePage() {
                 {/* Mood-adapted description */}
                 <div className={`${moodColors.bg} rounded-lg p-3`}>
                   <p className={`${moodColors.text} text-xs leading-relaxed`}>
-                    {
-                      challenge.moodAdaptations.find(
-                        adaptation => adaptation.mood.toLowerCase() === currentMood.id.toLowerCase()
-                      )?.content || "Get ready to tackle this challenge!"
-                    }
+                    {challenge.moodAdaptations.find(
+                      (adaptation) =>
+                        adaptation.mood.toLowerCase() ===
+                        currentMood.id.toLowerCase()
+                    )?.content || "Get ready to tackle this challenge!"}
                   </p>
                 </div>
               </Card>
@@ -321,7 +329,7 @@ export default function PracticePage() {
       )}
 
       {/* No Results */}
-      {challenges.length === 0 && !loading && (
+      {!session === false && challenges.length === 0 && !loading && (
         <div className="text-center py-12">
           <div className="mb-4 flex justify-center">
             <Search className="h-16 w-16 text-gray-400 dark:text-gray-500" />

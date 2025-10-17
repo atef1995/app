@@ -13,10 +13,12 @@ import {
 } from "lucide-react";
 import { useMood } from "@/components/providers/MoodProvider";
 import getMoodColors from "@/lib/getMoodColors";
+import { getMoodIcon } from "@/lib/getMoodIcon";
 
 export function Footer() {
   const { currentMood } = useMood();
   const moodColors = getMoodColors(currentMood.id);
+  const Icon = getMoodIcon(currentMood.icon);
 
   const currentYear = new Date().getFullYear();
 
@@ -85,7 +87,7 @@ export function Footer() {
               <div
                 className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm ${moodColors.accent} text-white`}
               >
-                <span>{currentMood.emoji}</span>
+                <Icon className="w-5 h-5" />
                 <span>Currently {currentMood.id.toUpperCase()}</span>
               </div>
             </div>

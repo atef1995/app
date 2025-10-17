@@ -4,7 +4,7 @@ export interface MoodConfig {
   id: MoodId;
   name: string;
   description: string;
-  emoji: string;
+  icon: string; // lucide-react icon name
   theme: {
     primary: string;
     secondary: string;
@@ -29,7 +29,7 @@ export const MOODS: Record<string, MoodConfig> = {
     id: MoodId.CHILL,
     name: "Chill",
     description: "Relaxed learning at your own pace",
-    emoji: "😌",
+    icon: "Cloud",
     theme: {
       primary: "#3B82F6", // blue-500
       secondary: "#93C5FD", // blue-300
@@ -52,7 +52,7 @@ export const MOODS: Record<string, MoodConfig> = {
     id: MoodId.RUSH,
     name: "Rush",
     description: "Fast-paced learning with energy",
-    emoji: "⚡",
+    icon: "Zap",
     theme: {
       primary: "#F59E0B", // amber-500
       secondary: "#FCD34D", // amber-300
@@ -75,7 +75,7 @@ export const MOODS: Record<string, MoodConfig> = {
     id: MoodId.GRIND,
     name: "Grind",
     description: "Intense focus and challenging content",
-    emoji: "🔥",
+    icon: "Flame",
     theme: {
       primary: "#DC2626", // red-600
       secondary: "#FCA5A5", // red-300
