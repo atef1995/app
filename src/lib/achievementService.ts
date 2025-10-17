@@ -221,6 +221,117 @@ export class AchievementService {
             userStats.crackedQuizzes >= 10,
           points: 50,
         },
+
+        // Exercise Achievements - Quality & Performance
+        {
+          key: "FIRST_EXERCISE",
+          condition:
+            action === "EXERCISE_COMPLETED" &&
+            userStats.exercisesCompleted === 1,
+          points: 15,
+        },
+        {
+          key: "EXERCISE_PERFECTIONIST",
+          condition:
+            action === "EXERCISE_COMPLETED" &&
+            metadata.attempts === 1 &&
+            metadata.hintsUsed === false,
+          points: 100,
+        },
+        {
+          key: "NO_HINTS_MASTER",
+          condition:
+            action === "EXERCISE_COMPLETED" &&
+            userStats.exercisesCompletedNoHints >= 5,
+          points: 75,
+        },
+        {
+          key: "EXERCISE_SPEEDSTER",
+          condition:
+            action === "EXERCISE_COMPLETED" &&
+            metadata.timeSpent &&
+            metadata.timeSpent <= (metadata.difficulty === "beginner" ? 7.5 : metadata.difficulty === "intermediate" ? 10 : 12.5) * 60,
+          points: 120,
+        },
+        {
+          key: "CLEAN_CODE_CHAMPION",
+          condition:
+            action === "EXERCISE_COMPLETED" &&
+            userStats.firstTryPasses >= 3,
+          points: 80,
+        },
+
+        // Exercise Achievements - Skill-Based
+        {
+          key: "HTML_CSS_MASTER",
+          condition:
+            action === "EXERCISE_COMPLETED" &&
+            metadata.category === "HTML & CSS" &&
+            userStats.completedCategories["HTML & CSS"] === true,
+          points: 150,
+        },
+        {
+          key: "JAVASCRIPT_NINJA",
+          condition:
+            action === "EXERCISE_COMPLETED" &&
+            metadata.category === "JavaScript" &&
+            userStats.completedCategories["JavaScript"] === true,
+          points: 150,
+        },
+        {
+          key: "DOM_WIZARD",
+          condition:
+            action === "EXERCISE_COMPLETED" &&
+            metadata.category === "DOM Manipulation" &&
+            userStats.completedCategories["DOM Manipulation"] === true,
+          points: 100,
+        },
+        {
+          key: "FULL_STACK_BUILDER",
+          condition:
+            action === "EXERCISE_COMPLETED" &&
+            Object.keys(userStats.exercisesByCategory).length >= 3,
+          points: 90,
+        },
+        {
+          key: "DIFFICULTY_CLIMBER",
+          condition:
+            action === "EXERCISE_COMPLETED" &&
+            (userStats.exercisesByDifficulty.beginner || 0) > 0 &&
+            (userStats.exercisesByDifficulty.intermediate || 0) > 0 &&
+            (userStats.exercisesByDifficulty.advanced || 0) > 0,
+          points: 125,
+        },
+
+        // Exercise Achievements - Learning & Progress
+        {
+          key: "PROBLEM_SOLVER",
+          condition:
+            action === "EXERCISE_COMPLETED" &&
+            metadata.attempts === 2,
+          points: 40,
+        },
+        {
+          key: "PERSISTENT_LEARNER",
+          condition:
+            action === "EXERCISE_COMPLETED" &&
+            (metadata.attempts || 0) >= 3,
+          points: 60,
+        },
+        {
+          key: "CALCULATOR_MASTER",
+          condition:
+            action === "EXERCISE_COMPLETED" &&
+            metadata.exerciseId === "calculator",
+          points: 30,
+        },
+        {
+          key: "FORM_VALIDATOR_PRO",
+          condition:
+            action === "EXERCISE_COMPLETED" &&
+            metadata.exerciseId === "form-validation",
+          points: 30,
+        },
       ];
 
       // Check each achievement
@@ -264,12 +375,30 @@ export class AchievementService {
    * Get user statistics for achievement checking
    */
   private static async getUserStats(userId: string) {
-    const [tutorialProgress, challengeProgress] = await Promise.all([
+    const [
+      tutorialProgress,
+      challengeProgress,
+      exerciseProgress,
+      exerciseAttempts,
+      allExercises,
+    ] = await Promise.all([
       prisma.tutorialProgress.findMany({
         where: { userId, quizPassed: true },
       }),
       prisma.challengeProgress.findMany({
         where: { userId, passed: true },
+      }),
+      prisma.exerciseProgress.findMany({
+        where: { userId, passed: true },
+        include: { exercise: true },
+      }),
+      prisma.exerciseAttempt.findMany({
+        where: { userId },
+        include: { exercise: true },
+      }),
+      prisma.exercise.findMany({
+        where: { published: true },
+        select: { category: true, id: true },
       }),
     ]);
 
@@ -300,10 +429,63 @@ export class AchievementService {
       return counts;
     }, {} as Record<string, number>);
 
+    // Calculate exercise stats
+    const exercisesCompleted = exerciseProgress.length;
+    const exercisesCompletedNoHints = exerciseAttempts.filter(
+      (attempt) => attempt.passed && !attempt.hintsUsed
+    ).length;
+
+    // Group exercises by category
+    const exercisesByCategory = exerciseProgress.reduce((acc, progress) => {
+      const category = progress.exercise.category;
+      if (!acc[category]) acc[category] = [];
+      acc[category].push(progress.exerciseId);
+      return acc;
+    }, {} as Record<string, string[]>);
+
+    // Group exercises by difficulty
+    const exercisesByDifficulty = exerciseProgress.reduce((acc, progress) => {
+      const difficulty = progress.exercise.difficulty;
+      if (!acc[difficulty]) acc[difficulty] = 0;
+      acc[difficulty]++;
+      return acc;
+    }, {} as Record<string, number>);
+
+    // Count first-try passes (passed on first attempt)
+    const firstTryPasses = exerciseProgress.filter(
+      (progress) => progress.attempts === 1
+    ).length;
+
+    // Count exercises with multiple attempts
+    const multipleAttemptPasses = exerciseProgress.filter(
+      (progress) => progress.attempts >= 3
+    ).length;
+
+    // Calculate category completion status
+    const totalExercisesByCategory = allExercises.reduce((acc, exercise) => {
+      if (!acc[exercise.category]) acc[exercise.category] = 0;
+      acc[exercise.category]++;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const completedCategories: Record<string, boolean> = {};
+    for (const category in exercisesByCategory) {
+      const totalInCategory = totalExercisesByCategory[category] || 0;
+      const completedInCategory = exercisesByCategory[category].length;
+      completedCategories[category] = completedInCategory >= totalInCategory && totalInCategory > 0;
+    }
+
     return {
       tutorialsStarted: allTutorialProgress.length,
       quizzesCompleted: tutorialProgress.length,
       challengesCompleted: challengeProgress.length,
+      exercisesCompleted,
+      exercisesCompletedNoHints,
+      exercisesByCategory,
+      exercisesByDifficulty,
+      firstTryPasses,
+      multipleAttemptPasses,
+      completedCategories,
       totalPoints,
       chillQuizzes: moodCounts.CHILL || 0,
       focusedQuizzes: moodCounts.FOCUSED || 0,

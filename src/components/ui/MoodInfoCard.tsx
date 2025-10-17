@@ -22,7 +22,7 @@ export const MoodInfoCard: React.FC<MoodInfoCardProps> = ({
     >
       <div className="flex items-center gap-4">
         <span className="text-4xl">
-          <Icon className="w-5 h-5" />;
+          <Icon className="w-5 h-5" />
         </span>
         <div>
           <h3 className={`text-xl font-bold mb-2 ${moodColors.text}`}>

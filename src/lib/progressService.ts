@@ -44,6 +44,18 @@ export interface ProjectSubmission {
   mood: string;
 }
 
+export interface ExerciseSubmission {
+  exerciseId: string;
+  html?: string;
+  css?: string;
+  js?: string;
+  passed: boolean;
+  passedTests: number;
+  timeSpent: number;
+  hintsUsed: boolean;
+  mood: string;
+}
+
 interface QuizQuestion {
   id: number;
   question: string;
@@ -349,6 +361,139 @@ export class ProgressService {
 
     return {
       attempt: challengeAttempt,
+      progress,
+      passed: submission.passed,
+      achievements, // Include achievements in response
+    };
+  }
+
+  /**
+   * Submit an exercise attempt and update exercise progress
+   */
+  static async submitExerciseAttempt(
+    userId: string,
+    submission: ExerciseSubmission
+  ) {
+    // Create exercise attempt record
+    const exerciseAttempt = await prisma.exerciseAttempt.create({
+      data: {
+        userId,
+        exerciseId: submission.exerciseId,
+        html: submission.html,
+        css: submission.css,
+        js: submission.js,
+        passed: submission.passed,
+        passedTests: submission.passedTests,
+        timeSpent: submission.timeSpent,
+        hintsUsed: submission.hintsUsed,
+        mood: submission.mood as MoodId,
+      },
+    });
+
+    // Get current progress to determine attempts count
+    const currentProgress = await prisma.exerciseProgress.findUnique({
+      where: {
+        userId_exerciseId: {
+          userId,
+          exerciseId: submission.exerciseId,
+        },
+      },
+    });
+
+    // Update or create exercise progress
+    const progress = await prisma.exerciseProgress.upsert({
+      where: {
+        userId_exerciseId: {
+          userId,
+          exerciseId: submission.exerciseId,
+        },
+      },
+      update: {
+        attempts: {
+          increment: 1,
+        },
+        passed: submission.passed || undefined, // Only update if passed
+        status: submission.passed
+          ? CompletionStatus.COMPLETED
+          : CompletionStatus.IN_PROGRESS,
+        bestTime:
+          submission.passed && submission.timeSpent
+            ? {
+                set: Math.min(
+                  submission.timeSpent,
+                  currentProgress?.bestTime ?? 999999
+                ),
+              }
+            : undefined,
+        completedAt: submission.passed ? new Date() : undefined,
+        updatedAt: new Date(),
+      },
+      create: {
+        userId,
+        exerciseId: submission.exerciseId,
+        status: submission.passed
+          ? CompletionStatus.COMPLETED
+          : CompletionStatus.IN_PROGRESS,
+        passed: submission.passed,
+        attempts: 1,
+        bestTime: submission.passed ? submission.timeSpent : null,
+        completedAt: submission.passed ? new Date() : null,
+      },
+      include: {
+        exercise: true,
+      },
+    });
+
+    // Check for achievements and update study plan if exercise was passed
+    let achievements: Array<{
+      achievement: {
+        id: string;
+        title: string;
+        description: string;
+        icon: string;
+      };
+    }> = [];
+    if (submission.passed) {
+      achievements = await AchievementService.checkAndUnlockAchievements({
+        userId,
+        action: "EXERCISE_COMPLETED",
+        metadata: {
+          timeSpent: submission.timeSpent,
+          mood: submission.mood as MoodId,
+          exerciseId: progress.exercise.slug,
+          hintsUsed: submission.hintsUsed,
+          attempts: progress.attempts,
+          category: progress.exercise.category,
+          difficulty: progress.exercise.difficulty,
+        },
+      });
+
+      // Update study plan progress
+      const exercise = await prisma.exercise.findUnique({
+        where: { id: submission.exerciseId },
+        select: { slug: true },
+      });
+
+      if (exercise?.slug) {
+        await StudyPlanService.updateStudyPlanProgressOnCompletion(
+          userId,
+          "exercise",
+          exercise.slug
+        );
+      }
+
+      // Share exercise completion to social feed if user has sharing enabled
+      await this.shareExerciseCompletion(
+        userId,
+        submission.exerciseId,
+        submission.timeSpent,
+        submission.mood,
+        submission.hintsUsed
+      );
+    }
+
+    return {
+      attempt: exerciseAttempt,
       progress,
       passed: submission.passed,
       achievements, // Include achievements in response
@@ -901,6 +1046,63 @@ export class ProgressService {
       });
     } catch (error) {
       console.error("Error sharing challenge completion:", error);
+    }
+  }
+
+  /**
+   * Share exercise completion to social feed
+   */
+  private static async shareExerciseCompletion(
+    userId: string,
+    exerciseId: string,
+    timeSpent: number,
+    mood: string,
+    hintsUsed: boolean
+  ) {
+    try {
+      // Check if user has social sharing enabled
+      const userSettings = await prisma.userSettings.findUnique({
+        where: { userId },
+      });
+
+      if (userSettings && userSettings.shareProgress === false) {
+        return; // User has explicitly disabled progress sharing
+      }
+
+      // Get exercise information
+      const exercise = await prisma.exercise.findUnique({
+        where: { id: exerciseId },
+        select: { title: true, difficulty: true, category: true },
+      });
+
+      if (!exercise) {
+        return;
+      }
+
+      let description = `🎨 Completed the "${exercise.title}" exercise`;
+      if (!hintsUsed) {
+        description = `💡 Solved "${exercise.title}" without hints!`;
+      }
+
+      await prisma.progressShare.create({
+        data: {
+          userId,
+          type: "exercise_completed",
+          title: `✏️ ${exercise.title}`,
+          description,
+          data: {
+            timeSpent,
+            mood,
+            exerciseId,
+            difficulty: exercise.difficulty,
+            category: exercise.category,
+            hintsUsed,
+          },
+          visibility: "FRIENDS",
+        },
+      });
+    } catch (error) {
+      console.error("Error sharing exercise completion:", error);
     }
   }
 }

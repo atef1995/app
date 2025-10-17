@@ -9,13 +9,14 @@ import {
   BookOpen,
   Code,
   Brain,
-  Hand,
   Building,
   ToolCase,
   GitPullRequest,
   FileText,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
+import { PageLayout } from "@/components/ui/PageLayout";
 
 interface ProgressStats {
   tutorials: {
@@ -64,20 +65,12 @@ export default function DashboardPage() {
 
   // Authenticated dashboard
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <PageLayout
+      subtitle="Ready to continue your web development journey? Choose your learning path below."
+      title={`Welcome back, ${session?.user.name?.split(" ")[0]}`}
+    >
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-3">
-            Welcome back, {session?.user.name?.split(" ")[0]}!{" "}
-            <Hand className="h-8 w-8 text-yellow-500" />
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Ready to continue your JavaScript journey? Choose your learning path
-            below.
-          </p>
-        </div>
-
+      <div className="container">
         {/* Mood Selector */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
@@ -87,10 +80,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Learning Paths */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
           <Link
             href="/tutorials"
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-blue-200 dark:hover:border-blue-400 dark:shadow-xl"
+            className="bg-white min-h-full dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-blue-200 dark:hover:border-blue-400 dark:shadow-xl"
           >
             <div className="mb-4 flex justify-center">
               <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -99,10 +92,28 @@ export default function DashboardPage() {
               Tutorials
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Interactive JavaScript lessons with code examples
+              Interactive Web Development lessons with code examples
             </p>
             <div className="text-sm text-blue-600 dark:text-blue-400 font-semibold">
               Start Learning →
+            </div>
+          </Link>
+
+          <Link
+            href="/exercises"
+            className=" min-h-full bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-indigo-200 dark:hover:border-indigo-400 dark:shadow-xl"
+          >
+            <div className="mb-4 flex justify-center">
+              <Zap className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              Exercises
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Interactive coding exercises with test validation
+            </p>
+            <div className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
+              Start Exercising →
             </div>
           </Link>
 
@@ -184,7 +195,7 @@ export default function DashboardPage() {
 
           <Link
             href="/contributions"
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-cyan-200 dark:hover:border-cyan-400 dark:shadow-xl"
+            className=" min-h-full flex flex-col justify-between bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-cyan-200 dark:hover:border-cyan-400 dark:shadow-xl"
           >
             <div className="mb-4 flex justify-center">
               <GitPullRequest className="h-8 w-8 text-cyan-600 dark:text-cyan-400" />
@@ -258,6 +269,6 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

@@ -26,16 +26,16 @@ export function SignupCTA({
   if (variant === "banner" && showBenefits) {
     return (
       <div
-        className={`bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl p-8 shadow-xl ${className}`}
+        className={`bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-800/70 dark:from-60% dark:to-purple-800/70 text-white rounded-2xl p-8 shadow-xl ${className}`}
       >
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="h-6 w-6" />
-            <h3 className="text-2xl font-bold">Unlock Your Full Learning Potential</h3>
+            <h3 className="text-2xl font-bold">
+              Unlock Your Full Learning Potential
+            </h3>
           </div>
-          <p className="text-blue-100 mb-6 text-lg">
-            {displayMessage}
-          </p>
+          <p className="text-blue-100 mb-6 text-lg">{displayMessage}</p>
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <div className="flex items-start gap-3">
               <CheckCircle2 className="h-5 w-5 text-blue-200 mt-1 flex-shrink-0" />
@@ -76,7 +76,7 @@ export function SignupCTA({
           </div>
           <Link
             href="/auth/signin"
-            className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 transition-all hover:scale-105 shadow-lg"
+            className="inline-flex items-center gap-2 bg-white dark:bg-purple-800 dark:text-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 transition-all hover:scale-105 shadow-lg"
           >
             Sign Up Free - It&apos;s Quick!
             <ArrowRight className="h-5 w-5" />

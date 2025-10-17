@@ -24,7 +24,7 @@ export function useAntiCheat({
       "Bruh, really? 💀 Just use your brain instead of trying to copy!",
       "Caught you red-handed! 🚨 No cap, cheating ain't it chief",
       "Sus behavior detected 👀 Stop trying to cheat and actually learn!",
-      "Yo, we see you! 😂 Put those copy skills toward learning JavaScript",
+      "Yo, we see you! 😂 Put those copy skills toward learning",
       "Nice try, but we're not NPCs 🤖 Close those dev tools and focus!",
       "Sheesh! 😬 Imagine trying to cheat on a learning platform...",
       "This ain't it, bestie 💅 Learn it properly or you'll get rekt later",

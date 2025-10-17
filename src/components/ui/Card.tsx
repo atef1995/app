@@ -1,6 +1,6 @@
 "use client";
 
-import { Crown, Sparkles, Lock, ArrowRight, Clock } from "lucide-react";
+import { Crown, Sparkles, Lock, ArrowRight, Clock, Loader } from "lucide-react";
 import { useMood } from "@/components/providers/MoodProvider";
 import getMoodColors from "@/lib/getMoodColors";
 import { useMoodColors } from "@/hooks/useMoodColors";
@@ -17,6 +17,7 @@ interface CardProps {
   description?: string;
   footer?: React.ReactNode;
   actions?: React.ReactNode;
+  loading?: boolean;
 }
 
 // Helper component for consistent action buttons
@@ -71,10 +72,11 @@ export const CardAction = {
     </span>
   ),
 
-  TimeInfo: ({ time }: { time: string }) => (
+  TimeInfo: ({ time }: { time: string | number }) => (
     <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
       <Clock className="h-4 w-4" />
       {time}
+      <span>min</span>
     </span>
   ),
 };
@@ -91,6 +93,7 @@ export default function Card({
   description,
   footer,
   actions,
+  loading,
 }: CardProps) {
   const { currentMood } = useMood();
   const { bg, border, gradient, text, button } = useMoodColors();
@@ -196,6 +199,7 @@ export default function Card({
           isPremium ? "opacity-30 pointer-events-none" : ""
         }`}
       >
+        {loading && <Loader className="absolute" />}
         {/* Main content area */}
         <div className="p-6 flex-1">{children}</div>
 

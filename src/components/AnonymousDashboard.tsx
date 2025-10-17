@@ -10,26 +10,29 @@ import {
   Sparkles,
   GitPullRequest,
   ToolCase,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
+import { PageLayout } from "./ui/PageLayout";
 
 export function AnonymousDashboard() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <PageLayout>
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container">
         {/* Hero Section */}
         <div className="mb-8 text-center">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4 shadow-lg">
             <Sparkles className="h-4 w-4" />
             Welcome to Vibed to Cracked
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            Master JavaScript Your Way
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 capitalize">
+            Master full-stack web development Your Way
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-6">
-            Choose your mood, pick your pace, and start learning JavaScript with
-            interactive tutorials designed for your vibe.
+            Choose your mood, pick your pace, and start your journey as a
+            full-stack web developer with interactive tutorials designed for
+            your vibe.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <SignupCTA variant="primary" message="Start Learning Free" />
@@ -59,7 +62,7 @@ export function AnonymousDashboard() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
             Choose Your Learning Path
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
             <Link
               href="/tutorials"
               className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-blue-200 dark:hover:border-blue-400 dark:shadow-xl group"
@@ -71,7 +74,7 @@ export function AnonymousDashboard() {
                 Tutorials
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-4 text-center text-sm">
-                Interactive JavaScript lessons with live code examples
+                Interactive code lessons with live code examples
               </p>
               <div className="text-sm text-blue-600 dark:text-blue-400 font-semibold text-center">
                 Start Learning →
@@ -80,6 +83,32 @@ export function AnonymousDashboard() {
                 <p className="text-xs text-center text-gray-500 dark:text-gray-500">
                   <span className="font-semibold text-green-600 dark:text-green-400">
                     5 free tutorials
+                  </span>{" "}
+                  without signup
+                </p>
+              </div>
+            </Link>
+
+            <Link
+              href="/exercises"
+              className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-indigo-200 dark:hover:border-indigo-400 dark:shadow-xl group"
+            >
+              <div className="mb-4 flex justify-center">
+                <Zap className="h-12 w-12 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 text-center">
+                Exercises
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4 text-center text-sm">
+                Interactive coding exercises with test validation
+              </p>
+              <div className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold text-center">
+                Start Exercising →
+              </div>
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-center text-gray-500 dark:text-gray-500">
+                  <span className="font-semibold text-green-600 dark:text-green-400">
+                    Free access
                   </span>{" "}
                   without signup
                 </p>
@@ -126,9 +155,6 @@ export function AnonymousDashboard() {
               href="/projects"
               className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-orange-200 dark:hover:border-orange-400 dark:shadow-xl group relative"
             >
-              <div className="absolute top-4 right-4 bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 text-xs font-bold px-2 py-1 rounded-full">
-                Signup Required
-              </div>
               <div className="mb-4 flex justify-center">
                 <Building className="h-12 w-12 text-orange-600 dark:text-orange-400 group-hover:scale-110 transition-transform" />
               </div>
@@ -152,12 +178,9 @@ export function AnonymousDashboard() {
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
             <Link
-              href="/auth/signin?feature=contributions"
+              href="/contributions"
               className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-cyan-200 dark:hover:border-cyan-400 dark:shadow-xl group relative"
             >
-              <div className="absolute top-4 right-4 bg-cyan-100 dark:bg-cyan-900 text-cyan-600 dark:text-cyan-300 text-xs font-bold px-2 py-1 rounded-full">
-                Signup Required
-              </div>
               <div className="mb-4 flex justify-center">
                 <GitPullRequest className="h-12 w-12 text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform" />
               </div>
@@ -203,6 +226,6 @@ export function AnonymousDashboard() {
         {/* Signup Benefits Section */}
         <SignupCTA variant="banner" showBenefits={true} className="mb-8" />
       </div>
-    </div>
+    </PageLayout>
   );
 }

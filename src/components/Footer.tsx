@@ -1,19 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Github,
-  Twitter,
-  Mail,
-  Heart,
-  Code,
-  BookOpen,
-  Users,
-  Bug,
-} from "lucide-react";
+import { Mail, Heart, Code, BookOpen, Users, Bug } from "lucide-react";
 import { useMood } from "@/components/providers/MoodProvider";
 import getMoodColors from "@/lib/getMoodColors";
 import { getMoodIcon } from "@/lib/getMoodIcon";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
+import { InstagramIcon } from "./icons/InstagramIcon";
 
 export function Footer() {
   const { currentMood } = useMood();
@@ -65,10 +58,20 @@ export function Footer() {
     // { name: "GitHub", href: "https://github.com", icon: Github },
     // { name: "Twitter", href: "https://twitter.com", icon: Twitter },
     { name: "Email", href: "mailto:atef@vibed-to-cracked.com", icon: Mail },
+    {
+      name: "TikTok",
+      href: "https://www.tiktok.com/@atefcoding?_t=ZN-90dG9Lkegbu&_r=1",
+      icon: TikTokIcon,
+    },
+    {
+      name: "Instagram",
+      href: "https://www.instagram.com/atefcodes/",
+      icon: InstagramIcon,
+    },
   ];
 
   return (
-    <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-20">
+    <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
       <div className="container mx-auto px-4 py-12">
         {/* Main Footer Content */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-8">
@@ -100,7 +103,7 @@ export function Footer() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  className="text-gray-400 hover:text-gray-400 dark:hover:text-gray-300 transition-colors"
                   aria-label={social.name}
                 >
                   <social.icon className="h-5 w-5" />

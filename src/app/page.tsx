@@ -151,9 +151,9 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Master JavaScript and build 10 real portfolio projects in 12 weeks.
-            Mood-adaptive learning that fits YOUR energy level - no burnout,
-            just results.
+            Become a full-stack web developer and build 10 real portfolio
+            projects in 12 weeks. Mood-adaptive learning that fits YOUR energy
+            level - no burnout, just results.
           </motion.p>
           <motion.div
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
@@ -500,7 +500,7 @@ export default function HomePage() {
                     topics: "Events, Dynamic Pages",
                   },
                   {
-                    title: "OOP JavaScript",
+                    title: "OOP Typescript",
                     duration: "3-4 hrs",
                     topics: "Classes, Inheritance",
                   },

@@ -5,17 +5,19 @@
  * Encourages signup with benefits and strong CTAs.
  */
 
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Lock, Sparkles, CheckCircle, Zap } from 'lucide-react';
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Lock, Sparkles, CheckCircle, Zap } from "lucide-react";
 
 interface AnonymousLimitReachedProps {
   category: string;
 }
 
-export default function AnonymousLimitReached({ category }: AnonymousLimitReachedProps) {
+export default function AnonymousLimitReached({
+  category,
+}: AnonymousLimitReachedProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
       <motion.div
@@ -37,7 +39,8 @@ export default function AnonymousLimitReached({ category }: AnonymousLimitReache
         </h1>
 
         <p className="text-lg text-center text-gray-600 dark:text-gray-300 mb-8">
-          You&apos;ve viewed <span className="font-bold text-purple-600">5 tutorials</span> —
+          You&apos;ve viewed{" "}
+          <span className="font-bold text-purple-600">5 tutorials</span> —
           that&apos;s awesome! Ready to unlock unlimited learning?
         </p>
 
@@ -50,7 +53,7 @@ export default function AnonymousLimitReached({ category }: AnonymousLimitReache
                 Unlimited Access to All Tutorials
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Browse our entire library of JavaScript tutorials
+                Browse our entire library of Web development tutorials
               </p>
             </div>
           </div>

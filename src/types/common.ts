@@ -38,6 +38,7 @@ export type ReviewAssignmentStatus =
 export type AchievementAction =
   | "QUIZ_COMPLETED"
   | "CHALLENGE_COMPLETED"
+  | "EXERCISE_COMPLETED"
   | "PROJECT_COMPLETED"
   | "TUTORIAL_STARTED"
   | "STREAK_UPDATED"
@@ -76,5 +77,9 @@ export interface AchievementMetadata {
   mood?: string;
   tutorialId?: string;
   challengeId?: string;
+  exerciseId?: string;
   projectId?: string;
+  hintsUsed?: boolean;
+  attempts?: number;
+  category?: string;
 }

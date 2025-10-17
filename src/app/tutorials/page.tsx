@@ -121,7 +121,7 @@ export default function TutorialsPage() {
 
   return (
     <PageLayout
-      title="JavaScript Tutorials"
+      title="Tutorials"
       subtitle={`Interactive lessons tailored to your ${currentMood.name.toLowerCase()} learning style`}
     >
       {/* Mood Impact */}

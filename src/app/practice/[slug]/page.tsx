@@ -383,13 +383,13 @@ export default function ChallengePage({ params }: ChallengePageProps) {
   }, [timeLeft, isTimedOut, handleTimeout]);
 
   // Loading state
-  if (!session || !resolvedParams || !challenge) {
+  if (!resolvedParams || !challenge) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400 mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-300">
-            Loading challenge...
+            something bad happened
           </p>
         </div>
       </div>
@@ -516,11 +516,11 @@ export default function ChallengePage({ params }: ChallengePageProps) {
                 {currentMood.name} Energy 🎯
               </h2>
               <p className="text-purple-700 dark:text-purple-300">
-                {
-                  challenge.moodAdaptations.find(
-                    adaptation => adaptation.mood.toLowerCase() === currentMood.id.toLowerCase()
-                  )?.content || "Get ready to tackle this challenge!"
-                }
+                {challenge.moodAdaptations.find(
+                  (adaptation) =>
+                    adaptation.mood.toLowerCase() ===
+                    currentMood.id.toLowerCase()
+                )?.content || "Get ready to tackle this challenge!"}
               </p>
             </div>
 

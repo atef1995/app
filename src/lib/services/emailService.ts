@@ -261,7 +261,7 @@ class EmailService {
         <body>
           <div class="header">
             <h1>Welcome to Vibed to Cracked! 🚀</h1>
-            <p>Your JavaScript learning journey starts now</p>
+            <p>Your web development learning journey starts now</p>
           </div>
           
           <div class="content">
@@ -269,7 +269,7 @@ class EmailService {
       moodEmojis[user.mood] || "👋"
     }</h2>
             
-            <p>Welcome to the most mood-driven JavaScript learning platform on the web! We're excited to have you on board.</p>
+            <p>Welcome to the most mood-driven web development learning platform on the web! We're excited to have you on board.</p>
             
             <div class="mood-badge">
               <strong>Your Current Mood:</strong> ${user.mood} ${
@@ -346,7 +346,7 @@ class EmailService {
               } learning style!</strong>
             </div>
             
-            <p>Don't miss out on this opportunity to level up your JavaScript skills with premium content and features.</p>
+            <p>Don't miss out on this opportunity to level up your Programming skills with premium content and features.</p>
             
             <a href="${promotion.ctaUrl}" class="cta-button">${
       promotion.ctaText
@@ -406,7 +406,7 @@ class EmailService {
             
             <p>We noticed it's been ${daysSinceActive} day${
       daysSinceActive > 1 ? "s" : ""
-    } since your last coding session. Your JavaScript skills are missing you!</p>
+    } since your last coding session. Your Programming skills are missing you!</p>
             
             ${
               reminderData.streak
@@ -427,7 +427,7 @@ class EmailService {
                 : ""
             }
             
-            <p>Remember, consistency is key to mastering JavaScript. Even 15 minutes of practice can make a huge difference!</p>
+            <p>Remember, consistency is key to become a web developer. Even 15 minutes of practice can make a huge difference!</p>
             
             <h3>Quick Study Options:</h3>
             <ul>
@@ -1087,11 +1087,18 @@ class EmailService {
     return titles[day] || `Day ${day}`;
   }
 
-  private generateFreeCourseTemplate(email: string, day: number, name?: string): string {
+  private generateFreeCourseTemplate(
+    email: string,
+    day: number,
+    name?: string
+  ): string {
     const userName = name || "there";
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
-    const courseDays: Record<number, { title: string; content: string; exercise: string; tutorialSlug: string }> = {
+    const courseDays: Record<
+      number,
+      { title: string; content: string; exercise: string; tutorialSlug: string }
+    > = {
       1: {
         title: "Variables & Data Types",
         content: `
@@ -1114,8 +1121,9 @@ let isLearning = true;
 console.log(\`Hello, \${userName}!\`);
           </pre>
         `,
-        exercise: "Create 3 variables: your name (string), your age (number), and whether you're excited to learn (boolean). Then console.log them!",
-        tutorialSlug: "fundamentals/variables-and-data-types"
+        exercise:
+          "Create 3 variables: your name (string), your age (number), and whether you're excited to learn (boolean). Then console.log them!",
+        tutorialSlug: "fundamentals/variables-and-data-types",
       },
       2: {
         title: "Functions & Scope",
@@ -1140,8 +1148,9 @@ const greeting = greetUser("Alex");
 console.log(greeting); // "Hello, Alex! Welcome to JavaScript!"
           </pre>
         `,
-        exercise: "Write a function called 'calculateAge' that takes a birth year and returns the person's age.",
-        tutorialSlug: "fundamentals/functions-and-scope"
+        exercise:
+          "Write a function called 'calculateAge' that takes a birth year and returns the person's age.",
+        tutorialSlug: "fundamentals/functions-and-scope",
       },
       3: {
         title: "Arrays & Objects",
@@ -1171,8 +1180,9 @@ const developer = {
 console.log(developer.name); // "Jamie"
           </pre>
         `,
-        exercise: "Create an array of your favorite programming languages and an object representing yourself as a developer.",
-        tutorialSlug: "fundamentals/arrays-and-objects"
+        exercise:
+          "Create an array of your favorite programming languages and an object representing yourself as a developer.",
+        tutorialSlug: "fundamentals/arrays-and-objects",
       },
       4: {
         title: "DOM Manipulation",
@@ -1198,8 +1208,9 @@ button.addEventListener('click', () => {
 });
           </pre>
         `,
-        exercise: "Create a button that changes the text of a heading when clicked.",
-        tutorialSlug: "dom/dom-manipulation"
+        exercise:
+          "Create a button that changes the text of a heading when clicked.",
+        tutorialSlug: "dom/dom-manipulation",
       },
       5: {
         title: "Build Your First Project",
@@ -1235,13 +1246,15 @@ document.querySelector('#increment').addEventListener('click', () => {
 
           <p><strong>Ready for more?</strong> Sign up for our full platform to access advanced projects, quizzes, and personalized learning!</p>
         `,
-        exercise: "Complete the counter app with decrement and reset functionality. Share it with a friend!",
-        tutorialSlug: "tutorials"
-      }
+        exercise:
+          "Complete the counter app with decrement and reset functionality. Share it with a friend!",
+        tutorialSlug: "tutorials",
+      },
     };
 
     const dayContent = courseDays[day];
-    if (!dayContent) return this.generateDefaultCourseTemplate(email, day, userName);
+    if (!dayContent)
+      return this.generateDefaultCourseTemplate(email, day, userName);
 
     return `
       <!DOCTYPE html>
@@ -1278,12 +1291,16 @@ document.querySelector('#increment').addEventListener('click', () => {
             </div>
 
             <p style="text-align: center; margin: 30px 0;">
-              <a href="${baseUrl}/tutorials/category/${dayContent.tutorialSlug}" class="cta-button">
+              <a href="${baseUrl}/tutorials/category/${
+      dayContent.tutorialSlug
+    }" class="cta-button">
                 Read Full Tutorial →
               </a>
             </p>
 
-            ${day === 5 ? `
+            ${
+              day === 5
+                ? `
               <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0;">
                 <h3>🎉 Congratulations on Completing the Course!</h3>
                 <p>Ready to take your skills to the next level?</p>
@@ -1291,9 +1308,13 @@ document.querySelector('#increment').addEventListener('click', () => {
                   View Premium Plans
                 </a>
               </div>
-            ` : `
-              <p><small>Tomorrow: Day ${day + 1} - ${this.getCourseDayTitle(day + 1)}</small></p>
-            `}
+            `
+                : `
+              <p><small>Tomorrow: Day ${day + 1} - ${this.getCourseDayTitle(
+                    day + 1
+                  )}</small></p>
+            `
+            }
           </div>
 
           <div class="footer">
@@ -1305,7 +1326,11 @@ document.querySelector('#increment').addEventListener('click', () => {
     `;
   }
 
-  private generateDefaultCourseTemplate(email: string, day: number, userName: string): string {
+  private generateDefaultCourseTemplate(
+    email: string,
+    day: number,
+    userName: string
+  ): string {
     return `
       <!DOCTYPE html>
       <html>
@@ -1375,7 +1400,7 @@ document.querySelector('#increment').addEventListener('click', () => {
             `
                 : ""
             }
-            <p>Vibed to Cracked<br>Learn JavaScript at Your Own Pace</p>
+            <p>Vibed to Cracked<br>Become a full-stack web developer at Your Own Pace</p>
             <p><a href="${baseUrl}">Visit Our Platform</a> | <a href="${baseUrl}/contact">Contact Support</a></p>
           </div>
         </body>

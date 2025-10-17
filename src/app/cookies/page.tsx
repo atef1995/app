@@ -3,7 +3,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Cookie Policy - Vibed to Cracked",
   description:
-    "Cookie Policy for Vibed to Cracked JavaScript learning platform",
+    "Cookie Policy for Vibed to Cracked Web Development learning platform",
 };
 
 export default function CookiesPage() {

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import {
   Check,
   X,
@@ -13,10 +14,18 @@ import {
   Trophy,
 } from "lucide-react";
 import CodeEditor from "../CodeEditor";
+import { submitExerciseAction } from "@/lib/actions";
+import { useToast } from "@/hooks/useToast";
+import { ToastContainer } from "./Toast";
 
 interface TestCase {
   description: string;
-  validate: (html: string, css: string, js: string) => boolean | Promise<boolean>;
+  validate: (
+    html: string,
+    css: string,
+    js: string,
+    iframeWindow?: Window | null
+  ) => boolean | Promise<boolean>;
 }
 
 interface ValidatedExerciseProps {
@@ -35,6 +44,7 @@ interface ValidatedExerciseProps {
   showHtmlEditor?: boolean;
   showCssEditor?: boolean;
   showJsEditor?: boolean;
+  exerciseId?: string;
 }
 
 export function ValidatedExercise({
@@ -49,16 +59,32 @@ export function ValidatedExercise({
   showHtmlEditor = true,
   showCssEditor = true,
   showJsEditor = true,
+  exerciseId,
 }: ValidatedExerciseProps) {
+  const { data: session } = useSession();
+  const toast = useToast();
   const [html, setHtml] = useState(initialHtml);
   const [css, setCss] = useState(initialCss);
   const [js, setJs] = useState(initialJs);
-  const [activeTab, setActiveTab] = useState<"html" | "css" | "js" | "preview">("html");
-  const [testResults, setTestResults] = useState<Array<{ passed: boolean; description: string }>>([]);
+  const [activeTab, setActiveTab] = useState<"html" | "css" | "js" | "preview">(
+    "html"
+  );
+  const [testResults, setTestResults] = useState<
+    Array<{ passed: boolean; description: string }>
+  >([]);
   const [isChecking, setIsChecking] = useState(false);
   const [allPassed, setAllPassed] = useState(false);
   const [showHints, setShowHints] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
+  const [solutionLoaded, setSolutionLoaded] = useState(false);
+  const [hintsViewed, setHintsViewed] = useState(false);
+  const [startTime, setStartTime] = useState<number>(Date.now());
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Reset start time when exercise loads
+  useEffect(() => {
+    setStartTime(Date.now());
+  }, [exerciseId]);
 
   const generatePreviewHTML = () => {
     return `<!DOCTYPE html>
@@ -90,12 +116,18 @@ export function ValidatedExercise({
     setIsChecking(true);
     setTestResults([]);
 
+    // Get iframe window for functional testing
+    const iframeWindow = iframeRef.current?.contentWindow;
+
+    // Small delay to ensure iframe content is fully loaded
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     const results = [];
     let passedCount = 0;
 
     for (const testCase of testCases) {
       try {
-        const passed = await testCase.validate(html, css, js);
+        const passed = await testCase.validate(html, css, js, iframeWindow);
         results.push({
           passed,
           description: testCase.description,
@@ -112,6 +144,58 @@ export function ValidatedExercise({
     setTestResults(results);
     const allTestsPassed = passedCount === testCases.length;
     setAllPassed(allTestsPassed);
+
+    // Submit to server if user is logged in and all tests passed
+    if (allTestsPassed && session?.user && exerciseId) {
+      const timeSpent = Math.floor((Date.now() - startTime) / 1000); // Convert to seconds
+
+      // Check if solution was used
+      if (solutionLoaded) {
+        toast.warning(
+          "Solution Used",
+          "Nice work! But using the solution doesn't count towards achievements. Try solving it on your own next time!"
+        );
+      } else {
+        try {
+          const result = await submitExerciseAction(
+            exerciseId,
+            html,
+            css,
+            js,
+            true,
+            passedCount,
+            timeSpent,
+            hintsViewed
+          );
+
+          if (result.success) {
+            toast.success(
+              "Exercise Completed!",
+              "Great job! Your progress has been saved."
+            );
+
+            // Show achievement toasts
+            if (result.achievements && result.achievements.length > 0) {
+              result.achievements.forEach((ua) => {
+                toast.achievement(
+                  `${ua.achievement.icon} ${ua.achievement.title}`,
+                  ua.achievement.description
+                );
+              });
+            }
+          } else if (result.error) {
+            toast.error("Submission Failed", result.error);
+          }
+        } catch (error) {
+          console.error("Error submitting exercise:", error);
+          toast.error(
+            "Submission Failed",
+            "Failed to save your progress. Please try again."
+          );
+        }
+      }
+    }
+
     setIsChecking(false);
   };
 
@@ -123,6 +207,9 @@ export function ValidatedExercise({
     setAllPassed(false);
     setShowHints(false);
     setShowSolution(false);
+    setSolutionLoaded(false);
+    setHintsViewed(false);
+    setStartTime(Date.now());
   };
 
   const loadSolution = () => {
@@ -131,6 +218,11 @@ export function ValidatedExercise({
       if (solution.css) setCss(solution.css);
       if (solution.js) setJs(solution.js);
       setShowSolution(true);
+      setSolutionLoaded(true);
+      toast.info(
+        "Solution Loaded",
+        "Remember: using the solution won't count for achievements. Try solving it yourself!"
+      );
     }
   };
 
@@ -169,7 +261,9 @@ export function ValidatedExercise({
         <h4 className="text-blue-800 dark:text-blue-300 font-semibold text-sm mb-1">
           📝 Exercise Instructions:
         </h4>
-        <p className="text-blue-700 dark:text-blue-200 text-sm">{instructions}</p>
+        <p className="text-blue-700 dark:text-blue-200 text-sm">
+          {instructions}
+        </p>
       </div>
 
       {/* Success Message */}
@@ -179,6 +273,19 @@ export function ValidatedExercise({
             <Trophy className="w-5 h-5" />
             <span className="font-semibold">
               Congratulations! You passed all tests! 🎉
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Solution Warning */}
+      {solutionLoaded && (
+        <div className="bg-orange-50 dark:bg-orange-900/20 border-b-2 border-orange-200 dark:border-orange-700 px-4 py-3">
+          <div className="flex items-center gap-2 text-orange-800 dark:text-orange-300">
+            <Lightbulb className="w-5 h-5" />
+            <span className="text-sm">
+              You&apos;re viewing the solution. Submissions won&apos;t count for
+              achievements.
             </span>
           </div>
         </div>
@@ -275,6 +382,7 @@ export function ValidatedExercise({
         {activeTab === "preview" && (
           <div className="h-[25rem]">
             <iframe
+              ref={iframeRef}
               srcDoc={generatePreviewHTML()}
               title="Preview"
               className="w-full h-full border-0"
@@ -317,7 +425,12 @@ export function ValidatedExercise({
       {hints.length > 0 && (
         <div className="border-t-2 border-gray-200 dark:border-gray-700 p-4">
           <button
-            onClick={() => setShowHints(!showHints)}
+            onClick={() => {
+              if (!showHints) {
+                setHintsViewed(true);
+              }
+              setShowHints(!showHints);
+            }}
             className="flex items-center gap-2 text-yellow-600 dark:text-yellow-400 font-medium cursor-pointer hover:text-yellow-700 dark:hover:text-yellow-300"
           >
             <Lightbulb className="w-4 h-4" />
@@ -358,6 +471,9 @@ export function ValidatedExercise({
           )}
         </button>
       </div>
+
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toast.toasts} onRemove={toast.removeToast} />
     </div>
   );
 }

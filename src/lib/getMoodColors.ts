@@ -36,7 +36,7 @@ const getMoodColors = (currentMoodId: string) => {
     default: // chill
       return {
         gradient:
-          "from-blue-50 via-pink-50 to-indigo-50 dark:from-blue-900/20 dark:via-pink-900/20 dark:to-indigo-900/20",
+          "from-blue-50 via-blue-50 to-indigo-50 dark:from-blue-900/20 dark:via-blue-900/30 dark:to-indigo-900/20",
         bg: "bg-blue-50 dark:bg-blue-900/20",
         accent:
           "bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800",

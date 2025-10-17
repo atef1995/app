@@ -267,9 +267,7 @@ async function seedContributionProjects() {
   });
 
   console.log(`✅ Created project: ${portfolioProject.title}`);
-  console.log(
-    `   Features: ${(portfolioProject.features as any[]).length}`
-  );
+  console.log(`   Features: ${(portfolioProject.features as any[]).length}`);
 
   // REST API Project - Highly valued by employers
   const apiProject = await prisma.contributionProject.upsert({

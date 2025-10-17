@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { exerciseAchievements } from "./seedExerciseAchievements";
 
 const prisma = new PrismaClient();
 
@@ -396,6 +397,9 @@ const achievements = [
     requirementValue: 5,
     isHidden: true,
   },
+
+  // Import exercise achievements from separate file for easier management
+  ...exerciseAchievements,
 ];
 
 async function seedAchievements() {

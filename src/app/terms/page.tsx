@@ -3,7 +3,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms of Service - Vibed to Cracked",
   description:
-    "Terms of Service for Vibed to Cracked JavaScript learning platform",
+    "Terms of Service for Vibed to Cracked web development learning platform",
 };
 
 export default function TermsPage() {
@@ -40,10 +40,10 @@ export default function TermsPage() {
             </h2>
             <div className="space-y-4 text-gray-700 dark:text-gray-300">
               <p>
-                Vibed to Cracked is a mood-driven JavaScript learning platform
-                that provides interactive tutorials, coding challenges, quizzes,
-                and educational content. Our service includes both free and
-                premium content, with different subscription tiers offering
+                Vibed to Cracked is a mood-driven web development learning
+                platform that provides interactive tutorials, coding challenges,
+                quizzes, and educational content. Our service includes both free
+                and premium content, with different subscription tiers offering
                 varying levels of access.
               </p>
             </div>

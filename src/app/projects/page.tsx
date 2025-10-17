@@ -7,7 +7,6 @@ import { useProjects } from "@/hooks/useProjectQueries";
 import { useCategories } from "@/hooks/useTutorialQueries";
 import ProjectCard from "@/components/ui/ProjectCard";
 import { PageLayout } from "@/components/ui/PageLayout";
-import { MoodInfoCard } from "@/components/ui/MoodInfoCard";
 import { ContentGrid } from "@/components/ui/ContentGrid";
 import { useMood } from "@/components/providers/MoodProvider";
 import {
@@ -29,30 +28,6 @@ export default function ProjectsPage() {
 
   const projectsQuery = useProjects(selectedCategory || undefined);
   const categoriesQuery = useCategories(1, 100); // Get all categories in one page
-
-  if (!session) {
-    return (
-      <PageLayout
-        title="Projects"
-        subtitle="Build real applications and get peer feedback"
-      >
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <Code className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
-              Please sign in to access projects.
-            </p>
-            <Link
-              href="/auth/signin"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              Sign in here
-            </Link>
-          </div>
-        </div>
-      </PageLayout>
-    );
-  }
 
   if (projectsQuery.isLoading || categoriesQuery.isLoading) {
     return (
@@ -112,9 +87,6 @@ export default function ProjectsPage() {
       title="Build & Share Projects"
       subtitle={`Apply your skills in real-world projects • ${currentMood.name} mode`}
     >
-      {/* Mood Info Card */}
-      <MoodInfoCard className="mb-8" />
-
       {/* Hero Section */}
       <div className="mb-12 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-8">
         <div className="text-center max-w-4xl mx-auto">

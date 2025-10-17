@@ -46,7 +46,7 @@ interface CodeEditorProps {
 const CodeEditor: React.FC<CodeEditorProps> = ({
   initialCode = "",
   readOnly = false,
-  height = "100%",
+  height = "440px",
   placeholder,
   onCodeChange,
   canRun = true,
@@ -69,7 +69,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     if (initialCode.trim() && editorRef.current) {
       setTimeout(() => {
         editorRef.current?.getAction("editor.action.formatDocument")?.run();
-      }, 1000);
+      }, 40000);
     }
   }, [initialCode]);
 

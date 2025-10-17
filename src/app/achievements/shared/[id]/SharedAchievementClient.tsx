@@ -53,13 +53,19 @@ const rarityEmojis = {
   LEGENDARY: "💎",
 };
 
-export default function SharedAchievementClient({ params }: { params: Promise<{ id: string }> }) {
+export default function SharedAchievementClient({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { data: session, status } = useSession();
   const [achievement, setAchievement] = useState<Achievement | null>(null);
   const [sharer, setSharer] = useState<Sharer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
+    null
+  );
 
   useEffect(() => {
     const resolveParams = async () => {
@@ -76,23 +82,27 @@ export default function SharedAchievementClient({ params }: { params: Promise<{ 
       try {
         // Get URL search parameters to check for sharedBy
         const urlParams = new URLSearchParams(window.location.search);
-        const sharedBy = urlParams.get('sharedBy');
-        
-        const apiUrl = `/api/achievements/${resolvedParams.id}${sharedBy ? `?sharedBy=${sharedBy}` : ''}`;
+        const sharedBy = urlParams.get("sharedBy");
+
+        const apiUrl = `/api/achievements/${resolvedParams.id}${
+          sharedBy ? `?sharedBy=${sharedBy}` : ""
+        }`;
         const response = await fetch(apiUrl);
-        
+
         if (!response.ok) {
           throw new Error("Achievement not found");
         }
-        
+
         const data = await response.json();
         setAchievement(data.achievement);
-        
+
         if (data.sharer) {
           setSharer(data.sharer);
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load achievement");
+        setError(
+          err instanceof Error ? err.message : "Failed to load achievement"
+        );
       } finally {
         setLoading(false);
       }
@@ -106,7 +116,9 @@ export default function SharedAchievementClient({ params }: { params: Promise<{ 
 
     const shareData = {
       title: `🏆 ${achievement.title} - Vibed to Cracked`,
-      text: `Check out this ${achievement.rarity.toLowerCase()} achievement I unlocked: "${achievement.title}"!`,
+      text: `Check out this ${achievement.rarity.toLowerCase()} achievement I unlocked: "${
+        achievement.title
+      }"!`,
       url: window.location.href,
     };
 
@@ -139,7 +151,9 @@ export default function SharedAchievementClient({ params }: { params: Promise<{ 
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-green-900 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-6">
           <Trophy className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-2">Achievement Not Found</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">
+            Achievement Not Found
+          </h1>
           <p className="text-gray-300 mb-6">
             This achievement might have been removed or the link is invalid.
           </p>
@@ -167,7 +181,7 @@ export default function SharedAchievementClient({ params }: { params: Promise<{ 
             <ArrowLeft className="h-4 w-4" />
             Back to Vibed to Cracked
           </Link>
-          
+
           {/* Sharer Information */}
           {sharer && (
             <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
@@ -175,7 +189,7 @@ export default function SharedAchievementClient({ params }: { params: Promise<{ 
                 {sharer.image ? (
                   <Image
                     src={sharer.image}
-                    alt={sharer.name || sharer.username || 'User'}
+                    alt={sharer.name || sharer.username || "User"}
                     width={40}
                     height={40}
                     className="rounded-full border-2 border-white/20"
@@ -187,10 +201,12 @@ export default function SharedAchievementClient({ params }: { params: Promise<{ 
                 )}
                 <div className="flex-1">
                   <p className="text-white font-medium">
-                    {sharer.name || sharer.username || 'Someone'} unlocked this achievement!
+                    {sharer.name || sharer.username || "Someone"} unlocked this
+                    achievement!
                   </p>
                   <p className="text-gray-300 text-sm">
-                    Unlocked on {new Date(sharer.unlockedAt).toLocaleDateString()}
+                    Unlocked on{" "}
+                    {new Date(sharer.unlockedAt).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="text-2xl">🎉</div>
@@ -204,14 +220,24 @@ export default function SharedAchievementClient({ params }: { params: Promise<{ 
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center border border-white/20">
             {/* Achievement Icon and Title */}
             <div className="mb-6">
-              <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-r ${rarityColors[achievement.rarity]} mb-4`}>
+              <div
+                className={`inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-r ${
+                  rarityColors[achievement.rarity]
+                } mb-4`}
+              >
                 <span className="text-4xl">{achievement.icon}</span>
               </div>
               <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-2xl">{rarityEmojis[achievement.rarity]}</span>
-                <h1 className="text-3xl font-bold text-white">{achievement.title}</h1>
+                <span className="text-2xl">
+                  {rarityEmojis[achievement.rarity]}
+                </span>
+                <h1 className="text-3xl font-bold text-white">
+                  {achievement.title}
+                </h1>
               </div>
-              <p className="text-xl text-gray-300 capitalize">{achievement.rarity.toLowerCase()} Achievement</p>
+              <p className="text-xl text-gray-300 capitalize">
+                {achievement.rarity.toLowerCase()} Achievement
+              </p>
             </div>
 
             {/* Description */}
@@ -224,7 +250,9 @@ export default function SharedAchievementClient({ params }: { params: Promise<{ 
               <div className="bg-white/5 rounded-lg p-4">
                 <Target className="h-6 w-6 text-blue-400 mx-auto mb-2" />
                 <p className="text-sm text-gray-400">Category</p>
-                <p className="text-white font-semibold capitalize">{achievement.category}</p>
+                <p className="text-white font-semibold capitalize">
+                  {achievement.category}
+                </p>
               </div>
               <div className="bg-white/5 rounded-lg p-4">
                 <Star className="h-6 w-6 text-yellow-400 mx-auto mb-2" />
@@ -235,12 +263,11 @@ export default function SharedAchievementClient({ params }: { params: Promise<{ 
                 <Calendar className="h-6 w-6 text-green-400 mx-auto mb-2" />
                 <p className="text-sm text-gray-400">Status</p>
                 <p className="text-white font-semibold">
-                  {achievement.isUnlocked && achievement.unlockedAt 
+                  {achievement.isUnlocked && achievement.unlockedAt
                     ? new Date(achievement.unlockedAt).toLocaleDateString()
-                    : achievement.isUnlocked 
-                    ? "Unlocked" 
-                    : "Not Unlocked"
-                  }
+                    : achievement.isUnlocked
+                    ? "Unlocked"
+                    : "Not Unlocked"}
                 </p>
               </div>
             </div>
@@ -260,9 +287,12 @@ export default function SharedAchievementClient({ params }: { params: Promise<{ 
             ) : session ? (
               <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-6">
                 <Users className="h-8 w-8 text-green-400 mx-auto mb-3" />
-                <h3 className="text-xl font-semibold text-white mb-2">Welcome back!</h3>
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  Welcome back!
+                </h3>
                 <p className="text-gray-300 mb-4">
-                  Ready to unlock more achievements? Continue your coding journey!
+                  Ready to unlock more achievements? Continue your coding
+                  journey!
                 </p>
                 <Link
                   href="/achievements"
@@ -275,9 +305,13 @@ export default function SharedAchievementClient({ params }: { params: Promise<{ 
             ) : (
               <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-6">
                 <Trophy className="h-8 w-8 text-blue-400 mx-auto mb-3" />
-                <h3 className="text-xl font-semibold text-white mb-2">Start Your Journey!</h3>
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  Start Your Journey!
+                </h3>
                 <p className="text-gray-300 mb-4">
-                  Join Vibed to Cracked and unlock achievements like this one! Master JavaScript through interactive challenges and track your progress.
+                  Join Vibed to Cracked and unlock achievements like this one!
+                  Master Web Development through interactive challenges and
+                  track your progress.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Link

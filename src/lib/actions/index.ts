@@ -2,3 +2,4 @@
 export { startTutorialAction } from "./tutorial-actions";
 export { startChallengeAction, submitChallengeAction } from "./challenge-actions";
 export { submitQuizAction } from "./quiz-actions";
+export { submitExerciseAction } from "./exercise-actions";

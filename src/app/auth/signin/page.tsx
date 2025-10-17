@@ -37,24 +37,24 @@ function SignInContent() {
       // Check for anonymous session and convert it
       const convertAnonymousSession = async () => {
         try {
-          const anonymousId = localStorage.getItem('vibed_anonymous_id');
+          const anonymousId = localStorage.getItem("vibed_anonymous_id");
           if (anonymousId) {
-            const response = await fetch('/api/auth/convert-anonymous', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+            const response = await fetch("/api/auth/convert-anonymous", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ anonymousId }),
             });
 
             if (response.ok) {
               const data = await response.json();
-              console.log('Anonymous session converted:', data);
+              console.log("Anonymous session converted:", data);
               // Clear anonymous data from localStorage
-              localStorage.removeItem('vibed_anonymous_id');
-              localStorage.removeItem('vibed_anonymous_session');
+              localStorage.removeItem("vibed_anonymous_id");
+              localStorage.removeItem("vibed_anonymous_session");
             }
           }
         } catch (error) {
-          console.error('Failed to convert anonymous session:', error);
+          console.error("Failed to convert anonymous session:", error);
           // Don't block signin on conversion failure
         }
       };
@@ -129,7 +129,7 @@ function SignInContent() {
             <span className="text-purple-600">Cracked</span>
           </h1>
           <p className="text-gray-600">
-            Sign in to start your mood-driven JavaScript learning journey
+            Sign in to start your mood-driven Web Development learning journey
           </p>
         </div>
 

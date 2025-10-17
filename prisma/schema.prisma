@@ -101,6 +101,10 @@ model User {
   contributionSubmissions ContributionSubmission[]
   contributionReviews     ContributionReview[]
 
+  // Exercises system relations
+  exerciseAttempts ExerciseAttempt[]
+  exerciseProgress ExerciseProgress[]
+
   @@map("users")
 }
 
@@ -1010,4 +1014,86 @@ model CourseSubscriber {
   @@index([status])
   @@index([createdAt])
   @@map("course_subscribers")
+}
+
+model Exercise {
+  id            String             @id @default(cuid())
+  slug          String             @unique
+  title         String
+  description   String             @db.Text
+  difficulty    String             @default("beginner") // beginner, intermediate, advanced
+  category      String
+  estimatedTime Int                @default(15) // in minutes
+  instructions  String             @db.Text
+  initialHtml    String?           @db.Text
+  initialCss     String?           @db.Text
+  initialJs      String?           @db.Text
+  showHtmlEditor Boolean           @default(true)
+  showCssEditor  Boolean           @default(true)
+  showJsEditor   Boolean           @default(true)
+  testCases     Json               @default("[]") // Array of { description, validate }
+  hints         String[]           @default([])
+  solution      Json               @default("{}") // { html, css, js }
+  topics        String[]           @default([])
+  isPremium     Boolean            @default(false)
+  requiredPlan  String             @default("FREE")
+  published     Boolean            @default(true)
+  order         Int                @default(0)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  attempts      ExerciseAttempt[]
+  progress      ExerciseProgress[]
+
+  @@index([difficulty])
+  @@index([category])
+  @@index([published, order])
+  @@map("exercises")
+}
+
+model ExerciseAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  exerciseId  String
+  html        String?  @db.Text
+  css         String?  @db.Text
+  js          String?  @db.Text
+  passed      Boolean  @default(false)
+  passedTests Int      @default(0)
+  timeSpent   Int? // in seconds
+  hintsUsed   Boolean  @default(false)
+  mood        String
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise    Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([exerciseId])
+  @@map("exercise_attempts")
+}
+
+model ExerciseProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  exerciseId  String
+  status      String    @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, COMPLETED
+  passed      Boolean   @default(false)
+  attempts    Int       @default(0)
+  bestTime    Int? // in seconds
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise    Exercise  @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, exerciseId])
+  @@index([userId, passed])
+  @@map("exercise_progress")
+}
+
+model ExerciseProgressAggregate {
+  id        String @id @default(cuid())
+  total     Int    @default(0)
+  completed Int    @default(0)
+
+  @@map("exercise_progress_aggregate")
 }
